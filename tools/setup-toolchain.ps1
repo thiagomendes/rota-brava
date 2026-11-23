@@ -5,7 +5,7 @@
   sem tocar em %APPDATA%. Idempotente; verifica SHA-256 de cada download.
 #>
 [CmdletBinding()]
-param([switch]$Force)
+param([switch]$Force, [switch]$SkipBlender)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $cfg = (Get-Content (Join-Path $PSScriptRoot 'toolchain.json') -Raw | ConvertFrom-Json).godot
@@ -48,3 +48,18 @@ if (-not (Test-Path (Join-Path $tplTarget 'windows_release_x86_64.exe')) -or $Fo
 & $console --version
 if ($LASTEXITCODE -ne 0) { throw 'Godot instalada nao respondeu a --version.' }
 Write-Host "Godot pronta em $dir"
+
+# Blender portatil (zip oficial, hash conferido) em .tools/blender. Use -SkipBlender para pular.
+if (-not $SkipBlender) {
+    $bl = (Get-Content (Join-Path $PSScriptRoot 'toolchain.json') -Raw | ConvertFrom-Json).blender
+    $blDir = Join-Path $root '.tools/blender'
+    $blExe = Join-Path $blDir "$($bl.folder)/$($bl.exe)"
+    if (-not (Test-Path $blExe) -or $Force) {
+        $zip = Get-Verified $bl "blender-$($bl.version)-windows-x64.zip"
+        New-Item -ItemType Directory -Force -Path $blDir | Out-Null
+        Expand-Archive -Path $zip -DestinationPath $blDir -Force
+    }
+    & $blExe --background --version | Select-Object -First 1
+    if ($LASTEXITCODE -ne 0) { throw 'Blender instalado nao respondeu a --version.' }
+    Write-Host "Blender pronto em $blDir"
+}
