@@ -84,6 +84,20 @@ func _panel(parent: Node, color: Color = Color(0.04, 0.1, 0.13, 0.82)) -> PanelC
 	return p
 
 
+## Ancora o controle num ponto relativo a tela (ax, ay em 0..1) com deslocamento em pixels; cresce para os lados indicados.
+func _anchor(c: Control, ax: float, ay: float, ox: float, oy: float, grow_h: Control.GrowDirection, grow_v: Control.GrowDirection) -> void:
+	c.anchor_left = ax
+	c.anchor_right = ax
+	c.anchor_top = ay
+	c.anchor_bottom = ay
+	c.offset_left = ox
+	c.offset_right = ox
+	c.offset_top = oy
+	c.offset_bottom = oy
+	c.grow_horizontal = grow_h
+	c.grow_vertical = grow_v
+
+
 func _label(parent: Node, size: int = FONT, color: Color = Color.WHITE) -> Label:
 	var l := Label.new()
 	l.add_theme_font_size_override("font_size", size)
@@ -122,9 +136,7 @@ func _build_objective(root: Control) -> void:
 func _build_member(root: Control) -> void:
 	_member_panel = _panel(root)
 	_member_panel.name = "MemberPanel"
-	_member_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_member_panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_member_panel.position = Vector2(-32, 28)
+	_anchor(_member_panel, 1.0, 0.0, -32.0, 28.0, Control.GROW_DIRECTION_BEGIN, Control.GROW_DIRECTION_END)
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 14)
 	_member_panel.add_child(h)
@@ -139,10 +151,7 @@ func _build_member(root: Control) -> void:
 func _build_prompt(root: Control) -> void:
 	_prompt_panel = _panel(root, Color(0.1, 0.07, 0.02, 0.9))
 	_prompt_panel.name = "PromptPanel"
-	_prompt_panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	_prompt_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_prompt_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_prompt_panel.position = Vector2(-220, -300)
+	_anchor(_prompt_panel, 0.5, 1.0, 0.0, -230.0, Control.GROW_DIRECTION_BOTH, Control.GROW_DIRECTION_BEGIN)
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 16)
 	_prompt_panel.add_child(h)
@@ -163,10 +172,7 @@ func _build_prompt(root: Control) -> void:
 func _build_subtitle(root: Control) -> void:
 	_sub_panel = _panel(root, Color(0, 0, 0, 0.78))
 	_sub_panel.name = "SubtitlePanel"
-	_sub_panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	_sub_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_sub_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_sub_panel.position = Vector2(-560, -40)
+	_anchor(_sub_panel, 0.5, 1.0, 0.0, -40.0, Control.GROW_DIRECTION_BOTH, Control.GROW_DIRECTION_BEGIN)
 	var v := VBoxContainer.new()
 	_sub_panel.add_child(v)
 	_sub_speaker = _label(v, 30, Color("ffd24d"))

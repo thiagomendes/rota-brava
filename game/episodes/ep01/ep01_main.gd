@@ -51,6 +51,8 @@ func _ready() -> void:
 	for m: StringName in [&"tracker", &"climber", &"pilot"]:
 		var a := MemberActor.new()
 		a.setup(m)
+		# Nascem longe do mapa: cada estagio reposiciona quem usa (evita atores empilhados na origem).
+		a.position = Vector3(500, 5, 500)
 		world.add_child(a)
 		actors[m] = a
 	boat = BoatActor.new()
