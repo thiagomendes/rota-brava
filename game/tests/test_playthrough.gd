@@ -21,8 +21,8 @@ func run(runner) -> void:
 	main.director.state_changed.connect(func(_old: StringName, new: StringName) -> void: visited.append(new))
 	var bot := Ep01DemoBot.new()
 	bot.main = main
-	bot.timeout_seconds = 1200.0
-	bot.log_steps = false
+	bot.timeout_seconds = 500.0
+	bot.log_steps = true
 	main.add_child(bot)
 	var result := {"done": false, "ok": false}
 	bot.finished.connect(func(ok: bool) -> void:

@@ -21,6 +21,7 @@ var _wp_state: StringName = &""
 var _tapped_at: float = -10.0
 var _complete_wait: float = 0.0
 var _held: Dictionary = {}
+var _tries: Dictionary = {}
 
 
 func _ready() -> void:
@@ -59,6 +60,7 @@ func _physics_process(delta: float) -> void:
 	if state != _wp_state:
 		_wp_state = state
 		_wp_index = 0
+		_tries.clear()
 		_step("estado %s" % state)
 	if main.controlled_node == null:
 		_release_all()
@@ -67,7 +69,7 @@ func _physics_process(delta: float) -> void:
 		&"dock_investigation":
 			_seek_interactable(delta)
 		&"river_search":
-			_drive_boat_waypoints(_river_waypoints(), 6.0, 1.0)
+			_drive_boat_waypoints(_river_waypoints(), 2.8, 0.6)
 		&"island_crossing":
 			_island(delta)
 		&"docking":
@@ -173,11 +175,15 @@ func _seek_interactable(delta: float) -> void:
 	var here := main.controlled_node.global_position
 	var best: Ep01Interactable = null
 	var best_d := INF
+	var best_tries := 1 << 30
 	for it in _usable_targets():
 		var d := it.distance_to(here)
-		if d < best_d:
+		var tries: int = _tries.get(it.action_id, 0)
+		# Prefere o que ainda nao tentou; entre iguais, o mais proximo.
+		if tries < best_tries or (tries == best_tries and d < best_d):
 			best = it
 			best_d = d
+			best_tries = tries
 	if best == null:
 		_release_all()
 		return
@@ -188,6 +194,7 @@ func _seek_interactable(delta: float) -> void:
 			_idle = 0.0
 			_tapped_at = elapsed
 			_step("interage %s" % best.action_id)
+			_tries[best.action_id] = int(_tries.get(best.action_id, 0)) + 1
 			_tap(&"interact")
 	else:
 		_idle = 0.0
@@ -228,6 +235,10 @@ func _drive_boat_waypoints(points: Array[Vector3], reach: float, throttle: float
 	var boat := main.boat
 	var d := points[_wp_index] - boat.global_position
 	d.y = 0.0
+	if log_steps and int(elapsed) % 5 == 0 and absf(elapsed - roundf(elapsed)) < 0.02:
+		print("[RB] bot barco pos=(%.1f, %.1f) rumo=%.2f vel=%.2f alvo#%d=(%.1f, %.1f) dist=%.1f" % [
+			boat.global_position.x, boat.global_position.z, boat.heading, boat.speed,
+			_wp_index, points[_wp_index].x, points[_wp_index].z, d.length()])
 	if d.length() <= reach:
 		_wp_index += 1
 		return false
