@@ -58,6 +58,7 @@ func _ready() -> void:
 	boat = BoatActor.new()
 	world.add_child(boat)
 	boat.place(Ep01Layout.BOAT_DOCKED_POS, Ep01Layout.BOAT_DOCKED_HEADING)
+	BoatVfx.attach(boat)
 	camera_rig = CameraRig.new()
 	add_child(camera_rig)
 	_load_stages()
@@ -76,6 +77,8 @@ func _ready() -> void:
 		_begin_normal()
 	else:
 		start_at(StringName(start))
+	if _has_flag("--perf-probe"):
+		add_child(PerfProbe.new())
 	if _has_flag("--ep01-demo"):
 		var bot := Ep01DemoBot.new()
 		bot.main = self
@@ -95,30 +98,9 @@ func _has_flag(flag: String) -> bool:
 
 
 func _build_environment() -> void:
-	var env := Environment.new()
-	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color("9fd3e6")
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color("dfeaf2")
-	env.ambient_light_energy = 0.7
-	var we := WorldEnvironment.new()
-	we.environment = env
-	add_child(we)
-	var sun := DirectionalLight3D.new()
-	sun.name = "Sun"
-	sun.rotation_degrees = Vector3(-55, -35, 0)
-	sun.light_energy = 1.1
-	sun.shadow_enabled = true
-	add_child(sun)
-	var water := MeshInstance3D.new()
-	water.name = "Water"
-	var pm := PlaneMesh.new()
-	pm.size = Vector2(340, 160)
-	water.mesh = pm
-	water.material_override = Blocks.material(Color("2f8f9d"))
-	water.position = Vector3(55, Ep01Layout.WATER_Y, 0)
-	water.set_meta(Blocks.PROVISIONAL, true)
-	add_child(water)
+	Atmosphere.build(self)
+	add_child(WaterSurface.new())
+	Atmosphere.add_vignette(self)
 
 
 func _load_stages() -> void:
