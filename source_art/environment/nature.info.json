@@ -1,0 +1,369 @@
+{
+  "ground_tile_a": {
+    "glb": "game/assets/models/environment/ground_tile_a.glb",
+    "tris": 3664,
+    "materials": [
+      "mat_env_ground"
+    ],
+    "vertices": 1921,
+    "bbox_min": [
+      -4.0,
+      -0.35,
+      -6.5
+    ],
+    "bbox_max": [
+      4.0,
+      0.0,
+      6.5
+    ],
+    "size": [
+      8.0,
+      0.35,
+      13.0
+    ],
+    "objects": [
+      "Ground_Tile_A_Surface"
+    ],
+    "empties": [
+      "TileOrigin"
+    ]
+  },
+  "ground_tile_b": {
+    "glb": "game/assets/models/environment/ground_tile_b.glb",
+    "tris": 3664,
+    "materials": [
+      "mat_env_ground"
+    ],
+    "vertices": 1921,
+    "bbox_min": [
+      -4.0,
+      -0.35,
+      -6.5
+    ],
+    "bbox_max": [
+      4.0,
+      0.0,
+      6.5
+    ],
+    "size": [
+      8.0,
+      0.35,
+      13.0
+    ],
+    "objects": [
+      "Ground_Tile_B_Surface"
+    ],
+    "empties": [
+      "TileOrigin.001"
+    ]
+  },
+  "ground_tile_path": {
+    "glb": "game/assets/models/environment/ground_tile_path.glb",
+    "tris": 1936,
+    "materials": [
+      "mat_env_ground"
+    ],
+    "vertices": 1041,
+    "bbox_min": [
+      -2.0,
+      -0.35,
+      -6.5
+    ],
+    "bbox_max": [
+      2.0,
+      0.0,
+      6.5
+    ],
+    "size": [
+      4.0,
+      0.35,
+      13.0
+    ],
+    "objects": [
+      "Ground_Tile_Path_Surface"
+    ],
+    "empties": [
+      "TileOrigin.002"
+    ]
+  },
+  "tree_a": {
+    "glb": "game/assets/models/environment/tree_a.glb",
+    "tris": 6424,
+    "materials": [
+      "mat_env_foliage_a",
+      "mat_env_trunk"
+    ],
+    "vertices": 3228,
+    "bbox_min": [
+      -2.009,
+      -0.128,
+      -1.826
+    ],
+    "bbox_max": [
+      2.151,
+      5.172,
+      2.038
+    ],
+    "size": [
+      4.16,
+      5.3,
+      3.864
+    ],
+    "objects": [
+      "Tree_A_Crown",
+      "Tree_A_Trunk"
+    ],
+    "empties": []
+  },
+  "tree_b": {
+    "glb": "game/assets/models/environment/tree_b.glb",
+    "tris": 6068,
+    "materials": [
+      "mat_env_foliage_c",
+      "mat_env_trunk"
+    ],
+    "vertices": 3048,
+    "bbox_min": [
+      -1.198,
+      -0.053,
+      -1.027
+    ],
+    "bbox_max": [
+      1.126,
+      6.403,
+      1.058
+    ],
+    "size": [
+      2.324,
+      6.457,
+      2.085
+    ],
+    "objects": [
+      "Tree_B_Crown",
+      "Tree_B_Trunk"
+    ],
+    "empties": []
+  },
+  "tree_c": {
+    "glb": "game/assets/models/environment/tree_c.glb",
+    "tris": 5524,
+    "materials": [
+      "mat_env_foliage_b",
+      "mat_env_trunk"
+    ],
+    "vertices": 2776,
+    "bbox_min": [
+      -0.972,
+      -0.104,
+      -1.493
+    ],
+    "bbox_max": [
+      2.878,
+      4.394,
+      1.803
+    ],
+    "size": [
+      3.85,
+      4.498,
+      3.296
+    ],
+    "objects": [
+      "Tree_C_Crown",
+      "Tree_C_Trunk"
+    ],
+    "empties": []
+  },
+  "bush_round": {
+    "glb": "game/assets/models/environment/bush_round.glb",
+    "tris": 4760,
+    "materials": [
+      "mat_env_bush"
+    ],
+    "vertices": 2390,
+    "bbox_min": [
+      -0.826,
+      -0.075,
+      -0.594
+    ],
+    "bbox_max": [
+      0.836,
+      0.865,
+      0.81
+    ],
+    "size": [
+      1.662,
+      0.94,
+      1.403
+    ],
+    "objects": [
+      "Bush_Round_Leaves"
+    ],
+    "empties": []
+  },
+  "bush_flower": {
+    "glb": "game/assets/models/environment/bush_flower.glb",
+    "tris": 3752,
+    "materials": [
+      "mat_env_bush",
+      "mat_env_bush_flower"
+    ],
+    "vertices": 1910,
+    "bbox_min": [
+      -0.696,
+      -0.069,
+      -0.42
+    ],
+    "bbox_max": [
+      0.719,
+      0.806,
+      0.462
+    ],
+    "size": [
+      1.415,
+      0.875,
+      0.882
+    ],
+    "objects": [
+      "Bush_Flower_Flowers",
+      "Bush_Flower_Leaves"
+    ],
+    "empties": []
+  },
+  "grass_tuft": {
+    "glb": "game/assets/models/environment/grass_tuft.glb",
+    "tris": 240,
+    "materials": [
+      "mat_env_reed"
+    ],
+    "vertices": 144,
+    "bbox_min": [
+      -0.161,
+      -0.002,
+      -0.13
+    ],
+    "bbox_max": [
+      0.17,
+      0.412,
+      0.066
+    ],
+    "size": [
+      0.331,
+      0.414,
+      0.196
+    ],
+    "objects": [
+      "Grass_Tuft_Blades"
+    ],
+    "empties": []
+  },
+  "reeds": {
+    "glb": "game/assets/models/environment/reeds.glb",
+    "tris": 260,
+    "materials": [
+      "mat_env_reed",
+      "mat_env_trunk"
+    ],
+    "vertices": 156,
+    "bbox_min": [
+      -0.312,
+      -0.001,
+      -0.322
+    ],
+    "bbox_max": [
+      0.464,
+      1.652,
+      0.226
+    ],
+    "size": [
+      0.775,
+      1.654,
+      0.547
+    ],
+    "objects": [
+      "Reeds_Heads",
+      "Reeds_Stalks"
+    ],
+    "empties": []
+  },
+  "rock_a": {
+    "glb": "game/assets/models/environment/rock_a.glb",
+    "tris": 480,
+    "materials": [
+      "mat_env_rock"
+    ],
+    "vertices": 242,
+    "bbox_min": [
+      -0.533,
+      0.0,
+      -0.472
+    ],
+    "bbox_max": [
+      0.494,
+      0.464,
+      0.509
+    ],
+    "size": [
+      1.027,
+      0.464,
+      0.981
+    ],
+    "objects": [
+      "Rock_A_Stone"
+    ],
+    "empties": []
+  },
+  "rock_b": {
+    "glb": "game/assets/models/environment/rock_b.glb",
+    "tris": 480,
+    "materials": [
+      "mat_env_rock_warm"
+    ],
+    "vertices": 242,
+    "bbox_min": [
+      -0.304,
+      0.0,
+      -0.352
+    ],
+    "bbox_max": [
+      0.291,
+      0.263,
+      0.347
+    ],
+    "size": [
+      0.595,
+      0.263,
+      0.698
+    ],
+    "objects": [
+      "Rock_B_Stone"
+    ],
+    "empties": []
+  },
+  "rock_c": {
+    "glb": "game/assets/models/environment/rock_c.glb",
+    "tris": 480,
+    "materials": [
+      "mat_env_rock"
+    ],
+    "vertices": 242,
+    "bbox_min": [
+      -0.741,
+      0.0,
+      -0.721
+    ],
+    "bbox_max": [
+      0.858,
+      0.609,
+      0.667
+    ],
+    "size": [
+      1.599,
+      0.609,
+      1.388
+    ],
+    "objects": [
+      "Rock_C_Stone"
+    ],
+    "empties": []
+  }
+}

@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/grass_tuft.glb" id="1_3u4wh"]
+
+[node name="Grass_Tuft" type="Node3D" unique_id=1591782303]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=1381151953 instance=ExtResource("1_3u4wh")]

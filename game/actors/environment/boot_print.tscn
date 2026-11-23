@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/boot_print.glb" id="1_xl0kq"]
+
+[node name="BootPrint" type="Node3D" unique_id=660339538]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=1368602806 instance=ExtResource("1_xl0kq")]
