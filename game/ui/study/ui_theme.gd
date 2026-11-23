@@ -105,7 +105,10 @@ static func make_focusable(b: Button) -> void:
 	b.resized.connect(func() -> void: b.pivot_offset = b.size * 0.5)
 	b.focus_entered.connect(func() -> void: _scale_to(b, 1.05))
 	b.focus_exited.connect(func() -> void: _scale_to(b, 1.0))
-	b.mouse_entered.connect(func() -> void: if not b.disabled: b.grab_focus())
+	# So com o mouse de fato em movimento: uma tela nova aberta sob um mouse parado nao pode roubar o foco inicial.
+	b.mouse_entered.connect(func() -> void:
+		if not b.disabled and Input.get_last_mouse_velocity().length() > 1.0:
+			b.grab_focus())
 
 
 static func _scale_to(b: Button, s: float) -> void:
