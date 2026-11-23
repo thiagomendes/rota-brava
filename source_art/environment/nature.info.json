@@ -5,6 +5,7 @@
     "materials": [
       "mat_env_ground"
     ],
+    "vertices": 1921,
     "bbox_min": [
       -4.0,
       -0.35,
@@ -33,6 +34,7 @@
     "materials": [
       "mat_env_ground"
     ],
+    "vertices": 1921,
     "bbox_min": [
       -4.0,
       -0.35,
@@ -61,6 +63,7 @@
     "materials": [
       "mat_env_ground"
     ],
+    "vertices": 1041,
     "bbox_min": [
       -2.0,
       -0.35,
@@ -90,6 +93,7 @@
       "mat_env_foliage_a",
       "mat_env_trunk"
     ],
+    "vertices": 3228,
     "bbox_min": [
       -2.009,
       -0.128,
@@ -118,6 +122,7 @@
       "mat_env_foliage_c",
       "mat_env_trunk"
     ],
+    "vertices": 3048,
     "bbox_min": [
       -1.198,
       -0.053,
@@ -146,6 +151,7 @@
       "mat_env_foliage_b",
       "mat_env_trunk"
     ],
+    "vertices": 2776,
     "bbox_min": [
       -0.972,
       -0.104,
@@ -173,6 +179,7 @@
     "materials": [
       "mat_env_bush"
     ],
+    "vertices": 2390,
     "bbox_min": [
       -0.826,
       -0.075,
@@ -200,6 +207,7 @@
       "mat_env_bush",
       "mat_env_bush_flower"
     ],
+    "vertices": 1910,
     "bbox_min": [
       -0.696,
       -0.069,
@@ -227,6 +235,7 @@
     "materials": [
       "mat_env_reed"
     ],
+    "vertices": 144,
     "bbox_min": [
       -0.161,
       -0.002,
@@ -254,6 +263,7 @@
       "mat_env_reed",
       "mat_env_trunk"
     ],
+    "vertices": 156,
     "bbox_min": [
       -0.312,
       -0.001,
@@ -281,6 +291,7 @@
     "materials": [
       "mat_env_rock"
     ],
+    "vertices": 242,
     "bbox_min": [
       -0.533,
       0.0,
@@ -307,6 +318,7 @@
     "materials": [
       "mat_env_rock_warm"
     ],
+    "vertices": 242,
     "bbox_min": [
       -0.304,
       0.0,
@@ -333,6 +345,7 @@
     "materials": [
       "mat_env_rock"
     ],
+    "vertices": 242,
     "bbox_min": [
       -0.741,
       0.0,

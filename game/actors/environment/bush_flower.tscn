@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/bush_flower.glb" id="1_m5cky"]
 
-[node name="Bush_Flower" type="Node3D" unique_id=1134213569]
+[node name="Bush_Flower" type="Node3D" unique_id=1875530240]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=50870446 instance=ExtResource("1_m5cky")]
+[node name="Model" parent="." unique_id=1953631371 instance=ExtResource("1_m5cky")]

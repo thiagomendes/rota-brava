@@ -117,7 +117,7 @@ def gbox(bm, c, s, rx=0, ry=0, rz=0, cuts=(0, 0, 0)):
                     d = inv @ (e.verts[0].co - e.verts[1].co)
                     if abs(d[ax]) > 0.6 * d.length and e.verts[0] in mine and e.verts[1] in mine:
                         edges.add(e)
-            bmesh.ops.subdivide_edges(bm, edges=list(edges), cuts=cuts[ax], use_grid_fill=True)
+            bmesh.ops.subdivide_edges(bm, edges=sorted(edges, key=lambda e: e.index), cuts=cuts[ax], use_grid_fill=True)
     return [v for v in bm.verts if v not in before]
 
 
@@ -309,6 +309,11 @@ class Asset:
         lo, hi = self.bounds_godot()
         tris = tri_count(self.objs)
         mats = sorted({m.name for o in self.objs for m in o.data.materials})
+        nverts = 0
+        deps = bpy.context.evaluated_depsgraph_get()
+        for o in self.objs:
+            nverts += len(o.evaluated_get(deps).to_mesh().vertices)
+            o.evaluated_get(deps).to_mesh_clear()
         glb = os.path.join(glb_dir, self.name.lower() + ".glb")
         os.makedirs(glb_dir, exist_ok=True)
         bpy.ops.object.select_all(action="DESELECT")
@@ -321,7 +326,7 @@ class Asset:
         bpy.ops.export_scene.gltf(**kw)
         info[self.name.lower()] = {
             "glb": os.path.relpath(glb, REPO).replace("\\", "/"),
-            "tris": tris, "materials": mats,
+            "tris": tris, "materials": mats, "vertices": nverts,
             "bbox_min": [round(c, 3) for c in lo], "bbox_max": [round(c, 3) for c in hi],
             "size": [round(hi[i] - lo[i], 3) for i in range(3)],
             "objects": sorted(o.name for o in self.objs), "empties": sorted(e.name for e in self.empties),

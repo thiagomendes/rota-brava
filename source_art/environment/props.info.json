@@ -7,6 +7,7 @@
       "mat_env_wood_deck",
       "mat_env_wood_light"
     ],
+    "vertices": 672,
     "bbox_min": [
       -0.45,
       0.0,
@@ -39,6 +40,7 @@
       "mat_env_wood_deck",
       "mat_env_wood_light"
     ],
+    "vertices": 576,
     "bbox_min": [
       -0.31,
       0.0,
@@ -73,6 +75,7 @@
       "mat_env_wood_deck",
       "mat_env_wood_light"
     ],
+    "vertices": 2814,
     "bbox_min": [
       -0.373,
       0.0,
@@ -106,6 +109,7 @@
       "mat_env_barrel",
       "mat_env_metal"
     ],
+    "vertices": 1722,
     "bbox_min": [
       -0.373,
       0.0,
@@ -133,6 +137,7 @@
     "materials": [
       "mat_env_rope"
     ],
+    "vertices": 582,
     "bbox_min": [
       -0.335,
       0.004,
@@ -161,6 +166,7 @@
       "mat_env_metal",
       "mat_env_wood_dark"
     ],
+    "vertices": 516,
     "bbox_min": [
       -0.13,
       0.0,
@@ -195,6 +201,7 @@
       "mat_env_net",
       "mat_env_rope"
     ],
+    "vertices": 1262,
     "bbox_min": [
       -0.923,
       -1.346,
@@ -228,6 +235,7 @@
       "mat_env_wood_dark",
       "mat_env_wood_light"
     ],
+    "vertices": 372,
     "bbox_min": [
       -0.575,
       0.0,
@@ -258,6 +266,7 @@
       "mat_env_bucket",
       "mat_env_metal"
     ],
+    "vertices": 548,
     "bbox_min": [
       -0.177,
       0.0,
@@ -286,6 +295,7 @@
       "mat_env_boat_trim",
       "mat_env_wood_light"
     ],
+    "vertices": 610,
     "bbox_min": [
       -0.076,
       -0.005,
@@ -314,6 +324,7 @@
       "mat_env_cork",
       "mat_env_rope"
     ],
+    "vertices": 500,
     "bbox_min": [
       -0.2,
       0.0,
@@ -349,6 +360,7 @@
       "mat_env_wood_dark",
       "mat_env_wood_light"
     ],
+    "vertices": 2628,
     "bbox_min": [
       -1.926,
       -0.012,
@@ -387,6 +399,7 @@
     "materials": [
       "mat_env_bootprint"
     ],
+    "vertices": 382,
     "bbox_min": [
       -0.095,
       0.001,

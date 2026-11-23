@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/reeds.glb" id="1_eoml0"]
 
-[node name="Reeds" type="Node3D" unique_id=1356416760]
+[node name="Reeds" type="Node3D" unique_id=821816721]
 metadata/provisional = true
 
 [node name="Model" parent="." unique_id=731467356 instance=ExtResource("1_eoml0")]

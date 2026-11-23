@@ -6,19 +6,19 @@
 height = 2.1
 radius = 0.1
 
-[node name="Lantern_Post" type="Node3D" unique_id=367766532]
+[node name="Lantern_Post" type="Node3D" unique_id=1168730183]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=1756127546 instance=ExtResource("1_exemv")]
+[node name="Model" parent="." unique_id=1089579535 instance=ExtResource("1_exemv")]
 
-[node name="Body" type="StaticBody3D" parent="." unique_id=607276713]
+[node name="Body" type="StaticBody3D" parent="." unique_id=1288476322]
 collision_mask = 0
 
-[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=349637143]
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1030937488]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
 shape = SubResource("CylinderShape3D_ipngl")
 
-[node name="LampLight" type="OmniLight3D" parent="." unique_id=464579256]
+[node name="LampLight" type="OmniLight3D" parent="." unique_id=1608563769]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.34, 1.7, 0)
 light_color = Color(1, 0.84705883, 0.5411765, 1)
 light_energy = 1.2

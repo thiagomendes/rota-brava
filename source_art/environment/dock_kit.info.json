@@ -7,6 +7,7 @@
       "mat_env_wood_dark",
       "mat_env_wood_deck"
     ],
+    "vertices": 2328,
     "bbox_min": [
       -0.998,
       -0.22,
@@ -40,6 +41,7 @@
       "mat_env_wood_dark",
       "mat_env_wood_deck"
     ],
+    "vertices": 4480,
     "bbox_min": [
       -2.009,
       -0.22,
@@ -73,6 +75,7 @@
       "mat_env_wood_dark",
       "mat_env_wood_deck"
     ],
+    "vertices": 1286,
     "bbox_min": [
       -0.184,
       -1.604,
@@ -103,6 +106,7 @@
     "materials": [
       "mat_env_metal"
     ],
+    "vertices": 684,
     "bbox_min": [
       -0.23,
       0.0,
@@ -131,6 +135,7 @@
       "mat_env_rope",
       "mat_env_rubber"
     ],
+    "vertices": 270,
     "bbox_min": [
       -0.29,
       -0.91,
@@ -159,6 +164,7 @@
       "mat_env_wood_dark",
       "mat_env_wood_light"
     ],
+    "vertices": 440,
     "bbox_min": [
       -0.265,
       -1.24,
@@ -187,6 +193,7 @@
       "mat_env_nail",
       "mat_env_wood_dark"
     ],
+    "vertices": 216,
     "bbox_min": [
       -2.0,
       -0.111,
@@ -214,6 +221,7 @@
     "materials": [
       "mat_env_wood_dark"
     ],
+    "vertices": 1382,
     "bbox_min": [
       -0.143,
       -2.012,

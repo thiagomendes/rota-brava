@@ -44,6 +44,7 @@ foreach ($s in $sets) {
             saida_glb = $v.glb
             glb_sha256 = (Get-FileHash $v.glb -Algorithm SHA256).Hash.ToLower()
             triangulos = $v.tris
+            vertices = $v.vertices
             materiais = $v.materials
             tamanho_m = $v.size
             objetos = $v.objects
