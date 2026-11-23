@@ -116,18 +116,21 @@ func run(runner) -> void:
 	r.check(_focus(menu) == menu.play_button, "foco continua navegavel depois de fechar Opcoes")
 
 	await _tap(&"ui_accept")
-	await r.frames(2)
-	var play := r.tree.current_scene as PlayPlaceholder
-	r.check(play != null, "ui_accept em Jogar abre a tela de jogo")
+	await r.frames(3)
+	var play := r.tree.current_scene as Ep01Main
+	r.check(play != null, "ui_accept em Jogar abre o episodio")
 	if play:
-		await _tap(&"interact")
-		await _tap(&"interact")
-		r.check(play.action_count == 2, "interact incrementa o contador (2 pressoes = 2)")
-		await _tap(&"move_left")
-		r.check(play.action_count == 2, "outras intencoes nao contam como interact")
 		await _tap(&"pause")
-		await r.frames(2)
+		r.check(play.hud.pause_open and r.tree.paused, "Esc no episodio abre a pausa")
+		r.check(_focus(play) == play.hud.get("_pause_resume"), "a pausa abre com foco em Retomar")
+		await _tap(&"pause")
+		r.check(not play.hud.pause_open and not r.tree.paused, "Esc de novo retoma")
+		await _tap(&"pause")
+		await _tap(&"ui_down")
+		await _tap(&"ui_accept")
+		await r.frames(3)
 		var back := r.tree.current_scene as MainMenu
-		r.check(back != null, "pause volta ao menu")
+		r.check(back != null, "Menu na pausa volta ao menu principal")
+		r.check(not r.tree.paused, "o jogo nao fica pausado no menu")
 		if back:
 			r.check(_focus(back) == back.play_button, "foco recuperado em Jogar apos voltar")

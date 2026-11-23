@@ -2,7 +2,7 @@ class_name MainMenu
 extends Control
 ## Menu inicial: Jogar, Opcoes, Sair. Foco inicial em Jogar (SPEC secao 5, Menu e retomada).
 
-const PLAY_SCENE := "res://ui/play_placeholder.tscn"
+const PLAY_SCENE := "res://episodes/ep01/ep01_main.tscn"
 
 @onready var menu: VBoxContainer = %Menu
 @onready var play_button: Button = %PlayButton

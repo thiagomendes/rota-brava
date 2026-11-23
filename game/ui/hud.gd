@@ -354,6 +354,8 @@ func say_all(keys: Array[String]) -> void:
 ## Retorna quando nao ha mais fala na fila nem em exibicao.
 func wait_silent() -> void:
 	while is_speaking():
+		if not is_inside_tree():
+			return
 		await get_tree().process_frame
 
 
@@ -391,6 +393,8 @@ func _pump() -> void:
 		var t := 0.0
 		while t < seconds and not _skip_current:
 			await get_tree().process_frame
+			if not is_inside_tree():
+				return
 			if not pause_open:
 				t += get_process_delta_time()
 		_hint_active = false

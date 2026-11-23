@@ -228,12 +228,14 @@ func _handoff(prev: StringName, next: StringName) -> void:
 	if prev != &"":
 		text = Loc.t("ui.swap.look", {"name": Loc.member_name(prev), "other": next_name}) + "\n" + text
 	hud.open_handoff(text, next)
+	print("[RB] handoff_open %s" % next)
 	await hud.handoff_confirmed
 	_give_control(next)
 
 
 func _give_control(member: StringName) -> void:
 	_last_member = member
+	print("[RB] control %s" % member)
 	set_controlled(current_stage.controlled_node(member))
 	current_stage.control_started(member)
 
@@ -383,6 +385,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _pause() -> void:
+	print("[RB] pause")
 	get_tree().paused = true
 	hud.open_pause()
 
@@ -399,6 +402,7 @@ func _on_replay() -> void:
 
 
 func _on_menu() -> void:
+	print("[RB] back_to_menu")
 	carry_completed = director.completed_episodes.duplicate()
 	get_tree().paused = false
 	get_tree().change_scene_to_file(MENU_SCENE)
