@@ -458,7 +458,7 @@ func open_handoff(text: String, member: StringName) -> void:
 
 
 func _confirm_handoff() -> void:
-	if not handoff_open:
+	if not handoff_open or pause_open:
 		return
 	if Time.get_ticks_msec() / 1000.0 - _handoff_since < HANDOFF_MIN_SECONDS:
 		return
@@ -505,7 +505,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif choice_open and event.is_action_pressed(&"ui_cancel"):
 		get_viewport().set_input_as_handled()
 		_pick(&"")
-	elif handoff_open and event.is_action_pressed(&"interact"):
+	elif handoff_open and not pause_open and event.is_action_pressed(&"interact"):
 		get_viewport().set_input_as_handled()
 		_confirm_handoff()
 	elif event.is_action_pressed(&"ui_accept") and not choice_open and not handoff_open \

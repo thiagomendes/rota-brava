@@ -76,7 +76,38 @@ func run(runner) -> void:
 	r.check(not main.hud.prompt_visible(), "alvo de outro integrante nao aparece para o ativo")
 	it.queue_free()
 
+	# Pausa durante a troca de integrante: interact nao pode confirmar com o jogo pausado (defeito D1 da revisao).
+	var swap := (load("res://episodes/ep01/ep01_main.tscn") as PackedScene).instantiate() as Ep01Main
+	main.queue_free()
+	await r.frames(2)
+	Ep01Main.start_state = &""
+	r.tree.root.add_child(swap)
+	r.tree.current_scene = swap
+	await r.frames(3)
+	(swap.stages[&"arrival"] as ArrivalStage).skip_intro()
+	await r.tree.create_timer(1.2).timeout
+	r.check(swap.hud.handoff_open, "D1: a troca esta aberta antes de pausar")
+	await _press(&"pause")
+	r.check(swap.hud.pause_open and swap.hud.handoff_open, "D1: pausa abre por cima da troca")
+	await r.tree.create_timer(0.6).timeout
+	await _press(&"interact")
+	r.check(swap.hud.handoff_open and swap.controlled_node == null and r.tree.paused,
+		"D1: interact com a pausa aberta nao confirma a troca")
+	await _press(&"pause")
+	r.check(not r.tree.paused and swap.hud.handoff_open, "D1: retomar mantem a troca pendente")
+	await r.tree.create_timer(0.6).timeout
+	await _press(&"interact")
+	r.check(swap.controlled_node == swap.actors[&"tracker"], "D1: depois de retomar, interact confirma")
+	r.tree.paused = false
+	swap.queue_free()
+	await r.frames(2)
+	r.tree.current_scene = null
+
 	# Pausa
+	main = (load("res://episodes/ep01/ep01_main.tscn") as PackedScene).instantiate() as Ep01Main
+	r.tree.root.add_child(main)
+	r.tree.current_scene = main
+	await r.frames(3)
 	await _press(&"pause")
 	r.check(r.tree.paused and main.hud.pause_open, "Esc pausa o jogo")
 	await _press(&"pause")

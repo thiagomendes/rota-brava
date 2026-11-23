@@ -187,8 +187,12 @@ func run(runner) -> void:
 		if (n as Node).get_meta(Blocks.PROVISIONAL, false) != true:
 			unmarked += 1
 	r.check(meshes > 50 and unmarked == 0, "todos os %d blocos do rio sao provisorios (%d sem marca)" % [meshes, unmarked])
-	r.check(stage.buoy_node != null and stage.buoy_node.global_position.distance_to(Ep01Layout.BUOY_POS + Vector3(0, Ep01Layout.WATER_Y, 0)) < 0.01,
-		"a boia esta em BUOY_POS")
+	# So a posicao horizontal: a boia balanca na vertical por desenho (depende do relogio do estagio).
+	var buoy_xz := Vector2.INF
+	if stage.buoy_node != null:
+		buoy_xz = Vector2(stage.buoy_node.global_position.x, stage.buoy_node.global_position.z)
+	r.check(buoy_xz.distance_to(Vector2(Ep01Layout.BUOY_POS.x, Ep01Layout.BUOY_POS.z)) < 0.01,
+		"a boia esta em BUOY_POS (horizontal)")
 	var named := {"Captain": false, "Pup": false}
 	for n in stage.find_children("Captain*", "Node3D", true, false):
 		named["Captain"] = true
