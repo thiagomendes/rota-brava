@@ -56,6 +56,9 @@ func enter() -> void:
 
 func exit() -> void:
 	_active = false
+	_done = true
+	if _tween and _tween.is_valid():
+		_tween.kill()
 	ctx.hud.set_skip_hint(false)
 
 

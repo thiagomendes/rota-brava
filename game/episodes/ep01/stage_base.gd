@@ -36,6 +36,11 @@ func control_started(_member: StringName) -> void:
 	pass
 
 
+## Dica graduada de GESTO (antes da fala): destaque visualmente o alvo (pulso, olhar do ativo). `key` e a chave da dica.
+func gesture_hint(_key: String) -> void:
+	pass
+
+
 func process_stage(_delta: float) -> void:
 	pass
 

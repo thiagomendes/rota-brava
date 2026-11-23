@@ -8,6 +8,8 @@ const IDLE_HINT_SECONDS := 25.0
 
 ## Execucao nova: registro de conclusao sobrevive a recarga da cena (a persistencia em disco e do RB-05).
 static var carry_completed: Array[StringName] = []
+## Teste/dev: inicia direto neste estado (apos fast_forward pela API do diretor). Vazio = comeco normal.
+static var start_state: StringName = &""
 
 ## Arquivo do estagio por estado. `return_trip` usa a mesma instancia de `docking`.
 const STAGE_DIR := {
@@ -67,11 +69,11 @@ func _ready() -> void:
 	hud.menu_requested.connect(_on_menu)
 	hud.resume_requested.connect(_resume)
 	hud.pause_requested.connect(_pause)
-	var start := _user_arg("--ep01-start")
+	var start := String(start_state) if start_state != &"" else _user_arg("--ep01-start")
 	if start.is_empty():
 		_begin_normal()
 	else:
-		_start_at(StringName(start))
+		start_at(StringName(start))
 
 
 func _user_arg(flag: String) -> String:
@@ -171,6 +173,7 @@ func _transition(old: StringName, new: StringName) -> void:
 		(stages[old] as StageBase).exit()
 	_enter_stage(new)
 	if new == &"complete":
+		await hud.wait_silent()
 		await get_tree().create_timer(1.0).timeout
 		hud.open_complete()
 		return
@@ -250,7 +253,7 @@ func _begin_normal() -> void:
 
 
 ## Atalho de desenvolvimento/verificacao: avanca o diretor pela API publica ate `target` e entrega o controle.
-func _start_at(target: StringName) -> void:
+func start_at(target: StringName) -> void:
 	_silent = true
 	fast_forward(target)
 	_silent = false
@@ -354,6 +357,8 @@ func _update_idle(delta: float) -> void:
 	var h: Dictionary = hints[mini(hint_index, hints.size() - 1)]
 	hint_index += 1
 	hud.say(String(h["key"]), {}, true)
+	if String(h.get("kind", "")) == "gesture" and current_stage:
+		current_stage.gesture_hint(String(h["key"]))
 
 
 # ---------- entrada, pausa e fim ----------

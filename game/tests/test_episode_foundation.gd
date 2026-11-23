@@ -86,3 +86,19 @@ func run(runner) -> void:
 	main.queue_free()
 	await r.frames(2)
 	r.tree.current_scene = null
+
+	# Inicio direto em cada estado (atalho usado por testes e demos dos estagios).
+	for state: StringName in [&"dock_investigation", &"river_search", &"island_crossing", &"docking", &"return_trip"]:
+		Ep01Main.start_state = state
+		var m := (load("res://episodes/ep01/ep01_main.tscn") as PackedScene).instantiate() as Ep01Main
+		r.tree.root.add_child(m)
+		r.tree.current_scene = m
+		await r.frames(3)
+		var expected: StringName = m.director.ACTIVE_BY_STATE[state]
+		r.check(m.director.state == state, "start_at: diretor em %s" % state)
+		r.check(m.controlled_node != null and m.director.active_member == expected,
+			"start_at: %s controla em %s" % [expected, state])
+		m.queue_free()
+		await r.frames(2)
+		r.tree.current_scene = null
+	Ep01Main.start_state = &""

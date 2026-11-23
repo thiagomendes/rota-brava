@@ -346,6 +346,12 @@ func say_all(keys: Array[String]) -> void:
 		await line_finished
 
 
+## Retorna quando nao ha mais fala na fila nem em exibicao.
+func wait_silent() -> void:
+	while is_speaking():
+		await get_tree().process_frame
+
+
 func is_speaking() -> bool:
 	return _speaking or not _queue.is_empty()
 
