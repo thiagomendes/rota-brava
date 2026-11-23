@@ -1,0 +1,24 @@
+# Godot
+game/.godot/
+game/*.translation
+*.tmp
+export_credentials.cfg
+
+# Ferramentas e artefatos locais (reproduziveis por tools/*.ps1)
+.tools/
+build/
+captures/
+logs/
+*.log
+
+# Blender: backups automaticos
+*.blend1
+*.blend2
+
+# Segredos e sistema
+.env
+*.keystore
+*.jks
+*.p12
+Thumbs.db
+desktop.ini

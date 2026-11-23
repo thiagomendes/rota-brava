@@ -1,0 +1,17 @@
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+
+# Binarios de autoria e runtime
+*.blend binary
+*.glb binary
+*.gltf text
+*.png binary
+*.jpg binary
+*.ogg binary
+*.wav binary
+*.flac binary
+*.ttf binary
+*.otf binary
+*.exe binary
+*.pck binary
