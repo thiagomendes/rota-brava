@@ -1,0 +1,35 @@
+{
+  "tris": 3326,
+  "materials": [
+    "mat_rastro_boots",
+    "mat_rastro_face",
+    "mat_rastro_hat",
+    "mat_rastro_jacket",
+    "mat_rastro_notebook",
+    "mat_rastro_pants",
+    "mat_rastro_paper",
+    "mat_rastro_skin",
+    "mat_rastro_skin_dark"
+  ],
+  "height_m": 1.3083,
+  "min_z": 0.0011,
+  "objects": [
+    "Rastro_ArmL",
+    "Rastro_ArmR",
+    "Rastro_Body",
+    "Rastro_BootL",
+    "Rastro_BootR",
+    "Rastro_Face",
+    "Rastro_HandL",
+    "Rastro_HandR",
+    "Rastro_Hat",
+    "Rastro_HatBrim",
+    "Rastro_Head",
+    "Rastro_LegL",
+    "Rastro_LegR",
+    "Rastro_Nose",
+    "Rastro_Notebook",
+    "Rastro_NotebookPages",
+    "Rastro_Pants"
+  ]
+}
