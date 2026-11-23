@@ -1,0 +1,39 @@
+{
+  "tris": 3140,
+  "materials": [
+    "mat_boat_bench",
+    "mat_boat_cabin",
+    "mat_boat_deck",
+    "mat_boat_glass",
+    "mat_boat_hull",
+    "mat_boat_planks",
+    "mat_boat_roof",
+    "mat_boat_trim",
+    "mat_boat_wheel"
+  ],
+  "hull_extent_m": [
+    2.2,
+    5.0,
+    1.01
+  ],
+  "hull_y_range": [
+    -2.0,
+    3.0
+  ],
+  "pivot_from_stern_fraction": 0.4,
+  "objects": [
+    "BenchMark",
+    "Boat_Bench",
+    "Boat_BenchLegs",
+    "Boat_BowCleat",
+    "Boat_Cabin",
+    "Boat_CabinRoof",
+    "Boat_Deck",
+    "Boat_DeckPlanks",
+    "Boat_Helm",
+    "Boat_HelmStand",
+    "Boat_Hull",
+    "Boat_Windows",
+    "DeckPoint"
+  ]
+}

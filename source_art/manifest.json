@@ -1,0 +1,110 @@
+{
+  "projeto": "Rota Brava",
+  "ticket": "RB-03-art",
+  "ativos": [
+    {
+      "id": "rastro",
+      "nome": "Rastro",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/scripts/build_rastro.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, shape keys"
+      },
+      "origem": [
+        "source_art/scripts/build_rastro.py",
+        "source_art/scripts/rbart.py",
+        "source_art/scripts/rbchars.py",
+        "source_art/params/rastro.json",
+        "source_art/characters/rastro/rastro.blend"
+      ],
+      "saida_glb": "game/assets/models/rastro.glb",
+      "glb_sha256": "f0574318d0e3e3fb9a8a61ab2cd0a6cfe81f94d23f974f374965689860dc4218",
+      "triangulos": 3326,
+      "materiais": [
+        "mat_rastro_boots",
+        "mat_rastro_face",
+        "mat_rastro_hat",
+        "mat_rastro_jacket",
+        "mat_rastro_notebook",
+        "mat_rastro_pants",
+        "mat_rastro_paper",
+        "mat_rastro_skin",
+        "mat_rastro_skin_dark"
+      ],
+      "objetos": [
+        "Rastro_ArmL",
+        "Rastro_ArmR",
+        "Rastro_Body",
+        "Rastro_BootL",
+        "Rastro_BootR",
+        "Rastro_Face",
+        "Rastro_HandL",
+        "Rastro_HandR",
+        "Rastro_Hat",
+        "Rastro_HatBrim",
+        "Rastro_Head",
+        "Rastro_LegL",
+        "Rastro_LegR",
+        "Rastro_Nose",
+        "Rastro_Notebook",
+        "Rastro_NotebookPages",
+        "Rastro_Pants"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria; nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Corpo-base provisorio da rastreadora (candidata A: chapeu de aba larga, caderno lateral, postura curvada). Sem rig/animacao (RB-04). 3 expressoes como shape keys em Rastro_Face. Recomendacao da candidata A: a aba larga e o torso curvado leem melhor em 48 px e se distinguem de Pico (arco/corda) e Leme (bracos abertos) - gosto e decisao de Thiago."
+    },
+    {
+      "id": "boat",
+      "nome": "Barco",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/scripts/build_boat.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, shape keys"
+      },
+      "origem": [
+        "source_art/scripts/build_boat.py",
+        "source_art/scripts/rbart.py",
+        "source_art/vehicles/boat/boat.blend"
+      ],
+      "saida_glb": "game/assets/models/boat.glb",
+      "glb_sha256": "65573c95748da723ffbe3be90e1273a75bfbf6128892ccfe77d566ef70edc76b",
+      "triangulos": 3140,
+      "materiais": [
+        "mat_boat_bench",
+        "mat_boat_cabin",
+        "mat_boat_deck",
+        "mat_boat_glass",
+        "mat_boat_hull",
+        "mat_boat_planks",
+        "mat_boat_roof",
+        "mat_boat_trim",
+        "mat_boat_wheel"
+      ],
+      "objetos": [
+        "BenchMark",
+        "Boat_Bench",
+        "Boat_BenchLegs",
+        "Boat_BowCleat",
+        "Boat_Cabin",
+        "Boat_CabinRoof",
+        "Boat_Deck",
+        "Boat_DeckPlanks",
+        "Boat_Helm",
+        "Boat_HelmStand",
+        "Boat_Hull",
+        "Boat_Windows",
+        "DeckPoint"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria; nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Barco amarelo provisorio. Pivo = centro de giro: eixo longitudinal, 40% do comprimento a partir da popa. Proa em -Z na Godot. Empties DeckPoint e BenchMark."
+    }
+  ]
+}
