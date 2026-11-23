@@ -291,10 +291,13 @@ func _centered_box(overlay: Control) -> VBoxContainer:
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	safe.add_child(center)
+	# Painel opaco: titulo e botoes nao brigam com o cenario (o titulo amarelo se perdia sobre o casco amarelo).
+	var panel := _panel(center, &"ModalPanel")
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 24)
 	v.alignment = BoxContainer.ALIGNMENT_CENTER
-	center.add_child(v)
+	panel.add_child(v)
 	return v
 
 

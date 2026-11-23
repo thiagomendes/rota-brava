@@ -5,6 +5,7 @@ extends Node
 
 var _main: Ep01Main
 var _frame: int = 0
+var _prompt_text: String = ""
 
 
 func _ready() -> void:
@@ -19,22 +20,25 @@ func _process(_delta: float) -> void:
 	var hud := _main.hud
 	if hud == null:
 		return
+	# O episodio esconde a acao quando nao ha alvo; reaplica ao fim do quadro para a captura mostrar o painel.
+	_apply_prompt.call_deferred()
 	match _frame:
 		26:
 			hud.close_handoff()
 			hud.handoff_confirmed.emit()
 		32:
-			hud.show_prompt(Loc.t("ui.action.examine"), &"paw")
+			_prompt_text = Loc.t("ui.action.examine")
 			hud.say("study.sub.tracker.normal")
 		40:
 			hud.clear_speech()
 			hud.say("study.sub.tracker.long")
 		48:
 			hud.clear_speech()
-			hud.show_prompt(Loc.t("study.prompt.accents"), &"paw")
+			_prompt_text = Loc.t("study.prompt.accents")
 			hud.say("study.sub.pilot.accents")
 		56:
 			hud.clear_speech()
+			_prompt_text = ""
 			hud.hide_prompt()
 			var opts: Array[Dictionary] = [
 				{"id": &"bank", "label": Loc.t("study.choice.bank"), "icon": &"bank"},
@@ -47,3 +51,8 @@ func _process(_delta: float) -> void:
 			hud.close_pause()
 			hud.open_complete()
 
+
+
+func _apply_prompt() -> void:
+	if _prompt_text != "" and _main.hud != null:
+		_main.hud.show_prompt(_prompt_text, &"paw")
