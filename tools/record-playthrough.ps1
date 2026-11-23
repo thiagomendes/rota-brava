@@ -20,8 +20,9 @@ $exe = Join-Path $root 'build/windows/RotaBrava.console.exe'
 $common = @('--write-movie', $out, '--fixed-fps', $Fps, '--resolution', $Resolution)
 $scene = 'res://episodes/ep01/ep01_main.tscn'
 if (-not $FromSource -and (Test-Path $exe)) {
-    Write-Host "> $exe $scene $($common -join ' ') --ep01-demo"
-    & $exe $scene @common --ep01-demo *> $log
+    # Templates de release nao aceitam caminho de cena na linha de comando: o menu inicia o episodio com --ep01-demo.
+    Write-Host "> $exe $($common -join ' ') --ep01-demo"
+    & $exe @common --ep01-demo *> $log
 } else {
     $cfg = (Get-Content (Join-Path $PSScriptRoot 'toolchain.json') -Raw | ConvertFrom-Json).godot
     $godot = Join-Path (Get-ToolsRoot $root) ".tools/godot/$($cfg.editor.console)"

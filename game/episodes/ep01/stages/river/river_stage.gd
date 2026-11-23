@@ -104,10 +104,10 @@ func _build_buoy() -> void:
 
 func _build_cove() -> void:
 	var sand := Color("e3cf9a")
-	Blocks.box(_scenery, "CoveSandSouth", Vector3(16, 0.8, 3), Vector3(84, -0.1, 19.5), sand)
-	Blocks.box(_scenery, "CoveSandEast", Vector3(3, 0.8, 19), Vector3(90.5, -0.1, 11.5), sand)
-	Blocks.box(_scenery, "RiverEndBank", Vector3(4, 0.8, 17), Vector3(90, -0.1, -5.5), sand)
-	Blocks.box(_scenery, "CoveBankWest", Vector3(2, 0.8, 4), Vector3(75, -0.1, 16), sand)
+	Blocks.box(_scenery, "CoveSandSouth", Vector3(16, 0.8, 3), Vector3(84, -0.45, 19.5), sand)
+	Blocks.box(_scenery, "CoveSandEast", Vector3(3, 0.8, 19), Vector3(90.5, -0.45, 11.5), sand)
+	Blocks.box(_scenery, "RiverEndBank", Vector3(4, 0.8, 17), Vector3(90, -0.45, -5.5), sand)
+	Blocks.box(_scenery, "CoveBankWest", Vector3(2, 0.8, 4), Vector3(75, -0.45, 16), sand)
 	_rock("CoveRock1", Vector3(80.0, 0.4, 20.5))
 	_rock("CoveRock2", Vector3(87.0, 0.4, 20.0))
 

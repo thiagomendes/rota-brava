@@ -233,9 +233,13 @@ func _centered_box(overlay: Control) -> VBoxContainer:
 
 func _build_handoff(root: Control) -> void:
 	_handoff_panel = _overlay(root, "HandoffOverlay")
-	(_handoff_panel.get_child(0) as ColorRect).color = Color(0, 0, 0, 0.35)
-	var v := _centered_box(_handoff_panel)
-	v.position.y = 200
+	# Sem escurecer a cena e na parte baixa: a camera enquadra no centro quem vai agir, e a crianca precisa ve-lo.
+	(_handoff_panel.get_child(0) as ColorRect).color = Color(0, 0, 0, 0.0)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 16)
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_handoff_panel.add_child(v)
+	_anchor(v, 0.5, 1.0, 0.0, -36.0, Control.GROW_DIRECTION_BOTH, Control.GROW_DIRECTION_BEGIN)
 	var p := _panel(v)
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 20)
