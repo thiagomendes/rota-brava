@@ -1,7 +1,8 @@
 class_name Hud
 extends CanvasLayer
 ## HUD do episodio: objetivo, quem controla, acao contextual, legendas, escolha, troca, pausa e conclusao.
-## Responde "quem controla, o que posso fazer agora, o que mudou" (SPEC secao 5). Visual PROVISORIO.
+## Responde "quem controla, o que posso fazer agora, o que mudou" (SPEC secao 5). Visual PROVISORIO (tema candidato A ate Thiago escolher).
+## Layout em unidades virtuais (viewport de referencia 1080 de altura; stretch canvas_items/expand). Ver game/ui/study/README.md.
 
 signal line_started(key: String)
 signal line_finished
@@ -17,7 +18,16 @@ const MEMBER_COLORS := MemberActor.COLORS
 const SKILL_ICONS := {&"tracker": &"notebook", &"climber": &"line", &"pilot": &"helm"}
 const HANDOFF_MIN_SECONDS := 0.45
 const FONT := 34
+## Alvo de toque minimo em unidades virtuais (>= 48 dp em aparelho com lado curto >= ~410 dp; ver README).
+const MIN_TOUCH := 128.0
+## Margem da area segura: fracao do lado, com minimo em unidades virtuais.
+const SAFE_FRACTION := 0.05
+const SAFE_MIN := 48.0
+const DEFAULT_THEME := "res://ui/study/theme_a.tres"
 
+var ui_theme: Theme
+var _root: Control
+var _safe_rects: Array[Control] = []
 var _objective_icon: IconView
 var _objective_label: Label
 var _member_panel: PanelContainer
@@ -55,36 +65,83 @@ var complete_open: bool = false
 func _ready() -> void:
 	name = "Hud"
 	layer = 10
-	var root := Control.new()
-	root.name = "Root"
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(root)
-	_build_objective(root)
-	_build_member(root)
-	_build_prompt(root)
-	_build_subtitle(root)
-	_build_choice(root)
-	_build_handoff(root)
-	_build_complete(root)
-	_build_pause(root)
+	_root = Control.new()
+	_root.name = "Root"
+	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_root)
+	var safe := _safe_rect(_root)
+	safe.name = "Safe"
+	_build_top_left(safe)
+	_build_member(safe)
+	_build_bottom_stack(safe)
+	_build_choice(_root)
+	_build_handoff(_root)
+	_build_complete(_root)
+	_build_pause(_root)
+	_root.resized.connect(_layout)
+	apply_theme(load(DEFAULT_THEME) as Theme)
+	_layout()
+
+
+## Troca o tema (candidatos A/B/C do estudo). Nao altera textos nem estado.
+func apply_theme(th: Theme) -> void:
+	ui_theme = th
+	_root.theme = th
+	if _prompt_icon:
+		_prompt_icon.color = accent_color()
+
+
+func accent_color() -> Color:
+	if ui_theme != null and ui_theme.has_color("accent", "Hud"):
+		return ui_theme.get_color("accent", "Hud")
+	return Color("ffd24d")
+
+
+## Retangulo da area segura em coordenadas do viewport.
+func safe_rect() -> Rect2:
+	var vp := get_viewport().get_visible_rect().size
+	var m := safe_margins(vp)
+	return Rect2(m, vp - m * 2.0)
+
+
+static func safe_margins(vp: Vector2) -> Vector2:
+	return Vector2(maxf(SAFE_MIN, vp.x * SAFE_FRACTION), maxf(SAFE_MIN, vp.y * SAFE_FRACTION))
+
+
+func _layout() -> void:
+	var vp := get_viewport().get_visible_rect().size
+	var m := safe_margins(vp)
+	for c in _safe_rects:
+		c.offset_left = m.x
+		c.offset_right = -m.x
+		c.offset_top = m.y
+		c.offset_bottom = -m.y
+	var width := clampf(vp.x - m.x * 2.0 - 36.0, 640.0, 1180.0)
+	_sub_text.custom_minimum_size.x = minf(width, vp.x * 0.62)
+	_objective_label.custom_minimum_size.x = minf(620.0, vp.x * 0.3)
 
 
 # ---------- construcao ----------
 
-func _panel(parent: Node, color: Color = Color(0.04, 0.1, 0.13, 0.82)) -> PanelContainer:
+func _safe_rect(parent: Control) -> Control:
+	var c := Control.new()
+	c.set_anchors_preset(Control.PRESET_FULL_RECT)
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(c)
+	_safe_rects.append(c)
+	return c
+
+
+func _panel(parent: Node, variant: StringName = &"HudPanel") -> PanelContainer:
 	var p := PanelContainer.new()
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = color
-	sb.set_corner_radius_all(18)
-	sb.set_content_margin_all(14)
-	p.add_theme_stylebox_override("panel", sb)
+	p.theme_type_variation = variant
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(p)
 	return p
 
 
-## Ancora o controle num ponto relativo a tela (ax, ay em 0..1) com deslocamento em pixels; cresce para os lados indicados.
+## Ancora o controle num ponto relativo a area (ax, ay em 0..1) com deslocamento em pixels; cresce para os lados indicados.
 func _anchor(c: Control, ax: float, ay: float, ox: float, oy: float, grow_h: Control.GrowDirection, grow_v: Control.GrowDirection) -> void:
 	c.anchor_left = ax
 	c.anchor_right = ax
@@ -98,10 +155,11 @@ func _anchor(c: Control, ax: float, ay: float, ox: float, oy: float, grow_h: Con
 	c.grow_vertical = grow_v
 
 
-func _label(parent: Node, size: int = FONT, color: Color = Color.WHITE) -> Label:
+func _label(parent: Node, size: int = FONT, variant: StringName = &"") -> Label:
 	var l := Label.new()
 	l.add_theme_font_size_override("font_size", size)
-	l.add_theme_color_override("font_color", color)
+	if variant != &"":
+		l.theme_type_variation = variant
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(l)
 	return l
@@ -110,90 +168,98 @@ func _label(parent: Node, size: int = FONT, color: Color = Color.WHITE) -> Label
 func _button(parent: Node, text: String, width: float = 520.0) -> Button:
 	var b := Button.new()
 	b.text = text
-	b.custom_minimum_size = Vector2(width, 88)
-	b.add_theme_font_size_override("font_size", 40)
+	b.custom_minimum_size = Vector2(maxf(width, MIN_TOUCH), MIN_TOUCH)
+	UiTheme.make_focusable(b)
 	parent.add_child(b)
 	return b
 
 
-func _build_objective(root: Control) -> void:
-	var p := _panel(root)
+func _build_top_left(safe: Control) -> void:
+	var col := VBoxContainer.new()
+	col.name = "TopLeft"
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_theme_constant_override("separation", 10)
+	safe.add_child(col)
+	var p := _panel(col)
 	p.name = "ObjectivePanel"
-	p.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	p.position = Vector2(32, 28)
 	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 14)
+	h.add_theme_constant_override("separation", 16)
 	p.add_child(h)
 	_objective_icon = IconView.new()
-	_objective_icon.custom_minimum_size = Vector2(72, 72)
+	_objective_icon.custom_minimum_size = Vector2(80, 80)
 	h.add_child(_objective_icon)
 	_objective_label = _label(h, 32)
 	_objective_label.custom_minimum_size = Vector2(620, 0)
 	_objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_objective_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_skip_label = _label(col, 30, &"AccentLabel")
+	_skip_label.name = "SkipHint"
+	_skip_label.text = Loc.t("ui.skip")
+	_skip_label.visible = false
 
 
-func _build_member(root: Control) -> void:
-	_member_panel = _panel(root)
+func _build_member(safe: Control) -> void:
+	_member_panel = _panel(safe)
 	_member_panel.name = "MemberPanel"
-	_anchor(_member_panel, 1.0, 0.0, -32.0, 28.0, Control.GROW_DIRECTION_BEGIN, Control.GROW_DIRECTION_END)
+	_anchor(_member_panel, 1.0, 0.0, 0.0, 0.0, Control.GROW_DIRECTION_BEGIN, Control.GROW_DIRECTION_END)
 	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 14)
+	h.add_theme_constant_override("separation", 16)
 	_member_panel.add_child(h)
 	_member_icon = IconView.new()
-	_member_icon.custom_minimum_size = Vector2(72, 72)
+	_member_icon.custom_minimum_size = Vector2(80, 80)
 	h.add_child(_member_icon)
 	_member_label = _label(h, 34)
 	_member_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_member_panel.visible = false
 
 
-func _build_prompt(root: Control) -> void:
-	_prompt_panel = _panel(root, Color(0.1, 0.07, 0.02, 0.9))
+## Pilha na base e ao centro: acao contextual acima, legenda abaixo. Nunca se sobrepoem e ficam entre os polegares.
+func _build_bottom_stack(safe: Control) -> void:
+	var v := VBoxContainer.new()
+	v.name = "BottomStack"
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_theme_constant_override("separation", 14)
+	v.alignment = BoxContainer.ALIGNMENT_END
+	_anchor(v, 0.5, 1.0, 0.0, 0.0, Control.GROW_DIRECTION_BOTH, Control.GROW_DIRECTION_BEGIN)
+	safe.add_child(v)
+	_prompt_panel = _panel(v, &"PromptPanel")
 	_prompt_panel.name = "PromptPanel"
-	_anchor(_prompt_panel, 0.5, 1.0, 0.0, -230.0, Control.GROW_DIRECTION_BOTH, Control.GROW_DIRECTION_BEGIN)
+	_prompt_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 16)
+	h.add_theme_constant_override("separation", 18)
 	_prompt_panel.add_child(h)
 	_prompt_icon = IconView.new()
-	_prompt_icon.custom_minimum_size = Vector2(84, 84)
-	_prompt_icon.color = Color("ffd24d")
+	_prompt_icon.custom_minimum_size = Vector2(96, 96)
 	h.add_child(_prompt_icon)
-	var v := VBoxContainer.new()
-	v.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	h.add_child(v)
-	_prompt_label = _label(v, 42, Color("ffd24d"))
-	var hint := _label(v, 26, Color(1, 1, 1, 0.8))
+	var pv := VBoxContainer.new()
+	pv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	h.add_child(pv)
+	_prompt_label = _label(pv, 44, &"AccentLabel")
+	var hint := _label(pv, 26, &"DimLabel")
 	hint.name = "KeyHint"
 	hint.text = Loc.t("ui.control.interact")
 	_prompt_panel.visible = false
-
-
-func _build_subtitle(root: Control) -> void:
-	_sub_panel = _panel(root, Color(0, 0, 0, 0.78))
+	_sub_panel = _panel(v, &"SubtitlePanel")
 	_sub_panel.name = "SubtitlePanel"
-	_anchor(_sub_panel, 0.5, 1.0, 0.0, -40.0, Control.GROW_DIRECTION_BOTH, Control.GROW_DIRECTION_BEGIN)
-	var v := VBoxContainer.new()
-	_sub_panel.add_child(v)
-	_sub_speaker = _label(v, 30, Color("ffd24d"))
-	_sub_text = _label(v, FONT)
+	_sub_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var sv := VBoxContainer.new()
+	_sub_panel.add_child(sv)
+	_sub_speaker = _label(sv, 30, &"AccentLabel")
+	_sub_text = _label(sv, FONT)
 	_sub_text.custom_minimum_size = Vector2(1100, 0)
 	_sub_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_sub_panel.visible = false
-	_skip_label = _label(root, 30)
-	_skip_label.name = "SkipHint"
-	_skip_label.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_skip_label.position = Vector2(40, 160)
-	_skip_label.text = Loc.t("ui.skip")
-	_skip_label.visible = false
 
 
 func _build_choice(root: Control) -> void:
-	_choice_panel = _panel(root, Color(0.04, 0.1, 0.13, 0.94))
+	var safe := _safe_rect(root)
+	safe.name = "ChoiceSafe"
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	safe.add_child(center)
+	_choice_panel = _panel(center, &"ModalPanel")
 	_choice_panel.name = "ChoicePanel"
-	_choice_panel.set_anchors_preset(Control.PRESET_CENTER)
-	_choice_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_choice_panel.grow_vertical = Control.GROW_DIRECTION_BOTH
 	_choice_panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	_choice_box = VBoxContainer.new()
 	_choice_box.add_theme_constant_override("separation", 20)
@@ -220,14 +286,18 @@ func _overlay(root: Control, name_: String) -> Control:
 
 
 func _centered_box(overlay: Control) -> VBoxContainer:
+	var safe := _safe_rect(overlay)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	overlay.add_child(center)
+	safe.add_child(center)
+	# Painel opaco: titulo e botoes nao brigam com o cenario (o titulo amarelo se perdia sobre o casco amarelo).
+	var panel := _panel(center, &"ModalPanel")
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 24)
 	v.alignment = BoxContainer.ALIGNMENT_CENTER
-	center.add_child(v)
+	panel.add_child(v)
 	return v
 
 
@@ -235,11 +305,12 @@ func _build_handoff(root: Control) -> void:
 	_handoff_panel = _overlay(root, "HandoffOverlay")
 	# Sem escurecer a cena e na parte baixa: a camera enquadra no centro quem vai agir, e a crianca precisa ve-lo.
 	(_handoff_panel.get_child(0) as ColorRect).color = Color(0, 0, 0, 0.0)
+	var safe := _safe_rect(_handoff_panel)
 	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 16)
+	v.add_theme_constant_override("separation", 36)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_handoff_panel.add_child(v)
-	_anchor(v, 0.5, 1.0, 0.0, -36.0, Control.GROW_DIRECTION_BOTH, Control.GROW_DIRECTION_BEGIN)
+	safe.add_child(v)
+	_anchor(v, 0.5, 1.0, 0.0, 0.0, Control.GROW_DIRECTION_BOTH, Control.GROW_DIRECTION_BEGIN)
 	var p := _panel(v)
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 20)
@@ -252,6 +323,7 @@ func _build_handoff(root: Control) -> void:
 	_handoff_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_handoff_text.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_handoff_button = _button(v, Loc.t("ui.menu.confirm"), 420)
+	_handoff_button.name = "ConfirmButton"
 	_handoff_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_handoff_button.pressed.connect(_confirm_handoff)
 
@@ -259,7 +331,7 @@ func _build_handoff(root: Control) -> void:
 func _build_complete(root: Control) -> void:
 	_complete_panel = _overlay(root, "CompleteOverlay")
 	var v := _centered_box(_complete_panel)
-	var title := _label(v, 84, Color("ffd24d"))
+	var title := _label(v, 84, &"AccentLabel")
 	title.name = "Title"
 	title.text = Loc.t("ep01.complete.title")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -280,7 +352,7 @@ func _build_complete(root: Control) -> void:
 func _build_pause(root: Control) -> void:
 	_pause_panel = _overlay(root, "PauseOverlay")
 	var v := _centered_box(_pause_panel)
-	var title := _label(v, 76, Color("ffd24d"))
+	var title := _label(v, 76, &"AccentLabel")
 	title.text = Loc.t("ui.pause.title")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_pause_resume = _button(v, Loc.t("ui.pause.resume"))
@@ -418,7 +490,7 @@ func open_choice(title: String, options: Array[Dictionary]) -> void:
 	var first: Button = null
 	for o in options:
 		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 16)
+		row.add_theme_constant_override("separation", 32)
 		var icon := IconView.new()
 		icon.kind = StringName(o.get("icon", "bank"))
 		icon.custom_minimum_size = Vector2(88, 88)
@@ -429,6 +501,11 @@ func open_choice(title: String, options: Array[Dictionary]) -> void:
 		_choice_box.add_child(row)
 		if first == null:
 			first = b
+	# Voltar visivel para mouse/toque (Esc/cancelar ja fazia o mesmo).
+	var back := _button(_choice_box, Loc.t("ui.menu.back"), 360)
+	back.name = "BackButton"
+	back.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	back.pressed.connect(func() -> void: _pick(&""))
 	_choice_panel.visible = true
 	choice_open = true
 	if first:
@@ -455,6 +532,11 @@ func open_handoff(text: String, member: StringName) -> void:
 	handoff_open = true
 	_handoff_since = Time.get_ticks_msec() / 1000.0
 	_handoff_button.grab_focus()
+
+
+func close_handoff() -> void:
+	handoff_open = false
+	_handoff_panel.visible = false
 
 
 func _confirm_handoff() -> void:
