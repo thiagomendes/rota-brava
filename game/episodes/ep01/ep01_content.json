@@ -1,0 +1,84 @@
+{
+  "episode_id": "ep01",
+  "title_key": "ep01.title",
+  "clues": [
+    {"id": "paw_print_bench", "icon": "paw", "label_key": "ep01.dock.clue.paw.label", "observation_key": "ep01.dock.tracker.small_print", "partial_key": "ep01.dock.tracker.paw_not_enough", "resolves_deduction_alone": false},
+    {"id": "boot_print_bank", "icon": "boot", "label_key": "ep01.dock.clue.boot.label", "observation_key": "ep01.dock.tracker.boot_observation", "partial_key": "ep01.dock.tracker.boot_not_enough", "resolves_deduction_alone": false}
+  ],
+  "deduction_key": "ep01.dock.tracker.deduction",
+  "destination_prompt_key": "ep01.dock.tracker.ask_destination",
+  "destinations": [
+    {"id": "bank", "correct": true, "label_key": "ep01.dock.choice.bank"},
+    {"id": "harbor", "correct": false, "label_key": "ep01.dock.choice.harbor", "observation_key": "ep01.dock.tracker.wrong_destination"}
+  ],
+  "states": ["arrival", "dock_investigation", "river_search", "island_crossing", "docking", "return_trip", "complete"],
+  "objectives": {
+    "arrival": {"objective_key": "ep01.arrival.objective", "icon": "notebook"},
+    "dock_investigation": {"objective_key": "ep01.dock.objective", "icon": "notebook"},
+    "river_search": {"objective_key": "ep01.river.objective", "icon": "helm"},
+    "island_crossing": {"objective_key": "ep01.island.objective", "icon": "line"},
+    "docking": {"objective_key": "ep01.docking.objective", "icon": "helm"},
+    "return_trip": {"objective_key": "ep01.return.objective", "icon": "helm"},
+    "complete": {"objective_key": "ep01.complete.objective", "icon": "helm"}
+  },
+  "active_member": {
+    "arrival": "", "dock_investigation": "tracker", "river_search": "pilot",
+    "island_crossing": "climber", "docking": "pilot", "return_trip": "pilot", "complete": ""
+  },
+  "hints": {
+    "arrival": [{"kind": "gesture", "key": "ep01.arrival.radio.hint_gesture"}, {"kind": "spoken", "key": "ep01.arrival.radio.hint_spoken"}],
+    "dock_investigation": [
+      {"kind": "gesture", "key": "ep01.dock.tracker.hint_gesture_bench"},
+      {"kind": "gesture", "key": "ep01.dock.tracker.hint_gesture_boot"},
+      {"kind": "spoken", "key": "ep01.dock.tracker.hint_spoken"}],
+    "river_search": [{"kind": "gesture", "key": "ep01.river.pilot.hint_gesture_buoy"}, {"kind": "gesture", "key": "ep01.river.pilot.hint_gesture_leaves"}, {"kind": "spoken", "key": "ep01.river.pilot.hint_spoken"}],
+    "island_crossing": [{"kind": "gesture", "key": "ep01.island.climber.hint_gesture"}, {"kind": "spoken", "key": "ep01.island.climber.hint_spoken"}],
+    "docking": [{"kind": "gesture", "key": "ep01.docking.pilot.hint_gesture"}, {"kind": "spoken", "key": "ep01.docking.pilot.hint_spoken"}],
+    "return_trip": [{"kind": "gesture", "key": "ep01.return.pilot.hint_gesture"}, {"kind": "spoken", "key": "ep01.return.pilot.hint_spoken"}]
+  },
+  "lines": {
+    "arrival": {
+      "enter": ["ep01.arrival.radio.horn", "ep01.arrival.radio.crate", "ep01.arrival.pilot.react", "ep01.arrival.pilot.ask_captain"],
+      "intro_finished": ["ep01.arrival.tracker.take_over"]
+    },
+    "dock_investigation": {
+      "clue_examined:paw_print_bench": ["ep01.dock.tracker.small_print"],
+      "clue_examined:boot_print_bank": ["ep01.dock.tracker.boot_observation"],
+      "both_clues": ["ep01.dock.tracker.deduction", "ep01.dock.tracker.ask_destination"],
+      "destination_rejected:harbor": ["ep01.dock.tracker.wrong_destination"],
+      "destination_chosen:bank": ["ep01.dock.tracker.deduction"]
+    },
+    "river_search": {
+      "enter": ["ep01.river.pilot.start"],
+      "leaves": ["ep01.river.pilot.leaves"],
+      "bank_guide": ["ep01.river.pilot.bank_guide"],
+      "slow_down": ["ep01.river.pilot.slow_down"],
+      "buoy_rounded": ["ep01.river.pilot.buoy"],
+      "cove_reached": ["ep01.river.pilot.spot_captain", "ep01.river.captain.wave"]
+    },
+    "island_crossing": {
+      "enter": ["ep01.island.climber.start"],
+      "foothold_reached": ["ep01.island.climber.foothold"],
+      "foothold_missed": ["ep01.island.climber.missed"],
+      "line_fixed": ["ep01.island.climber.line_ready", "ep01.island.climber.tug_1", "ep01.island.climber.tug_2"]
+    },
+    "docking": {
+      "enter": ["ep01.docking.pilot.start"],
+      "assist": ["ep01.docking.pilot.assist"],
+      "retry": ["ep01.docking.pilot.retry"],
+      "boat_docked": ["ep01.docking.pilot.aligned"]
+    },
+    "return_trip": {
+      "enter": ["ep01.return.pilot.depart"],
+      "departure_confirmed": ["ep01.return.captain.thanks", "ep01.return.pup.horn", "ep01.return.radio.joke"]
+    },
+    "complete": {
+      "enter": ["ep01.complete.title", "ep01.complete.body"]
+    }
+  },
+  "footholds": [
+    {"id": "foothold_1", "index": 1},
+    {"id": "foothold_2", "index": 2},
+    {"id": "foothold_3", "index": 3}
+  ]
+}

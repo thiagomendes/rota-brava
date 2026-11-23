@@ -91,14 +91,30 @@ try {
     $shot1 = Capture $game 'rb-01-menu.png'
     Check ($null -ne $shot1) "captura do menu: $shot1"
 
+    # Menu -> Jogar -> pular a abertura (E) -> confirmar a troca para Rastro (E) -> pausa (Esc) -> Menu -> Sair
     Keys 'ENTER'
-    Check (WaitLog '[RB] play_ready' 5) 'Enter em Jogar abre a tela de jogo'
-    Keys 'E'; Keys 'E'
-    Check ((Log) -match 'interact count=2') 'tecla E gera 2 interacoes'
-    $shot2 = Capture $game 'rb-01-jogo.png'
-    Check ($null -ne $shot2) "captura da tela de jogo: $shot2"
+    Start-Sleep -Seconds 3
+    $shotIntro = Capture $game 'ep01-abertura.png'
+    Check ($null -ne $shotIntro) "captura da abertura: $shotIntro"
+    Keys 'E'
+    Check (WaitLog '[RB] event intro_finished' 8) 'E pula a abertura (intro_finished aceito)'
+    Check (WaitLog '[RB] handoff_open tracker' 8) 'a troca para Rastro pede confirmacao'
+    Start-Sleep -Seconds 1
+    $shotSwap = Capture $game 'ep01-troca.png'
+    Check ($null -ne $shotSwap) "captura da troca de integrante: $shotSwap"
+    Keys 'E'
+    Check (WaitLog '[RB] control tracker' 5) 'E confirma e Rastro assume o controle'
+    Start-Sleep -Seconds 1
+    $shotDock = Capture $game 'ep01-cais.png'
+    Check ($null -ne $shotDock) "captura do cais com Rastro: $shotDock"
     Keys 'ESC'
-    Check (WaitLog 'back_to_menu' 5) 'Esc volta ao menu'
+    Check (WaitLog '[RB] pause' 5) 'Esc abre a pausa'
+    Start-Sleep -Milliseconds 500
+    $shotPause = Capture $game 'ep01-pausa.png'
+    Check ($null -ne $shotPause) "captura da pausa: $shotPause"
+    Keys 'DOWN'; Keys 'ENTER'
+    Check (WaitLog '[RB] back_to_menu' 5) 'Menu na pausa volta ao menu'
+    Check (([regex]::Matches((Log), 'menu_ready focus=PlayButton')).Count -ge 2) 'o menu reaparece com foco em Jogar'
     Start-Sleep -Seconds 1
     Keys 'DOWN'; Keys 'DOWN'; Keys 'ENTER'
     Check (WaitLog '[RB] quit' 5) 'Sair pelo menu por teclado'

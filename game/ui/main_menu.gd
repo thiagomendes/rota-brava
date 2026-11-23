@@ -2,7 +2,7 @@ class_name MainMenu
 extends Control
 ## Menu inicial: Jogar, Opcoes, Sair. Foco inicial em Jogar (SPEC secao 5, Menu e retomada).
 
-const PLAY_SCENE := "res://ui/play_placeholder.tscn"
+const PLAY_SCENE := "res://episodes/ep01/ep01_main.tscn"
 
 @onready var menu: VBoxContainer = %Menu
 @onready var play_button: Button = %PlayButton
@@ -19,6 +19,9 @@ func _ready() -> void:
 	back_button.pressed.connect(_close_options)
 	play_button.grab_focus()
 	print("[RB] menu_ready focus=%s" % play_button.name)
+	# Gravacao/demonstracao da build exportada: o exe so abre o menu, entao o bot entra por aqui.
+	if OS.get_cmdline_user_args().has("--ep01-demo") or OS.get_cmdline_args().has("--ep01-demo"):
+		_on_play_pressed.call_deferred()
 
 
 func _unhandled_input(event: InputEvent) -> void:
