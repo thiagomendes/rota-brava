@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "lines": [
+    {
+      "id": "ep01.dock.tracker.small_print",
+      "character": "Rastro",
+      "intent": "normal",
+      "language": "pt_BR",
+      "subtitle": "ep01.dock.tracker.small_print",
+      "file": "res://audio/voice/ep01_dock_tracker_small_print.wav",
+      "duration": 2.811,
+      "peak_dbfs": -3.0,
+      "status": "provisorio",
+      "tool": "Windows System.Speech (SAPI) + source_audio/voice_post.py",
+      "voice": "Microsoft Daniel",
+      "direction": "Fala baixo e claro, pausado."
+    },
+    {
+      "id": "ep01.river.pilot.start",
+      "character": "Leme",
+      "intent": "urgencia",
+      "language": "pt_BR",
+      "subtitle": "ep01.river.pilot.start",
+      "file": "res://audio/voice/ep01_river_pilot_start.wav",
+      "duration": 3.273,
+      "peak_dbfs": -3.0,
+      "status": "provisorio",
+      "tool": "Windows System.Speech (SAPI) + source_audio/voice_post.py",
+      "voice": "Microsoft Maria",
+      "direction": "Conversa em movimento, ritmo solto."
+    },
+    {
+      "id": "ep01.island.climber.line_ready",
+      "character": "Pico",
+      "intent": "descoberta",
+      "language": "pt_BR",
+      "subtitle": "ep01.island.climber.line_ready",
+      "file": "res://audio/voice/ep01_island_climber_line_ready.wav",
+      "duration": 3.409,
+      "peak_dbfs": -3.0,
+      "status": "provisorio",
+      "tool": "Windows System.Speech (SAPI) + source_audio/voice_post.py",
+      "voice": "Microsoft Maria Desktop",
+      "direction": "Confirma em frases curtas, vivo."
+    },
+    {
+      "id": "ep01.radio.team.found_boat",
+      "character": "team",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.team.found_boat",
+      "file": "res://audio/voice/ep01_radio_team_found_boat.wav",
+      "duration": 5.067,
+      "peak_dbfs": -3.0,
+      "status": "provisorio",
+      "tool": "Windows System.Speech (SAPI) + source_audio/voice_post.py",
+      "voice": "Microsoft Daniel",
+      "direction": "Fala baixo e claro, pausado."
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "voices": {
+    "ep01.dock.tracker.small_print": {
+      "duration_s": 2.811,
+      "peak_dbfs": -3.0,
+      "true_peak_est_dbfs": -2.98,
+      "rms_dbfs": -18.67,
+      "lead_silence_ms": 40.0,
+      "file": "res://audio/voice/ep01_dock_tracker_small_print.wav",
+      "sample_rate": 22050,
+      "radio_filter": false
+    },
+    "ep01.river.pilot.start": {
+      "duration_s": 3.273,
+      "peak_dbfs": -3.0,
+      "true_peak_est_dbfs": -2.93,
+      "rms_dbfs": -22.05,
+      "lead_silence_ms": 43.9,
+      "file": "res://audio/voice/ep01_river_pilot_start.wav",
+      "sample_rate": 22050,
+      "radio_filter": false
+    },
+    "ep01.island.climber.line_ready": {
+      "duration_s": 3.409,
+      "peak_dbfs": -3.0,
+      "true_peak_est_dbfs": -2.96,
+      "rms_dbfs": -22.64,
+      "lead_silence_ms": 40.2,
+      "file": "res://audio/voice/ep01_island_climber_line_ready.wav",
+      "sample_rate": 22050,
+      "radio_filter": false
+    },
+    "ep01.radio.team.found_boat": {
+      "duration_s": 5.067,
+      "peak_dbfs": -3.0,
+      "true_peak_est_dbfs": -3.0,
+      "rms_dbfs": -16.75,
+      "lead_silence_ms": 0.5,
+      "file": "res://audio/voice/ep01_radio_team_found_boat.wav",
+      "sample_rate": 22050,
+      "radio_filter": true
+    }
+  },
+  "note": "dBFS de amostra nao e dBTP; true_peak_est_dbfs e estimativa por sobreamostragem 4x.",
+  "music": {
+    "theme_explore": {
+      "duration_s": 19.2,
+      "peak_dbfs": -6.0,
+      "true_peak_est_dbfs": -5.98,
+      "rms_dbfs": -23.81,
+      "loop_seam_step": [
+        0.00093,
+        0.00117
+      ],
+      "max_adjacent_step": 0.03593,
+      "bpm": 100,
+      "bars": 8
+    },
+    "theme_discovery": {
+      "duration_s": 19.2,
+      "peak_dbfs": -6.0,
+      "true_peak_est_dbfs": -6.0,
+      "rms_dbfs": -29.74,
+      "loop_seam_step": [
+        0.0,
+        0.0
+      ],
+      "max_adjacent_step": 0.00823,
+      "bpm": 100,
+      "bars": 8
+    }
+  }
+}
