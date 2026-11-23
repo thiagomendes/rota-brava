@@ -1,0 +1,19 @@
+{
+  "godot": {
+    "version": "4.7.2-stable",
+    "templatesDir": "4.7.2.stable",
+    "editor": {
+      "url": "https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_win64.exe.zip",
+      "sha256": "731980f9608d61333e5baf54a2ef17210acc7a538446c0cb9969f002aca1e953",
+      "exe": "Godot_v4.7.2-stable_win64.exe",
+      "console": "Godot_v4.7.2-stable_win64_console.exe"
+    },
+    "templates": {
+      "url": "https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz",
+      "sha256": "f298490b8d44d934be425a5a65a51bf15f422428b229a06a6e11d9ffea248011"
+    }
+  },
+  "blender": {
+    "note": "Nao instalado na tarefa 01. Fixar versao e checksum na tarefa 03 (primeiro ativo 3D)."
+  }
+}
