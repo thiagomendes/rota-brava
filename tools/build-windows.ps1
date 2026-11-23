@@ -3,9 +3,11 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $cfg = (Get-Content (Join-Path $PSScriptRoot 'toolchain.json') -Raw | ConvertFrom-Json).godot
-$godot = Join-Path $root ".tools/godot/$($cfg.editor.console)"
+. "$PSScriptRoot/common.ps1"
+$toolsRoot = Get-ToolsRoot $root
+$godot = Join-Path $toolsRoot ".tools/godot/$($cfg.editor.console)"
 if (-not (Test-Path $godot)) { throw 'Godot ausente. Rode ./tools/setup-toolchain.ps1' }
-$tpl = Join-Path $root ".tools/godot/editor_data/export_templates/$($cfg.templatesDir)/windows_release_x86_64.exe"
+$tpl = Join-Path $toolsRoot ".tools/godot/editor_data/export_templates/$($cfg.templatesDir)/windows_release_x86_64.exe"
 if (-not (Test-Path $tpl)) { throw "Template de exportacao ausente: $tpl" }
 
 $out = Join-Path $root 'build/windows'
