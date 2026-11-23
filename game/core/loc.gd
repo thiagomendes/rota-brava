@@ -13,11 +13,20 @@ static func _catalog(lang: String) -> Dictionary:
 	if _cache.has(lang):
 		return _cache[lang]
 	var data: Dictionary = {}
-	var path := "res://i18n/%s.json" % lang
-	if FileAccess.file_exists(path):
+	# <idioma>.json e, opcionalmente, <idioma>.<parte>.json (um por estagio/area; chaves nao se repetem).
+	var paths: Array[String] = ["res://i18n/%s.json" % lang]
+	var extra: Array[String] = []
+	for file in DirAccess.get_files_at("res://i18n"):
+		if file != lang + ".json" and file.begins_with(lang + ".") and file.ends_with(".json"):
+			extra.append("res://i18n/" + file)
+	extra.sort()
+	paths.append_array(extra)
+	for path in paths:
+		if not FileAccess.file_exists(path):
+			continue
 		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 		if parsed is Dictionary:
-			data = parsed
+			data.merge(parsed, true)
 		else:
 			push_warning("Loc: catalogo invalido: " + path)
 	_cache[lang] = data
@@ -50,3 +59,13 @@ static func t(key: String, params: Dictionary = {}) -> String:
 static func reload() -> void:
 	_cache.clear()
 	missing.clear()
+
+
+## Nome e habilidade localizados de um integrante (tracker, climber, pilot). Chaves montadas aqui, validadas em test_content.
+static func member_name(member: StringName) -> String:
+	return t("member." + String(member) + ".name")
+
+
+static func member_skill(member: StringName) -> String:
+	return t("member." + String(member) + ".skill")
+

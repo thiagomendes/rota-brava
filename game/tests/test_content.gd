@@ -10,6 +10,23 @@ func _load(path: String) -> Variant:
 	return JSON.parse_string(FileAccess.get_file_as_string(path))
 
 
+## pt_BR.json + pt_BR.<parte>.json, como o Loc carrega. Chave repetida entre arquivos e erro.
+func _merged_catalog(duplicates: Array[String]) -> Dictionary:
+	var merged: Dictionary = {}
+	var paths: Array[String] = [CATALOG]
+	for file in DirAccess.get_files_at("res://i18n"):
+		if file != "pt_BR.json" and file.begins_with("pt_BR.") and file.ends_with(".json"):
+			paths.append("res://i18n/" + file)
+	for p in paths:
+		var d: Variant = _load(p)
+		if d is Dictionary:
+			for k in d:
+				if merged.has(k):
+					duplicates.append(str(k))
+				merged[k] = d[k]
+	return merged
+
+
 ## Coleta chaves de texto: valores de campos "key"/"*_key" e textos em listas que parecem chave.
 func _collect_keys(node: Variant, out: Array[String]) -> void:
 	if node is Dictionary:
@@ -43,7 +60,9 @@ func _scan(dir: String, out: Array[String]) -> void:
 
 func run(r) -> void:
 	Loc.reload()
-	var cat_v: Variant = _load(CATALOG)
+	var dups: Array[String] = []
+	var cat_v: Variant = _merged_catalog(dups)
+	r.check(dups.is_empty(), "nenhuma chave repetida entre arquivos do catalogo %s" % str(dups))
 	var con_v: Variant = _load(CONTENT)
 	r.check(cat_v is Dictionary, "catalogo pt_BR.json carrega")
 	r.check(con_v is Dictionary, "ep01_content.json carrega")

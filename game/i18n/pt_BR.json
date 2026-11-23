@@ -76,6 +76,7 @@
   "ep01.complete.objective": "Missão cumprida.",
   "ui.swap.look": "{name} olha para {other}.",
   "ui.swap.confirm": "Assumir {name}? Habilidade: {skill}.",
+  "ui.skip": "E: pular a abertura",
   "ui.swap.active": "Agora você controla {name}.",
   "ui.help.repeat": "Repetir instrução",
   "ui.help.repeat_button": "Repetir instrução ({control})",
