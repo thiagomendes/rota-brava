@@ -32,7 +32,8 @@ func _initialize() -> void:
 
 
 func _only_filter() -> String:
-	for arg in OS.get_cmdline_user_args():
+	# O PowerShell pode remover o `--`; aceita o filtro tambem entre os argumentos comuns.
+	for arg in OS.get_cmdline_user_args() + OS.get_cmdline_args():
 		if arg.begins_with("--only="):
 			return arg.trim_prefix("--only=")
 	return ""
