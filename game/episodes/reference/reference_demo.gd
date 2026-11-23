@@ -13,6 +13,7 @@ const PAGE_KEYS := {
 	&"hud": "ref.page.hud", &"voice": "ref.page.voice", &"music": "ref.page.music",
 }
 const EXPRESSION_KEYS: Array[String] = ["ref.rastro.neutral", "ref.rastro.attentive", "ref.rastro.surprised"]
+const CHARACTER_LABELS := {"team": "Equipe"}
 const INTENT_LABELS := {"normal": "normal", "urgencia": "urgência", "descoberta": "descoberta", "radio": "rádio"}
 const MUSIC_KEYS := {&"explore": "ref.music.explore", &"discovery": "ref.music.discovery"}
 const MUSIC := {
@@ -324,7 +325,7 @@ func _page_voice() -> void:
 	for entry: Dictionary in VoiceCatalog.all_lines():
 		var b := Button.new()
 		var who := Loc.t("ref.voice.meta", {
-			"character": String(entry.get("character", "")),
+			"character": String(CHARACTER_LABELS.get(String(entry.get("character", "")), entry.get("character", ""))),
 			"intent": String(INTENT_LABELS.get(String(entry.get("intent", "")), entry.get("intent", ""))),
 			"voice": String(entry.get("voice", ""))})
 		b.text = "%s %s\n%s" % [Loc.t("ref.voice.play"), Loc.t(String(entry.get("subtitle", ""))), who]

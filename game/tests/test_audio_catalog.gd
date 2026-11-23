@@ -53,7 +53,8 @@ func run(r) -> void:
 			all_sub = false
 			printerr("legenda sem texto: " + str(e["subtitle"]))
 		var file := str(e["file"])
-		if not ResourceLoader.exists(file):
+		# O arquivo-fonte precisa existir de fato: o cache de importacao sozinho nao basta (so vale no editor).
+		if not FileAccess.file_exists(file) or not ResourceLoader.exists(file):
 			all_exist = false
 			continue
 		var s := load(file) as AudioStreamWAV
