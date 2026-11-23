@@ -1,0 +1,56 @@
+[gd_resource type="AudioBusLayout" format=3]
+
+; Layout de buses (SPEC secao 6). Aplicar em game/project.godot, secao [audio]:
+;   buses/default_bus_layout="res://audio/default_bus_layout.tres"
+; Ducking suave: compressor na Musica com sidechain no bus Voz (limiar -28 dB, razao 3:1, ataque 40 ms,
+; liberacao 600 ms). Se o sidechain nao agradar, alternativa manual documentada: baixar Musica -6 dB
+; com tween de 0,3 s ao iniciar fala e voltar em 0,8 s. Master: limitador com teto -1 dB.
+; Valores provisorios; mixagem fina e aceite perceptual pendentes.
+
+[sub_resource type="AudioEffectHardLimiter" id="limiter"]
+ceiling_db = -1.0
+
+[sub_resource type="AudioEffectCompressor" id="duck"]
+threshold = -28.0
+ratio = 3.0
+gain = 0.0
+attack_us = 40000.0
+release_ms = 600.0
+mix = 1.0
+sidechain = &"Voz"
+
+[resource]
+bus/0/name = &"Master"
+bus/0/solo = false
+bus/0/mute = false
+bus/0/bypass_fx = false
+bus/0/volume_db = 0.0
+bus/0/send = &""
+bus/0/effect/0/effect = SubResource("limiter")
+bus/0/effect/0/enabled = true
+bus/1/name = &"Voz"
+bus/1/solo = false
+bus/1/mute = false
+bus/1/bypass_fx = false
+bus/1/volume_db = 0.0
+bus/1/send = &"Master"
+bus/2/name = &"Musica"
+bus/2/solo = false
+bus/2/mute = false
+bus/2/bypass_fx = false
+bus/2/volume_db = -4.0
+bus/2/send = &"Master"
+bus/2/effect/0/effect = SubResource("duck")
+bus/2/effect/0/enabled = true
+bus/3/name = &"Efeitos"
+bus/3/solo = false
+bus/3/mute = false
+bus/3/bypass_fx = false
+bus/3/volume_db = -2.0
+bus/3/send = &"Master"
+bus/4/name = &"Ambiente"
+bus/4/solo = false
+bus/4/mute = false
+bus/4/bypass_fx = false
+bus/4/volume_db = -8.0
+bus/4/send = &"Master"

@@ -1,0 +1,13 @@
+{
+  "voices": {
+    "tracker": {"character": "Rastro", "sapi": "Microsoft Daniel", "pitch": "-3st", "rate": "-10%", "direction": "Fala baixo e claro, pausado."},
+    "climber": {"character": "Pico", "sapi": "Microsoft Maria Desktop", "pitch": "+3st", "rate": "+8%", "direction": "Confirma em frases curtas, vivo."},
+    "pilot": {"character": "Leme", "sapi": "Microsoft Maria", "pitch": "-1st", "rate": "+14%", "direction": "Conversa em movimento, ritmo solto."}
+  },
+  "lines": [
+    {"id": "ep01.dock.tracker.small_print", "voice": "tracker", "intent": "normal", "key": "ep01.dock.tracker.small_print", "file": "ep01_dock_tracker_small_print"},
+    {"id": "ep01.river.pilot.start", "voice": "pilot", "intent": "urgencia", "key": "ep01.river.pilot.start", "file": "ep01_river_pilot_start", "pitch": "+1st", "rate": "+24%"},
+    {"id": "ep01.island.climber.line_ready", "voice": "climber", "intent": "descoberta", "key": "ep01.island.climber.line_ready", "file": "ep01_island_climber_line_ready", "pitch": "+5st"},
+    {"id": "ep01.radio.team.found_boat", "voice": "tracker", "intent": "radio", "key": "ep01.radio.team.found_boat", "file": "ep01_radio_team_found_boat", "character": "team", "radio": true}
+  ]
+}
