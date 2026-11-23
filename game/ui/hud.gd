@@ -348,8 +348,7 @@ func say(key: String, params: Dictionary = {}, is_hint: bool = false) -> void:
 func say_all(keys: Array[String]) -> void:
 	for k in keys:
 		say(k)
-	while _speaking or not _queue.is_empty():
-		await line_finished
+	await wait_silent()
 
 
 ## Retorna quando nao ha mais fala na fila nem em exibicao.
