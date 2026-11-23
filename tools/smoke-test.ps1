@@ -22,6 +22,8 @@ public static class RbWin {
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
   [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr h, out RECT r);
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
+  [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+  [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int cmd);
   [DllImport("user32.dll")] public static extern void keybd_event(byte vk, byte scan, uint flags, UIntPtr extra);
 }
 '@
@@ -74,7 +76,18 @@ try {
     [void]$game.Handle   # mantem o handle aberto para ler ExitCode depois
     $game.Refresh()
     Check ($game.MainWindowHandle -ne 0 -and [RbWin]::IsWindowVisible($game.MainWindowHandle)) 'janela visivel'
-    [void][RbWin]::SetForegroundWindow($game.MainWindowHandle); Start-Sleep -Milliseconds 500
+    # O Windows pode recusar SetForegroundWindow; um toque em Alt libera a troca de foco.
+    # Sem foco, as teclas iriam a outro aplicativo, entao o script falha em vez de enviar.
+    $hasFocus = $false
+    for ($i = 0; $i -lt 5 -and -not $hasFocus; $i++) {
+        [RbWin]::keybd_event(0x12, 0, 0, [UIntPtr]::Zero); [RbWin]::keybd_event(0x12, 0, 0x2, [UIntPtr]::Zero)
+        [void][RbWin]::ShowWindow($game.MainWindowHandle, 9)
+        [void][RbWin]::SetForegroundWindow($game.MainWindowHandle)
+        Start-Sleep -Milliseconds 500
+        $hasFocus = ([RbWin]::GetForegroundWindow() -eq $game.MainWindowHandle)
+    }
+    Check $hasFocus 'janela do jogo em primeiro plano (teclas chegam a ela)'
+    if (-not $hasFocus) { throw 'Sem foco na janela do jogo; abortando para nao enviar teclas a outro aplicativo.' }
     $shot1 = Capture $game 'rb-01-menu.png'
     Check ($null -ne $shot1) "captura do menu: $shot1"
 
