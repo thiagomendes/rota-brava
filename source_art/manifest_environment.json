@@ -1,0 +1,1432 @@
+{
+  "projeto": "Rota Brava",
+  "ticket": "RB-04-env",
+  "agente": "art3d",
+  "ativos": [
+    {
+      "id": "dock_deck_2m",
+      "conjunto": "dock_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_dock.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_dock.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/dock_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/dock_deck_2m.glb",
+      "glb_sha256": "268d64daa6600cdc72a96c1f985a318377f0518215194aded2703da6f941cfe4",
+      "triangulos": 4360,
+      "materiais": [
+        "mat_env_nail",
+        "mat_env_wood_dark",
+        "mat_env_wood_deck"
+      ],
+      "tamanho_m": [
+        1.996,
+        0.222,
+        5.999
+      ],
+      "objetos": [
+        "Dock_Deck_2m_Nails",
+        "Dock_Deck_2m_Planks",
+        "Dock_Deck_2m_Stringers",
+        "Dock_Deck_2m_Underlay"
+      ],
+      "empties": [
+        "DeckTop"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Kit modular do cais: deck de tabuas (2 e 4 m), poste com anel de corda, cabeco, defensa de pneu, escada, borda, estaca."
+    },
+    {
+      "id": "dock_deck_4m",
+      "conjunto": "dock_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_dock.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_dock.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/dock_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/dock_deck_4m.glb",
+      "glb_sha256": "ffa61ac74a5dd29e7baa60e8127ac9d7fba3d8e8f19aec8442b022db6f51acff",
+      "triangulos": 8384,
+      "materiais": [
+        "mat_env_nail",
+        "mat_env_wood_dark",
+        "mat_env_wood_deck"
+      ],
+      "tamanho_m": [
+        4.007,
+        0.222,
+        6.0
+      ],
+      "objetos": [
+        "Dock_Deck_4m_Nails",
+        "Dock_Deck_4m_Planks",
+        "Dock_Deck_4m_Stringers",
+        "Dock_Deck_4m_Underlay"
+      ],
+      "empties": [
+        "DeckTop.001"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Kit modular do cais: deck de tabuas (2 e 4 m), poste com anel de corda, cabeco, defensa de pneu, escada, borda, estaca."
+    },
+    {
+      "id": "dock_post",
+      "conjunto": "dock_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_dock.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_dock.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/dock_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/dock_post.glb",
+      "glb_sha256": "7c3a77ff667496f78003825c1e0f5ec45efc1910f99184a80e468f4d84285c46",
+      "triangulos": 2556,
+      "materiais": [
+        "mat_env_rope",
+        "mat_env_wood_dark",
+        "mat_env_wood_deck"
+      ],
+      "tamanho_m": [
+        0.545,
+        2.634,
+        0.368
+      ],
+      "objetos": [
+        "Dock_Post_Cap",
+        "Dock_Post_Pile",
+        "Dock_Post_RopeRing"
+      ],
+      "empties": [
+        "RopePoint"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Kit modular do cais: deck de tabuas (2 e 4 m), poste com anel de corda, cabeco, defensa de pneu, escada, borda, estaca."
+    },
+    {
+      "id": "dock_cleat",
+      "conjunto": "dock_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_dock.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_dock.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/dock_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/dock_cleat.glb",
+      "glb_sha256": "a4253850247c185a9e19ccefba6b23bc3734c4d46abc3f966fc77c05541c233f",
+      "triangulos": 1356,
+      "materiais": [
+        "mat_env_metal"
+      ],
+      "tamanho_m": [
+        0.46,
+        0.199,
+        0.16
+      ],
+      "objetos": [
+        "Dock_Cleat_Base",
+        "Dock_Cleat_Horn"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Kit modular do cais: deck de tabuas (2 e 4 m), poste com anel de corda, cabeco, defensa de pneu, escada, borda, estaca."
+    },
+    {
+      "id": "dock_fender",
+      "conjunto": "dock_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_dock.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_dock.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/dock_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/dock_fender.glb",
+      "glb_sha256": "7da4506bebb455c7554a73a7a199ab47ffd1c10c1cced200a8c0dce6421008ad",
+      "triangulos": 532,
+      "materiais": [
+        "mat_env_rope",
+        "mat_env_rubber"
+      ],
+      "tamanho_m": [
+        0.58,
+        0.911,
+        0.171
+      ],
+      "objetos": [
+        "Dock_Fender_Rope",
+        "Dock_Fender_Tire"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Kit modular do cais: deck de tabuas (2 e 4 m), poste com anel de corda, cabeco, defensa de pneu, escada, borda, estaca."
+    },
+    {
+      "id": "dock_ladder",
+      "conjunto": "dock_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_dock.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_dock.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/dock_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/dock_ladder.glb",
+      "glb_sha256": "62bbbe921a128fbb58499ffaf46f950b2f29ded849c2c81de0110724457bc3bc",
+      "triangulos": 840,
+      "materiais": [
+        "mat_env_wood_dark",
+        "mat_env_wood_light"
+      ],
+      "tamanho_m": [
+        0.53,
+        1.64,
+        0.24
+      ],
+      "objetos": [
+        "Dock_Ladder_Rails",
+        "Dock_Ladder_Rungs"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Kit modular do cais: deck de tabuas (2 e 4 m), poste com anel de corda, cabeco, defensa de pneu, escada, borda, estaca."
+    },
+    {
+      "id": "dock_edge",
+      "conjunto": "dock_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_dock.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_dock.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/dock_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/dock_edge.glb",
+      "glb_sha256": "1f0954d2058416d8f23450e391ff41f5c27863f11f8e35182f2a373404ed1fec",
+      "triangulos": 412,
+      "materiais": [
+        "mat_env_nail",
+        "mat_env_wood_dark"
+      ],
+      "tamanho_m": [
+        4.0,
+        0.223,
+        0.178
+      ],
+      "objetos": [
+        "Dock_Edge_Beam",
+        "Dock_Edge_Bolts"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Kit modular do cais: deck de tabuas (2 e 4 m), poste com anel de corda, cabeco, defensa de pneu, escada, borda, estaca."
+    },
+    {
+      "id": "dock_pile",
+      "conjunto": "dock_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_dock.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_dock.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/dock_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/dock_pile.glb",
+      "glb_sha256": "54b334966a5ea3da05fb43a158086e059b133570e0334fb67f1776b1e6c97d48",
+      "triangulos": 2760,
+      "materiais": [
+        "mat_env_wood_dark"
+      ],
+      "tamanho_m": [
+        0.287,
+        1.824,
+        0.273
+      ],
+      "objetos": [
+        "Dock_Pile_Pile"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Kit modular do cais: deck de tabuas (2 e 4 m), poste com anel de corda, cabeco, defensa de pneu, escada, borda, estaca."
+    },
+    {
+      "id": "crate_l",
+      "conjunto": "props",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_props.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_props.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/props.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/crate_l.glb",
+      "glb_sha256": "9b6816b2eea95f82f0d43e7360dbcf72479cd2013c55800942aac6f432702d97",
+      "triangulos": 1256,
+      "materiais": [
+        "mat_env_wood_dark",
+        "mat_env_wood_deck",
+        "mat_env_wood_light"
+      ],
+      "tamanho_m": [
+        0.9,
+        0.8,
+        0.9
+      ],
+      "objetos": [
+        "Crate_L_Core",
+        "Crate_L_Frame",
+        "Crate_L_Slats"
+      ],
+      "empties": [
+        "TopPoint"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Adercos: caixotes (L, S, com pessegos), barril, rolo de corda, lampiao, rede, placa, balde, remo, boia de cortica, cabana, pegada de bota."
+    },
+    {
+      "id": "crate_s",
+      "conjunto": "props",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_props.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_props.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/props.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/crate_s.glb",
+      "glb_sha256": "6b46fc172bc836f08983b78eef38b7c994c5b5596f843a33fb247e6e0307462a",
+      "triangulos": 1080,
+      "materiais": [
+        "mat_env_wood_dark",
+        "mat_env_wood_deck",
+        "mat_env_wood_light"
+      ],
+      "tamanho_m": [
+        0.62,
+        0.5,
+        0.62
+      ],
+      "objetos": [
+        "Crate_S_Core",
+        "Crate_S_Frame",
+        "Crate_S_Slats"
+      ],
+      "empties": [
+        "TopPoint.001"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Adercos: caixotes (L, S, com pessegos), barril, rolo de corda, lampiao, rede, placa, balde, remo, boia de cortica, cabana, pegada de bota."
+    },
+    {
+      "id": "crate_peach",
+      "conjunto": "props",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_props.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_props.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/props.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/crate_peach.glb",
+      "glb_sha256": "6cd3a2c696f15b43c0c4d08305fdd95017f1fe6c3f21a8a2213b0a91198554b3",
+      "triangulos": 5412,
+      "materiais": [
+        "mat_env_leaf",
+        "mat_env_peach",
+        "mat_env_wood_dark",
+        "mat_env_wood_deck",
+        "mat_env_wood_light"
+      ],
+      "tamanho_m": [
+        0.741,
+        0.577,
+        0.75
+      ],
+      "objetos": [
+        "Crate_Peach_Core",
+        "Crate_Peach_Frame",
+        "Crate_Peach_Leaves",
+        "Crate_Peach_Peaches",
+        "Crate_Peach_Slats"
+      ],
+      "empties": [
+        "TopPoint.002"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Adercos: caixotes (L, S, com pessegos), barril, rolo de corda, lampiao, rede, placa, balde, remo, boia de cortica, cabana, pegada de bota."
+    },
+    {
+      "id": "barrel",
+      "conjunto": "props",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_props.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_props.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/props.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/barrel.glb",
+      "glb_sha256": "4b790ad04ada8a29866f4502f1560c960287acc5f605358e25c174de4437637c",
+      "triangulos": 3424,
+      "materiais": [
+        "mat_env_barrel",
+        "mat_env_metal"
+      ],
+      "tamanho_m": [
+        0.745,
+        0.84,
+        0.745
+      ],
+      "objetos": [
+        "Barrel_Hoops",
+        "Barrel_Staves"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Adercos: caixotes (L, S, com pessegos), barril, rolo de corda, lampiao, rede, placa, balde, remo, boia de cortica, cabana, pegada de bota."
+    },
+    {
+      "id": "rope_coil",
+      "conjunto": "props",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_props.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_props.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/props.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/rope_coil.glb",
+      "glb_sha256": "f9f31922aeae8ebe1f3adf51dde1c0e2f0be4d3ef5ddf26f7866a150161cf440",
+      "triangulos": 1160,
+      "materiais": [
+        "mat_env_rope"
+      ],
+      "tamanho_m": [
+        0.964,
+        0.171,
+        1.044
+      ],
+      "objetos": [
+        "Rope_Coil_Rope"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Adercos: caixotes (L, S, com pessegos), barril, rolo de corda, lampiao, rede, placa, balde, remo, boia de cortica, cabana, pegada de bota."
+    },
+    {
+      "id": "lantern_post",
+      "conjunto": "props",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_props.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_props.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/props.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/lantern_post.glb",
+      "glb_sha256": "26f5ead8467940600b1024497dea711db8b07900b10793001ef9abdf920128db",
+      "triangulos": 980,
+      "materiais": [
+        "mat_env_lamp_glass",
+        "mat_env_metal",
+        "mat_env_wood_dark"
+      ],
+      "tamanho_m": [
+        0.585,
+        2.1,
+        0.26
+      ],
+      "objetos": [
+        "Lantern_Post_Arm",
+        "Lantern_Post_Cage",
+        "Lantern_Post_Glass",
+        "Lantern_Post_Hat",
+        "Lantern_Post_Pole"
+      ],
+      "empties": [
+        "LampPoint"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Adercos: caixotes (L, S, com pessegos), barril, rolo de corda, lampiao, rede, placa, balde, remo, boia de cortica, cabana, pegada de bota."
+    },
+    {
+      "id": "fishing_net",
+      "conjunto": "props",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_props.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_props.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/props.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/fishing_net.glb",
+      "glb_sha256": "16515376bfe62b6b46c1d5bb9ab4abc0fc45ca7b31747c687421e8c18590baca",
+      "triangulos": 2964,
+      "materiais": [
+        "mat_env_cork",
+        "mat_env_net",
+        "mat_env_rope"
+      ],
+      "tamanho_m": [
+        1.847,
+        1.385,
+        0.104
+      ],
+      "objetos": [
+        "Fishing_Net_Floats",
+        "Fishing_Net_Mesh",
+        "Fishing_Net_Rope"
+      ],
+      "empties": [
+        "HangPoint"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Adercos: caixotes (L, S, com pessegos), barril, rolo de corda, lampiao, rede, placa, balde, remo, boia de cortica, cabana, pegada de bota."
+    },
+    {
+      "id": "sign_board",
+      "conjunto": "props",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_props.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_props.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/props.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/sign_board.glb",
+      "glb_sha256": "10013de9188c6657a1183d59acf0291c22bf87ad5d4a4e9c083621c32a38338b",
+      "triangulos": 724,
+      "materiais": [
+        "mat_env_boat_name",
+        "mat_env_hut_door",
+        "mat_env_wood_dark",
+        "mat_env_wood_light"
+      ],
+      "tamanho_m": [
+        1.191,
+        1.602,
+        0.197
+      ],
+      "objetos": [
+        "Sign_Board_Board",
+        "Sign_Board_Frame",
+        "Sign_Board_Icon",
+        "Sign_Board_Post"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Adercos: caixotes (L, S, com pessegos), barril, rolo de corda, lampiao, rede, placa, balde, remo, boia de cortica, cabana, pegada de bota."
+    },
+    {
+      "id": "bucket",
+      "conjunto": "props",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_props.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_props.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/props.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/bucket.glb",
+      "glb_sha256": "fa7754ca7ce1bb6b4a0c8d33a4900cdd15deb52d4180a29ed909ff353074dbec",
+      "triangulos": 1088,
+      "materiais": [
+        "mat_env_bucket",
+        "mat_env_metal"
+      ],
+      "tamanho_m": [
+        0.354,
+        0.477,
+        0.345
+      ],
+      "objetos": [
+        "Bucket_Body",
+        "Bucket_Handle"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Adercos: caixotes (L, S, com pessegos), barril, rolo de corda, lampiao, rede, placa, balde, remo, boia de cortica, cabana, pegada de bota."
+    },
+    {
+      "id": "oar",
+      "conjunto": "props",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_props.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_props.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/props.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/oar.glb",
+      "glb_sha256": "cf344b3fe54fd3e52d550d236318f3c5aff53f70d13048e6042f22e524b6c71c",
+      "triangulos": 1208,
+      "materiais": [
+        "mat_env_boat_trim",
+        "mat_env_wood_light"
+      ],
+      "tamanho_m": [
+        0.152,
+        1.985,
+        0.068
+      ],
+      "objetos": [
+        "Oar_Blade",
+        "Oar_Shaft"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Adercos: caixotes (L, S, com pessegos), barril, rolo de corda, lampiao, rede, placa, balde, remo, boia de cortica, cabana, pegada de bota."
+    },
+    {
+      "id": "cork_buoy",
+      "conjunto": "props",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_props.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_props.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/props.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/cork_buoy.glb",
+      "glb_sha256": "1ead13fb2d14aca97e597e0d874618f881be1cc266196bdf8457d2b245943863",
+      "triangulos": 988,
+      "materiais": [
+        "mat_env_cork",
+        "mat_env_rope"
+      ],
+      "tamanho_m": [
+        0.4,
+        0.493,
+        0.4
+      ],
+      "objetos": [
+        "Cork_Buoy_Float",
+        "Cork_Buoy_Rope"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Adercos: caixotes (L, S, com pessegos), barril, rolo de corda, lampiao, rede, placa, balde, remo, boia de cortica, cabana, pegada de bota."
+    },
+    {
+      "id": "boat_hut",
+      "conjunto": "props",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_props.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_props.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/props.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/boat_hut.glb",
+      "glb_sha256": "0e483bd82ed89885aab04b67dba11a7a6e16d0dcdfedbd89b12b31fbbb5595cc",
+      "triangulos": 5008,
+      "materiais": [
+        "mat_env_bush_flower",
+        "mat_env_hut_door",
+        "mat_env_hut_glass",
+        "mat_env_hut_roof",
+        "mat_env_hut_wall",
+        "mat_env_leaf",
+        "mat_env_rock",
+        "mat_env_wood_dark",
+        "mat_env_wood_light"
+      ],
+      "tamanho_m": [
+        3.852,
+        3.322,
+        3.35
+      ],
+      "objetos": [
+        "Boat_Hut_Boards",
+        "Boat_Hut_Door",
+        "Boat_Hut_FlowerBox",
+        "Boat_Hut_Flowers",
+        "Boat_Hut_Frames",
+        "Boat_Hut_Plants",
+        "Boat_Hut_Plinth",
+        "Boat_Hut_Ridge",
+        "Boat_Hut_Roof",
+        "Boat_Hut_Walls",
+        "Boat_Hut_Window"
+      ],
+      "empties": [
+        "DoorPoint"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Adercos: caixotes (L, S, com pessegos), barril, rolo de corda, lampiao, rede, placa, balde, remo, boia de cortica, cabana, pegada de bota."
+    },
+    {
+      "id": "boot_print",
+      "conjunto": "props",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_props.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_props.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/props.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/boot_print.glb",
+      "glb_sha256": "1c61f9e80e4dd7d239c70b6120f878f1ffc3a549774060cb591f71f5a98038ef",
+      "triangulos": 728,
+      "materiais": [
+        "mat_env_bootprint"
+      ],
+      "tamanho_m": [
+        0.19,
+        0.022,
+        0.425
+      ],
+      "objetos": [
+        "Boot_Print_Sole",
+        "Boot_Print_Tread"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Adercos: caixotes (L, S, com pessegos), barril, rolo de corda, lampiao, rede, placa, balde, remo, boia de cortica, cabana, pegada de bota."
+    },
+    {
+      "id": "ground_tile_a",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/ground_tile_a.glb",
+      "glb_sha256": "93e66c8e510c55145a17592060c47e22a23a52d23a1bdb2516c677bd33feb186",
+      "triangulos": 3664,
+      "materiais": [
+        "mat_env_ground"
+      ],
+      "tamanho_m": [
+        8.0,
+        0.35,
+        13.0
+      ],
+      "objetos": [
+        "Ground_Tile_A_Surface"
+      ],
+      "empties": [
+        "TileOrigin"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "ground_tile_b",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/ground_tile_b.glb",
+      "glb_sha256": "da1622714ec2f19f4abe6da129446501a4959015e7b3d758d4dc3a5574dcbe17",
+      "triangulos": 3664,
+      "materiais": [
+        "mat_env_ground"
+      ],
+      "tamanho_m": [
+        8.0,
+        0.35,
+        13.0
+      ],
+      "objetos": [
+        "Ground_Tile_B_Surface"
+      ],
+      "empties": [
+        "TileOrigin.001"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "ground_tile_path",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/ground_tile_path.glb",
+      "glb_sha256": "d49bee818c292d0a17e5d29d0eeec42bb4e30c3d22ff53e624aafbc8590e7ddf",
+      "triangulos": 1936,
+      "materiais": [
+        "mat_env_ground"
+      ],
+      "tamanho_m": [
+        4.0,
+        0.35,
+        13.0
+      ],
+      "objetos": [
+        "Ground_Tile_Path_Surface"
+      ],
+      "empties": [
+        "TileOrigin.002"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "tree_a",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/tree_a.glb",
+      "glb_sha256": "5dcde54629d5a9f6161e7dc4afe5a34df3f4e42abb4e8dc5a9b36d83c997c36f",
+      "triangulos": 6424,
+      "materiais": [
+        "mat_env_foliage_a",
+        "mat_env_trunk"
+      ],
+      "tamanho_m": [
+        4.16,
+        5.3,
+        3.864
+      ],
+      "objetos": [
+        "Tree_A_Crown",
+        "Tree_A_Trunk"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "tree_b",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/tree_b.glb",
+      "glb_sha256": "de2d7341dbe7b624f06e5e55f03b906e2a450dfbe3c1e2840e2244588605980b",
+      "triangulos": 6068,
+      "materiais": [
+        "mat_env_foliage_c",
+        "mat_env_trunk"
+      ],
+      "tamanho_m": [
+        2.324,
+        6.457,
+        2.085
+      ],
+      "objetos": [
+        "Tree_B_Crown",
+        "Tree_B_Trunk"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "tree_c",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/tree_c.glb",
+      "glb_sha256": "22e8ef5c87990f9bf396fbbcfdb481cf8461cee46152e4cdcac958dd24a68ac1",
+      "triangulos": 5524,
+      "materiais": [
+        "mat_env_foliage_b",
+        "mat_env_trunk"
+      ],
+      "tamanho_m": [
+        3.85,
+        4.498,
+        3.296
+      ],
+      "objetos": [
+        "Tree_C_Crown",
+        "Tree_C_Trunk"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "bush_round",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/bush_round.glb",
+      "glb_sha256": "f56326947b84f721f7122d35da41bd1788aedff48b50141cbd2a87b0075b9863",
+      "triangulos": 4760,
+      "materiais": [
+        "mat_env_bush"
+      ],
+      "tamanho_m": [
+        1.662,
+        0.94,
+        1.403
+      ],
+      "objetos": [
+        "Bush_Round_Leaves"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "bush_flower",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/bush_flower.glb",
+      "glb_sha256": "20d497e7263bc0e405a3ce3743c0e4766d9a1f305b4432bca9206dc29d0f0ee2",
+      "triangulos": 3752,
+      "materiais": [
+        "mat_env_bush",
+        "mat_env_bush_flower"
+      ],
+      "tamanho_m": [
+        1.415,
+        0.875,
+        0.882
+      ],
+      "objetos": [
+        "Bush_Flower_Flowers",
+        "Bush_Flower_Leaves"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "grass_tuft",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/grass_tuft.glb",
+      "glb_sha256": "106e824f00906718739d1914777d45c5d8bec2aa6c3cb22fc3124a12d2c8608d",
+      "triangulos": 240,
+      "materiais": [
+        "mat_env_reed"
+      ],
+      "tamanho_m": [
+        0.331,
+        0.414,
+        0.196
+      ],
+      "objetos": [
+        "Grass_Tuft_Blades"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "reeds",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/reeds.glb",
+      "glb_sha256": "c15683736fa822c0e8be70bc138dddc26228ae757ed11e0fd0304be422f0a152",
+      "triangulos": 260,
+      "materiais": [
+        "mat_env_reed",
+        "mat_env_trunk"
+      ],
+      "tamanho_m": [
+        0.775,
+        1.654,
+        0.547
+      ],
+      "objetos": [
+        "Reeds_Heads",
+        "Reeds_Stalks"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "rock_a",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/rock_a.glb",
+      "glb_sha256": "73eb37ebc0c6489c34aab036a621b5fde66a3d4919c9856cfc4fb2f9cf88ef60",
+      "triangulos": 480,
+      "materiais": [
+        "mat_env_rock"
+      ],
+      "tamanho_m": [
+        1.027,
+        0.464,
+        0.981
+      ],
+      "objetos": [
+        "Rock_A_Stone"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "rock_b",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/rock_b.glb",
+      "glb_sha256": "4a38f87cce734518d7cabd14a4c177426d071a8dc60d991ef190fa95b47eac8b",
+      "triangulos": 480,
+      "materiais": [
+        "mat_env_rock_warm"
+      ],
+      "tamanho_m": [
+        0.595,
+        0.263,
+        0.698
+      ],
+      "objetos": [
+        "Rock_B_Stone"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "rock_c",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/rock_c.glb",
+      "glb_sha256": "35a7a288ae1d1812dfb104c13054e1b51a01b225d7f8f431f37a7323ddf91653",
+      "triangulos": 480,
+      "materiais": [
+        "mat_env_rock"
+      ],
+      "tamanho_m": [
+        1.599,
+        0.609,
+        1.388
+      ],
+      "objetos": [
+        "Rock_C_Stone"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "boat_v2",
+      "conjunto": "boat_v2",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_boat_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_boat_v2.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/boat_v2.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/boat_v2.glb",
+      "glb_sha256": "6df108479434c8b576877fd003decb0d2569d4ef8ce922558824b044d0db9a63",
+      "triangulos": 13364,
+      "materiais": [
+        "mat_env_boat_bench",
+        "mat_env_boat_cabin",
+        "mat_env_boat_deck",
+        "mat_env_boat_flag",
+        "mat_env_boat_glass",
+        "mat_env_boat_hull",
+        "mat_env_boat_lamp",
+        "mat_env_boat_motor",
+        "mat_env_boat_name",
+        "mat_env_boat_roof",
+        "mat_env_boat_stripe",
+        "mat_env_boat_trim",
+        "mat_env_boat_wheel",
+        "mat_env_metal",
+        "mat_env_paw",
+        "mat_env_rope",
+        "mat_env_white",
+        "mat_env_wood_dark",
+        "mat_env_wood_light"
+      ],
+      "tamanho_m": [
+        2.59,
+        3.167,
+        5.635
+      ],
+      "objetos": [
+        "Boat_Bench",
+        "Boat_BenchLegs",
+        "Boat_Cabin",
+        "Boat_CabinRoof",
+        "Boat_Cleat",
+        "Boat_Deck",
+        "Boat_DeckPlanks",
+        "Boat_Fenders",
+        "Boat_Flag",
+        "Boat_FlagPole",
+        "Boat_Helm",
+        "Boat_HelmColumn",
+        "Boat_HelmStand",
+        "Boat_Horn",
+        "Boat_Hull",
+        "Boat_Lantern",
+        "Boat_LanternGlass",
+        "Boat_Motor",
+        "Boat_MotorCowl",
+        "Boat_MotorLeg",
+        "Boat_MotorTiller",
+        "Boat_Name",
+        "Boat_Rail",
+        "Boat_Rope",
+        "Boat_Stripe",
+        "Boat_WindowFrames",
+        "Boat_Windows",
+        "PawMark"
+      ],
+      "empties": [
+        "BenchMark",
+        "DeckPoint",
+        "HornPoint",
+        "PivotMark",
+        "WheelPoint"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Barco v2 (evolucao do RB-03): cabine na popa, banco com PawMark, volante, motor, bandeirola, lampiao, corda. Pivo a 40% da popa."
+    }
+  ]
+}

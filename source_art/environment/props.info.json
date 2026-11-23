@@ -1,0 +1,411 @@
+{
+  "crate_l": {
+    "glb": "game/assets/models/environment/crate_l.glb",
+    "tris": 1256,
+    "materials": [
+      "mat_env_wood_dark",
+      "mat_env_wood_deck",
+      "mat_env_wood_light"
+    ],
+    "bbox_min": [
+      -0.45,
+      0.0,
+      -0.45
+    ],
+    "bbox_max": [
+      0.45,
+      0.8,
+      0.45
+    ],
+    "size": [
+      0.9,
+      0.8,
+      0.9
+    ],
+    "objects": [
+      "Crate_L_Core",
+      "Crate_L_Frame",
+      "Crate_L_Slats"
+    ],
+    "empties": [
+      "TopPoint"
+    ]
+  },
+  "crate_s": {
+    "glb": "game/assets/models/environment/crate_s.glb",
+    "tris": 1080,
+    "materials": [
+      "mat_env_wood_dark",
+      "mat_env_wood_deck",
+      "mat_env_wood_light"
+    ],
+    "bbox_min": [
+      -0.31,
+      0.0,
+      -0.31
+    ],
+    "bbox_max": [
+      0.31,
+      0.5,
+      0.31
+    ],
+    "size": [
+      0.62,
+      0.5,
+      0.62
+    ],
+    "objects": [
+      "Crate_S_Core",
+      "Crate_S_Frame",
+      "Crate_S_Slats"
+    ],
+    "empties": [
+      "TopPoint.001"
+    ]
+  },
+  "crate_peach": {
+    "glb": "game/assets/models/environment/crate_peach.glb",
+    "tris": 5412,
+    "materials": [
+      "mat_env_leaf",
+      "mat_env_peach",
+      "mat_env_wood_dark",
+      "mat_env_wood_deck",
+      "mat_env_wood_light"
+    ],
+    "bbox_min": [
+      -0.373,
+      0.0,
+      -0.379
+    ],
+    "bbox_max": [
+      0.368,
+      0.577,
+      0.371
+    ],
+    "size": [
+      0.741,
+      0.577,
+      0.75
+    ],
+    "objects": [
+      "Crate_Peach_Core",
+      "Crate_Peach_Frame",
+      "Crate_Peach_Leaves",
+      "Crate_Peach_Peaches",
+      "Crate_Peach_Slats"
+    ],
+    "empties": [
+      "TopPoint.002"
+    ]
+  },
+  "barrel": {
+    "glb": "game/assets/models/environment/barrel.glb",
+    "tris": 3424,
+    "materials": [
+      "mat_env_barrel",
+      "mat_env_metal"
+    ],
+    "bbox_min": [
+      -0.373,
+      0.0,
+      -0.373
+    ],
+    "bbox_max": [
+      0.373,
+      0.84,
+      0.373
+    ],
+    "size": [
+      0.745,
+      0.84,
+      0.745
+    ],
+    "objects": [
+      "Barrel_Hoops",
+      "Barrel_Staves"
+    ],
+    "empties": []
+  },
+  "rope_coil": {
+    "glb": "game/assets/models/environment/rope_coil.glb",
+    "tris": 1160,
+    "materials": [
+      "mat_env_rope"
+    ],
+    "bbox_min": [
+      -0.335,
+      0.004,
+      -0.339
+    ],
+    "bbox_max": [
+      0.629,
+      0.174,
+      0.706
+    ],
+    "size": [
+      0.964,
+      0.171,
+      1.044
+    ],
+    "objects": [
+      "Rope_Coil_Rope"
+    ],
+    "empties": []
+  },
+  "lantern_post": {
+    "glb": "game/assets/models/environment/lantern_post.glb",
+    "tris": 980,
+    "materials": [
+      "mat_env_lamp_glass",
+      "mat_env_metal",
+      "mat_env_wood_dark"
+    ],
+    "bbox_min": [
+      -0.13,
+      0.0,
+      -0.13
+    ],
+    "bbox_max": [
+      0.455,
+      2.1,
+      0.13
+    ],
+    "size": [
+      0.585,
+      2.1,
+      0.26
+    ],
+    "objects": [
+      "Lantern_Post_Arm",
+      "Lantern_Post_Cage",
+      "Lantern_Post_Glass",
+      "Lantern_Post_Hat",
+      "Lantern_Post_Pole"
+    ],
+    "empties": [
+      "LampPoint"
+    ]
+  },
+  "fishing_net": {
+    "glb": "game/assets/models/environment/fishing_net.glb",
+    "tris": 2964,
+    "materials": [
+      "mat_env_cork",
+      "mat_env_net",
+      "mat_env_rope"
+    ],
+    "bbox_min": [
+      -0.923,
+      -1.346,
+      -0.032
+    ],
+    "bbox_max": [
+      0.924,
+      0.039,
+      0.072
+    ],
+    "size": [
+      1.847,
+      1.385,
+      0.104
+    ],
+    "objects": [
+      "Fishing_Net_Floats",
+      "Fishing_Net_Mesh",
+      "Fishing_Net_Rope"
+    ],
+    "empties": [
+      "HangPoint"
+    ]
+  },
+  "sign_board": {
+    "glb": "game/assets/models/environment/sign_board.glb",
+    "tris": 724,
+    "materials": [
+      "mat_env_boat_name",
+      "mat_env_hut_door",
+      "mat_env_wood_dark",
+      "mat_env_wood_light"
+    ],
+    "bbox_min": [
+      -0.575,
+      0.0,
+      -0.082
+    ],
+    "bbox_max": [
+      0.615,
+      1.602,
+      0.115
+    ],
+    "size": [
+      1.191,
+      1.602,
+      0.197
+    ],
+    "objects": [
+      "Sign_Board_Board",
+      "Sign_Board_Frame",
+      "Sign_Board_Icon",
+      "Sign_Board_Post"
+    ],
+    "empties": []
+  },
+  "bucket": {
+    "glb": "game/assets/models/environment/bucket.glb",
+    "tris": 1088,
+    "materials": [
+      "mat_env_bucket",
+      "mat_env_metal"
+    ],
+    "bbox_min": [
+      -0.177,
+      0.0,
+      -0.172
+    ],
+    "bbox_max": [
+      0.177,
+      0.477,
+      0.172
+    ],
+    "size": [
+      0.354,
+      0.477,
+      0.345
+    ],
+    "objects": [
+      "Bucket_Body",
+      "Bucket_Handle"
+    ],
+    "empties": []
+  },
+  "oar": {
+    "glb": "game/assets/models/environment/oar.glb",
+    "tris": 1208,
+    "materials": [
+      "mat_env_boat_trim",
+      "mat_env_wood_light"
+    ],
+    "bbox_min": [
+      -0.076,
+      -0.005,
+      -0.034
+    ],
+    "bbox_max": [
+      0.076,
+      1.98,
+      0.034
+    ],
+    "size": [
+      0.152,
+      1.985,
+      0.068
+    ],
+    "objects": [
+      "Oar_Blade",
+      "Oar_Shaft"
+    ],
+    "empties": []
+  },
+  "cork_buoy": {
+    "glb": "game/assets/models/environment/cork_buoy.glb",
+    "tris": 988,
+    "materials": [
+      "mat_env_cork",
+      "mat_env_rope"
+    ],
+    "bbox_min": [
+      -0.2,
+      0.0,
+      -0.2
+    ],
+    "bbox_max": [
+      0.2,
+      0.493,
+      0.2
+    ],
+    "size": [
+      0.4,
+      0.493,
+      0.4
+    ],
+    "objects": [
+      "Cork_Buoy_Float",
+      "Cork_Buoy_Rope"
+    ],
+    "empties": []
+  },
+  "boat_hut": {
+    "glb": "game/assets/models/environment/boat_hut.glb",
+    "tris": 5008,
+    "materials": [
+      "mat_env_bush_flower",
+      "mat_env_hut_door",
+      "mat_env_hut_glass",
+      "mat_env_hut_roof",
+      "mat_env_hut_wall",
+      "mat_env_leaf",
+      "mat_env_rock",
+      "mat_env_wood_dark",
+      "mat_env_wood_light"
+    ],
+    "bbox_min": [
+      -1.926,
+      -0.012,
+      -1.675
+    ],
+    "bbox_max": [
+      1.926,
+      3.31,
+      1.675
+    ],
+    "size": [
+      3.852,
+      3.322,
+      3.35
+    ],
+    "objects": [
+      "Boat_Hut_Boards",
+      "Boat_Hut_Door",
+      "Boat_Hut_FlowerBox",
+      "Boat_Hut_Flowers",
+      "Boat_Hut_Frames",
+      "Boat_Hut_Plants",
+      "Boat_Hut_Plinth",
+      "Boat_Hut_Ridge",
+      "Boat_Hut_Roof",
+      "Boat_Hut_Walls",
+      "Boat_Hut_Window"
+    ],
+    "empties": [
+      "DoorPoint"
+    ]
+  },
+  "boot_print": {
+    "glb": "game/assets/models/environment/boot_print.glb",
+    "tris": 728,
+    "materials": [
+      "mat_env_bootprint"
+    ],
+    "bbox_min": [
+      -0.095,
+      0.001,
+      -0.2
+    ],
+    "bbox_max": [
+      0.095,
+      0.023,
+      0.225
+    ],
+    "size": [
+      0.19,
+      0.022,
+      0.425
+    ],
+    "objects": [
+      "Boot_Print_Sole",
+      "Boot_Print_Tread"
+    ],
+    "empties": []
+  }
+}
