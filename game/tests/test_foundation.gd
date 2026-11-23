@@ -96,7 +96,10 @@ func run(runner) -> void:
 	await _tap(&"ui_down")
 	r.check(_focus(menu) == menu.options_button, "ui_down move o foco de Jogar para Opcoes")
 	await _tap(&"ui_down")
-	r.check(_focus(menu) == menu.quit_button, "ui_down move o foco de Opcoes para Sair")
+	r.check(_focus(menu) == menu.references_button, "ui_down move o foco de Opcoes para Referencias")
+	await _tap(&"ui_down")
+	r.check(_focus(menu) == menu.quit_button, "ui_down move o foco de Referencias para Sair")
+	await _tap(&"ui_up")
 	await _tap(&"ui_up")
 	await _tap(&"ui_up")
 	r.check(_focus(menu) == menu.play_button, "ui_up volta o foco para Jogar")
@@ -133,4 +136,5 @@ func run(runner) -> void:
 		r.check(back != null, "Menu na pausa volta ao menu principal")
 		r.check(not r.tree.paused, "o jogo nao fica pausado no menu")
 		if back:
-			r.check(_focus(back) == back.play_button, "foco recuperado em Jogar apos voltar")
+			var owner_name := String(_focus(back).name) if _focus(back) != null else "nenhum"
+			r.check(_focus(back) == back.play_button, "foco recuperado em Jogar apos voltar (foco em: %s)" % owner_name)

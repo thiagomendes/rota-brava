@@ -116,7 +116,7 @@ try {
     Check (WaitLog '[RB] back_to_menu' 5) 'Menu na pausa volta ao menu'
     Check (([regex]::Matches((Log), 'menu_ready focus=PlayButton')).Count -ge 2) 'o menu reaparece com foco em Jogar'
     Start-Sleep -Seconds 1
-    Keys 'DOWN'; Keys 'DOWN'; Keys 'ENTER'
+    Keys 'DOWN'; Keys 'DOWN'; Keys 'DOWN'; Keys 'ENTER'
     Check (WaitLog '[RB] quit' 5) 'Sair pelo menu por teclado'
     Check ($game.WaitForExit(10000)) 'processo do jogo encerrou'
     if ($game.HasExited) { Check ($game.ExitCode -eq 0) "codigo de saida do jogo 0 (obtido $($game.ExitCode))" }
