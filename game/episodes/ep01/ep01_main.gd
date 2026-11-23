@@ -74,6 +74,11 @@ func _ready() -> void:
 		_begin_normal()
 	else:
 		start_at(StringName(start))
+	if _has_flag("--ep01-demo"):
+		var bot := Ep01DemoBot.new()
+		bot.main = self
+		bot.finished.connect(func(ok: bool) -> void: get_tree().quit(0 if ok else 1))
+		add_child(bot)
 
 
 func _user_arg(flag: String) -> String:
@@ -81,6 +86,10 @@ func _user_arg(flag: String) -> String:
 		if arg.begins_with(flag + "="):
 			return arg.trim_prefix(flag + "=")
 	return ""
+
+
+func _has_flag(flag: String) -> bool:
+	return OS.get_cmdline_user_args().has(flag) or OS.get_cmdline_args().has(flag)
 
 
 func _build_environment() -> void:
