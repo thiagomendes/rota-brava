@@ -1,0 +1,101 @@
+{
+  "tris": 20208,
+  "materials": [
+    "mat_leme_band",
+    "mat_leme_eye",
+    "mat_leme_hair",
+    "mat_leme_hat",
+    "mat_leme_iris",
+    "mat_leme_leather",
+    "mat_leme_pants",
+    "mat_leme_scarf",
+    "mat_leme_shirt",
+    "mat_leme_skin",
+    "mat_leme_vest"
+  ],
+  "height_m": 1.3088,
+  "min_z": -0.0,
+  "objects": [
+    "Leme_Belt",
+    "Leme_Body",
+    "Leme_BootL",
+    "Leme_BootR",
+    "Leme_Face",
+    "Leme_Hair",
+    "Leme_HandL",
+    "Leme_HandR",
+    "Leme_Hat",
+    "Leme_HatBand",
+    "Leme_Head",
+    "Leme_Pants",
+    "Leme_Scarf",
+    "Leme_Shirt",
+    "Leme_Vest",
+    "Leme_VestDetails"
+  ],
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "hand_tip.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "hand_tip.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R",
+    "toe.R",
+    "toe_tip.R",
+    "heel.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "toe.L",
+    "toe_tip.L",
+    "heel.L"
+  ],
+  "bone_count": 28,
+  "animations": {
+    "idle": [
+      0,
+      72
+    ],
+    "idle_wheel": [
+      0,
+      72
+    ],
+    "react_horn": [
+      0,
+      27
+    ],
+    "steer_left": [
+      0,
+      30
+    ],
+    "steer_right": [
+      0,
+      30
+    ],
+    "walk": [
+      0,
+      30
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "blink"
+  ]
+}
