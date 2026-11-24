@@ -13,6 +13,7 @@
 ## 1. Onde estamos
 - **Ticket ativo:** `RB-R1 · Reorientação de qualidade (premium)`. Origem: Thiago reprovou arte/som/UI do RB-04 (“personagens nada infantis, gráfico ruim, som primitivo, mapa sem tamanho/densidade”).
 - **Portão 1:** decidido pelo lead por delegação (vila **B** “na orla”; heróis **A** “brinquedo brilhante”; UI v2). Reversível.
+- **Agora (2026-11-24):** direção reaberta (D7–D13). Rastro v2 pronto para aprovação em 3D; Pico e Leme só depois da aprovação; mundo e som em seguida.
 - **Próximo marco:** **Portão 2** — Thiago joga o primeiro minuto + mapa completo e **ouve** o som.
 - **Instrução de Thiago:** concluir o RB-R1 e **PARAR** (não iniciar RB-05) para uma pausa de análise da sequência.
 
@@ -70,6 +71,8 @@ bash tools/build-windows.sh          # exporta build/windows/RotaBrava.exe a par
 |---|---|
 | `feature/rb-r1-reorientacao` | **integração ativa** (tudo do RB-R1 até agora) |
 | `feature/rb-r1-{jogo,herois,mundo,marca-ui,audio,conteudo}` | já integradas; podem ser reusadas para follow-ups |
+| `feature/rb-r1-lookdev` | renderizador Forward+ e vitrine de materiais (não integrada) |
+| `feature/rb-r1-rastro-v2` | Rastro v2 (traje de herói investigador), base lookdev, `faac307`; **aguarda aprovação de Thiago** no visualizador 3D https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR |
 | `main` | RB-01..RB-04; recebe o RB-R1 só após revisão e Portão 2 |
 
 ## 5. Agentes
