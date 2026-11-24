@@ -7,7 +7,7 @@ extends Node3D
 ## Uso pelo integrador: `visual.play(&"walk", visual.walk_speed_scale(velocity.length()))` quando velocity > 0.1,
 ## `visual.play(&"idle")` parado, `visual.set_expression(&"atenta")`.
 
-const LOOPING: Array[StringName] = [&"idle", &"walk", &"run", &"idle_wheel"]
+const LOOPING: Array[StringName] = [&"idle", &"walk", &"run", &"idle_wheel", &"chat", &"wag"]
 const EXPRESSIONS: Array[StringName] = [&"atenta", &"surpresa", &"alegre", &"triste", &"brava_leve", &"blink"]
 ## Visemas de boca (RB-R1): somados por cima da expressao para a boca acompanhar o balbucio.
 const VISEMES: Array[StringName] = [&"mouth_A", &"mouth_E", &"mouth_O", &"mouth_M"]
@@ -30,6 +30,8 @@ var _expression: StringName = &"neutra"
 var _expression_weight: float = 1.0
 var _visemes: Dictionary = {}
 var _gaze: Vector2 = Vector2.ZERO
+## Visemas/olhar so sobrescrevem o rosto depois de set_viseme/set_gaze (clipes podem animar a boca, ex.: latido do filhote).
+var _extras_active: bool = false
 
 
 func _ready() -> void:
@@ -129,6 +131,7 @@ func set_viseme(viseme: StringName, weight: float = 1.0) -> void:
 	_visemes.clear()
 	if viseme in VISEMES:
 		_visemes[viseme] = clampf(weight, 0.0, 1.0)
+	_extras_active = true
 	_apply_face_extras()
 
 
@@ -136,6 +139,7 @@ func set_viseme(viseme: StringName, weight: float = 1.0) -> void:
 func set_gaze(dir: Vector2) -> void:
 	_bind()
 	_gaze = dir.clamp(Vector2(-1, -1), Vector2(1, 1))
+	_extras_active = true
 	_apply_face_extras()
 
 
@@ -154,7 +158,7 @@ func look_at_point(point: Vector3) -> void:
 
 
 func _apply_face_extras() -> void:
-	if _face == null or _face.mesh == null:
+	if _face == null or _face.mesh == null or not _extras_active:
 		return
 	for key in VISEMES:
 		var idx := _face.find_blend_shape_by_name(String(key))

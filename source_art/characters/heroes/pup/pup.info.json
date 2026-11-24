@@ -1,0 +1,101 @@
+{
+  "tris": 8744,
+  "materials": [
+    "mat_pup_boca",
+    "mat_pup_coleira",
+    "mat_pup_creme",
+    "mat_pup_emblema",
+    "mat_pup_escuro",
+    "mat_pup_iris",
+    "mat_pup_nariz",
+    "mat_pup_olhos",
+    "mat_pup_orelha",
+    "mat_pup_ouro",
+    "mat_pup_pelo"
+  ],
+  "height_m": 0.507,
+  "min_z": -0.002,
+  "objects": [
+    "Pup_Body",
+    "Pup_Chest",
+    "Pup_Collar",
+    "Pup_EarL",
+    "Pup_EarR",
+    "Pup_Face",
+    "Pup_Head",
+    "Pup_Nose",
+    "Pup_Paws",
+    "Pup_Tag",
+    "Pup_TagStar",
+    "Pup_Tail"
+  ],
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "ear.L",
+    "ear.R",
+    "fl_upper.L",
+    "fl_lower.L",
+    "fl_paw.L",
+    "fl_upper.R",
+    "fl_lower.R",
+    "fl_paw.R",
+    "tail1",
+    "tail2",
+    "tail3",
+    "bl_upper.L",
+    "bl_lower.L",
+    "bl_paw.L",
+    "bl_upper.R",
+    "bl_lower.R",
+    "bl_paw.R"
+  ],
+  "bone_count": 23,
+  "animations": {
+    "bark": [
+      0,
+      24
+    ],
+    "idle": [
+      0,
+      84
+    ],
+    "jump_happy": [
+      0,
+      30
+    ],
+    "step_on_horn": [
+      0,
+      42
+    ],
+    "wag": [
+      0,
+      36
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "triste",
+    "brava_leve",
+    "blink",
+    "mouth_A",
+    "mouth_E",
+    "mouth_O",
+    "mouth_M",
+    "look_left",
+    "look_right",
+    "look_up"
+  ],
+  "head_ratio": 0.0,
+  "walk_speed_mps": 0.0,
+  "run_speed_mps": 0.0,
+  "variant": "pup"
+}

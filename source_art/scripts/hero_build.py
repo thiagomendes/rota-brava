@@ -27,7 +27,7 @@ def build(cid, variant, blend_path=None, glb_path=None):
     rig["provisional"] = True
     rig["agent"] = "art3d"
     rig["variant"] = variant
-    rep = hero_anim.author(rig, b.face_ob, b.F)
+    rep = hero_anim.author(rig, b.face_ob, b.F, cid=cid)
     bpy.context.view_layer.update()
     objs = b.objs
     lo, hi = world_bbox(objs)
@@ -41,7 +41,7 @@ def build(cid, variant, blend_path=None, glb_path=None):
             "objects": sorted(o.name for o in objs), "tris_por_objeto": {o.name: tri_count([o]) for o in objs},
             "bones": [bb.name for bb in rig.data.bones], "bone_count": len(rig.data.bones), "animations": acts,
             "shape_keys": [k.name for k in b.face_ob.data.shape_keys.key_blocks],
-            "walk_speed_mps": round(hero_anim.walk_speed(), 4), "run_speed_mps": round(hero_anim.run_speed(), 4),
+            "walk_speed_mps": round(hero_anim.walk_speed(b.F), 4), "run_speed_mps": round(hero_anim.run_speed(b.F), 4),
             "variant": variant}
     info.update(rep)
     print("CHAR_INFO", json.dumps(info))

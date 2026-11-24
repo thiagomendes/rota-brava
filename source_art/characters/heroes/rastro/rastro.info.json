@@ -1,5 +1,5 @@
 {
-  "tris": 19204,
+  "tris": 19172,
   "materials": [
     "mat_rastro_boca",
     "mat_rastro_botas",
@@ -67,7 +67,7 @@
     "Rastro_Hat": 930,
     "Rastro_HatBand": 432,
     "Rastro_HatStar": 28,
-    "Rastro_Neck": 80,
+    "Rastro_Neck": 48,
     "Rastro_HandR": 1600,
     "Rastro_HandL": 1600,
     "Rastro_Jacket": 1952,

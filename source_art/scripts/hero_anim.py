@@ -25,12 +25,16 @@ TOUCH_TARGET = Vector((0.08, 0.44, 0.112))
 FACE_KEYS = ("atenta", "surpresa", "alegre", "triste", "blink")
 
 
-def walk_speed():
-    return WALK_STEP / (WALK_T * WALK_SF)
+def leg_k(F):
+    return F.hz / 0.32
 
 
-def run_speed():
-    return RUN_STEP / (RUN_T * RUN_SF)
+def walk_speed(F):
+    return WALK_STEP * leg_k(F) / (WALK_T * WALK_SF)
+
+
+def run_speed(F):
+    return RUN_STEP * leg_k(F) / (RUN_T * RUN_SF)
 
 
 def face(**kw):
@@ -79,7 +83,7 @@ def pose_walk(R, F, t, T):
     torso(R, lean=4.0, yaw=-7.0 * math.sin(ph), head_yaw=4.0 * math.sin(ph), head_pitch=-1.0, head_roll=2.0 * math.cos(ph))
     sw = 28.0 * math.cos(ph)
     arms_down(R, F, bend=20, out=6, swing=(-sw, sw))
-    gait(R, F, p0, WALK_STEP, WALK_SF, 0.060)
+    gait(R, F, p0, WALK_STEP * leg_k(F), WALK_SF, 0.060 * leg_k(F) ** 0.5)
     return face(blink=blink_curve(t, 0.55))
 
 
@@ -92,7 +96,7 @@ def pose_run(R, F, t, T):
     torso(R, lean=12.0, yaw=-10.0 * math.sin(ph), head_yaw=3.0 * math.sin(ph), head_pitch=4.0, head_roll=2.5 * math.cos(ph))
     sw = 48.0 * math.cos(ph)
     arms_down(R, F, bend=62, out=10, swing=(-sw, sw))
-    gait(R, F, p0, RUN_STEP, RUN_SF, 0.085, phi_land=10.0, phi_push=-34.0)
+    gait(R, F, p0, RUN_STEP * leg_k(F), RUN_SF, 0.085 * leg_k(F) ** 0.5, phi_land=10.0, phi_push=-34.0)
     return face(alegre=0.45, blink=0.0)
 
 
@@ -250,6 +254,180 @@ def pose_team(R, F, t, T):
     return face(alegre=a)
 
 
+# ----------------------------------------------------------------- clipes por personagem (RB-R1, segunda leva)
+def pose_idle_simple(R, F, t, T):
+    ph = 2 * math.pi * t / T
+    breath = math.sin(ph)
+    R.hips_off = Vector((0.004 * math.sin(ph), 0.0, -0.010 + 0.003 * breath))
+    torso(R, lean=2.0 + 0.6 * breath, head_yaw=10.0 * math.sin(ph * 0.5), head_pitch=1.5 * math.sin(ph + 1.0), head_roll=2.0 * math.sin(ph + 2.0))
+    arms_down(R, F, bend=16 + 2 * breath, out=6 + breath)
+    stand_feet(R)
+    return face(blink=blink_curve(t, 1.0) + blink_curve(t, T - 0.6))
+
+
+def pose_idle_hop(R, F, t, T):
+    """Pico: quica na ponta dos pes (3 quiques), alonga os bracos para cima e volta."""
+    ph = 2 * math.pi * t / T
+    hop = max(0.0, math.sin(3 * ph)) * (1 - smooth(t, 1.6, 1.9)) * smooth(t, 0.0, 0.2) + max(0.0, math.sin(3 * ph)) * smooth(t, 2.6, 2.9) * (1 - smooth(t, T - 0.2, T))
+    stretch = smooth(t, 1.7, 2.1) * (1 - smooth(t, 2.4, 2.8))
+    R.hips_off = Vector((0.0, 0.0, -0.010 + 0.030 * hop + 0.012 * stretch))
+    torso(R, lean=2.0 - 4.0 * stretch, head_pitch=6.0 * stretch + 3.0 * hop, head_roll=3.0 * math.sin(ph))
+    arms_down(R, F, bend=30 - 10 * hop, out=8 + 6 * hop)
+    if stretch > 0.001:
+        R.evaluate()
+        for s, sx in (("R", 1), ("L", -1)):
+            rest = R.tip("hand." + s)
+            reach(R, s, rest.lerp(Vector((sx * (F.sh.x + 0.06), 0.02, F.sh.z + 0.32)), stretch),
+                  Vector((0.1 * sx, 0.2, -1.0)).lerp(Vector((0.1 * sx, 0.0, 1.0)), stretch), pole=(sx * 1.0, -0.4, -0.3))
+    for s in ("R", "L"):
+        put_foot(R, s, R.rest_head["heel." + s].y, -24.0 * hop, "ball")
+    return face(alegre=0.35 + 0.3 * hop, blink=blink_curve(t, 2.2))
+
+
+def pose_idle_compass(R, F, t, T):
+    """Leme: confere a bussola de pulso (antebraco esquerdo a frente), depois sorri olhando o mar."""
+    ph = 2 * math.pi * t / T
+    look = smooth(t, 0.4, 0.9) * (1 - smooth(t, 2.0, 2.5))
+    sea = smooth(t, 2.6, 3.0) * (1 - smooth(t, 3.6, T))
+    R.hips_off = Vector((0.004 * math.sin(ph), 0.0, -0.010 + 0.003 * math.sin(2 * ph)))
+    torso(R, lean=2.0 + 3.0 * look, head_pitch=-22.0 * look + 4.0 * sea, head_yaw=10.0 * look - 16.0 * sea, head_roll=4.0 * sea)
+    arms_down(R, F, bend=16, out=6)
+    if look > 0.001:
+        R.evaluate()
+        rest = R.tip("hand.L")
+        tgt = Vector((-0.02, F.v["belly"] + 0.16, F.sh.z - 0.06))
+        reach(R, "L", rest.lerp(tgt, look), Vector((-0.1, 0.2, -1.0)).lerp(Vector((1.0, 0.3, 0.0)), look), pole=(-1.0, -0.3, -0.6))
+    stand_feet(R)
+    return face(alegre=0.8 * sea, atenta=0.5 * look, blink=blink_curve(t, 2.3))
+
+
+def pose_jump(R, F, t, T):
+    """Pico: salto de apoio em apoio sem root motion. Impulso 0-0,25 s, voo ~0,45 s (0,25-0,70), amortecimento ate 1,0 s."""
+    pre = smooth(t, 0.0, 0.18) * (1 - smooth(t, 0.18, 0.27))
+    fly = min(max((t - 0.25) / 0.45, 0.0), 1.0)
+    air = math.sin(math.pi * fly) if 0.0 < fly < 1.0 else 0.0
+    land = math.sin(math.pi * min(max((t - 0.70) / 0.30, 0.0), 1.0))
+    R.hips_off = Vector((0.0, 0.0, -0.07 * pre - 0.06 * land + 0.22 * air))
+    torso(R, lean=14 * pre + 10 * land + 6 * air, head_pitch=-6 * air)
+    sw = 40 * air - 30 * pre
+    arms_down(R, F, bend=30 + 30 * air, out=10 + 20 * air, swing=(-sw, -sw))
+    tuck = 0.10 * air
+    for s in ("R", "L"):
+        put_foot(R, s, R.rest_head["heel." + s].y, -30.0 * air if air > 0.02 else 0.0, "ball" if air > 0.02 else "heel",
+                 lift=0.16 * air + tuck * 0.0, pole=(0.0, 1.0, 0.0))
+    return face(atenta=0.6 * pre, alegre=0.7 * air, blink=0.0)
+
+
+def pose_pull(R, F, t, T):
+    """Pico: dois puxoes firmes numa corda a frente (forca maxima em ~0,42 s e ~1,02 s)."""
+    e = smooth(t, 0.0, 0.18) * (1 - smooth(t, 1.38, 1.6))
+    p = smooth(t, 0.12, 0.42) * (1 - smooth(t, 0.48, 0.72)) + smooth(t, 0.72, 1.02) * (1 - smooth(t, 1.14, 1.34))
+    p = max(0.0, min(1.0, p))
+    R.hips_off = Vector((0, -0.03 * p, -0.03 - 0.03 * p))
+    torso(R, lean=-8.0 * p + 4.0, head_pitch=-3 * p)
+    arms_down(R, F, bend=16, out=6)
+    R.evaluate()
+    for s, sx in (("R", 1), ("L", -1)):
+        rest = R.tip("hand." + s)
+        high = Vector((sx * 0.05, 0.26, F.sh.z + 0.20))
+        low = Vector((sx * 0.06, 0.16, F.hz + 0.08))
+        tip = rest.lerp(high.lerp(low, p), e)
+        hd = Vector((0, 0.25, -1.0)).lerp(Vector((0, 1.0, 0.45)).lerp(Vector((0, 1.0, -0.35)), p), e)
+        reach(R, s, tip, hd, pole=(sx * 0.8, -0.4, -1.0), roll=-30.0 * e)
+    for s in ("R", "L"):
+        put_foot(R, s, R.rest_head["heel." + s].y, 0.0, "heel", dx=(0.03 if s == "R" else -0.03), pole=(0.0, 1.0, 0.0))
+    return face(atenta=0.6 * e, blink=blink_curve(t, 1.45))
+
+
+def pose_look_up(R, F, t, T):
+    a = smooth(t, 0.1, 0.7) * (1 - smooth(t, 1.5, 1.95))
+    R.hips_off = Vector((0, 0, -0.010))
+    torso(R, lean=-5.0 * a + 2.0, head_pitch=34.0 * a, head_yaw=8.0 * math.sin(2 * math.pi * t * 0.8) * a)
+    arms_down(R, F, bend=16, out=6)
+    e = smooth(t, 0.45, 0.85) * (1 - smooth(t, 1.3, 1.6))
+    if e > 0.001:
+        R.evaluate()
+        rest = R.tip("hand.R")
+        reach(R, "R", rest.lerp(Vector((F.sh.x + 0.02, 0.14, F.sh.z + 0.18)), e), Vector((0.1, 0.2, -1.0)).lerp(Vector((-0.6, 0.4, 0.1)), e),
+              pole=(1.0, -0.5, -0.3))
+    stand_feet(R)
+    return face(atenta=0.8 * a, blink=blink_curve(t, 1.7))
+
+
+# Leme no volante. Alvo no referencial do ator (Blender): centro do WheelPoint visto de BoatActor.CREW[&"pilot"] olhando para a proa.
+WHEEL_C = Vector((0.0, 0.47, 0.72))
+WHEEL_R = 0.19
+WHEEL_TILT = math.radians(32)
+
+
+def wheel_point(a_deg):
+    a = math.radians(a_deg)
+    return WHEEL_C + Vector((WHEEL_R * math.cos(a), WHEEL_R * math.sin(a) * math.sin(WHEEL_TILT), WHEEL_R * math.sin(a) * math.cos(WHEEL_TILT)))
+
+
+def pose_idle_wheel(R, F, t, T, ang=0.0, steer=0.0):
+    ph = 2 * math.pi * t / T
+    R.hips_off = Vector((0.0, 0.15, -0.035 + 0.003 * math.sin(ph)))
+    R.rel("hips", eul(z=steer * 6.0, y=-steer * 4.0))
+    torso(R, lean=24.0 + 1.0 * math.sin(ph), roll=-steer * 8.0, yaw=steer * 8.0, head_yaw=steer * 14.0 + 3 * math.sin(ph + 1), head_pitch=6.0)
+    for s, base in (("R", 0.0), ("L", 180.0)):
+        sx = 1 if s == "R" else -1
+        tip = wheel_point(base + ang + 2.0 * math.sin(ph))
+        reach(R, s, tip + Vector((0, 0.01, 0)), Vector((-0.25 * sx, 1.0, -0.15)), pole=(sx * 0.8, -0.3, -1.0), roll=-40.0)
+    for s in ("R", "L"):
+        put_foot(R, s, R.rest_head["heel." + s].y, 0.0, "heel", pole=(0.0, 1.0, 0.0), dx=(0.02 if s == "R" else -0.02))
+    return face(alegre=0.3, blink=blink_curve(t, 1.6))
+
+
+def pose_steer(R, F, t, T, sign):
+    e = smooth(t, 0.0, 0.35) * (1 - smooth(t, 0.65, 1.0))
+    f = pose_idle_wheel(R, F, 0.0, 2.4, ang=sign * 38.0 * e, steer=sign * e)
+    f["atenta"] = 0.6 * e
+    return f
+
+
+def pose_horn(R, F, t, T):
+    e = smooth(t, 0.0, 0.2) * (1 - smooth(t, 0.55, 0.9))
+    pull = math.sin(math.pi * smooth(t, 0.25, 0.6))
+    f = pose_idle_wheel(R, F, 0.0, 2.4)
+    R.evaluate()
+    rest = R.tip("hand.R")
+    tgt = Vector((F.sh.x + 0.04, 0.30, F.sh.z + 0.30 - 0.08 * pull))
+    reach(R, "R", rest.lerp(tgt, e), Vector((-0.25, 1.0, -0.15)).lerp(Vector((0.0, 0.1, 1.0)), e), pole=(0.8, -0.5, -0.8))
+    f["alegre"] = 0.9 * e
+    f["blink"] = 0.0
+    return f
+
+
+def pose_thanks(R, F, t, T):
+    """Piloto: maos juntas no peito e uma pequena reverencia de agradecimento."""
+    a = smooth(t, 0.1, 0.5) * (1 - smooth(t, 1.5, 1.9))
+    bow = math.sin(math.pi * smooth(t, 0.5, 1.4))
+    R.hips_off = Vector((0, -0.02 * bow, -0.010))
+    torso(R, lean=2.0 + 22.0 * bow, head_pitch=-10.0 * bow)
+    arms_down(R, F, bend=16, out=6)
+    R.evaluate()
+    for s, sx in (("R", 1), ("L", -1)):
+        rest = R.tip("hand." + s)
+        reach(R, s, rest.lerp(Vector((sx * 0.015, F.v["belly"] + 0.10, F.sh.z - 0.10)), a),
+              Vector((0.1 * sx, 0.2, -1.0)).lerp(Vector((-0.2 * sx, 0.3, 1.0)), a), pole=(sx * 1.0, -0.3, -0.6))
+    stand_feet(R)
+    return face(alegre=a, blink=blink_curve(t, 1.7))
+
+
+def pose_chat(R, F, t, T):
+    """Morador conversando: gesticula com a mao direita, acena com a cabeca e inclina o corpo."""
+    ph = 2 * math.pi * t / T
+    g = smooth(t, 0.2, 0.6) * (1 - smooth(t, T - 0.5, T - 0.1))
+    R.hips_off = Vector((0, 0, -0.010))
+    torso(R, lean=3.0, yaw=6.0 * math.sin(ph), head_pitch=5.0 * math.sin(3 * ph), head_yaw=-8.0 * math.sin(ph))
+    arms_down(R, F, bend=18, out=6)
+    R.evaluate()
+    rest = R.tip("hand.R")
+    tgt = Vector((F.sh.x + 0.05 + 0.04 * math.sin(2 * ph), F.v["belly"] + 0.15, F.sh.z - 0.10 + 0.05 * math.sin(3 * ph)))
+    reach(R, "R", rest.lerp(tgt, g), Vector((0.1, 0.2, -1.0)).lerp(Vector((0.2, 1.0, 0.4)), g), pole=(1.0, -0.4, -0.6))
+    stand_feet(R)
+    return face(alegre=0.4 + 0.3 * math.sin(2 * ph) * g, blink=blink_curve(t, 0.9) + blink_curve(t, 2.4))
 CLIPS = {
     "idle": (4.0, True, pose_idle),
     "walk": (WALK_T, True, pose_walk),
@@ -263,18 +441,40 @@ CLIPS = {
     "wave": (1.6, False, pose_wave),
     "celebrate": (1.2, False, pose_celebrate),
     "team_pose": (1.5, False, pose_team),
+    "jump": (1.0, False, pose_jump),
+    "pull_rope": (1.6, False, pose_pull),
+    "look_up": (2.0, False, pose_look_up),
+    "idle_wheel": (2.4, True, pose_idle_wheel),
+    "steer_left": (1.0, False, lambda R, F, t, T: pose_steer(R, F, t, T, +1)),
+    "steer_right": (1.0, False, lambda R, F, t, T: pose_steer(R, F, t, T, -1)),
+    "react_horn": (0.9, False, pose_horn),
+    "thanks": (2.0, False, pose_thanks),
+    "chat": (3.0, True, pose_chat),
 }
+IDLES = {"rastro": (4.0, pose_idle), "pico": (3.6, pose_idle_hop), "leme": (4.2, pose_idle_compass)}
+CLIP_SETS = {
+    "rastro": ["idle", "walk", "run", "stop", "crouch", "inspect_touch", "look_to_leme", "react_surprise", "point", "wave", "celebrate", "team_pose"],
+    "pico": ["idle", "walk", "run", "stop", "jump", "pull_rope", "look_up", "react_surprise", "celebrate", "wave", "team_pose"],
+    "leme": ["idle", "walk", "run", "stop", "idle_wheel", "steer_left", "steer_right", "react_horn", "celebrate", "wave", "point", "team_pose"],
+    "captain": ["idle", "walk", "wave", "thanks"],
+    "villager_a": ["idle", "walk", "wave", "chat"],
+    "villager_b": ["idle", "walk", "wave", "chat"],
+    "villager_c": ["idle", "walk", "wave", "chat"],
+}
+LOOPING = ("idle", "walk", "run", "idle_wheel", "chat")
 
 
-def author(rig, face_ob, F, names=None):
+def author(rig, face_ob, F, names=None, cid="rastro"):
     R = cl.Rigger(rig)
     sk = face_ob.data.shape_keys
     sk.animation_data_create()
     rig.animation_data_create()
     prev = {}
     report = {}
-    for name in (names or CLIPS.keys()):
+    for name in (names or CLIP_SETS.get(cid, CLIP_SETS["rastro"])):
         dur, loop, fn = CLIPS[name]
+        if name == "idle":
+            dur, fn = IDLES.get(cid, (3.0, pose_idle_simple))
         act = bpy.data.actions.new(name)
         act.use_fake_user = True
         keyact = bpy.data.actions.new(name + "_key")
@@ -291,6 +491,8 @@ def author(rig, face_ob, F, names=None):
             R.evaluate()
             if name == "inspect_touch":
                 best = min(best, (R.tip("hand.R") - TOUCH_TARGET).length)
+            if name == "idle_wheel":
+                best = min(best, ((R.tip("hand.R") + R.tip("hand.L")) * 0.5 - WHEEL_C).length)
             R.apply(i, prev)
             for kn in FACE_KEYS:
                 kb = sk.key_blocks[kn]
@@ -298,6 +500,8 @@ def author(rig, face_ob, F, names=None):
                 kb.keyframe_insert("value", frame=i)
         if name == "inspect_touch":
             report["inspect_tip_err_m"] = round(best, 4)
+        if name == "idle_wheel":
+            report["wheel_mid_err_m"] = round(best, 4)
         act["loop"] = loop
         for ad, a_ in ((rig.animation_data, act), (sk.animation_data, keyact)):
             ad.action = None

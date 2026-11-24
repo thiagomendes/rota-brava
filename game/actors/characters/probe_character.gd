@@ -4,7 +4,7 @@ extends SceneTree
 
 
 func _init() -> void:
-	for id in ["rastro_model", "extra_a"]:
+	for id in ["rastro_model", "villager_a"]:
 		var root := (load("res://actors/characters/%s.tscn" % id) as PackedScene).instantiate()
 		get_root().add_child(root)
 		var vis := root.find_child("Model", false, false) as CharacterVisual

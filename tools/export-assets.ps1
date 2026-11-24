@@ -45,13 +45,7 @@ foreach ($a in $assets) {
 }
 
 # ---- personagens organicos (RB-04-chars): malha SKIN+SUBSURF, rig, pesos, shape keys e animacoes -> um GLB por personagem
-$chars = @(
-    @{ id = 'leme';    name = 'Leme';    role = 'pilot';   note = 'Piloto: gorro de marinheiro, lenco, colete claro com bolsos, maos grandes. Clipes de volante (idle_wheel, steer_left/right, react_horn) + idle/walk.' },
-    @{ id = 'pico';    name = 'Pico';    role = 'climber'; note = 'Especialista em travessias: capacete leve, corda enrolada nas costas e a tiracolo, mosquetoes no cinto/mochila/peito, luvas sem dedos, jaqueta verde. Clipes idle, walk, react_surprise, pull_rope (dois puxoes, 1,6 s) e look_up.' },
-    @{ id = 'extra_a'; name = 'Figurante A'; role = 'extra'; note = 'Figurante do cais com chapeu de palha. Malha simples, rig completo, clipes idle e walk.' },
-    @{ id = 'extra_b'; name = 'Figurante B'; role = 'extra'; note = 'Figurante do cais com lenco na cabeca e tunica. Malha simples, rig completo, clipes idle e walk.' },
-    @{ id = 'extra_c'; name = 'Figurante C'; role = 'extra'; note = 'Figurante do cais com boina. Malha simples, rig completo, clipes idle e walk.' }
-)
+$chars = @()   # RB-R1: elenco antigo do RB-04 substituido pelos herois/moradores abaixo
 $charSrc = @('source_art/scripts/char_build.py', 'source_art/scripts/char_lib.py', 'source_art/scripts/char_face.py', 'source_art/scripts/char_anim.py', 'source_art/scripts/rbart.py')
 foreach ($c in $chars) {
     $blend = "source_art/characters/rb04/$($c.id)/$($c.id).blend"
@@ -82,20 +76,28 @@ foreach ($c in $chars) {
     }
 }
 # ---- herois do RB-R1 (criancas-herois, refeitos do zero): Rastro na variacao recomendada; Pico e Leme seguem do RB-04 ate o Portao 1
-$heroSrc = @('source_art/scripts/hero_build.py', 'source_art/scripts/hero_lib.py', 'source_art/scripts/hero_face.py', 'source_art/scripts/hero_anim.py', 'source_art/scripts/char_lib.py', 'source_art/scripts/char_anim.py', 'source_art/scripts/rbart.py')
+$heroSrc = @('source_art/scripts/hero_build.py', 'source_art/scripts/pup_build.py', 'source_art/scripts/hero_lib.py', 'source_art/scripts/hero_face.py', 'source_art/scripts/hero_anim.py', 'source_art/scripts/char_lib.py', 'source_art/scripts/char_anim.py', 'source_art/scripts/rbart.py')
 $heroes = @(
-    @{ id = 'rastro'; name = 'Rastro'; role = 'tracker'; note = 'RB-R1: crianca-heroi (8 anos), variacao A "brinquedo brilhante": cabeca ~37% da altura, olhos grandes com iris, pupila e dois brilhos, maos de 4 dedos, botas grandes com sola creme; jaqueta de equipe laranja #FF8A1F com gola creme, emblema da Rota Brava em relevo no peito esquerdo, cinto com fivela-bussola, chapeu de aba larga com faixa e rosa dos ventos, rabos de cavalo, bolsa com caderno, lupa. Rig 28 ossos + ponteiras (RB-04), expressoes, visemas, olhar, 12 clipes.' }
+    @{ id = 'pico'; name = 'Pico'; role = 'climber'; script = 'hero_build'; note = 'RB-R1 direcao A: crianca-heroi (7 anos), verde #3DBE5A, capacete com lanterna, rolo de corda nas costas com alca que nao tapa o emblema, mosquetoes, luvas. 11 clipes (inclui jump e pull_rope).' },
+    @{ id = 'leme'; name = 'Leme'; role = 'pilot'; script = 'hero_build'; note = 'RB-R1 direcao A: crianca-heroi (9 anos), azul #2F8CFF, bone nautico, colete salva-vidas com faixas refletivas, bolsos e gola, bussola de pulso. 12 clipes (inclui idle_wheel/steer/react_horn).' },
+    @{ id = 'captain'; name = 'Piloto resgatado'; role = 'captain'; script = 'hero_build'; note = 'RB-R1: adulto simpatico com quepe de capitao, bigode e barba, jaqueta com botoes dourados. Clipes idle, walk, wave, thanks.' },
+    @{ id = 'villager_a'; name = 'Moradora'; role = 'villager'; script = 'hero_build'; note = 'RB-R1: moradora adulta, menta/limao. Clipes idle, walk, wave, chat.' },
+    @{ id = 'villager_b'; name = 'Morador idoso'; role = 'villager'; script = 'hero_build'; note = 'RB-R1: morador idoso de barba, pessego/creme. Clipes idle, walk, wave, chat.' },
+    @{ id = 'villager_c'; name = 'Crianca da vila'; role = 'villager'; script = 'hero_build'; note = 'RB-R1: crianca da vila, rosa/ceu. Clipes idle, walk, wave, chat.' },
+    @{ id = 'pup'; name = 'Filhote'; role = 'pup'; script = 'pup_build'; note = 'RB-R1: filhote original (caramelo, focinho e mancha creme, orelhas caidas, coleira turquesa com pingente-emblema). Rig proprio de 22 ossos. Clipes idle, wag, jump_happy, bark, step_on_horn.' },
+    @{ id = 'rastro'; name = 'Rastro'; role = 'tracker'; script = 'hero_build'; note = 'RB-R1: crianca-heroi (8 anos), variacao A "brinquedo brilhante": cabeca ~37% da altura, olhos grandes com iris, pupila e dois brilhos, maos de 4 dedos, botas grandes com sola creme; jaqueta de equipe laranja #FF8A1F com gola creme, emblema da Rota Brava em relevo no peito esquerdo, cinto com fivela-bussola, chapeu de aba larga com faixa e rosa dos ventos, rabos de cavalo, bolsa com caderno, lupa. Rig 28 ossos + ponteiras (RB-04), expressoes, visemas, olhar, 12 clipes.' }
 )
 foreach ($c in $heroes) {
     $blend = "source_art/characters/heroes/$($c.id)/$($c.id).blend"
     $glb = "game/assets/models/characters/$($c.id).glb"
-    Invoke-Blender 'source_art/scripts/hero_build.py' @('--id', $c.id, '--blend', $blend, '--glb', $glb)
+    if ($c.script -eq 'pup_build') { Invoke-Blender 'source_art/scripts/pup_build.py' @('--blend', $blend, '--glb', $glb) }
+    else { Invoke-Blender 'source_art/scripts/hero_build.py' @('--id', $c.id, '--blend', $blend, '--glb', $glb) }
     $info = Get-Content ([IO.Path]::ChangeExtension($blend, '.info.json')) -Raw | ConvertFrom-Json
     $anims = [ordered]@{}
     foreach ($p in $info.animations.PSObject.Properties | Sort-Object Name) { $anims[$p.Name] = [math]::Round(($p.Value[1] - $p.Value[0]) / 30.0, 3) }
     $entries += [ordered]@{
         id = $c.id; nome = $c.name; papel = $c.role; agente = 'art3d'
-        processo = [ordered]@{ script = 'source_art/scripts/hero_build.py'; ferramenta = "Blender $bver (tools/blender.ps1, headless)"; exportador = 'glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA'; tecnicas = 'modificador SKIN + SUBSURF, metaballs (cabelo), torno (chapeu), bmesh; pesos por distancia normalizada pela espessura de cada parte; cinematica FK/IK em Python' }
+        processo = [ordered]@{ script = "source_art/scripts/$($c.script).py"; ferramenta = "Blender $bver (tools/blender.ps1, headless)"; exportador = 'glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA'; tecnicas = 'modificador SKIN + SUBSURF, metaballs (cabelo), torno (chapeu), bmesh; pesos por distancia normalizada pela espessura de cada parte; cinematica FK/IK em Python' }
         origem = $heroSrc + @($blend)
         saida_glb = $glb
         glb_sha256 = (Get-FileHash $glb -Algorithm SHA256).Hash.ToLower()
@@ -117,6 +119,22 @@ foreach ($c in $heroes) {
         data = (Get-Date -Format 'yyyy-MM-dd')
         nota = $c.note
     }
+}
+# ---- retratos do HUD (busto 512x512, fundo transparente) gerados dos mesmos scripts
+Invoke-Blender 'source_art/scripts/hero_portraits.py' @('--out', 'game/ui/portraits')
+$portraits = [ordered]@{}
+foreach ($p in Get-ChildItem 'game/ui/portraits' -Filter '*.png' | Sort-Object Name) { $portraits[$p.Name] = (Get-FileHash $p.FullName -Algorithm SHA256).Hash.ToLower() }
+$entries += [ordered]@{
+    id = 'portraits'; nome = 'Retratos do HUD'; agente = 'art3d'
+    processo = [ordered]@{ script = 'source_art/scripts/hero_portraits.py'; ferramenta = "Blender $bver (tools/blender.ps1, headless)"; exportador = 'PNG RGBA 512x512 (Eevee toon, contorno Solidify)' }
+    origem = @('source_art/scripts/hero_portraits.py') + $heroSrc
+    saida = 'game/ui/portraits'
+    arquivos_sha256 = $portraits
+    status = 'provisorio'
+    aprovacao = 'pendente (Thiago)'
+    originalidade = 'renders dos personagens procedurais do projeto; nada de terceiros'
+    data = (Get-Date -Format 'yyyy-MM-dd')
+    nota = 'rastro, pico, leme, captain, pup x neutra, alegre, surpresa. Uso: Hud.set_portrait_texture(member, tex).'
 }
 $manifest = [ordered]@{ projeto = 'Rota Brava'; ticket = 'RB-03-art + RB-04-chars + RB-R1-herois'; ativos = $entries }
 $manifest | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $root 'source_art/manifest.json') -Encoding utf8
