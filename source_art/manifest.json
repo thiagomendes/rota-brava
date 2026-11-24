@@ -1348,7 +1348,7 @@
         "script": "source_art/characters/pico_v2/build_pico_v2.py",
         "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless) + Cycles CPU para assar mapas",
         "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, PBR metallic-roughness, KHR_materials_clearcoat, JPEG embutido",
-        "tecnicas": "corpo inteirico por SKIN+SUBSURF com gomos acolchoados, articulacoes e bolso deslocados em numpy; capacete parametrico + Solidify; metaballs e mechas por tubos achatados (cabelo); corda por laco em raycast no corpo; torno, toros, tubos e prismas (equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (ripstop, lona, pespontos, helice da corda, sardas); normal map assada por Bump; FK/IK em Python"
+        "tecnicas": "corpo inteirico por SKIN+SUBSURF com gomos acolchoados, articulacoes e bolso deslocados em numpy; capacete parametrico + Solidify; metaballs e mechas por tubos achatados em tres camadas (cabelo); shape keys fist_R/fist_L nas luvas (punho); corda por laco em raycast no corpo; torno, toros, tubos e prismas (equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (ripstop, lona, pespontos, helice da corda, sardas); normal map assada por Bump; FK/IK em Python"
       },
       "origem": [
         "source_art/characters/pico_v2/build_pico_v2.py",
@@ -1368,9 +1368,9 @@
         "source_art/scripts/rbart.py"
       ],
       "saida_glb": "game/assets/models/characters/pico_v2.glb",
-      "glb_sha256": "75d299ab70851e7f69f27c9d86ac7b3a9aad792d468e088d8d70e4185c973302",
-      "glb_bytes": 6589776,
-      "triangulos": 24864,
+      "glb_sha256": "7a891963046ce5f2ed3a554f6c25232246a21375e409c5533146ad701dff0350",
+      "glb_bytes": 6995068,
+      "triangulos": 24944,
       "materiais": [
         "mat_pico_v2_face_dark",
         "mat_pico_v2_face_eye",

@@ -46,13 +46,13 @@ hero_lib.CAST["pico_v2"] = dict(display="Pico", K=1.0, hat="none", hair="tufts",
 # Afastamento lateral das pernas (eixo do quadril/joelho/tornozelo): pes separados, chao visivel entre as botas parado
 HIP_X = 0.088
 # v2.1: alongamento dos bracos (m que o pulso desce no repouso) e mao um pouco maior
-ARM_DROP = 0.075
+ARM_DROP = 0.088
 # Bainha da jaqueta curta (acima do cinto) e passo dos gomos
 HEM_DZ = 0.054
 BAFFLE_T = 0.046      # passo dos gomos do tronco (m)
 BAFFLE_A = 0.042      # passo dos aneis das mangas (m)
 
-DECIMATE = {"suit": 0.23, "glove": 0.36, "boot": 0.38, "hair": 0.16, "sole": 0.7, "belt": 0.6, "rope": 0.62,
+DECIMATE = {"suit": 0.23, "glove": 0.36, "boot": 0.38, "hair": 0.14, "sole": 0.7, "belt": 0.6, "rope": 0.62,
             "lamp_band": 0.7, "chin_strap": 0.8, "knee_pad": 0.5, "carabiner_a": 0.7, "carabiner_b": 0.7}
 
 
@@ -357,10 +357,9 @@ class PV2(hero_lib.Builder):
         self.reg(ob, "single", "head")
         # ---- mechas
         self.tail_axes = []
-        rng = np.random.default_rng(11)
         lb = bmesh.new()
 
-        def lock(a_deg, length, w0, out, down, flick, curl, dz0, root_in=0.020, seg=7, sides=6, flat=0.55, twist=0.0, lift=0.0):
+        def lock(a_deg, length, w0, out, down, flick, curl, dz0, root_in=0.020, seg=7, sides=6, flat=0.55, twist=0.0, lift=0.0, taper=1.5):
             a = math.radians(a_deg)
             rad = V(math.sin(a), math.cos(a), 0.0)
             tang = V(math.cos(a), -math.sin(a), 0.0)
@@ -382,7 +381,7 @@ class PV2(hero_lib.Builder):
                 if twist:
                     ca, sa = math.cos(twist * t), math.sin(twist * t)
                     nrm, bvec = nrm * ca + bvec * sa, bvec * ca - nrm * sa
-                w = w0 * (1.0 - t ** 1.5) * (0.85 + 0.15 * math.sin(math.pi * t))
+                w = w0 * (1.0 - t ** taper) * (0.85 + 0.15 * math.sin(math.pi * t))
                 if i == seg:
                     rings.append([lb.verts.new(p)])
                     continue
@@ -397,27 +396,31 @@ class PV2(hero_lib.Builder):
             cap = lb.verts.new(pts[0] - (pts[1] - pts[0]) * 0.3)
             for q in range(sides):
                 lb.faces.new((rings[0][(q + 1) % sides], rings[0][q], cap))
-            self.tail_axes.append((1, [(p, w0 * (1.0 - (i / seg) ** 1.5)) for i, p in enumerate(pts)]))
-        # v2.1: cabelo solto e bagunçado atras, em DUAS camadas que se sobrepoem (nao uma fileira de pontas iguais).
-        # Camada de baixo: mechas compridas e largas que caem rente a nuca e abrem a ponta para os lados.
-        for i, a in enumerate((104, 126, 150, 172, 192, 214, 236, 256)):
-            L = rng.uniform(0.105, 0.135) * k
-            side = 1 if a < 180 else -1
-            lock(a + rng.uniform(-6, 6), L, rng.uniform(0.040, 0.048) * k, rng.uniform(0.10, 0.22), 1.0, rng.uniform(0.10, 0.35),
-                 side * rng.uniform(0.20, 0.55), -0.002 * k, root_in=-0.006, flat=0.58, twist=side * rng.uniform(0.2, 0.7), lift=0.25)
-        # Camada de cima: mechas mais curtas, saindo da borda do capacete por cima da camada de baixo, em direcoes variadas
-        # (umas viram para fora, outras para cima, uma cruza a vizinha)
-        for i, a in enumerate((96, 118, 140, 160, 182, 203, 224, 246, 266)):
-            L = rng.uniform(0.062, 0.090) * k
-            side = 1 if a < 180 else -1
-            curl = side * rng.uniform(-0.25, 0.65)
-            lock(a + rng.uniform(-7, 7), L, rng.uniform(0.032, 0.040) * k, rng.uniform(0.35, 0.60), rng.uniform(0.65, 0.95),
-                 rng.uniform(0.45, 1.05), curl, -0.006 * k, root_in=-0.020, sides=5, flat=0.55, twist=rng.uniform(-0.8, 0.8), lift=0.35)
+            self.tail_axes.append((1, [(p, w0 * (1.0 - (i / seg) ** taper)) for i, p in enumerate(pts)]))
+        # v2.1: cabelo solto e bagunçado atras, em TRES camadas que se sobrepoem (nao uma fileira de pontas iguais): angulos
+        # irregulares, comprimentos e larguras variados, pontas em alturas diferentes, vizinhas que se juntam em tufos e
+        # algumas pontas que viram para fora. Sem torcao (torcer o tubo achatado criava nos).
+        # (angulo, comprimento, largura, para fora, queda, ponta para cima, curva lateral)
+        # Camada de baixo: mechas compridas e largas, rente a nuca, cobrem o vao entre o cabelo e o pescoco.
+        for a, L, w, out, dn, fl, cu in ((110, 0.118, 0.052, 0.18, 1.0, 0.22, 0.34), (134, 0.160, 0.056, 0.10, 1.0, 0.10, 0.10),
+                                         (157, 0.128, 0.054, 0.08, 1.0, 0.18, -0.24), (181, 0.172, 0.058, 0.05, 1.0, 0.06, 0.14),
+                                         (204, 0.122, 0.054, 0.10, 1.0, 0.20, 0.30), (227, 0.154, 0.056, 0.12, 1.0, 0.10, -0.12),
+                                         (251, 0.112, 0.050, 0.20, 1.0, 0.26, -0.36)):
+            lock(a, L * k, w * k, out, dn, fl, cu, -0.010 * k, root_in=-0.004, seg=7, flat=0.46, taper=2.2)
+        # Camada do meio: por cima da de baixo, saem mais para fora (volume) e abrem em direcoes diferentes
+        for a, L, w, out, dn, fl, cu in ((97, 0.096, 0.042, 0.44, 0.92, 0.30, 0.46), (121, 0.118, 0.046, 0.34, 1.0, 0.16, -0.16),
+                                         (146, 0.084, 0.044, 0.40, 0.92, 0.28, 0.38), (170, 0.126, 0.048, 0.30, 1.0, 0.12, -0.30),
+                                         (193, 0.094, 0.046, 0.38, 0.95, 0.26, 0.22), (216, 0.120, 0.048, 0.32, 1.0, 0.14, 0.38),
+                                         (240, 0.090, 0.044, 0.42, 0.92, 0.28, -0.28), (264, 0.098, 0.042, 0.46, 0.92, 0.32, -0.46)):
+            lock(a, L * k, w * k, out, dn, fl, cu, -0.004 * k, root_in=-0.016, seg=7, flat=0.46, taper=2.0)
+        # Camada de cima: poucos tufos logo abaixo da borda que espetam para fora e para o lado (o "bagunçado")
+        for a, L, w, out, dn, fl, cu in ((131, 0.078, 0.036, 0.80, 0.55, 0.22, 0.34), (162, 0.070, 0.034, 0.78, 0.60, 0.18, -0.40),
+                                         (198, 0.082, 0.036, 0.80, 0.55, 0.22, 0.44), (233, 0.072, 0.034, 0.82, 0.58, 0.20, -0.34)):
+            lock(a, L * k, w * k, out, dn, fl, cu, 0.002 * k, root_in=-0.022, seg=7, sides=5, flat=0.50, taper=1.8)
         # atras das orelhas: duas mechas por lado que espetam para tras/fora
         for sx in (1, -1):
-            for a, L in ((84, 0.070), (92, 0.056)):
-                lock(sx * a + rng.uniform(-3, 3), L * k, 0.030 * k, 0.55, 0.80, 0.60, -0.45 * sx, -0.008 * k, root_in=-0.004, sides=5,
-                     flat=0.55, twist=0.4 * sx)
+            for a, L, fl in ((84, 0.072, 0.50), (93, 0.058, 0.36)):
+                lock(sx * a, L * k, 0.032 * k, 0.50, 0.85, fl, -0.40 * sx, -0.008 * k, root_in=-0.004, seg=7, sides=5, flat=0.50)
         # costeletas na frente das orelhas
         for sx in (1, -1):
             lock(sx * 66, 0.046 * k, 0.022 * k, 0.30, 1.0, 0.25, -0.15 * sx, -0.006 * k, root_in=0.004, flat=0.5)

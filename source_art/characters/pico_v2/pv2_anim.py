@@ -44,8 +44,8 @@ def pose_idle_pico(R, F, t, T):
     hop = b1 * hw1 + b2 * hw2
     hw = hw1 + hw2
     st = smooth(t, 1.45, 1.85) * (1 - smooth(t, 2.70, 3.05))
-    R.rel("shoulder.R", eul(y=-30.0 * st))
-    R.rel("shoulder.L", eul(y=30.0 * st))
+    R.rel("shoulder.R", eul(y=-36.0 * st))
+    R.rel("shoulder.L", eul(y=36.0 * st))
     side = math.sin(math.pi * smooth(t, 1.95, 2.70))
     shake = smooth(t, 2.85, 3.0) * (1 - smooth(t, 3.25, 3.45))
     R.hips_off = Vector((0.004 * math.sin(ph) - 0.010 * side * st, 0.0,
@@ -83,13 +83,13 @@ def pose_team_pico(R, F, t, T):
     wide = smooth(t, 0.22, 0.38) - smooth(t, 1.24, 1.40)
     R.hips_off = Vector((0.0, 0.0, -0.040 * pre + 0.060 * air + 0.030 * air2 - 0.034 * land - 0.016 * a - 0.008 * tug))
     R.rel("hips", eul(z=6.0 * a))
-    torso(R, lean=lerp(2.0, -7.0, a) + 12 * pre + 4 * tug + 4.0 * fist, yaw=-8.0 * a, roll=4.0 * a - 12.0 * fist,
+    torso(R, lean=lerp(2.0, -7.0, a) + 12 * pre + 4 * tug + 4.0 * fist, yaw=-8.0 * a, roll=4.0 * a - 18.0 * fist,
           head_pitch=8.0 * a + 4.0 * fist, head_roll=-8.0 * a - 4.0 * fist, head_yaw=10.0 * a)
     ha.arms_down(R, F, bend=20, out=8)
     R.evaluate()
     rr, rl = R.tip("hand.R"), R.tip("hand.L")
     up = Vector((F.sh.x - 0.01, 0.08, F.sh.z + 0.62))
-    R.rel("shoulder.R", eul(y=-30.0 * fist))
+    R.rel("shoulder.R", eul(y=-34.0 * fist))
     mid = Vector((F.sh.x + 0.16, 0.16, F.sh.z + 0.02))
     tr = rr.lerp(mid, smooth(t, 0.20, 0.55) * (1 - fist)).lerp(up, fist)
     reach(R, "R", tr, Vector((0.1, 0.2, -1.0)).lerp(Vector((0.1, 0.15, 1.0)), max(fist, 0.5 * a)), pole=(1.0, -0.5, -0.4))
