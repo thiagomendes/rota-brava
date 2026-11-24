@@ -36,16 +36,15 @@ var _lean: float = 0.0
 
 func _ready() -> void:
 	name = "Boat"
-	var hull := Node3D.new()
-	hull.name = "Hull"
-	add_child(hull)
-	Blocks.box(hull, "HullBody", Vector3(2.2, 0.8, 5.0), Vector3(0, 0.1, 0), COLOR_HULL)
-	Blocks.box(hull, "Bow", Vector3(1.4, 0.7, 1.2), Vector3(0, 0.15, -3.0), COLOR_HULL)
-	Blocks.box(hull, "Deck", Vector3(2.0, 0.1, 4.6), Vector3(0, 0.52, 0), Color("c9a36a"))
-	Blocks.box(hull, "Cabin", Vector3(1.6, 1.2, 1.4), Vector3(0, 1.15, 1.4), Color("fff3c4"))
-	Blocks.box(hull, "Bench", Vector3(1.4, 0.35, 0.5), Ep01Layout.BENCH_LOCAL + Vector3(0, -0.1, 0), Color("a0714a"))
-	wheel = Blocks.cylinder(hull, "Wheel", 0.3, 0.06, Vector3(0, 1.45, 0.5), Color("5a3a22"))
-	wheel.rotation.x = deg_to_rad(70.0)
+	# Modelo do RB-04 (art3d): casco curvo, cabine na popa, banco, volante, lampiao. Sem colisao solida (o barco anda por funcao).
+	var model := (load("res://actors/environment/boat_v2.tscn") as PackedScene).instantiate()
+	model.name = "Model"
+	add_child(model)
+	Stylize.apply(model)
+	var body := model.get_node_or_null("Body") as CollisionObject3D
+	if body != null:
+		body.collision_layer = 0
+	wheel = model.find_child("WheelPoint", true, false) as Node3D
 	deck_point = Marker3D.new()
 	deck_point.name = "DeckPoint"
 	deck_point.position = Vector3(0, 0.6, 0.2)

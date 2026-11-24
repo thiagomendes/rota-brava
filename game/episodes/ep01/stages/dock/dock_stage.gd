@@ -65,22 +65,12 @@ func _wall(wname: String, size: Vector3, pos: Vector3) -> void:
 
 
 func _build_scenery() -> void:
-	var wood := Color("b58a5a")
+	# Cais, margem, adereços, cabana, vegetacao e rochas: montagem modular do RB-04 (art3d), com o sombreador estilizado.
+	var assembled := (load("res://actors/environment/dock_assembled.tscn") as PackedScene).instantiate()
+	assembled.name = "DockAssembled"
+	add_child(assembled)
+	Stylize.apply(assembled)
 	var dark_wood := Color("7a5636")
-	Blocks.solid_box(self, "DockDeck", Vector3(16, 0.4, 6), Vector3(0, -0.2, 0), wood)
-	Blocks.solid_box(self, "BankGround", Vector3(20, 0.4, 13), Vector3(0, -0.2, 9.5), Color("7d9a54"))
-	# Tabuas e cabecos
-	for i in range(-7, 8, 2):
-		Blocks.box(self, "Plank%d" % i, Vector3(0.06, 0.02, 5.9), Vector3(i, 0.01, 0), dark_wood)
-	for p: Vector3 in [Vector3(-7.5, 0.35, -2.6), Vector3(7.5, 0.35, -2.6), Vector3(-7.5, 0.35, 2.6), Vector3(7.5, 0.35, 2.6)]:
-		Blocks.cylinder(self, "Bollard", 0.18, 0.7, p, dark_wood)
-	# Caixotes no cais (fora do caminho do banco)
-	Blocks.solid_box(self, "Crate1", Vector3(0.9, 0.8, 0.9), Vector3(6.2, 0.4, 1.8), Color("d9a05b"))
-	Blocks.solid_box(self, "Crate2", Vector3(0.7, 0.6, 0.7), Vector3(5.2, 0.3, 2.2), Color("c48a45"))
-	# Cabana na margem
-	Blocks.solid_box(self, "HutBody", Vector3(3.4, 2.2, 2.8), Vector3(-7.0, 1.1, 13.5), Color("e3cfa5"))
-	Blocks.box(self, "HutRoof", Vector3(3.9, 0.35, 3.3), Vector3(-7.0, 2.4, 13.5), Color("a8503c"))
-	Blocks.box(self, "HutDoor", Vector3(0.8, 1.4, 0.06), Vector3(-7.0, 0.7, 12.08), dark_wood)
 	# Moradores/multidao em blocos neutros (sem colisao)
 	var spots: Array[Vector3] = [Vector3(5.5, 0, 12.5), Vector3(6.6, 0, 13.4), Vector3(7.6, 0, 12.2), Vector3(4.6, 0, 14.0), Vector3(8.2, 0, 14.2)]
 	var tones: Array[Color] = [Color("9aa5ab"), Color("b9b3a4"), Color("8e9aa0"), Color("a9a2b4"), Color("b0b8a8")]
@@ -94,10 +84,6 @@ func _build_scenery() -> void:
 	_wall("DockEndWest", Vector3(0.4, 3.0, 6.0), Vector3(-8.2, 1.5, 0))
 	_wall("DockEndEast", Vector3(0.4, 3.0, 6.0), Vector3(8.2, 1.5, 0))
 	_wall("DockEdgeNorth", Vector3(16.8, 3.0, 0.4), Vector3(0, 1.5, -3.2))
-	for x in range(-10, 11, 4):
-		Blocks.box(self, "FencePost%d" % x, Vector3(0.14, 0.9, 0.14), Vector3(x, 0.45, 16.0), dark_wood)
-	Blocks.box(self, "FenceRail", Vector3(20.0, 0.1, 0.1), Vector3(0, 0.8, 16.0), dark_wood)
-	Blocks.box(self, "DockRail", Vector3(16.0, 0.08, 0.08), Vector3(0, 0.5, -3.0), dark_wood)
 
 
 func _build_marks() -> void:
@@ -110,10 +96,6 @@ func _build_marks() -> void:
 	ctx.boat.add_child(paw)
 	var pg: Array[Node3D] = []
 	pg.append(Blocks.cylinder(paw, "PawMarkGlow", 0.3, 0.01, Vector3(0, 0.0, 0), GLOW_COLOR, 1.6))
-	Blocks.cylinder(paw, "PawMarkPad", 0.11, 0.02, Vector3(0, 0.012, 0.05), DARK)
-	for i in 4:
-		var a := -0.45 + 0.3 * i
-		Blocks.cylinder(paw, "PawMarkToe%d" % i, 0.045, 0.02, Vector3(sin(a) * 0.2, 0.012, -0.08 - cos(a) * 0.08), DARK)
 	var light := OmniLight3D.new()
 	light.name = "PawMarkLight"
 	light.light_color = GLOW_COLOR
@@ -131,10 +113,7 @@ func _build_marks() -> void:
 	add_child(boot)
 	boot.global_position = Ep01Layout.BANK_PRINT_POS
 	var bg: Array[Node3D] = []
-	Blocks.cylinder(boot, "BootMarkMud", 0.9, 0.02, Vector3(0, 0.011, 0), Color("6b5236"))
 	bg.append(Blocks.cylinder(boot, "BootMarkGlow", 0.75, 0.01, Vector3(0, 0.025, 0), GLOW_COLOR, 1.6))
-	Blocks.box(boot, "BootMarkSole", Vector3(0.28, 0.02, 0.55), Vector3(0, 0.04, -0.15), DARK)
-	Blocks.box(boot, "BootMarkHeel", Vector3(0.24, 0.02, 0.2), Vector3(0, 0.04, 0.22), DARK)
 	var bl := OmniLight3D.new()
 	bl.name = "BootMarkLight"
 	bl.light_color = GLOW_COLOR
