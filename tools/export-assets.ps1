@@ -48,6 +48,7 @@ foreach ($a in $assets) {
 $chars = @(
     @{ id = 'rastro';  name = 'Rastro';  role = 'tracker'; note = 'Rastreadora: chapeu de aba larga caida, cabelo, colete laranja sobre camisa, cinto com caderno por cordao, bolsa, luvas sem dedos, botas. Rig 28 ossos, 6 clipes.' },
     @{ id = 'leme';    name = 'Leme';    role = 'pilot';   note = 'Piloto: gorro de marinheiro, lenco, colete claro com bolsos, maos grandes. Clipes de volante (idle_wheel, steer_left/right, react_horn) + idle/walk.' },
+    @{ id = 'pico';    name = 'Pico';    role = 'climber'; note = 'Especialista em travessias: capacete leve, corda enrolada nas costas e a tiracolo, mosquetoes no cinto/mochila/peito, luvas sem dedos, jaqueta verde. Clipes idle, walk, react_surprise, pull_rope (dois puxoes, 1,6 s) e look_up.' },
     @{ id = 'extra_a'; name = 'Figurante A'; role = 'extra'; note = 'Figurante do cais com chapeu de palha. Malha simples, rig completo, clipes idle e walk.' },
     @{ id = 'extra_b'; name = 'Figurante B'; role = 'extra'; note = 'Figurante do cais com lenco na cabeca e tunica. Malha simples, rig completo, clipes idle e walk.' },
     @{ id = 'extra_c'; name = 'Figurante C'; role = 'extra'; note = 'Figurante do cais com boina. Malha simples, rig completo, clipes idle e walk.' }
@@ -97,6 +98,7 @@ if ($Images) {
     Invoke-Blender 'source_art/scripts/render_views.py' @('--asset', 'boat', '--out', $out)
 }
 Write-Host 'OK export-assets'
+
 
 
 

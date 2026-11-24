@@ -1,10 +1,10 @@
 extends Node3D
-## Previa dos personagens na CAMERA DO JOGO (offset (0, 7.5, 9.5), fov 55) para capturas com o Movie Maker (RB-04-chars).
+## Previa dos personagens na CAMERA DO JOGO (offset do dock (0, 4.6, 6.2), fov 55) para capturas com o Movie Maker (RB-04-chars).
 ## Nao e jogo nem teste. Argumentos (em qualquer posicao da linha de comando): --facing=camera|away, --zoom=1.0 (1 = camera real;
 ## < 1 aproxima ao longo do mesmo eixo), --old (inclui o Rastro de blocos do RB-03 para comparar), --clip=idle|walk|pose.
 ## ./tools/godot.ps1 --path game res://actors/characters/preview_characters.tscn --write-movie C:\tmp\f.png --fixed-fps 10 --resolution 1280x720 --quit-after 20
 
-const CAM_OFFSET := Vector3(0.0, 7.5, 9.5)
+const CAM_OFFSET := Vector3(0.0, 4.6, 6.2)
 const SPACING := 1.35
 
 var _facing: String = "camera"
@@ -31,7 +31,7 @@ func _ready() -> void:
 	_clip = _arg("--clip=", "idle")
 	_old = _flag("--old")
 	_build_world()
-	var ids := ["rastro_model", "leme_model", "extra_a", "extra_b", "extra_c"]
+	var ids := ["rastro_model", "leme_model", "pico_model", "extra_a", "extra_b", "extra_c"]
 	var count := ids.size() + (1 if _old else 0)
 	var x0 := -SPACING * (count - 1) * 0.5
 	var slot := 0
@@ -99,3 +99,5 @@ func _build_world() -> void:
 	m.roughness = 0.9
 	floor_mi.material_override = m
 	add_child(floor_mi)
+
+

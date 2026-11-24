@@ -40,3 +40,10 @@
   contato dos pes e alcance da mao. Loop dos clipes `idle`, `walk`, `idle_wheel` e definido em `CharacterVisual` (o glTF nao tem flag de loop).
 - **Limites conhecidos:** triangulos altos para o tamanho em tela (Rastro ~22,6 mil); sem LOD; roupa nao tem simulacao (caderno/bolsa
   acompanham o quadril); cabelo e colete mostram arestas duras em poses extremas; `walk` tem velocidade nominal de ~0,69 m/s no referencial do corpo.
+
+
+### Atualizacao RB-04-chars (2a rodada)
+- **Pico (`climber`)** criado: `char_build.py --id pico` (capacete leve, corda enrolada nas costas + tiracolo, 4 mosquetoes, mochila, luvas, jaqueta verde #5AA469), mesmo rig de 28 ossos e as mesmas shape keys, `mat_pico_*`. Clipes: `idle`, `walk`, `react_surprise`, `pull_rope` (1,6 s, dois puxoes), `look_up`. Cena `game/actors/characters/pico_model.tscn`.
+- **Idle dos figurantes/Pico:** pes quase juntos (calcanhares ~12 cm), tronco < 2 graus; `CharacterVisual.play` agora troca de clipe na hora quando o no nao esta processando (evita congelar a ultima pose da caminhada).
+- **Polimento:** cabelo sem o bloco lateral, mangas mais finas com punho, colete e peso da camisa mais suaves, `walk` com passo de 0,34 m (velocidade nominal 0,586 m/s, `CharacterVisual.WALK_SPEED_MPS`), agachada com tronco a 24 graus.
+- **Triangulos (antes -> depois):** Rastro 22.588 -> 14.944; Leme 20.208 -> 14.076; figurantes 11.448/11.920/10.696 -> 8.420/9.212/7.844; Pico 16.568 (novo).
