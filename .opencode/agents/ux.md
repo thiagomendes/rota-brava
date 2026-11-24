@@ -1,7 +1,7 @@
 ---
 description: UX infantil, UI Godot, foco, entrada multimodal, acessibilidade, localizacao e areas seguras.
 mode: subagent
-model: anthropic/claude-sonnet-5-5#low
+model: anthropic/claude-opus-5-5#low
 permissions:
   - action: subagent
     resource: "*"

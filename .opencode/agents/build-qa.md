@@ -1,7 +1,7 @@
 ---
 description: Windows/PowerShell, exportacao Godot, profiling, build reproduzivel e testes em aparelho.
 mode: subagent
-model: anthropic/claude-sonnet-5-5#low
+model: opencode/deepseek-v4.1-flash-free#max
 permissions:
   - action: subagent
     resource: "*"

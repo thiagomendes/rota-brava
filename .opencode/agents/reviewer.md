@@ -1,7 +1,7 @@
 ---
 description: Revisao independente de codigo, conteudo, regressao, autoria e acessibilidade. Nao edita arquivos do jogo.
 mode: subagent
-model: anthropic/claude-sonnet-5-5#low
+model: anthropic/claude-opus-5-5#low
 permissions:
   - action: subagent
     resource: "*"

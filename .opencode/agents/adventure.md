@@ -1,7 +1,7 @@
 ---
 description: Design de missoes, puzzles cooperativos, narrativa infantil, roteiro localizado e assistencia gradual.
 mode: subagent
-model: anthropic/claude-sonnet-5-5#low
+model: opencode/deepseek-v4.1-flash-free#max
 permissions:
   - action: subagent
     resource: "*"

@@ -1,7 +1,7 @@
 ---
 description: Godot/GDScript tipado - atores, entrada, camera, maquina de estados, save e testes deterministicos. Use para mecanicas jogaveis.
 mode: subagent
-model: anthropic/claude-sonnet-5-5#low
+model: anthropic/claude-opus-5-5#low
 permissions:
   - action: subagent
     resource: "*"
