@@ -14,6 +14,7 @@ var _gpu: Array[float] = []
 var _cpu: Array[float] = []
 var _draws: Array[float] = []
 var _done: bool = false
+var _spikes: Array = []
 
 
 func _ready() -> void:
@@ -24,7 +25,48 @@ func _ready() -> void:
 		elif arg.begins_with("--perf-seconds="):
 			sample_seconds = float(arg.trim_prefix("--perf-seconds="))
 	RenderingServer.viewport_set_measure_render_time(get_viewport().get_viewport_rid(), true)
+	_apply_toggles.call_deferred()
 	_last_us = Time.get_ticks_usec()
+
+
+## Diagnostico: --perf-off=shadows,water,vfx,post,audio,chars desliga cada parte para achar o custo (so medicao).
+func _apply_toggles() -> void:
+	var raw := ""
+	for arg in OS.get_cmdline_user_args() + OS.get_cmdline_args():
+		if arg.begins_with("--perf-off="):
+			raw = arg.trim_prefix("--perf-off=")
+	if raw.is_empty():
+		return
+	var main := get_parent()
+	for part in raw.split(","):
+		match part:
+			"shadows":
+				for l in main.find_children("*", "DirectionalLight3D", true, false):
+					(l as DirectionalLight3D).shadow_enabled = false
+			"water":
+				var w := main.get_node_or_null("Water")
+				if w:
+					w.visible = false
+			"vfx":
+				for p in main.find_children("*", "GPUParticles3D", true, false):
+					(p as GPUParticles3D).visible = false
+			"post":
+				for we in main.find_children("*", "WorldEnvironment", true, false):
+					var env := (we as WorldEnvironment).environment
+					env.glow_enabled = false
+					env.fog_enabled = false
+					env.adjustment_enabled = false
+				for v in main.find_children("Vignette", "CanvasLayer", true, false):
+					(v as CanvasLayer).visible = false
+			"audio":
+				var a := main.get_node_or_null("AudioDirector")
+				if a:
+					a.process_mode = Node.PROCESS_MODE_DISABLED
+					AudioServer.set_bus_mute(0, true)
+			"chars":
+				for a in main.find_children("Actor_*", "CharacterBody3D", true, false):
+					(a as Node3D).visible = false
+	print("[RB] perf toggles: %s" % raw)
 
 
 func _process(_delta: float) -> void:
@@ -37,6 +79,8 @@ func _process(_delta: float) -> void:
 	if _elapsed < warmup_seconds:
 		return
 	_frames.append(dt_ms)
+	if dt_ms > 16.7 and _spikes.size() < 40:
+		_spikes.append([snappedf(_elapsed - warmup_seconds, 0.01), snappedf(dt_ms, 0.1)])
 	var rid := get_viewport().get_viewport_rid()
 	_gpu.append(RenderingServer.viewport_get_measured_render_time_gpu(rid))
 	_cpu.append(RenderingServer.viewport_get_measured_render_time_cpu(rid))
@@ -67,6 +111,7 @@ func report() -> Dictionary:
 	var win := get_window()
 	return {
 		"frames": _frames.size(),
+		"spikes_over_16_7ms": _spikes,
 		"seconds": snappedf(sample_seconds, 0.1),
 		"frame_ms": {"mean": snappedf(mean(_frames), 0.01), "p50": snappedf(percentile(_frames, 0.5), 0.01),
 			"p95": snappedf(percentile(_frames, 0.95), 0.01), "p99": snappedf(percentile(_frames, 0.99), 0.01),

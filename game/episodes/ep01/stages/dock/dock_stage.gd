@@ -70,6 +70,7 @@ func _build_scenery() -> void:
 	assembled.name = "DockAssembled"
 	add_child(assembled)
 	Stylize.apply(assembled)
+	Stylize.trim_small_shadows(assembled)
 	var dark_wood := Color("7a5636")
 	# Moradores/multidao em blocos neutros (sem colisao)
 	var spots: Array[Vector3] = [Vector3(5.5, 0, 12.5), Vector3(6.6, 0, 13.4), Vector3(7.6, 0, 12.2), Vector3(4.6, 0, 14.0), Vector3(8.2, 0, 14.2)]

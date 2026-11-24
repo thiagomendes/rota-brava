@@ -35,6 +35,20 @@ static func material_for(src: Material) -> Material:
 	return m
 
 
+## Pecas pequenas (tufos, juncos, baldes) quase nao contribuem para a sombra e custam chamadas de desenho: nao projetam sombra.
+static func trim_small_shadows(root: Node, max_extent: float = 0.7) -> int:
+	var trimmed := 0
+	for n in root.find_children("*", "MeshInstance3D", true, false):
+		var mi := n as MeshInstance3D
+		if mi.mesh == null:
+			continue
+		var size := mi.get_aabb().size * mi.global_transform.basis.get_scale()
+		if maxf(size.x, maxf(size.y, size.z)) < max_extent:
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			trimmed += 1
+	return trimmed
+
+
 ## Aplica o sombreador estilizado a toda MeshInstance3D sob `root` (sem alterar os recursos importados).
 static func apply(root: Node) -> void:
 	for n in root.find_children("*", "MeshInstance3D", true, false):
