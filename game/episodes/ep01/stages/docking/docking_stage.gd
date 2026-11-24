@@ -302,7 +302,7 @@ func focus_node(member: StringName) -> Node3D:
 
 func camera_view() -> Dictionary:
 	# Alta e a oeste/sul do barco: linha (z=4), barco (alvo) e pier (a leste) ficam juntos e livres.
-	return {"offset": Vector3(-7.0, 12.0, 13.0), "yaw": 0.0}
+	return {"offset": Vector3(-2.4, 4.2, 4.6), "yaw": 0.0}
 
 
 func gesture_hint(_key: String) -> void:

@@ -22,7 +22,7 @@ const SPOTS := [
 	[Vector3(170.0, 0.0, 25.0), &"boat"],    # fundo da enseada
 	[Vector3(180.6, 0.0, 15.0), &"foot"],    # ponta sul da margem do braco (Pico)
 	[Vector3(197.0, 0.0, 8.0), &"foot"],     # beira sul da ilha
-	[Vector3(206.0, 0.0, -8.5), &"foot"],    # canto nordeste da ilha
+	[Vector3(205.0, 0.0, -8.5), &"foot"],    # canto nordeste da ilha
 ]
 
 ## Indices ja coletados nesta execucao.

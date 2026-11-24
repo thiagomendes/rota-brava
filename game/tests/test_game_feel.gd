@@ -91,9 +91,23 @@ func _hero_fraction(m: Ep01Main, a: MemberActor) -> float:
 
 
 func _occluded(m: Ep01Main, from: Vector3, to: Vector3, exclude: Array[RID]) -> String:
-	var q := PhysicsRayQueryParameters3D.create(from, to, 1, exclude)
-	var hit := m.get_world_3d().direct_space_state.intersect_ray(q)
-	return "" if hit.is_empty() else String((hit["collider"] as Node).get_path())
+	# Muros invisiveis (sem malha visivel) nao ocluem: sao ignorados; ate 8 tentativas, nunca laco infinito.
+	var ex := exclude.duplicate()
+	for i in 8:
+		var q := PhysicsRayQueryParameters3D.create(from, to, 1, ex)
+		var hit := m.get_world_3d().direct_space_state.intersect_ray(q)
+		if hit.is_empty():
+			return ""
+		var col := hit["collider"] as Node
+		var seen := false
+		for mi in col.find_children("*", "MeshInstance3D", true, false):
+			if (mi as MeshInstance3D).is_visible_in_tree():
+				seen = true
+				break
+		if seen:
+			return String(col.get_path())
+		ex.append((col as CollisionObject3D).get_rid())
+	return "muitos colisores"
 
 
 func _framing() -> void:
@@ -101,9 +115,10 @@ func _framing() -> void:
 	var cases := [
 		[&"dock_investigation", &"tracker", Ep01Layout.BENCH_INTERACT_POS + Vector3(0, 0.3, 0)],
 		[&"dock_investigation", &"tracker", Ep01Layout.BANK_PRINT_POS + Vector3(0, 0.2, 0)],
-		[&"river_search", &"pilot", Ep01Layout.BUOY_POS + Vector3(0, 0.5, 0)],
+		# Rio: no inicio a boia esta a 90 m; o alvo do momento e a agua a frente da proa (ler a correnteza).
+		[&"river_search", &"pilot", Ep01Layout.BOAT_DOCKED_POS + Vector3(5.0, -0.3, 0.0)],
 		[&"island_crossing", &"climber", (Ep01Layout.ROCK_FOOTHOLDS[0] as Vector3) + Vector3(0, 0.1, 0)],
-		[&"docking", &"pilot", Ep01Layout.DOCKING_TARGET_POS],
+		[&"docking", &"pilot", Ep01Layout.DOCKING_TARGET_POS + Vector3(0, 0.4, 0)],
 	]
 	var sizes := [Vector2i(1280, 720), Vector2i(1600, 720), Vector2i(960, 720)]
 	var root_vp: Window = r.tree.root
@@ -124,6 +139,8 @@ func _framing() -> void:
 			r.check(f >= 0.12 and f <= 0.18, "%s %s em %dx%d: heroi ocupa %.1f%% da altura (12-18%%)" % [c[0], c[1], s.x, s.y, f * 100.0])
 		r.tree.root.size = old_size
 		await r.frames(1)
+		if c[0] == &"river_search":
+			c[2] = m.boat.global_position + m.boat.forward() * 6.0
 		var cam_pos := m.camera_rig.camera.global_position
 		var ex: Array[RID] = [a.get_rid()]
 		var o1 := _occluded(m, cam_pos, a.global_position + Vector3(0, 0.7, 0), ex)

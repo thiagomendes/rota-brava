@@ -90,7 +90,7 @@ func run(runner) -> void:
 	r.check(sag_mid < Ep01Layout.ANCHOR_A.y - 0.1, "a corda tem curva (meio abaixo das pontas)")
 	await r.tree.create_timer(4.5).timeout
 	r.check(st.rope_sag() <= 0.11, "depois dos puxoes a corda fica esticada")
-	r.check(pico.global_position.distance_to(Ep01Layout.ANCHOR_B) < 4.5, "Pico seguro na ilha perto de ANCHOR_B")
+	r.check(pico.global_position.distance_to(Ep01Layout.ANCHOR_B) < 4.5, "Pico seguro na ilha perto de ANCHOR_B %s" % pico.global_position)
 	var blocks := 0
 	for c in st.get_children():
 		if c is MeshInstance3D or c is StaticBody3D:

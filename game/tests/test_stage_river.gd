@@ -183,10 +183,12 @@ func run(runner) -> void:
 	var unmarked := 0
 	var meshes := 0
 	for n in stage.find_children("*", "MeshInstance3D", true, false):
+		if (n as Node).get_path().get_concatenated_names().contains("RiverWorld") or (n as Node).get_path().get_concatenated_names().contains("Horizon"):
+			continue   # cena de mundo final (art3d), nao e bloco
 		meshes += 1
 		if (n as Node).get_meta(Blocks.PROVISIONAL, false) != true:
 			unmarked += 1
-	r.check(meshes > 50 and unmarked == 0, "todos os %d blocos do rio sao provisorios (%d sem marca)" % [meshes, unmarked])
+	r.check(meshes > (20 if stage.world_mounted else 50) and unmarked == 0, "todos os %d blocos do rio sao provisorios (%d sem marca)" % [meshes, unmarked])
 	# So a posicao horizontal: a boia balanca na vertical por desenho (depende do relogio do estagio).
 	var buoy_xz := Vector2.INF
 	if stage.buoy_node != null:

@@ -203,7 +203,7 @@ func focus_node(member: StringName) -> Node3D:
 
 
 func camera_view() -> Dictionary:
-	return {"offset": Vector3(-3.0, 13.0, 14.0), "yaw": 0.0}
+	return {"offset": Vector3(-4.0, 4.2, 3.0), "yaw": 0.0}
 
 
 func refresh_world() -> void:

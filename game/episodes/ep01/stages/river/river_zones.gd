@@ -36,6 +36,7 @@ const BOX_OBSTACLES := [
 	Rect2(-8.0, -3.0, 16.0, 6.0),
 	Rect2(-10.0, 3.0, 20.0, 13.0),
 	Ep01Layout.SANDBAR_RECT,            # banco de areia: desacelera e desvia o barco
+	Rect2(175.5, 1.5, 6.5, 16.5),       # lingua de terra do pouso de Pico
 ]
 
 

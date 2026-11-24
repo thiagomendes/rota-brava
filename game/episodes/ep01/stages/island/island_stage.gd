@@ -21,7 +21,7 @@ const ROPE_THICK := 0.08
 const FOOT_SIZE := 1.4
 const WORLD_SCENE := "res://episodes/ep01/world/island_world.tscn"
 ## Salto: alcance horizontal maximo, cone da mira (rad) e tempo empurrando ate pular na borda.
-const JUMP_RANGE := 3.4
+const JUMP_RANGE := 3.8
 const JUMP_MIN := 0.9
 const AIM_CONE := 0.9
 const EDGE_LOOK := 0.55
@@ -33,12 +33,12 @@ const S := Ep01Layout.STAGE3_SHIFT
 ## Iscas (pedras escuras e molhadas, um pouco abaixo dos apoios); pousar = passo perdido.
 const DECOYS := [Vector3(93.8 + S, -0.15, 3.4), Vector3(95.0 + S, -0.15, 7.6), Vector3(97.4 + S, -0.15, 7.0), Vector3(98.8 + S, -0.15, 6.6)]
 ## Chao firme (x,z; topo y = 0): margem oeste do braco e ilha. Os apoios ficam na agua entre os dois.
-const BANK_RECT := Rect2(89.5 + S, 2.0, 2.3, 14.0)
-const ISLAND_RECT := Rect2(100.0 + S, -10.0, 18.0, 19.0)
-const ISLAND_SAFE_POS := Vector3(101.0 + S, 0.0, 5.6)
+const BANK_RECT := Rect2(175.5, 1.5, 6.5, 16.5)      # lingua de terra do pouso (river_world Floors/PicoLanding)
+const ISLAND_RECT := Rect2(191.5, -10.0, 15.0, 22.0)  # ilha (island_world Floors/IslandFloor)
+const ISLAND_SAFE_POS := Vector3(192.5, 0.0, 5.6)
 ## Pontos de pouso em terra (para pular de volta a margem e do apoio 3 para a ilha).
-const BANK_LAND := Vector3(91.2 + S, 0.0, 6.5)
-const ISLAND_LAND := Vector3(100.9 + S, 0.0, 4.2)
+const BANK_LAND := Vector3(181.2, 0.0, 6.5)
+const ISLAND_LAND := Vector3(192.0, 0.0, 4.2)
 
 var rope_visible: bool = false
 var world_mounted: bool = false
@@ -244,7 +244,7 @@ func control_started(member: StringName) -> void:
 
 func camera_view() -> Dictionary:
 	# Camera a oeste-sudoeste olhando para leste: braco, apoios e ilha a frente; o barco na enseada atras/a direita.
-	return {"offset": Vector3(0, 8.0, 12.0), "yaw": -1.2}
+	return {"offset": Vector3(0, 3.4, 4.8), "yaw": -1.2}
 
 
 func _next_target() -> Vector3:
