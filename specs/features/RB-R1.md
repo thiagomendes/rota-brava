@@ -31,6 +31,8 @@ Thiago viu as capturas do jogo (render por software na nuvem) e reprovou a dire�
 - **D8 · Ordem:** (1) heróis v2 em vitrine de estudos → Thiago aprova antes de entrar no jogo; (2) proposta de mundo refinada, também em vitrine; (3) som profissional. O Portão 1 volta a ficar aberto para heróis e mundo.
 - **D9 · Esforço:** `art3d` e `ux` em esforço alto (trabalho visual); demais subagentes seguem baixos.
 - **D10 · Som (a decidir na fase 3):** Thiago propõe usar a API do Google AI Studio (vozes Gemini e trilha gerada) para substituir o balbucio e melhorar a música. Antes: conferir termos de uso comercial do áudio gerado e vozes adequadas em pt-BR. Se adotado, substitui D2 (balbucio + Piper) e flexibiliza D3 (só CC0). A chave entra só como segredo do ambiente, nunca no repositório.
+- **D11 · Alvo de acabamento (Thiago, 2026-11-24, com print de outro jogo dele feito em Blender por código):** a referência é de QUALIDADE, não de aparência nem de proporção: material macio tipo vinil com brilho suave, tecidos com textura, volume vindo da luz (não cor chapada nem contorno grosso), membros que nascem do corpo sem emenda, luz direcional + luzes quentes locais, sombra de contato, oclusão nos cantos, névoa de profundidade, cenário denso e coeso. Proporção atual pode ficar, com ajustes pontuais. Os estudos heróis v2 (cor chapada) foram reprovados.
+- **D12 · Renderizador:** Windows primeiro, com qualidade; o computador passa ao renderizador completo da Godot (Forward+). Portabilidade (celular) fica para depois do episódio fechado.
 - Seguem em paralelo as tarefas que não dependem do visual (contador de emblemas, opções no jogo, duração em modo humano).
 
 ## Barra de qualidade (mensurável e perceptual)
