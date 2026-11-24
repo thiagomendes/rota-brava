@@ -66,10 +66,17 @@ static func set_value(section: String, key: String, value: Variant, save: bool =
 		_emitter().steering_assist_changed.emit(bool(value))
 
 
+## Bus da musica sob ducking (fala tocando): o AudioDirector registra aqui para o volume novo respeitar o -6 dB.
+static var music_duck_db: Callable = Callable()
+
+
 static func apply_bus(bus: String, linear: float) -> void:
 	var idx := AudioServer.get_bus_index(bus)
 	if idx >= 0:
-		AudioServer.set_bus_volume_db(idx, linear_to_db(maxf(linear, 0.0001)))
+		var extra := 0.0
+		if bus == "Musica" and music_duck_db.is_valid():
+			extra = float(music_duck_db.call())
+		AudioServer.set_bus_volume_db(idx, linear_to_db(maxf(linear, 0.0001)) + extra)
 		AudioServer.set_bus_mute(idx, linear <= 0.001)
 
 

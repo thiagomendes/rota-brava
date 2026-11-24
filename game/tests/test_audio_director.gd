@@ -84,7 +84,8 @@ func run(r) -> void:
 	d.start_ambience(0.0)
 	r.check(d.is_ambience_playing(), "director: start_ambience toca as camadas")
 	var idx := AudioServer.get_bus_index(&"Musica")
-	var base := AudioServer.get_bus_volume_db(idx)
+	# A base do ducking e o volume da musica escolhido nas opcoes (RB-R1 tarefa 6).
+	var base := linear_to_db(float(Options.get_value("audio", "Musica")))
 	d.duck_music(true)
 	r.check(d.ducked and is_equal_approx(d.music_bus_target_db(), base + AudioDirector.DUCK_DB), "director: duck_music(true) fixa o alvo em -6 dB")
 	await r.tree.create_timer(0.6).timeout

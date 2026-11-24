@@ -367,8 +367,11 @@ func _flat_dist(pos: Vector3) -> float:
 	return d.length()
 
 
-## 0 longe; cresce linearmente ate ASSIST_MAX dentro de ASSIST_RANGE do alvo.
+## 0 longe; cresce linearmente ate ASSIST_MAX dentro de ASSIST_RANGE do alvo. Com a assistencia de pilotagem
+## desligada nas opcoes, o barco nao se alinha sozinho (a corrente fraca continua).
 func assist_for(pos: Vector3) -> float:
+	if not bool(Options.get_value("access", "steering_assist")):
+		return 0.0
 	return clampf(1.0 - _flat_dist(pos) / ASSIST_RANGE, 0.0, 1.0) * ASSIST_MAX
 
 

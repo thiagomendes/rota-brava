@@ -129,7 +129,8 @@ func run(runner) -> void:
 		await _tap(&"pause")
 		r.check(not play.hud.pause_open and not r.tree.paused, "Esc de novo retoma")
 		await _tap(&"pause")
-		await _tap(&"ui_down")
+		await _tap(&"ui_down")   # Opcoes (RB-R1)
+		await _tap(&"ui_down")   # Menu
 		await _tap(&"ui_accept")
 		await r.frames(3)
 		var back := r.tree.current_scene as MainMenu

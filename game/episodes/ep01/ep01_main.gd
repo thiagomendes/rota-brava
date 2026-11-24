@@ -76,6 +76,10 @@ func _ready() -> void:
 	BoatVfx.attach(boat)
 	camera_rig = CameraRig.new()
 	add_child(camera_rig)
+	# Opcoes do jogador valem no episodio mesmo sem passar pela tela-titulo, e mudam na hora (menu de pausa).
+	Options.apply_all()
+	camera_rig.reduced_motion = Options.reduced_motion()
+	Options.signals().changed.connect(_on_option_changed)
 	_load_stages()
 	collectibles = Ep01Collectibles.new()
 	world.add_child(collectibles)
@@ -631,3 +635,14 @@ func _on_menu() -> void:
 	carry_completed = director.completed_episodes.duplicate()
 	get_tree().paused = false
 	get_tree().change_scene_to_file(MENU_SCENE)
+
+
+func _on_option_changed(_section: String, key: String, _value: Variant) -> void:
+	if key == "reduced_motion" and is_instance_valid(camera_rig):
+		camera_rig.reduced_motion = Options.reduced_motion()
+
+
+func _exit_tree() -> void:
+	if Options.signals().changed.is_connected(_on_option_changed):
+		Options.signals().changed.disconnect(_on_option_changed)
+

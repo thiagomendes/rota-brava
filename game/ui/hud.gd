@@ -92,6 +92,11 @@ var _complete_replay: Button
 var _pause_panel: Control
 var _pause_box: Control
 var _pause_resume: Button
+var _pause_options: Button
+## Opcoes dentro do jogo (pausa): o mesmo painel da tela-titulo; cada mudanca vale na hora.
+var options_panel: OptionsPanel
+var _options_overlay: Control
+var options_open: bool = false
 var _queue: Array[Dictionary] = []
 var _speaking: bool = false
 var _skip_current: bool = false
@@ -562,9 +567,36 @@ func _build_pause(root: Control) -> void:
 	_pause_resume = _button(v, Loc.t("ui.pause.resume"), 520, &"boat", &"PrimaryButton")
 	_pause_resume.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_pause_resume.pressed.connect(func() -> void: resume_requested.emit())
+	_pause_options = _button(v, Loc.t("ui.menu.options"), 520, &"gear")
+	_pause_options.name = "PauseOptions"
+	_pause_options.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_pause_options.pressed.connect(open_options)
 	var menu := _button(v, Loc.t("ui.menu.menu"), 520, &"home")
 	menu.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	menu.pressed.connect(func() -> void: menu_requested.emit())
+	_options_overlay = _overlay(root, "OptionsOverlay", 0.25)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_safe_rect(_options_overlay).add_child(center)
+	options_panel = OptionsPanel.new()
+	center.add_child(options_panel)
+	options_panel.ui_sound.connect(func(n: StringName) -> void: ui_sound.emit(n))
+	options_panel.back_requested.connect(close_options)
+
+
+func open_options() -> void:
+	ui_sound.emit(&"confirm")
+	options_open = true
+	_options_overlay.visible = true
+	options_panel.open()
+
+
+func close_options() -> void:
+	options_open = false
+	_options_overlay.visible = false
+	if pause_open:
+		_pause_options.grab_focus()
 
 
 # ---------- objetivo, integrante e acao contextual ----------
@@ -939,6 +971,8 @@ func open_pause() -> void:
 func close_pause() -> void:
 	pause_open = false
 	_pause_panel.visible = false
+	if options_open:
+		close_options()
 
 
 func open_complete() -> void:
@@ -961,6 +995,10 @@ func close_complete() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_echo():
+		return
+	if options_open and (event.is_action_pressed(&"ui_cancel") or event.is_action_pressed(&"pause")):
+		get_viewport().set_input_as_handled()
+		close_options()
 		return
 	if event.is_action_pressed(&"pause") and not choice_open and not complete_open:
 		get_viewport().set_input_as_handled()

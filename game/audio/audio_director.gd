@@ -83,6 +83,7 @@ var _line_duck: bool = false
 
 
 func _ready() -> void:
+	Options.music_duck_db = func() -> float: return DUCK_DB if ducked else 0.0
 	_ensure_catalog()
 	rng.randomize()
 	for i in 2:
@@ -611,8 +612,8 @@ func duck_music(on: bool) -> void:
 	if idx < 0:
 		ducked = on
 		return
-	if is_nan(_music_bus_base_db):
-		_music_bus_base_db = AudioServer.get_bus_volume_db(idx) if not ducked else AudioServer.get_bus_volume_db(idx) - DUCK_DB
+	# A base e sempre o volume da musica escolhido nas opcoes (pode mudar no meio do jogo, pela pausa).
+	_music_bus_base_db = linear_to_db(maxf(float(Options.get_value("audio", String(BUS_MUSIC))), 0.0001))
 	ducked = on
 	var target := _music_bus_base_db + (DUCK_DB if on else 0.0)
 	if _duck_tween != null and _duck_tween.is_valid():
@@ -656,6 +657,7 @@ func stop_all() -> void:
 
 
 func _exit_tree() -> void:
+	Options.music_duck_db = Callable()
 	# restaura o bus Musica se o diretor sair com ducking ativo
 	if not is_nan(_music_bus_base_db):
 		var idx := AudioServer.get_bus_index(BUS_MUSIC)
