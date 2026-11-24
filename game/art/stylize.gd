@@ -35,6 +35,33 @@ static func material_for(src: Material) -> Material:
 	return m
 
 
+const OUTLINE := preload("res://art/outline.gdshader")
+
+
+## Contorno fino de casca invertida (bible secao 7): so personagens e itens interativos. `thickness` em fracao de tela.
+static func add_outline(root: Node, thickness: float = 0.010, color: Color = Color(0.12, 0.10, 0.18)) -> int:
+	var mat := ShaderMaterial.new()
+	mat.shader = OUTLINE
+	mat.set_shader_parameter("thickness", thickness)
+	mat.set_shader_parameter("outline_color", color)
+	var n := 0
+	for node in root.find_children("*", "MeshInstance3D", true, false):
+		var mi := node as MeshInstance3D
+		if mi.mesh == null:
+			continue
+		for i in mi.mesh.get_surface_count():
+			var m := mi.get_active_material(i)
+			if m == null:
+				continue
+			if mi.get_surface_override_material(i) == null:
+				mi.set_surface_override_material(i, m.duplicate())
+			var dst := mi.get_surface_override_material(i)
+			if dst.next_pass == null:
+				dst.next_pass = mat
+				n += 1
+	return n
+
+
 ## Pecas pequenas (tufos, juncos, baldes) quase nao contribuem para a sombra e custam chamadas de desenho: nao projetam sombra.
 static func trim_small_shadows(root: Node, max_extent: float = 0.7) -> int:
 	var trimmed := 0

@@ -71,6 +71,7 @@ func _mount_model(member_id: StringName) -> void:
 	_visual.add_child(m)
 	model = m as CharacterVisual
 	Stylize.apply(m)
+	Stylize.add_outline(m, 0.008)
 	if model != null:
 		model.play(&"idle")
 

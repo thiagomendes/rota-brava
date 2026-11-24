@@ -4,21 +4,19 @@ extends RefCounted
 ## Chave quente de fim de manha com sombra fria; preenchimento do ceu; nevoa leve; tonemap filmic; bloom discreto.
 
 const SUN_COLOR := Color("ffe6be")
-const SKY_TOP := Color("5fa8dc")
+const SKY_TOP := Color("4fa6e8")
 const SKY_HORIZON := Color("f2e2c0")
 const GROUND_BOTTOM := Color("6ba3b5")
 const AMBIENT := Color("9cc8e8")
 
 
 static func build(parent: Node) -> Dictionary:
-	var sky_mat := ProceduralSkyMaterial.new()
-	sky_mat.sky_top_color = SKY_TOP
-	sky_mat.sky_horizon_color = SKY_HORIZON
-	sky_mat.ground_horizon_color = SKY_HORIZON
-	sky_mat.ground_bottom_color = GROUND_BOTTOM
-	sky_mat.sun_angle_max = 28.0
-	sky_mat.sun_curve = 0.12
+	# Ceu estilizado com nuvens fofas (art/sky.gdshader), na paleta da biblia de estilo.
+	var sky_mat := ShaderMaterial.new()
+	sky_mat.shader = preload("res://art/sky.gdshader")
 	var sky := Sky.new()
+	sky.process_mode = Sky.PROCESS_MODE_REALTIME
+	sky.radiance_size = Sky.RADIANCE_SIZE_64
 	sky.sky_material = sky_mat
 
 	var env := Environment.new()
