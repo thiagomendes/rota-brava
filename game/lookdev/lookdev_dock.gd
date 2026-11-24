@@ -4,7 +4,7 @@ extends Node3D
 ##   --lookdev=before  visual atual do jogo (Atmosphere + Stylize + contorno); rodar com --rendering-method mobile
 ##   --lookdev=after   luz/ambiente novos (abaixo) + materiais novos (LookdevMaterials), renderizador Forward+
 ##   --lookdev-cam=low | close | high   camera baixa da referencia (padrao), close do heroi, camera alta antiga
-##   --lookdev-rastro=v2 | v1   no modo after, o Rastro da vitrine e a proposta v2 (padrao, materiais PBR do proprio GLB)
+##   --lookdev-rastro=v2 | v1   no modo after, cada heroi com proposta v2 (lookdev/<id>_v2_model.tscn) a mostra (padrao, PBR do proprio GLB); v1 volta os antigos
 ##                              ou o Rastro do jogo com os materiais de lookdev. O jogo NAO muda: so esta vitrine.
 ## Imprime "LOOKDEV PERF ..." com chamadas de desenho e primitivas no quadro 15.
 ## Uso (nuvem): xvfb-run -a -s "-screen 0 1600x900x24" bash tools/godot.sh --path game --rendering-driver vulkan \
@@ -14,7 +14,7 @@ const SLICE := "res://episodes/ep01/world/harbor_slice.tscn"
 const BOAT := "res://actors/environment/boat_v2.tscn"
 const SKY_SHADER := "res://art/sky.gdshader"
 ## Proposta Rastro v2 (RB-R1 D13): substitui o Rastro so nesta vitrine.
-const RASTRO_V2 := "res://lookdev/rastro_v2_model.tscn"
+const V2_MODEL := "res://lookdev/%s_v2_model.tscn"
 ## Heroi principal no cais, de frente para a camera em 3/4.
 const HERO_POS := Vector3(-2.0, 0.0, 1.0)
 const HEROES := [
@@ -68,9 +68,11 @@ func _ready() -> void:
 	_place_camera()
 	for h: Array in HEROES:
 		var path := String(h[0])
-		var pbr := after and rastro_variant == "v2" and path.ends_with("rastro_model.tscn")
+		# Proposta v2 de cada heroi (RB-R1 D13): res://lookdev/<id>_v2_model.tscn, se ja existir.
+		var v2_path := V2_MODEL % path.get_file().trim_suffix("_model.tscn")
+		var pbr := after and rastro_variant == "v2" and ResourceLoader.exists(v2_path)
 		if pbr:
-			path = RASTRO_V2
+			path = v2_path
 		var inst := (load(path) as PackedScene).instantiate() as Node3D
 		add_child(inst)
 		inst.position = HERO_POS + (h[1] as Vector3)
