@@ -20,7 +20,7 @@ ENGINE = arg_value("--engine", "EEVEE")
 
 
 def open_char():
-    bpy.ops.wm.open_mainfile(filepath=os.path.join(REPO, "source_art", "characters", "rb04", CID, CID + ".blend"))
+    bpy.ops.wm.open_mainfile(filepath=arg_value("--blend", os.path.join(REPO, "source_art", "characters", "rb04", CID, CID + ".blend")))
     sc = bpy.context.scene
     rig = [o for o in bpy.data.objects if o.type == "ARMATURE"][0]
     if "--rest" in sys.argv:
@@ -141,7 +141,7 @@ def mode_clip():
     frames = [int(x) for x in arg_value("--frames").split(",")]
     view = arg_value("--view", "lado")
     scale = float(arg_value("--scale", "1.8"))
-    base = os.path.join(OUT, "%s_%s_%s" % (CID, clip, view))
+    base = os.path.join(OUT, "%s%s_%s_%s" % (CID, arg_value("--tag", ""), clip, view))
     locs = {"lado": (5, 0, 0.65), "frente": (0, 5, 0.65), "costas": (0, -5, 0.65), "tres": (3.5, 3.5, 0.9)}
     for fr in frames:
         set_pose(rig, clip, fr)
@@ -211,6 +211,7 @@ def mode_mesh():
     shot(sc, os.path.join(OUT, CID + "_malha_rosto.png"), 900, 900)
 
 {"views": mode_views, "expr": mode_expr, "clip": mode_clip, "mesh": mode_mesh, "face": mode_face, "extremes": mode_extremes}[MODE]()
+
 
 
 

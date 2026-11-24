@@ -33,6 +33,13 @@ CHARS = {
         pal=dict(skin="#C98E63", hair="#5A4636", shirt="#4C86C8", vest="#F2EEDC", pants="#2B4570", leather="#4A3426",
                  hat="#F7F7F2", band="#2B4570", scarf="#F26B5B", iris="#6B4423", eye="#FFFFFF"),
         anims=["idle", "walk", "idle_wheel", "steer_left", "steer_right", "react_horn"]),
+    "pico": dict(
+        display="Pico", K=1.02, levels=2, detail="hero", head_hat="helmet", hair="short", braid=False, glove="fingerless",
+        vest="green", notebook=False, bag=False, belt=True, scarf=False, tunic=False, torso_w=1.06, lean=False,
+        brow_w=1.1, eye_size=1.12, hands_big=1.2, iris_rot=0.0, rope=True, carabiners=True,
+        pal=dict(skin="#D9A073", hair="#7A3E1F", shirt="#5AA469", vest="#2F6B45", pants="#6B5B4B", leather="#8A5A2B",
+                 hat="#F2C14E", band="#2F6B45", rope="#FFD24D", metal="#C9D3DA", iris="#3A6E8A", eye="#FFFFFF"),
+        anims=["idle", "walk", "react_surprise", "pull_rope", "look_up"]),
     "extra_a": dict(
         display="ExtraA", K=1.03, levels=1, detail="simple", head_hat="straw", hair="short", braid=False, glove="none",
         vest="none", notebook=False, bag=False, belt=False, scarf=False, tunic=False, torso_w=1.0, lean=False,
@@ -78,6 +85,7 @@ def hand_frame(sx):
 def make_skin_parts(cfg, M, S):
     """Retorna lista (nome, objeto, modo_de_peso)."""
     lv = cfg["levels"]
+    lv1 = max(lv - 1, 1)
     P = cfg["pal"]
     tw = cfg["torso_w"]
     parts = []
@@ -92,7 +100,7 @@ def make_skin_parts(cfg, M, S):
         roots.append(base)
         nodes += [((sx * 0.262, -0.002, 0.65), 0.034), ((sx * 0.27, 0.0, 0.62), 0.036), ((sx * 0.34, 0.03, 0.43), 0.029)]
         edges += [(base, base + 1), (base + 1, base + 2)]
-    parts.append(("Body", cl.skin_obj(S + "_Body", nodes, edges, M["skin"], levels=lv, scale=(1, 0.9, 1), roots=roots), "dist"))
+    parts.append(("Body", cl.skin_obj(S + "_Body", nodes, edges, M["skin"], levels=lv1, scale=(1, 0.9, 1), roots=roots), "dist"))
     # --- maos: cada uma e um objeto (duas raizes)
     for sx, sd in ((1, "R"), (-1, "L")):
         sub_n, sub_e = [], []
@@ -131,9 +139,9 @@ def make_skin_parts(cfg, M, S):
     chest_i = top_i - 1
     for sx in (1, -1):
         b = len(nodes)
-        nodes += [((sx * 0.13 * (0.5 + tw * 0.5), 0, 0.845), 0.058), ((sx * 0.20, 0, 0.825), 0.056), ((sx * 0.27, 0, 0.62), 0.047),
-                  ((sx * 0.305, 0.012, 0.53), 0.046)]
-        edges += [(top_i, b), (b, b + 1), (b + 1, b + 2), (b + 2, b + 3)]
+        nodes += [((sx * 0.13 * (0.5 + tw * 0.5), 0, 0.845), 0.054), ((sx * 0.20, 0, 0.825), 0.050), ((sx * 0.27, 0, 0.62), 0.041),
+                  ((sx * 0.305, 0.012, 0.53), 0.038), ((sx * 0.309, 0.013, 0.515), 0.037)]
+        edges += [(top_i, b), (b, b + 1), (b + 1, b + 2), (b + 2, b + 3), (b + 3, b + 4)]
     parts.append(("Shirt", cl.skin_obj(S + "_Shirt", nodes, edges, M["shirt"], levels=lv, scale=(1, 0.80, 1)), "dist"))
 
     # --- colete: casca da propria camisa deslocada pela normal (nunca fica atras dela) com furos de manga e espessura
@@ -162,7 +170,7 @@ def make_skin_parts(cfg, M, S):
         nodes += [((sx * 0.075, 0, 0.46), 0.088), ((sx * 0.085, 0.005, 0.30), 0.066 if not cfg["tunic"] else 0.058),
                   ((sx * 0.085, 0, 0.13), 0.062 if not cfg["tunic"] else 0.052)]
         edges += [(0, b), (b, b + 1), (b + 1, b + 2)]
-    parts.append(("Pants", cl.skin_obj(S + "_Pants", nodes, edges, M["pants"], levels=lv, scale=(1, 0.9, 1)), "dist"))
+    parts.append(("Pants", cl.skin_obj(S + "_Pants", nodes, edges, M["pants"], levels=lv1, scale=(1, 0.9, 1)), "dist"))
 
     # --- botas
     nodes = []
@@ -176,20 +184,20 @@ def make_skin_parts(cfg, M, S):
     for sx, sd in ((1, "R"), (-1, "L")):
         b = [((sx * 0.085, 0.0, 0.215), 0.063), ((sx * 0.085, 0.0, 0.105), 0.068), ((sx * 0.085, 0.075, 0.052), 0.068),
              ((sx * 0.085, 0.145, 0.040), 0.054)]
-        parts.append(("Boot" + sd, cl.skin_obj(S + "_Boot" + sd, b, [(0, 1), (1, 2), (2, 3)], M["leather"], levels=lv + 0, floor=0.0), "dist"))
+        parts.append(("Boot" + sd, cl.skin_obj(S + "_Boot" + sd, b, [(0, 1), (1, 2), (2, 3)], M["leather"], levels=lv1, floor=0.0), "dist"))
 
     # --- luvas sem dedos (Rastro)
     if cfg["glove"] == "fingerless":
         for sx, sd in ((1, "R"), (-1, "L")):
             W, d, f, n = hand_frame(sx)
             nn = [(tuple(W - d * 0.04), 0.036), (tuple(W + d * 0.005), 0.039), (tuple(W + d * 0.050), 0.042), (tuple(W + d * 0.040 + f * 0.026), 0.024)]
-            parts.append(("Glove" + sd, cl.skin_obj(S + "_Glove" + sd, nn, [(0, 1), (1, 2), (1, 3)], M["leather"], levels=lv), "dist"))
+            parts.append(("Glove" + sd, cl.skin_obj(S + "_Glove" + sd, nn, [(0, 1), (1, 2), (1, 3)], M["leather"], levels=lv1), "dist"))
     return parts
 
 
 def make_head(cfg, M, S):
     bm = bmesh.new()
-    cl.ellipsoid(bm, (0, 0, 0), (1, 1, 1), 32, 20)
+    cl.ellipsoid(bm, (0, 0, 0), (1, 1, 1), 26, 16)
     for v in bm.verts:
         x, y, z = v.co
         if z < 0:
@@ -211,12 +219,12 @@ def make_hair(cfg, M, S):
     style = cfg["hair"]
     bm = bmesh.new()
     sc = (HEAD_R[0] * 1.07, HEAD_R[1] * 1.07, HEAD_R[2] * 1.06)
-    cl.ellipsoid(bm, HEAD_C, sc, 32, 18)
+    cl.ellipsoid(bm, HEAD_C, sc, 24, 14)
     kill = []
     for f in bm.faces:
         c = f.calc_center_median() - Vector(HEAD_C)
         nx, ny, nz = c.x / sc[0], c.y / sc[1], c.z / sc[2]
-        face_open = ny > 0.36 and abs(nx) < 0.84 and nz < 0.56 + 0.07 * math.sin(nx * 15)
+        face_open = ny > 0.2 and nz < 0.56 + 0.07 * math.sin(nx * 15)
         ear = abs(nx) > 0.80 and -0.25 < ny < 0.4 and -0.45 < nz < 0.15
         low = nz < (-0.74 if style in ("bob", "ponytail") else -0.12)
         top = nz > (0.25 if cfg["head_hat"] == "scarf" else 0.80)
@@ -260,16 +268,29 @@ def make_hat(cfg, M, S, rig_K):
             if z > 0.14:
                 return r, z - 0.012 * math.exp(-(r * r) / 0.002) + 0.0
             return r, z
-        cl.lathe(bm, prof, 40, droop)
+        cl.lathe(bm, prof, 32, droop)
         pos = (0, -0.005, 1.172)
         tilt = 1.0
         band = ("torus", 0.168, 0.016, 0.040)
     elif kind == "dixie":
         prof = [(0.0, 0.140), (0.080, 0.137), (0.128, 0.120), (0.150, 0.075), (0.158, 0.030), (0.185, 0.012), (0.215, 0.026), (0.222, 0.020),
                 (0.19, 0.0), (0.165, -0.004), (0.0, -0.004)]
-        cl.lathe(bm, prof, 40)
+        cl.lathe(bm, prof, 32)
         pos, tilt = (0, -0.005, 1.150), -2.0
         band = ("torus", 0.160, 0.012, 0.028)
+    elif kind == "helmet":
+        prof = [(0.0, 0.135), (0.07, 0.133), (0.125, 0.117), (0.157, 0.075), (0.168, 0.030), (0.172, 0.008), (0.205, 0.0), (0.215, -0.012),
+                (0.20, -0.020), (0.17, -0.010), (0.165, 0.0), (0.0, 0.0)]
+
+        def droop(r, z, a):
+            if r > 0.175:   # aba curta so na frente (viseira) e minima atras
+                front = 0.5 + 0.5 * math.cos(a - math.pi / 2)
+                return r * (0.75 + 0.35 * front), z - 0.01 * front
+            return r, z
+        cl.lathe(bm, prof, 36, droop)
+        cl.ellipsoid(bm, (0.0, 0.0, 0.14), (0.016, 0.07, 0.014), 10, 6)   # cume do capacete
+        pos, tilt = (0, -0.004, 1.158), 2.0
+        band = ("torus", 0.168, 0.011, 0.022)
     elif kind == "straw":
         prof = [(0.0, 0.115), (0.09, 0.113), (0.14, 0.10), (0.158, 0.055), (0.162, 0.018), (0.19, 0.008), (0.245, -0.002), (0.25, -0.010),
                 (0.24, -0.016), (0.19, -0.002), (0.162, 0.0), (0.0, 0.0)]
@@ -318,7 +339,7 @@ def make_hat(cfg, M, S, rig_K):
     objs = [ob]
     if band is not None:
         bb = bmesh.new()
-        cl.torus_z(bb, band[1], band[2], band[3])
+        cl.torus_z(bb, band[1], band[2], band[3], major=28, minor=6)
         bm2 = bb
         ob2 = new_object(S + "_HatBand", bm2, M["band"] if "band" in M else M["leather"])
         ob2.location = (0, 0, 0)
@@ -402,7 +423,7 @@ def build(cid, blend_path=None, glb_path=None, with_anim=True):
         else:
             cl.bind_to_rig(ob, rig)
             try:
-                cl.smooth_weights(ob, 2, 0.5)
+                cl.smooth_weights(ob, 4 if ob.name.endswith("_Shirt") else 2, 0.5)
             except Exception as e:  # noqa
                 print("aviso: suavizacao de pesos falhou", ob.name, e)
     for key, srcname in XFER.items():
@@ -419,7 +440,7 @@ def build(cid, blend_path=None, glb_path=None, with_anim=True):
     bones = [b.name for b in rig.data.bones]
     acts = {a.name: [round(a.frame_range[0]), round(a.frame_range[1])] for a in bpy.data.actions if not a.name.endswith("_key")}
     info = {"tris": tri_count(allm), "materials": mats, "height_m": round(hi.z - lo.z, 4), "min_z": round(lo.z, 4),
-            "objects": sorted(o.name for o in allm), "bones": bones, "bone_count": len(bones), "animations": acts,
+            "objects": sorted(o.name for o in allm), "tris_por_objeto": {o.name: tri_count([o]) for o in allm}, "bones": bones, "bone_count": len(bones), "animations": acts,
             "shape_keys": [k.name for k in face_ob.data.shape_keys.key_blocks]}
     print("CHAR_INFO", json.dumps(info))
     if blend_path:
@@ -441,7 +462,7 @@ def make_accessories(cfg, M, S, body):
     out = []
     if cfg["belt"]:
         bm = bmesh.new()
-        cl.torus_z(bm, 0.118 * cfg["torso_w"] * 0.95, 0.014, 0.585, sy=0.82)
+        cl.torus_z(bm, 0.118 * cfg["torso_w"] * 0.95, 0.014, 0.585, sy=0.82, major=24, minor=6)
         by = cl.snap_y(body["Vest"] if "Vest" in body else body["Shirt"], 0.0, 0.585)
         cl.rounded_box(bm, (0, by + 0.002, 0.585), (0.04, 0.016, 0.034), 0.004)
         ob = new_object(S + "_Belt", bm, M["leather"])
@@ -481,6 +502,63 @@ def make_accessories(cfg, M, S, body):
         cl.ellipsoid(bm, (0.0, 0.085, 0.865), (0.035, 0.022, 0.035), 10, 8)
         cl.tube(bm, [(0.0, 0.085, 0.86), (0.015, 0.095, 0.815), (0.03, 0.095, 0.78)], [0.022, 0.02, 0.012], 8, True)
         out.append((new_object(S + "_Scarf", bm, M["scarf"]), "chest"))
+    # punhos: aneis que escondem a borda da manga (cada um preso ao antebraco)
+    for sx, sd in ((1, "R"), (-1, "L")):
+        bm = bmesh.new()
+        cl.torus_z(bm, 0.031, 0.011, 0.0, major=20, minor=6)
+        qd = Vector((sx * 0.07, 0.03, -0.19)).to_track_quat("Z", "Y").to_matrix().to_4x4()
+        cl.transform_bm(bm, Matrix.Translation((sx * 0.303, 0.011, 0.535)) @ qd)
+        out.append((new_object(S + "_Cuff" + sd, bm, M["shirt"]), "forearm." + sd))
+    if cfg.get("rope"):
+        tw = cfg["torso_w"]
+        # mochila pequena + rolo de corda grande nas costas (silhueta distintiva) + tiracolo de corda no peito
+        bm = bmesh.new()
+        cl.rounded_box(bm, (0, -0.150, 0.66), (0.20, 0.085, 0.26), 0.02)
+        out.append((new_object(S + "_Backpack", bm, M["vest"]), "chest"))
+        bm = bmesh.new()
+        for i in range(3):
+            tb = bmesh.new()
+            cl.torus_z(tb, 0.105, 0.032, 0.0, major=28, minor=8)
+            cl.transform_bm(tb, Matrix.Translation((0, -0.225 - 0.045 * i, 0.70)) @ Matrix.Rotation(math.radians(90), 4, "X"))
+            me_tmp = bpy.data.meshes.new("t")
+            tb.to_mesh(me_tmp)
+            tb.free()
+            bm.from_mesh(me_tmp)
+            bpy.data.meshes.remove(me_tmp)
+        cl.tube(bm, [(0.10, -0.25, 0.62), (0.15, -0.20, 0.52), (0.14, -0.15, 0.44), (0.12, -0.12, 0.40)], 0.014, 6, True)
+        out.append((new_object(S + "_RopeCoil", bm, M["rope"]), "chest"))
+        bm = bmesh.new()
+        vest = body["Vest"]
+        pts = []
+        for i in range(8):
+            u = i / 7.0
+            x = 0.095 * (1 - u) + (-0.11) * u
+            z = 0.85 * (1 - u) + 0.58 * u
+            yy = cl.snap_y(vest, x, z)
+            pts.append((x, (yy if yy is not None else 0.09) + 0.006, z))
+        cl.tube(bm, pts, 0.017, 6, True)
+        out.append((new_object(S + "_RopeSash", bm, M["rope"]), "chest"))
+    if cfg.get("carabiners"):
+        bm = bmesh.new()
+        spots = [(0.115, 0.586, "belt"), (-0.115, 0.586, "belt"), (0.0, -0.205, "pack"), (0.07, 0.0, "chest")]
+        for x, z, kind_ in spots:
+            tb = bmesh.new()
+            cl.torus_z(tb, 0.040, 0.011, 0.0, sy=0.62, major=20, minor=6)
+            cl.rounded_box(tb, (0.0, 0.0, 0.0), (0.004, 0.004, 0.004), 0.0005)
+            if kind_ == "belt":
+                y = (cl.snap_y(body["Vest"], x, z) or 0.09) + 0.012
+                M_ = Matrix.Translation((x, y, z - 0.02)) @ Matrix.Rotation(math.radians(90), 4, "X") @ Matrix.Rotation(math.radians(90 if abs(x) > 0 else 0), 4, "Z")
+            elif kind_ == "pack":
+                M_ = Matrix.Translation((x, -0.205, 0.60)) @ Matrix.Rotation(math.radians(90), 4, "X")
+            else:
+                M_ = Matrix.Translation((x, (cl.snap_y(body["Vest"], x, 0.80) or 0.09) + 0.016, 0.80)) @ Matrix.Rotation(math.radians(90), 4, "X")
+            cl.transform_bm(tb, M_)
+            me_tmp = bpy.data.meshes.new("t")
+            tb.to_mesh(me_tmp)
+            tb.free()
+            bm.from_mesh(me_tmp)
+            bpy.data.meshes.remove(me_tmp)
+        out.append((new_object(S + "_Carabiners", bm, M["metal"]), "chest"))
     if cfg["braid"]:
         bm = bmesh.new()
         pts = [(0.075, -0.15, 1.00), (0.09, -0.175, 0.95), (0.092, -0.185, 0.89), (0.09, -0.185, 0.835), (0.088, -0.18, 0.79)]
@@ -497,6 +575,13 @@ def main():
 
 
 main()
+
+
+
+
+
+
+
 
 
 

@@ -15,3 +15,5 @@ $a = @('--background','--factory-startup','--python','source_art/scripts/char_re
 
 Modos de `char_render.py`: `views` (frente/lado/costas/perspectiva), `expr` (5 expressoes), `face`, `extremes` (ombro, cotovelo, joelho,
 quadril, pescoco, tronco), `clip` (quadros de um clipe), `mesh` (malha). `--rest` renderiza no pose de repouso.
+
+Camera do dock: o preview usa offset (0, 4.6, 6.2), fov 55 (preview_characters.gd, --zoom=0.4 aproxima). Antes/depois do idle: char_render.py --blend <blend antigo extraido do git> --tag _antes.

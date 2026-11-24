@@ -1,5 +1,5 @@
 {
-  "tris": 20208,
+  "tris": 14076,
   "materials": [
     "mat_leme_band",
     "mat_leme_eye",
@@ -13,13 +13,15 @@
     "mat_leme_skin",
     "mat_leme_vest"
   ],
-  "height_m": 1.3088,
-  "min_z": -0.0,
+  "height_m": 1.3095,
+  "min_z": -0.0007,
   "objects": [
     "Leme_Belt",
     "Leme_Body",
     "Leme_BootL",
     "Leme_BootR",
+    "Leme_CuffL",
+    "Leme_CuffR",
     "Leme_Face",
     "Leme_Hair",
     "Leme_HandL",
@@ -33,6 +35,26 @@
     "Leme_Vest",
     "Leme_VestDetails"
   ],
+  "tris_por_objeto": {
+    "Leme_Body": 400,
+    "Leme_HandR": 720,
+    "Leme_HandL": 720,
+    "Leme_Shirt": 2496,
+    "Leme_Vest": 1528,
+    "Leme_Pants": 368,
+    "Leme_BootR": 112,
+    "Leme_BootL": 112,
+    "Leme_Head": 1312,
+    "Leme_Hair": 1480,
+    "Leme_Hat": 576,
+    "Leme_HatBand": 336,
+    "Leme_Belt": 348,
+    "Leme_VestDetails": 288,
+    "Leme_Scarf": 700,
+    "Leme_CuffR": 240,
+    "Leme_CuffL": 240,
+    "Leme_Face": 2100
+  },
   "bones": [
     "root",
     "hips",
