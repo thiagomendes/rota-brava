@@ -25,51 +25,198 @@ def smooth(e0, e1, x):
     return t * t * (3 - 2 * t)
 
 
-def ground_tile(M, info, glb, name, seed, width=4.0, path=False):
-    """Chao em grade de 0,25 m: topo em y = 0 (so afunda ate 1,8 cm longe das bordas), cor de grama/terra por vertice
-    (material unico branco), borda com saia para nao vazar a agua nas juncoes."""
+BANK_Z = 9.5   # centro dos ladrilhos em z (margem sul z 3..16)
+# caminho de terra batida (coords do MUNDO): cais (0, 3) -> pegada (-6, 10) -> praca oeste (-10, 8)
+PATH = [(0.4, 3.1), (0.0, 4.2), (-1.4, 6.0), (-3.4, 7.8), (-5.2, 9.4), (-6.4, 10.1), (-8.0, 9.6), (-9.2, 8.6), (-10.6, 7.9)]
+MUD = (-6.0, 10.0, 1.35)
+
+
+def path_dist(x, z):
+    best, bt = 1e9, 0.0
+    for i in range(len(PATH) - 1):
+        ax, az = PATH[i]
+        bx, bz = PATH[i + 1]
+        dx, dz = bx - ax, bz - az
+        L2 = dx * dx + dz * dz
+        t = clamp(((x - ax) * dx + (z - az) * dz) / L2)
+        d = math.hypot(x - ax - dx * t, z - az - dz * t)
+        if d < best:
+            best, bt = d, (i + t) / (len(PATH) - 1)
+    return best, bt
+
+
+def path_half_width(x, z, t):
+    return 0.95 + 0.22 * noise(x * 1.7, z * 1.7, 5.0) + 0.25 * math.sin(t * 9.0)
+
+
+def bank_height(x, z):
+    """Altura da margem (mundo). Caminho e lama: y = 0 exato. Grama: morrinhos de ate ~22 cm longe do caminho,
+    zerando nas bordas da margem (cais, agua, cerca) e sob a cabana."""
+    d, t = path_dist(x, z)
+    w = path_half_width(x, z, t)
+    if d <= w + 0.45 or math.hypot(x - MUD[0], z - MUD[1]) <= MUD[2] + 0.3:
+        return 0.0
+    edge = min(10.0 - abs(x), (z - 3.0) * 2.5, 16.0 - z)
+    hut = max(abs(x + 7.0) - 2.3, abs(z - 13.5) - 2.0)
+    f = smooth(0.0, 1.6, edge) * smooth(0.0, 0.8, hut) * smooth(w + 0.3, w + 2.2, d)
+    return 0.22 * f * clamp(0.45 + 0.55 * noise(x * 0.55, z * 0.6, 2.0))
+
+
+def ground_tile(M, info, glb, name, seed, width=4.0, path=False, ox=0.0):
+    """Ladrilho da margem sul (RB-R1): amostra a margem do MUNDO em x = ox +- width/2, z 3..16. Partes:
+    Surface (grama com variacao por vertice e morrinhos), Path (terra batida e lama em y = 0 exato) e Pebbles."""
     a = Asset(name, M, seed)
-    s = seed * 1.37
-    bm = bmesh.new()
     W = width
     NX, NZ = int(W * 4), 52
-    grass = hex_to_linear("#7CCB4A")
-    dirt = hex_to_linear("#E2C493")
+    grass = hex_to_linear("#5DB43E")
+    grass_l = hex_to_linear("#86C94C")
+    grass_d = hex_to_linear("#4FA83D")
+    dirt = hex_to_linear("#DDBF8E")
+    dirt_e = hex_to_linear("#B98A5E")
+    mud = hex_to_linear("#8E6A46")
 
-    def edge_fade(x, z):
-        d = min(W / 2 - abs(x), TD / 2 - abs(z))
-        return smooth(0.0, 0.7, d)
+    def H(x, z):
+        return bank_height(x + ox, z + BANK_Z)
 
-    def height(x, z):
-        return -0.018 * clamp(0.5 + 0.5 * noise(x, z, s)) ** 2 * edge_fade(x, z)
-
-    layer = bm.verts.layers.float_color.new("Col")
-    vs, faces = grid_patch(bm, -W / 2, W / 2, -TD / 2, TD / 2, NX, NZ, height)
-    for row in vs:
-        for v in row:
-            x, z = v.co.x, v.co.z
-            f = edge_fade(x, z)
-            w = smooth(0.30, 0.80, 0.5 + 0.5 * noise(x * 0.8 + 3, z * 0.8, s + 9)) * 0.75
-            if path:
-                w = max(w, 1.0 - smooth(0.45, 1.25, abs(x + 0.3 * math.sin(z * 0.7)) + 0.2 * math.sin(z * 1.3)))
-            w = 0.1 + (w - 0.1) * f
-            k = (0.86 + 0.14 * (0.5 + 0.5 * noise(x * 1.1, z * 1.1, s + 4))) * (1 - 0.05 * f * a.rng.random())
-            k = 1 - (1 - k) * f
-            v[layer] = tuple(clamp((grass[i] * (1 - w) + dirt[i] * w) * k, 0, 1) for i in range(3)) + (1.0,)
-    # saia: desce 0,35 m nas quatro bordas (cor de terra escura)
-    skirt = hex_to_linear("#A07A55")
-    for edge in ([vs[i][0] for i in range(NX + 1)], [vs[i][NZ] for i in range(NX, -1, -1)],
-                 [vs[0][j] for j in range(NZ, -1, -1)], [vs[NX][j] for j in range(NZ + 1)]):
-        low = []
-        for v in edge:
-            nv = bm.verts.new((v.co.x, -0.35, v.co.z))
-            nv[layer] = tuple(skirt) + (1.0,)
-            low.append(nv)
-        for i in range(len(edge) - 1):
-            bm.faces.new((edge[i], low[i], low[i + 1], edge[i + 1]))
-    a.part("Surface", bm, "mat_env_ground", jit=0.0, ao=0.0, paint=False)
+    for part in ("Surface",):
+        bm = bmesh.new()
+        layer = bm.verts.layers.float_color.new("Col")
+        vs, faces = grid_patch(bm, -W / 2, W / 2, -TD / 2, TD / 2, NX, NZ, H)
+        kill = []
+        for f in faces:
+            c = f.calc_center_median()
+            xw, zw = c.x + ox, c.z + BANK_Z
+            d, t = path_dist(xw, zw)
+            on = d <= path_half_width(xw, zw, t) - 0.05 or math.hypot(xw - MUD[0], zw - MUD[1]) <= MUD[2] - 0.05
+            if False and on:
+                kill.append(f)
+        for row in vs:
+            for v in row:
+                xw, zw = v.co.x + ox, v.co.z + BANK_Z
+                d, t = path_dist(xw, zw)
+                w = path_half_width(xw, zw, t)
+                if part == "Path":
+                    e = smooth(w * 0.3, w, d)
+                    c = [dirt[i] * (1 - e) + dirt_e[i] * e for i in range(3)]
+                    m = 1.0 - smooth(MUD[2] * 0.55, MUD[2], math.hypot(xw - MUD[0], zw - MUD[1]))
+                    c = [c[i] * (1 - m) + mud[i] * m for i in range(3)]
+                    k = 0.92 + 0.08 * noise(xw * 3.1, zw * 3.1, 7.0)
+                else:
+                    n1 = 0.5 + 0.5 * noise(xw * 0.7, zw * 0.7, 3.0)
+                    n2 = 0.5 + 0.5 * noise(xw * 2.3 + 4, zw * 2.1, 9.0)
+                    c = [grass[i] * (1 - n1) + grass_l[i] * n1 for i in range(3)]
+                    dk = smooth(0.55, 0.9, n2)
+                    c = [c[i] * (1 - dk) + grass_d[i] * dk for i in range(3)]
+                    near = 1.0 - smooth(-0.1, 0.6, d - w)
+                    mud_n = 1.0 - smooth(MUD[2] - 0.1, MUD[2] + 0.4, math.hypot(xw - MUD[0], zw - MUD[1]))
+                    near = max(near, mud_n)
+                    c = [c[i] * (1 - 0.85 * near) + dirt_e[i] * 0.85 * near for i in range(3)]
+                    k = 0.9 + 0.1 * (v.co.y / 0.22)
+                v[layer] = tuple(clamp(c[i] * k, 0, 1) for i in range(3)) + (1.0,)
+        bmesh.ops.delete(bm, geom=kill, context="FACES")
+        if part == "Surface":
+            # saia: desce 0,35 m nas bordas do ladrilho (nao vaza agua nas juncoes)
+            skirt = hex_to_linear("#A07A55")
+            for edge in ([vs[i][0] for i in range(NX + 1)], [vs[i][NZ] for i in range(NX, -1, -1)],
+                         [vs[0][j] for j in range(NZ, -1, -1)], [vs[NX][j] for j in range(NZ + 1)]):
+                edge = [v for v in edge if v.is_valid]
+                low = []
+                for v in edge:
+                    nv = bm.verts.new((v.co.x, -0.35, v.co.z))
+                    nv[layer] = tuple(skirt) + (1.0,)
+                    low.append(nv)
+                for i in range(len(edge) - 1):
+                    if (edge[i].co - edge[i + 1].co).length < 0.3:
+                        bm.faces.new((edge[i], low[i], low[i + 1], edge[i + 1]))
+        if not bm.faces:
+            bm.free()
+            continue
+        a.part(part, bm, "mat_env_ground", jit=0.0, ao=0.0, paint=False, smooth=(part == "Surface"))
+    # pedrinhas na borda do caminho
+    bm = bmesh.new()
+    lay = a._layer(bm)
+    rng = a.rng
+    for i in range(int(W * 18)):
+        x = rng.uniform(-W / 2 + 0.1, W / 2 - 0.1)
+        z = rng.uniform(-TD / 2 + 0.3, TD / 2 - 0.3)
+        xw, zw = x + ox, z + BANK_Z
+        d, t = path_dist(xw, zw)
+        w = path_half_width(xw, zw, t)
+        if abs(d - w) > 0.35 or math.hypot(xw - MUD[0], zw - MUD[1]) < MUD[2] + 0.2:
+            continue
+        r = rng.uniform(0.05, 0.12)
+        before = set(bm.verts)
+        gsph(bm, (x, H(x, z) + r * 0.25, z), (r, r * 0.55, r * rng.uniform(0.8, 1.2)), 8, 5)
+        g = rng.uniform(0.85, 1.1)
+        for v in bm.verts:
+            if v not in before:
+                v[lay] = (clamp(0.92 * g), clamp(0.9 * g), clamp(0.97 * g), 1.0)
+    if bm.verts:
+        a.part("Pebbles", bm, "mat_env_rock", paint=False)
+    else:
+        bm.free()
     a.point("TileOrigin", (0, 0, 0))
     a.finish(glb, info, offset=W + 1.0)
+
+
+def bank_path(M, info, glb):
+    """Caminho de terra batida da margem sul em coordenadas do MUNDO (origem 0): fita com bordas irregulares em
+    y = 0,002 e poca de lama em volta da pegada (y = 0,004). Partes: Dirt, Mud."""
+    a = Asset("Bank_Path", M, 74)
+    dirt = hex_to_linear("#DDBF8E")
+    dirt_e = hex_to_linear("#B98A5E")
+    mud = hex_to_linear("#8E6A46")
+    pts = []
+    for i in range(len(PATH) - 1):
+        ax, az = PATH[i]
+        bx, bz = PATH[i + 1]
+        n = max(2, int(math.hypot(bx - ax, bz - az) / 0.2))
+        for k in range(n):
+            pts.append((ax + (bx - ax) * k / n, az + (bz - az) * k / n))
+    pts.append(PATH[-1])
+    # suaviza o polilinha (cantos arredondados)
+    for _ in range(6):
+        pts = [pts[0]] + [((pts[i - 1][0] + 2 * pts[i][0] + pts[i + 1][0]) / 4, (pts[i - 1][1] + 2 * pts[i][1] + pts[i + 1][1]) / 4)
+                          for i in range(1, len(pts) - 1)] + [pts[-1]]
+    bm = bmesh.new()
+    lay = bm.verts.layers.float_color.new("Col")
+    rows = []
+    N = len(pts)
+    for i, (x, z) in enumerate(pts):
+        p0 = pts[max(0, i - 1)]
+        p1 = pts[min(N - 1, i + 1)]
+        tx, tz = p1[0] - p0[0], p1[1] - p0[1]
+        L = math.hypot(tx, tz) or 1.0
+        nx, nz = -tz / L, tx / L
+        t = i / (N - 1)
+        w = path_half_width(x, z, t)
+        row = []
+        for s, col in ((-1.0, dirt_e), (-0.55, dirt), (0.0, dirt), (0.55, dirt), (1.0, dirt_e)):
+            jit = 0.08 * noise(x * 5.0 + s * 3, z * 5.0, 2.0) if abs(s) == 1.0 else 0.0
+            v = bm.verts.new((x + nx * (w + jit) * s, 0.002, z + nz * (w + jit) * s))
+            k = 0.93 + 0.07 * noise(x * 3.3 + s, z * 3.1, 7.0)
+            v[lay] = tuple(clamp(col[c] * k) for c in range(3)) + (1.0,)
+            row.append(v)
+        rows.append(row)
+    for i in range(N - 1):
+        for j in range(4):
+            bm.faces.new((rows[i][j], rows[i][j + 1], rows[i + 1][j + 1], rows[i + 1][j]))
+    a.part("Dirt", bm, "mat_env_ground", paint=False, recalc=False)
+    bm = bmesh.new()
+    lay = bm.verts.layers.float_color.new("Col")
+    c = bm.verts.new((MUD[0], 0.004, MUD[1]))
+    c[lay] = tuple(mud) + (1.0,)
+    ring = []
+    for k in range(28):
+        ang = math.tau * k / 28
+        r = MUD[2] * (1.0 + 0.12 * math.sin(3 * ang + 1.0) + 0.06 * math.sin(7 * ang))
+        v = bm.verts.new((MUD[0] + r * math.cos(ang), 0.004, MUD[1] + r * math.sin(ang)))
+        v[lay] = tuple(clamp(mud[i] * 1.12 + 0.03) for i in range(3)) + (1.0,)
+        ring.append(v)
+    for k in range(28):
+        bm.faces.new((c, ring[(k + 1) % 28], ring[k]))
+    a.part("Mud", bm, "mat_env_ground", paint=False, recalc=False, smooth=False)
+    a.finish(glb, info)
 
 
 def blob_crown(bm, a, centers, base_r, noise_amp=0.12, ao_h=None):
@@ -203,9 +350,10 @@ def main():
     M = materials()
     info = {}
     glb = arg_value("--glb-dir", os.path.join(REPO, "game", "assets", "models", "environment"))
-    ground_tile(M, info, glb, "Ground_Tile_A", 71, 8.0)
-    ground_tile(M, info, glb, "Ground_Tile_B", 72, 8.0)
-    ground_tile(M, info, glb, "Ground_Tile_Path", 73, 4.0, path=True)
+    ground_tile(M, info, glb, "Ground_Tile_A", 71, 8.0, ox=-6.0)
+    ground_tile(M, info, glb, "Ground_Tile_B", 72, 8.0, ox=6.0)
+    ground_tile(M, info, glb, "Ground_Tile_Path", 73, 4.0, path=True, ox=0.0)
+    bank_path(M, info, glb)
     tree(M, info, glb, "Tree_A", 81, "a")
     tree(M, info, glb, "Tree_B", 82, "b")
     tree(M, info, glb, "Tree_C", 83, "c")

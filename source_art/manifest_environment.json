@@ -19,7 +19,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_deck_2m.glb",
-      "glb_sha256": "e13bb1c74e001fd3fdedc12494bf8f104ec744b6233373f31eb11ea77b355e32",
+      "glb_sha256": "6ebd6a6ede6c0279b89f62be535c7ad2e5896c36094ba5fde4199ce4521b3b70",
       "triangulos": 4360,
       "vertices": 2328,
       "materiais": [
@@ -63,7 +63,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_deck_4m.glb",
-      "glb_sha256": "55b41e66ee0015720e59d4aa39ac04205092ca5f93d4dc04179bb4c24f83ea6f",
+      "glb_sha256": "4899a50361fc7ade4032ae44b178ffe131f9184bae60d85479e27f2fec835f81",
       "triangulos": 8384,
       "vertices": 4480,
       "materiais": [
@@ -107,7 +107,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_post.glb",
-      "glb_sha256": "46884c9211629b6f91c5994124f0a528525d9e8334eb4e6f3678e9056f967d7d",
+      "glb_sha256": "28939647d259f6928183cd39e7ba54167179a74e1b4046ceb2b2058a1f6b29a9",
       "triangulos": 2556,
       "vertices": 1286,
       "materiais": [
@@ -150,7 +150,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_cleat.glb",
-      "glb_sha256": "e11a9a1dcb8cabde5c1522dd5120490217e53d809dc7b0b02d6d1fd7afc76d12",
+      "glb_sha256": "e9a143cd5dd18e776241ad8e805fd3ab90a19b1d90979662e5edf8d57f83c8de",
       "triangulos": 1356,
       "vertices": 684,
       "materiais": [
@@ -227,7 +227,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_ladder.glb",
-      "glb_sha256": "ef6f95464bbbaf5e93be19dfc8f9d66aca51948082cfcf9a13a96e7243eab491",
+      "glb_sha256": "a6b345f92706d1c58bad530184e423e0eb1c35afbe05b927fe12da5633bf8130",
       "triangulos": 840,
       "vertices": 440,
       "materiais": [
@@ -266,7 +266,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_edge.glb",
-      "glb_sha256": "afb06802e379b60339f6dfb21dbea33106ab10b80c6a62fe335d206c26d8e188",
+      "glb_sha256": "0f21b6a06f04aa766af88f88f0b91324aa8d756c4eb6acf0379c3125ab883c64",
       "triangulos": 412,
       "vertices": 216,
       "materiais": [
@@ -305,7 +305,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_pile.glb",
-      "glb_sha256": "5076e7c4c0b5967844fd85fc6a9f470aeb3de9802fe8347c192f78e35e21ff19",
+      "glb_sha256": "2d5f4eefe565478210172e45464f26637eb199e8706d7ad5d8e96fe43a888b68",
       "triangulos": 2760,
       "vertices": 1382,
       "materiais": [
@@ -342,7 +342,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/crate_l.glb",
-      "glb_sha256": "2ceeab7fe4ea66b2399169ac73ac7b0ca89693aa3336bc020422911893b3d8ed",
+      "glb_sha256": "a54e78881ab1872bfd4273ec62932239d7fa27482a51c380cb809b4c7d9db653",
       "triangulos": 1256,
       "vertices": 672,
       "materiais": [
@@ -385,7 +385,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/crate_s.glb",
-      "glb_sha256": "62fa0ea6fcf7b64a7f229ce96a8ead6fd29312bcaa66a7a2101ebde64d863df5",
+      "glb_sha256": "a3e88c0feaf35853c07a84dc3c938a3bf219caa6533c8712e82d938bbc145c2d",
       "triangulos": 1080,
       "vertices": 576,
       "materiais": [
@@ -428,7 +428,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/crate_peach.glb",
-      "glb_sha256": "5d56e8eab0fb8c5f084fb77410480ff87fffbfc6ee3353a7b40e2ac6f59fa803",
+      "glb_sha256": "e5f248b6607b3ae0626405cdfe6c1217777aa043ba92d8d98da35853b34a94d6",
       "triangulos": 5412,
       "vertices": 2814,
       "materiais": [
@@ -551,7 +551,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/lantern_post.glb",
-      "glb_sha256": "400e462287b6298d9a762622f94444176ecfa006a764b8280d1a6ef26bec7627",
+      "glb_sha256": "54edd7945ea8816c757cafe2c9a2a9ed7eae88d70f5be45fbe33d6ce58cd1829",
       "triangulos": 980,
       "vertices": 516,
       "materiais": [
@@ -596,7 +596,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/fishing_net.glb",
-      "glb_sha256": "c5b67fef2f9d3ac53a9f31373cf7c3c2e4fda9cd8aeea04983c592f2dbf66034",
+      "glb_sha256": "16515376bfe62b6b46c1d5bb9ab4abc0fc45ca7b31747c687421e8c18590baca",
       "triangulos": 2964,
       "vertices": 1262,
       "materiais": [
@@ -639,7 +639,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/sign_board.glb",
-      "glb_sha256": "dce074f42756143a81c9ff6a74a8fbb96c0999c8b9e2d38d22f58fe72f8622c3",
+      "glb_sha256": "3a7429e30b5e4a151b4a7c0e3ba5af47c97ba9b4aae408a06f61966c6fdb8970",
       "triangulos": 724,
       "vertices": 372,
       "materiais": [
@@ -721,7 +721,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/oar.glb",
-      "glb_sha256": "0e3782a98e12d0f8ecd313f6f3b3892ba12664f4b9c7cf8b715e8d35d1cb3229",
+      "glb_sha256": "d48b2693770484387c98d8029be09b0f2d698b970b159806393acfa2e0aa9e60",
       "triangulos": 1208,
       "vertices": 610,
       "materiais": [
@@ -799,7 +799,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/boat_hut.glb",
-      "glb_sha256": "3b7cee1909c6ab321ae7b9c5e23d912e154feaa21daaa0a3c8bf1e8c63be41b4",
+      "glb_sha256": "e19bdb031a8463c5045d37a688d803eebce8a7ea58cf641ffd134fdc3dfb27f5",
       "triangulos": 5008,
       "vertices": 2628,
       "materiais": [
@@ -856,7 +856,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/boot_print.glb",
-      "glb_sha256": "224ecd904fc02bd08fe57c8118b7ac2d678dee5ba522954929c80c001cfe8587",
+      "glb_sha256": "486dbfd4ec53391581fab1e0d1a62e1e491765b1000e19e2cf4b6e571beec103",
       "triangulos": 728,
       "vertices": 382,
       "materiais": [
@@ -894,18 +894,20 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/ground_tile_a.glb",
-      "glb_sha256": "e5cd3e8cb599d10441017dd3cfb25b3319c36934f0bf5ded13d23b36eae10552",
-      "triangulos": 3664,
-      "vertices": 1921,
+      "glb_sha256": "199039bf93c17cdec55c40bec576465f265ce5e112ab123bb9181f1ea5153624",
+      "triangulos": 4560,
+      "vertices": 2397,
       "materiais": [
-        "mat_env_ground"
+        "mat_env_ground",
+        "mat_env_rock"
       ],
       "tamanho_m": [
         8.0,
-        0.35,
+        0.512,
         13.0
       ],
       "objetos": [
+        "Ground_Tile_A_Pebbles",
         "Ground_Tile_A_Surface"
       ],
       "empties": [
@@ -933,7 +935,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/ground_tile_b.glb",
-      "glb_sha256": "e940b09600ca310ddf7544aae906aecf5952aaf5976e0b1d477a12cb2e8610b0",
+      "glb_sha256": "3651ef2a1d8960d254b4ddd0f271cb04a7f0d41b9f8154ffa6b89c67d8bb407a",
       "triangulos": 3664,
       "vertices": 1921,
       "materiais": [
@@ -941,7 +943,7 @@
       ],
       "tamanho_m": [
         8.0,
-        0.35,
+        0.563,
         13.0
       ],
       "objetos": [
@@ -972,23 +974,63 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/ground_tile_path.glb",
-      "glb_sha256": "275c4e6e7f1cd2c3a4b46b6f75379ee5c02ca7de7b7367d6011d18df07231a6b",
-      "triangulos": 1936,
-      "vertices": 1041,
+      "glb_sha256": "7a1c2d2ebf3399a6927932f5ed2f2545d45817a91181c0549e0e82c1025ecc0b",
+      "triangulos": 2384,
+      "vertices": 1279,
       "materiais": [
-        "mat_env_ground"
+        "mat_env_ground",
+        "mat_env_rock"
       ],
       "tamanho_m": [
         4.0,
-        0.35,
+        0.515,
         13.0
       ],
       "objetos": [
+        "Ground_Tile_Path_Pebbles",
         "Ground_Tile_Path_Surface"
       ],
       "empties": [
         "TileOrigin.002"
       ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas."
+    },
+    {
+      "id": "bank_path",
+      "conjunto": "nature",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_nature.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_nature.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/nature.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/bank_path.glb",
+      "glb_sha256": "acc1e545caf2b262088c3cae05fdca03099ecbd8b9e7e8f1d76f53ca4e70e622",
+      "triangulos": 580,
+      "vertices": 379,
+      "materiais": [
+        "mat_env_ground"
+      ],
+      "tamanho_m": [
+        12.352,
+        0.002,
+        8.609
+      ],
+      "objetos": [
+        "Bank_Path_Dirt",
+        "Bank_Path_Mud"
+      ],
+      "empties": [],
       "status": "provisorio",
       "aprovacao": "pendente (Thiago)",
       "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
@@ -1011,7 +1053,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/tree_a.glb",
-      "glb_sha256": "cfa997f6c3a3459750229e93fda2d8fc2d017fd11d26cb455848fa0e9817e4a4",
+      "glb_sha256": "9e3a04c18696c74489c4acfe91d641d47ab6dcd62959ec53058878ba2da30b5f",
       "triangulos": 6424,
       "vertices": 3228,
       "materiais": [
@@ -1050,7 +1092,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/tree_b.glb",
-      "glb_sha256": "8687929a20eda88edbca81803ce7265f998bc3af39746c8311657ba7e0bc4fe9",
+      "glb_sha256": "719d037912c1ea31d21080e5c13fd6d9fb2ad3ee5154a4f763661021fe88ede4",
       "triangulos": 6068,
       "vertices": 3048,
       "materiais": [
@@ -1089,7 +1131,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/tree_c.glb",
-      "glb_sha256": "b26d53e0b267b8f099caa45077f9423615dc3df18c75dec7ddbfabbbed4befdf",
+      "glb_sha256": "f2d47325fff6256da390879813432463a191c918d47945b428d286ca8c86df9c",
       "triangulos": 5524,
       "vertices": 2776,
       "materiais": [
@@ -1128,7 +1170,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/bush_round.glb",
-      "glb_sha256": "87327b4de7f2ff607fcfca54914aaf4b601549831bf73966c4a7f349b37ca6d7",
+      "glb_sha256": "7ed67b8a45f331f263f8c687b93f6787713e041ac1f831d509acce2768f6db31",
       "triangulos": 4760,
       "vertices": 2390,
       "materiais": [
@@ -1165,7 +1207,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/bush_flower.glb",
-      "glb_sha256": "6db0eaaf11988663a40cbb8881e8b5cd139ce294fd5d904ab9f23c5f86620343",
+      "glb_sha256": "085da7cc5ddae5391279225d881e43a5cafe2209d267458d6992109b2dc3bcd1",
       "triangulos": 3752,
       "vertices": 1910,
       "materiais": [
@@ -1391,7 +1433,7 @@
         "source_art/environment/boat_v2.blend"
       ],
       "saida_glb": "game/assets/models/environment/boat_v2.glb",
-      "glb_sha256": "343149081cc58d436c80acf04d7bc1ef841de7c933028b7c3873c5fb29f2bfca",
+      "glb_sha256": "2b84dfde61bbea60a737cb97d3031394f4a66498bd025093d3d003ee0fd37063",
       "triangulos": 13364,
       "vertices": 6852,
       "materiais": [
@@ -1479,7 +1521,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/house_a.glb",
-      "glb_sha256": "44b2a608382a5ea318694e87153303ef282bfaf028e26913d25e13fd755d328b",
+      "glb_sha256": "6057901790beb4059264032284720540bc5b608214268c8f9fd8e7ca05b228ed",
       "triangulos": 5624,
       "vertices": 3000,
       "materiais": [
@@ -1535,7 +1577,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/house_b.glb",
-      "glb_sha256": "70c594bf09d87d7464336cf2f9e15df6b576e0c17440df76239c3ba84e56ccd3",
+      "glb_sha256": "849352e2669d8eeaace7e13b4c2fc6400abb236cdbbe014c1bcd2da1b076df41",
       "triangulos": 9396,
       "vertices": 5016,
       "materiais": [
@@ -1597,7 +1639,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/house_c.glb",
-      "glb_sha256": "0d94c1cd53dda808330134512bf07f26cd8f633366c43beeeae12fc76382af63",
+      "glb_sha256": "f5af938e3e9f9909b53a53ca0b9bdd233db13bdce6663376e5f2fb476597a379",
       "triangulos": 9960,
       "vertices": 5342,
       "materiais": [
@@ -1654,7 +1696,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/house_d.glb",
-      "glb_sha256": "65f37f2f265c53c29e1f115ed98570ea4b2541766d37e9ce5f23819384b9228f",
+      "glb_sha256": "24ee57aaf07a74229f27958e51db7dd5c2442328883994d57f929c50558ebcb9",
       "triangulos": 3624,
       "vertices": 1924,
       "materiais": [
@@ -1710,7 +1752,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/market_stall_red.glb",
-      "glb_sha256": "5d12d267eab5fd8180cab896616b37d28fbb27dd3f91be0f1ac9ab8277ba2244",
+      "glb_sha256": "054e3e9c8f93a4afd45dfb046088dd27e2f3b19e552ac646202326ecc421de73",
       "triangulos": 5324,
       "vertices": 2800,
       "materiais": [
@@ -1757,7 +1799,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/market_stall_blue.glb",
-      "glb_sha256": "1411e39efb907b5d18dbdd2b8d0d675238e2c4cbacc50620d958eeb1ce54bc37",
+      "glb_sha256": "1c53e26a560f5d6ef0ef0156dbbbc3ee1290bb3842f6a851eb6a9f77ff7a8cb9",
       "triangulos": 5324,
       "vertices": 2800,
       "materiais": [
@@ -1845,7 +1887,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/park_bench.glb",
-      "glb_sha256": "8a3ff27eaced0983054c15b4c1861c2b239ef61133f5bcec2e0a5b1017055b91",
+      "glb_sha256": "aaa7280bef144788a7ba88191912b950dbc99b05d125f67967c038d23e275a7a",
       "triangulos": 708,
       "vertices": 376,
       "materiais": [
@@ -1884,7 +1926,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/flower_bed.glb",
-      "glb_sha256": "f2193b2513918c34eeaa06f9cf63977c3c6e9509ee2a7061c60a27ce688e80cd",
+      "glb_sha256": "68874881269db925b28e42403f63f5a033981a7d399d076e52fbff3e1f4b5e6b",
       "triangulos": 1708,
       "vertices": 902,
       "materiais": [
@@ -1925,7 +1967,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/flower_clump.glb",
-      "glb_sha256": "811cd446801aaca2af81fd46c051f36f502ca8ca3bed6aa25b02048222c4101d",
+      "glb_sha256": "f630e359236d21ccb153a422e4ccbdcd2158b0c984ae0a243842f7c52937071c",
       "triangulos": 332,
       "vertices": 182,
       "materiais": [
@@ -1962,7 +2004,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/fence_2m.glb",
-      "glb_sha256": "acb1d55808f858440575bff83b522a376db2a775586af6f7c50b743da63a5ff4",
+      "glb_sha256": "f8ea493f3f7dc75f6eee5b4242f32538e3399dd9fab17cb3484c16c368ad9706",
       "triangulos": 1404,
       "vertices": 734,
       "materiais": [
@@ -1999,7 +2041,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/stone_stairs.glb",
-      "glb_sha256": "38254a324273696036eebda40c9a121d6c28dc1eb2dd8357bb3dae470be44492",
+      "glb_sha256": "3802a060625bc9416262a3affa8aef1046f590c3ca232db03f7728d1e63279b5",
       "triangulos": 1944,
       "vertices": 1008,
       "materiais": [
@@ -2038,7 +2080,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/low_wall.glb",
-      "glb_sha256": "17c0a6c79947a7675c9cf4489af993ac2579b12c854ae57d4e812a38ff08d991",
+      "glb_sha256": "4d7dd2b045984a677bcb83f57cf8690226f8a60ba71b4022457b41f4fded4ed5",
       "triangulos": 1188,
       "vertices": 616,
       "materiais": [
@@ -2077,7 +2119,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/quay_block.glb",
-      "glb_sha256": "888589b7ae867abd28ff718968396edc99db8d09006a09fc3cde2048bb94ac36",
+      "glb_sha256": "af417ef77805ede585b53fa5f0df57893ef4979943bcad9d498796b862b34f7d",
       "triangulos": 2246,
       "vertices": 1756,
       "materiais": [
@@ -2196,7 +2238,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/terrace_wall.glb",
-      "glb_sha256": "db88e7b97c5b89142c6297e7e8158bf441b3b8ca747e4a2033e3659ba74a0732",
+      "glb_sha256": "a3b61dab1ede18ec2323b07955dc9d5db072484c7965feb792f6b0f2ef4a787a",
       "triangulos": 4764,
       "vertices": 2472,
       "materiais": [
@@ -2235,8 +2277,8 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/lighthouse.glb",
-      "glb_sha256": "5affc4730765b6f631b522540831abb2e6e691f75789f8f4c15b518a5594481e",
-      "triangulos": 3554,
+      "glb_sha256": "aaa808479f73d646413f2cf60b75c1b80df924c28fd375f5d6e9dd763d1cf7e9",
+      "triangulos": 3334,
       "vertices": 1873,
       "materiais": [
         "mat_env_lh_dark",
@@ -2361,7 +2403,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/cloud.glb",
-      "glb_sha256": "a5489f32c8051adff358e6f1f7560e25d1d594ed4cc9893d3202735f17af14a9",
+      "glb_sha256": "937bf64b12e70d0e6889639a33a26adeae81b410cbf1426b50e791e83dc93e18",
       "triangulos": 1372,
       "vertices": 700,
       "materiais": [
@@ -2398,7 +2440,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/seagull.glb",
-      "glb_sha256": "004fa352c384ea56e9fddf3de691c1f7cae0da5a5dd59bf19186597fafa812f2",
+      "glb_sha256": "19f5e896b71074dc3ba491cb9659f7e39c2402447cf4a5569399fb6be0f78c58",
       "triangulos": 264,
       "vertices": 142,
       "materiais": [
@@ -2439,7 +2481,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/tree_round.glb",
-      "glb_sha256": "760b84f33ba29a850fbf74ddc024f8e440b77e01659848b05e732a521d55382b",
+      "glb_sha256": "77dfa64d7719349a781abccf47ac5792659357e6e214193a59ed73348e66b598",
       "triangulos": 1004,
       "vertices": 512,
       "materiais": [
@@ -2478,7 +2520,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/tree_round_dark.glb",
-      "glb_sha256": "0bc72335971dccb8404c3cdf723f48a6183f4fd88bd90cf04bb4a84e228a13b8",
+      "glb_sha256": "96ce6e04dbb53331b230d3da1751d4beb9367adbf8b35d1b407496978fa8d52a",
       "triangulos": 1228,
       "vertices": 626,
       "materiais": [
@@ -2517,17 +2559,17 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/tree_tall.glb",
-      "glb_sha256": "b7f410475b161b7390544c4755810a155723f0ddeb85b954a776c2c51e814c70",
-      "triangulos": 224,
-      "vertices": 116,
+      "glb_sha256": "6868752bd809dd1262eda3fbeaf137fb5421ecd0f4838bc8c460c19df7d1b301",
+      "triangulos": 336,
+      "vertices": 172,
       "materiais": [
         "mat_env_foliage_b",
         "mat_env_trunk"
       ],
       "tamanho_m": [
-        1.951,
+        2.225,
         6.2,
-        1.902
+        2.169
       ],
       "objetos": [
         "Tree_Tall_Canopy",
@@ -2556,7 +2598,7 @@
         "source_art/environment/village_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/rowboat.glb",
-      "glb_sha256": "81dfae5730ceaf790b4227842d6584c72bbedd6be7f78e746018bcf6861cfcd5",
+      "glb_sha256": "1d7fbf69f8db63bfd8a14ac18daeee26f740971dff4bfd18e597ff41d10ed357",
       "triangulos": 280,
       "vertices": 146,
       "materiais": [
@@ -2617,6 +2659,708 @@
       "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
       "data": "2026-11-23",
       "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "river_bank_north",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/river_bank_north.glb",
+      "glb_sha256": "40ad2c08f3624935a12da840b54f7fca0370f1ef58108541235979b22fcce5b8",
+      "triangulos": 9496,
+      "vertices": 4930,
+      "materiais": [
+        "mat_env_ground"
+      ],
+      "tamanho_m": [
+        168.982,
+        9.542,
+        72.889
+      ],
+      "objetos": [
+        "River_Bank_North_Ground"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "river_bank_south",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/river_bank_south.glb",
+      "glb_sha256": "42d4c6828c2a51e2e5f2c17d1d5300e89a98830b5baa4429cb1ff4aeb794ccfe",
+      "triangulos": 11716,
+      "vertices": 6073,
+      "materiais": [
+        "mat_env_ground"
+      ],
+      "tamanho_m": [
+        186.481,
+        9.721,
+        93.0
+      ],
+      "objetos": [
+        "River_Bank_South_Ground"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "island_ground",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/island_ground.glb",
+      "glb_sha256": "19f061eecfd707abc41f6555b5c8394c193a5f61493ee4ac631366d5b7150f3d",
+      "triangulos": 4560,
+      "vertices": 2390,
+      "materiais": [
+        "mat_env_ground"
+      ],
+      "tamanho_m": [
+        34.689,
+        4.448,
+        47.25
+      ],
+      "objetos": [
+        "Island_Ground_Ground"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "sandbar",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/sandbar.glb",
+      "glb_sha256": "320108470efb853ae3a11b23cb6ab629fcfbc2cbfe429f66d36f8708a37fb733",
+      "triangulos": 872,
+      "vertices": 487,
+      "materiais": [
+        "mat_env_ground"
+      ],
+      "tamanho_m": [
+        25.84,
+        3.718,
+        12.235
+      ],
+      "objetos": [
+        "Sandbar_Ground"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "headland",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/headland.glb",
+      "glb_sha256": "6adcf7273a5503c0ee25b1cbaef3ecb474686d8abfa98da46a6e88594db3b2a6",
+      "triangulos": 4636,
+      "vertices": 2432,
+      "materiais": [
+        "mat_env_ground",
+        "mat_env_rock"
+      ],
+      "tamanho_m": [
+        21.5,
+        3.604,
+        21.0
+      ],
+      "objetos": [
+        "Headland_Ground",
+        "Headland_Rocks"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "far_water",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/far_water.glb",
+      "glb_sha256": "3e1a338d7e5d199fb968ff2368affbd0d2e7278cac0af52100d60455b17cf2e7",
+      "triangulos": 8,
+      "vertices": 16,
+      "materiais": [
+        "mat_env_far_water"
+      ],
+      "tamanho_m": [
+        2200.0,
+        0.0,
+        2200.0
+      ],
+      "objetos": [
+        "Far_Water_Plane"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "arch_bridge",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/arch_bridge.glb",
+      "glb_sha256": "228627869733b3a62d01d4a288062710802dd5ccf8d486429afbc0a4239bc28c",
+      "triangulos": 11200,
+      "vertices": 5980,
+      "materiais": [
+        "mat_env_masonry",
+        "mat_env_trim",
+        "mat_env_wood_dark",
+        "mat_env_wood_deck"
+      ],
+      "tamanho_m": [
+        3.633,
+        6.725,
+        39.2
+      ],
+      "objetos": [
+        "Arch_Bridge_Abutments",
+        "Arch_Bridge_Deck",
+        "Arch_Bridge_Rails",
+        "Arch_Bridge_Stringers"
+      ],
+      "empties": [
+        "Underside_Center"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "fence_rustic",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/fence_rustic.glb",
+      "glb_sha256": "416f532f91a37ac5c8ff657efcb332cd12643d0a92c06a24ff48952ff93be2e0",
+      "triangulos": 340,
+      "vertices": 186,
+      "materiais": [
+        "mat_env_wood_deck",
+        "mat_env_wood_light"
+      ],
+      "tamanho_m": [
+        2.043,
+        0.951,
+        0.19
+      ],
+      "objetos": [
+        "Fence_Rustic_Rails",
+        "Fence_Rustic_Stakes"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "palm_tree",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/palm_tree.glb",
+      "glb_sha256": "f7d586056e69a4e2ff00c3aa903e08e084a8ba135d453b5dcc7ef51a41c0f783",
+      "triangulos": 1096,
+      "vertices": 572,
+      "materiais": [
+        "mat_env_foliage_a",
+        "mat_env_palm",
+        "mat_env_trunk"
+      ],
+      "tamanho_m": [
+        4.569,
+        5.735,
+        4.569
+      ],
+      "objetos": [
+        "Palm_Tree_Coconuts",
+        "Palm_Tree_Fronds",
+        "Palm_Tree_Trunk"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "tent",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/tent.glb",
+      "glb_sha256": "f1b26d24b2b7c4ded4ed29efe05a7215513325bbfe0ca02d59e91084331d3a0a",
+      "triangulos": 212,
+      "vertices": 128,
+      "materiais": [
+        "mat_env_tent",
+        "mat_env_tent_dark",
+        "mat_env_wood_dark"
+      ],
+      "tamanho_m": [
+        3.215,
+        1.7,
+        4.022
+      ],
+      "objetos": [
+        "Tent_Canvas",
+        "Tent_Flaps",
+        "Tent_Poles"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "campfire",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/campfire.glb",
+      "glb_sha256": "9576379d5f2a636958fe62643a25f32ffe822d3265af4c9990b5b0541bac17c9",
+      "triangulos": 1012,
+      "vertices": 532,
+      "materiais": [
+        "mat_env_ash",
+        "mat_env_rock",
+        "mat_env_trunk"
+      ],
+      "tamanho_m": [
+        1.39,
+        0.395,
+        1.383
+      ],
+      "objetos": [
+        "Campfire_Ash",
+        "Campfire_Logs",
+        "Campfire_Stones"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "flag_pole",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/flag_pole.glb",
+      "glb_sha256": "705698952fdf5a5beca0c0cfeb4c23320f997b01b5fa324c68da1d84affd31a2",
+      "triangulos": 108,
+      "vertices": 62,
+      "materiais": [
+        "mat_env_flag",
+        "mat_env_flag_navy",
+        "mat_env_wood_dark"
+      ],
+      "tamanho_m": [
+        1.228,
+        3.126,
+        0.16
+      ],
+      "objetos": [
+        "Flag_Pole_Flag",
+        "Flag_Pole_Pole",
+        "Flag_Pole_Stripe"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "step_rock_safe",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/step_rock_safe.glb",
+      "glb_sha256": "8522cada431cd08d6a8deddb628c07ee93045f2830af7f6d0bea847a9a5e30fe",
+      "triangulos": 288,
+      "vertices": 156,
+      "materiais": [
+        "mat_env_flag",
+        "mat_env_rock_safe"
+      ],
+      "tamanho_m": [
+        2.029,
+        1.81,
+        1.996
+      ],
+      "objetos": [
+        "Step_Rock_Safe_Body",
+        "Step_Rock_Safe_Marks"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "step_rock_decoy",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/step_rock_decoy.glb",
+      "glb_sha256": "ae3639712dbf193e99cb81154dee3108f9ed95a87b623fc0955d3ab1258c5d68",
+      "triangulos": 224,
+      "vertices": 114,
+      "materiais": [
+        "mat_env_rock_wet"
+      ],
+      "tamanho_m": [
+        1.165,
+        1.409,
+        1.003
+      ],
+      "objetos": [
+        "Step_Rock_Decoy_Body"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "boulder",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/boulder.glb",
+      "glb_sha256": "e496d8146ea94bda68c01884c35f3f94322bc0fbb5985f2482a319631a927c09",
+      "triangulos": 528,
+      "vertices": 268,
+      "materiais": [
+        "mat_env_rock"
+      ],
+      "tamanho_m": [
+        3.16,
+        2.228,
+        2.659
+      ],
+      "objetos": [
+        "Boulder_Body"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "shell",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/shell.glb",
+      "glb_sha256": "266aaf6bd99cf895a5479d8e9663175c4cdb1037651874438ec020927043fb19",
+      "triangulos": 40,
+      "vertices": 22,
+      "materiais": [
+        "mat_env_tint"
+      ],
+      "tamanho_m": [
+        0.18,
+        0.035,
+        0.214
+      ],
+      "objetos": [
+        "Shell_Body"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "pier_small",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/pier_small.glb",
+      "glb_sha256": "2c62d6356312bed73a81e1ba02446f4e920805ac883bcaefcd296467a0a9dfff",
+      "triangulos": 1072,
+      "vertices": 592,
+      "materiais": [
+        "mat_env_wood_dark",
+        "mat_env_wood_deck"
+      ],
+      "tamanho_m": [
+        2.489,
+        1.85,
+        6.0
+      ],
+      "objetos": [
+        "Pier_Small_Deck",
+        "Pier_Small_Piles"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
+    },
+    {
+      "id": "gull_standing",
+      "conjunto": "world_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_world.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_world.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/world_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/gull_standing.glb",
+      "glb_sha256": "a6b2771001441571f7fdd0638691a0ae9c9636c1a0fe427b2f90ba591b95698c",
+      "triangulos": 352,
+      "vertices": 190,
+      "materiais": [
+        "mat_env_beak",
+        "mat_env_gull",
+        "mat_env_gull_gray"
+      ],
+      "tamanho_m": [
+        0.236,
+        0.415,
+        0.551
+      ],
+      "objetos": [
+        "Gull_Standing_Beak",
+        "Gull_Standing_Body",
+        "Gull_Standing_Wings"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada."
     }
   ]
 }

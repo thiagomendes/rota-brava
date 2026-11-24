@@ -6,14 +6,14 @@
 height = 3.0
 radius = 0.15
 
-[node name="Street_Lamp" type="Node3D" unique_id=617670049]
+[node name="Street_Lamp" type="Node3D" unique_id=1308678850]
 metadata/provisional = true
 
 [node name="Model" parent="." unique_id=2127265383 instance=ExtResource("1_d6soi")]
 
-[node name="Body" type="StaticBody3D" parent="." unique_id=1269716215]
+[node name="Body" type="StaticBody3D" parent="." unique_id=1015687307]
 collision_mask = 0
 
-[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1576761387]
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=371878408]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 shape = SubResource("CylinderShape3D_myfch")

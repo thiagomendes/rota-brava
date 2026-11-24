@@ -41,3 +41,8 @@ Biblioteca comum: `envlib.py` (usa `source_art/scripts/rbart.py` do RB-03). Conf
 - Layout: `source_art/environment/village_layout.py` (fonte unica) -> `game/episodes/ep01/world/harbor_layout.json` -> `gen_harbor_slice.gd` -> `harbor_slice.tscn`.
 - Estudos de direcao: `source_art/studies/world/study_village.py` (Eevee; importa os GLB do proprio projeto). Renders em `captures/rb-r1/mundo/` (fora do Git).
 - Personagem-escala dos estudos e da preview: cilindro/capsula de 1,10 m, NAO e o heroi.
+
+## RB-R1-mundo etapa 2 (rio, ilha, horizonte, margem sul) - PROVISORIO
+- `source_art/environment/build_world.py` -> `world_kit.blend` + 18 GLB (terrenos por SDF em coordenadas do mundo, ponte, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas seguras/iscas, rochedo, concha, pier, gaivota pousada). `world_layout.py` -> `game/episodes/ep01/world/{river,island,horizon}_layout.json` -> `gen_world_scenes.gd`.
+- Margem sul: `build_nature.py` (ladrilhos amostram a margem do mundo + `Bank_Path`). Tudo procedural, nada baixado.
+- Capturas: `source_art/studies/world/capture-world.ps1` (Movie Maker em `preview_world.tscn`) -> `captures/rb-r1/mundo/` (fora do Git).

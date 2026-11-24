@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/river_bank_north.glb" id="1_08d37"]
+
+[node name="River_Bank_North" type="Node3D" unique_id=806319314]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=1323372683 instance=ExtResource("1_08d37")]

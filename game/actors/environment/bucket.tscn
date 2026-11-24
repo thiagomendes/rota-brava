@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/bucket.glb" id="1_v3leg"]
 
-[node name="Bucket" type="Node3D" unique_id=1356857296]
+[node name="Bucket" type="Node3D" unique_id=1671587204]
 metadata/provisional = true
 
 [node name="Model" parent="." unique_id=1447852420 instance=ExtResource("1_v3leg")]

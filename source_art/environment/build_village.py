@@ -517,7 +517,7 @@ def lighthouse(M, info, glb):
     br, bw = bmesh.new(), bmesh.new()
     for i, (y0, y1) in enumerate(bands):
         prof = [(r_at(y0 + (y1 - y0) * k / 3), y0 + (y1 - y0) * k / 3) for k in range(4)]
-        lathe(br if i % 2 == 0 else bw, prof, seg=24)
+        lathe(br if i % 2 == 0 else bw, prof, seg=24, caps=False)
     a.part("Bands_Red", br, "mat_env_lh_red", jit=0.03, ao=0.25, ao_h=15)
     a.part("Bands_White", bw, "mat_env_lh_white", jit=0.03, ao=0.2, ao_h=15)
     # porta e janelinhas
@@ -659,8 +659,8 @@ def tree_cone(M, info, glb):
     gcyl(bm, (0, 0, 0), (0, 1.2, 0), 0.16, 0.12, seg=8)
     a.part("Trunk", bm, "mat_env_trunk", jit=0.1, ao=0.3)
     bm = bmesh.new()
-    prof = [(0.0, 0.9)] + [(1.25 * math.sin(math.pi * t / 8) ** 0.8 * (1.0 - 0.45 * t / 8), 0.9 + 5.2 * t / 8)
-                           for t in range(1, 8)] + [(0.0, 6.2)]
+    prof = [(0.0, 0.9)] + [(1.25 * math.sin(math.pi * k / 12) * (1.0 - 0.22 * (1 - math.cos(math.pi * k / 12)) / 2),
+                            0.9 + 2.65 * (1 - math.cos(math.pi * k / 12))) for k in range(1, 12)] + [(0.0, 6.2)]
     lathe(bm, prof, seg=14)
     lay = a._layer(bm)
     for v in bm.verts:
@@ -764,4 +764,5 @@ def main():
     save_all(blend, info, os.path.splitext(blend)[0] + ".info.json")
 
 
-main()
+if __name__ == "__main__":
+    main()

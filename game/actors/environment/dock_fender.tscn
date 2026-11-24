@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/dock_fender.glb" id="1_ohe2l"]
 
-[node name="Dock_Fender" type="Node3D" unique_id=642615747]
+[node name="Dock_Fender" type="Node3D" unique_id=1002363116]
 metadata/provisional = true
 
 [node name="Model" parent="." unique_id=971383668 instance=ExtResource("1_ohe2l")]

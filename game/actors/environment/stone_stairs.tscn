@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/stone_stairs.glb" id="1_t8f5k"]
 
-[node name="Stone_Stairs" type="Node3D" unique_id=1396806033]
+[node name="Stone_Stairs" type="Node3D" unique_id=312565248]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=242263885 instance=ExtResource("1_t8f5k")]
+[node name="Model" parent="." unique_id=1898901328 instance=ExtResource("1_t8f5k")]

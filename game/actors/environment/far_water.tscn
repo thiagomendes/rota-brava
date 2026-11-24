@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/far_water.glb" id="1_bijin"]
+
+[node name="Far_Water" type="Node3D" unique_id=1566698750]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=584687044 instance=ExtResource("1_bijin")]

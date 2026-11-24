@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/island_ground.glb" id="1_w6cwb"]
+
+[node name="Island_Ground" type="Node3D" unique_id=282391714]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=543162044 instance=ExtResource("1_w6cwb")]

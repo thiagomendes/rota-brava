@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/dock_pile.glb" id="1_n3boe"]
 
-[node name="Dock_Pile" type="Node3D" unique_id=557862492]
+[node name="Dock_Pile" type="Node3D" unique_id=81854569]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=1757880593 instance=ExtResource("1_n3boe")]
+[node name="Model" parent="." unique_id=1514469834 instance=ExtResource("1_n3boe")]

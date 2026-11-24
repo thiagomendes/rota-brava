@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/gull_standing.glb" id="1_gg271"]
+
+[node name="Gull_Standing" type="Node3D" unique_id=139657676]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=1915232989 instance=ExtResource("1_gg271")]

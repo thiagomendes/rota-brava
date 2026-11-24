@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/dock_ladder.glb" id="1_0ohgs"]
 
-[node name="Dock_Ladder" type="Node3D" unique_id=61911872]
+[node name="Dock_Ladder" type="Node3D" unique_id=724437279]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=2128782426 instance=ExtResource("1_0ohgs")]
+[node name="Model" parent="." unique_id=373748345 instance=ExtResource("1_0ohgs")]

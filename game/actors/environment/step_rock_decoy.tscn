@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/step_rock_decoy.glb" id="1_15fpm"]
+
+[node name="Step_Rock_Decoy" type="Node3D" unique_id=1715946765]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=468295285 instance=ExtResource("1_15fpm")]
