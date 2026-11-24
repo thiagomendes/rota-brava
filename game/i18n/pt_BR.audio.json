@@ -6,5 +6,7 @@
   "audio.caption.rope_creak": "[corda range]",
   "audio.caption.rope_tug": "[puxão de corda]",
   "audio.caption.clue_found": "[pista encontrada]",
-  "audio.caption.notebook": "[rabisco de lápis]"
+  "audio.caption.notebook": "[rabisco de lápis]",
+  "audio.caption.rope_snap": "[estalo de corda]",
+  "audio.caption.star": "[estrela ganha]"
 }
