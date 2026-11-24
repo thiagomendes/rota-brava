@@ -23,5 +23,22 @@
   "study.icon.line": "Linha",
   "study.icon.helm": "Leme",
   "study.icon.paw": "Pata",
-  "study.icon.boot": "Bota"
+  "study.icon.boot": "Bota",
+  "ui.menu.references": "Referências",
+  "ui.options.bus.master": "Geral",
+  "ui.options.bus.voz": "Vozes",
+  "ui.options.bus.musica": "Música",
+  "ui.options.bus.efeitos": "Efeitos",
+  "ui.options.bus.ambiente": "Ambiente",
+  "ui.options.subtitle_size": "Tamanho da legenda",
+  "ui.options.size.0": "Aa",
+  "ui.options.size.1": "Aa",
+  "ui.options.size.2": "Aa",
+  "ui.options.reduced_motion": "Menos movimento",
+  "ui.options.steering_assist": "Ajuda no leme",
+  "ui.glyph.keyboard": "E",
+  "ui.glyph.pad": "A",
+  "ui.hud.help_short": "Ajuda",
+  "ui.hud.your_turn": "Sua vez!",
+  "ui.complete.stars": "{count} estrelas"
 }

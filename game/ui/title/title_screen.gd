@@ -1,0 +1,182 @@
+class_name TitleScreen
+extends Control
+## Tela-titulo v2 (RB-R1): ceu/mar animado, logo SVG com mola, palco 3D para os herois (placeholder; o lead
+## coloca os modelos em `hero_root`), botoes grandes com pictograma e sons via `ui_sound(name)`.
+## Nomes e comportamento dos botoes sao os do menu antigo (test_foundation.gd).
+
+## Sons da UI: &"focus", &"confirm", &"back", &"tick", &"select", &"whoosh". O lead liga ao AudioDirector.
+signal ui_sound(name: StringName)
+
+const LOGO := "res://ui/brand/logo_h.svg"
+const SAFE_FRACTION := 0.05
+const SAFE_MIN := 48.0
+const BUTTON_HEIGHT := 128.0
+
+var background: ColorRect
+var logo: TextureRect
+var hero_stage: SubViewportContainer
+## Onde o lead instancia os 3 herois 3D (os placeholders sao filhos chamados Placeholder*).
+var hero_root: Node3D
+var menu: VBoxContainer
+var play_button: Button
+var continue_button: Button
+var options_button: Button
+var references_button: Button
+var quit_button: Button
+var options_panel: OptionsPanel
+var back_button: Button
+var _safe: Control
+var _t: float = 0.0
+
+
+func _ready() -> void:
+	set_anchors_preset(Control.PRESET_FULL_RECT)
+	theme = ThemeV2.build()
+	Options.apply_all()
+	_build()
+	resized.connect(_layout)
+	_layout()
+	ThemeV2.pop_in(logo, 0.4, 0.7)
+	var i := 0
+	for b in [play_button, options_button, references_button, quit_button]:
+		ThemeV2.pop_in(b, 0.6, 0.4, 0.25 + i * 0.07)
+		i += 1
+	play_button.grab_focus()
+
+
+func _build() -> void:
+	background = ColorRect.new()
+	background.name = "Background"
+	background.set_anchors_preset(Control.PRESET_FULL_RECT)
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://ui/title/sky_sea.gdshader") as Shader
+	mat.set_shader_parameter("motion", 0.0 if Options.reduced_motion() else 1.0)
+	background.material = mat
+	add_child(background)
+	_safe = Control.new()
+	_safe.name = "Safe"
+	_safe.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_safe.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_safe)
+	_build_heroes()
+	logo = TextureRect.new()
+	logo.name = "Logo"
+	logo.texture = load(LOGO) as Texture2D
+	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
+	logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_safe.add_child(logo)
+	menu = VBoxContainer.new()
+	menu.name = "Menu"
+	menu.add_theme_constant_override("separation", 26)
+	menu.alignment = BoxContainer.ALIGNMENT_CENTER
+	_safe.add_child(menu)
+	play_button = _button("PlayButton", "ui.menu.play", &"boat", &"PrimaryButton", 170.0)
+	play_button.add_theme_font_size_override("font_size", 60)
+	continue_button = _button("ContinueButton", "ui.menu.continue", &"notebook", &"Button")
+	# Sem sistema de salvamento ainda: Continuar fica oculto (e fora da navegacao) ate existir progresso salvo.
+	continue_button.visible = false
+	options_button = _button("OptionsButton", "ui.menu.options", &"gear", &"GreenButton")
+	references_button = _button("ReferencesButton", "ui.menu.references", &"magnifier", &"QuietButton")
+	quit_button = _button("QuitButton", "ui.menu.quit", &"wave", &"OrangeButton")
+	options_panel = OptionsPanel.new()
+	options_panel.visible = false
+	_safe.add_child(options_panel)
+	options_panel.ui_sound.connect(func(n: StringName) -> void: ui_sound.emit(n))
+	back_button = options_panel.back_button
+
+
+func _build_heroes() -> void:
+	hero_stage = SubViewportContainer.new()
+	hero_stage.name = "HeroStage"
+	hero_stage.stretch = true
+	hero_stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_safe.add_child(hero_stage)
+	var sv := SubViewport.new()
+	sv.name = "HeroViewport"
+	sv.transparent_bg = true
+	sv.own_world_3d = true
+	hero_stage.add_child(sv)
+	var cam := Camera3D.new()
+	cam.position = Vector3(0, 1.0, 4.6)
+	cam.fov = 34.0
+	sv.add_child(cam)
+	cam.look_at_from_position(cam.position, Vector3(0, 0.75, 0))
+	var sun := DirectionalLight3D.new()
+	sun.rotation_degrees = Vector3(-45, 30, 0)
+	sun.light_color = Color("FFE6BE")
+	sv.add_child(sun)
+	hero_root = Node3D.new()
+	hero_root.name = "Heroes"
+	sv.add_child(hero_root)
+	var i := 0
+	for m: StringName in [&"tracker", &"climber", &"pilot"]:
+		# PROVISORIO: capsulas na cor-assinatura ate o lead colocar os modelos dos herois.
+		var mi := MeshInstance3D.new()
+		mi.name = "Placeholder_%s" % m
+		var cap := CapsuleMesh.new()
+		cap.radius = 0.32
+		cap.height = 1.1
+		mi.mesh = cap
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = MemberActor.COLORS.get(m, Color.WHITE)
+		mi.material_override = mat
+		mi.position = Vector3((i - 1) * 0.95, 0.55 + (0.12 if i == 1 else 0.0), 0)
+		hero_root.add_child(mi)
+		i += 1
+
+
+func _button(node_name: String, key: String, icon: StringName, variant: StringName, h: float = BUTTON_HEIGHT) -> Button:
+	var b := Button.new()
+	b.name = node_name
+	b.text = Loc.t(key)
+	b.icon = IconView.texture_for(icon)
+	b.expand_icon = true
+	b.add_theme_constant_override("icon_max_width", int(h * 0.62))
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.theme_type_variation = variant
+	b.custom_minimum_size = Vector2(520, h)
+	ThemeV2.springify(b)
+	b.focus_entered.connect(func() -> void: ui_sound.emit(&"focus"))
+	b.pressed.connect(func() -> void: ui_sound.emit(&"confirm"))
+	menu.add_child(b)
+	return b
+
+
+func _layout() -> void:
+	var vp := size
+	var m := Vector2(maxf(SAFE_MIN, vp.x * SAFE_FRACTION), maxf(SAFE_MIN, vp.y * SAFE_FRACTION))
+	_safe.offset_left = m.x
+	_safe.offset_top = m.y
+	_safe.offset_right = -m.x
+	_safe.offset_bottom = -m.y
+	var area := vp - m * 2.0
+	(background.material as ShaderMaterial).set_shader_parameter("aspect", vp.x / maxf(vp.y, 1.0))
+	var menu_w := clampf(area.x * 0.34, 520.0, 640.0)
+	for b: Button in [play_button, continue_button, options_button, references_button, quit_button]:
+		b.custom_minimum_size.x = menu_w
+	menu.size = Vector2(menu_w, 0)
+	menu.reset_size()
+	menu.position = Vector2(area.x - menu_w - 12.0, (area.y - menu.get_combined_minimum_size().y) * 0.5 + area.y * 0.06)
+	var left_w := area.x - menu_w - 60.0
+	var logo_w := minf(left_w, 1100.0)
+	logo.size = Vector2(logo_w, logo_w * 340.0 / 1632.0)
+	logo.position = Vector2((left_w - logo_w) * 0.5, 0)
+	logo.pivot_offset = logo.size * 0.5
+	var stage_top := logo.size.y + 20.0
+	hero_stage.position = Vector2(0, stage_top)
+	hero_stage.size = Vector2(left_w, area.y - stage_top)
+	options_panel.reset_size()
+	options_panel.position = (area - options_panel.get_combined_minimum_size()) * 0.5
+
+
+func _process(delta: float) -> void:
+	if Options.reduced_motion() or logo == null:
+		return
+	_t += delta
+	logo.rotation = sin(_t * 1.3) * 0.012
+	if hero_root:
+		for c in hero_root.get_children():
+			if c is Node3D and String(c.name).begins_with("Placeholder"):
+				(c as Node3D).rotation.y = sin(_t + (c as Node3D).position.x) * 0.3
