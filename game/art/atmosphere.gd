@@ -27,19 +27,19 @@ static func build(parent: Node) -> Dictionary:
 	env.ambient_light_energy = 0.55
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	env.tonemap_exposure = 1.0
+	env.tonemap_exposure = 0.92
 	env.glow_enabled = true
 	env.glow_intensity = 0.55
 	env.glow_bloom = 0.06
 	env.glow_hdr_threshold = 1.2
 	env.fog_enabled = true
 	env.fog_light_color = Color("cfe6f0")
-	env.fog_density = 0.0035
-	env.fog_sky_affect = 0.45
-	env.fog_aerial_perspective = 0.35
+	env.fog_density = 0.0012
+	env.fog_sky_affect = 0.25
+	env.fog_aerial_perspective = 0.15
 	env.adjustment_enabled = true
-	env.adjustment_contrast = 1.06
-	env.adjustment_saturation = 1.14
+	env.adjustment_contrast = 1.12
+	env.adjustment_saturation = 1.18
 
 	var we := WorldEnvironment.new()
 	we.name = "WorldEnvironment"

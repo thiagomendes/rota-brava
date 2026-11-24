@@ -66,7 +66,7 @@ func _wall(wname: String, size: Vector3, pos: Vector3) -> void:
 
 func _build_scenery() -> void:
 	# Cais, margem, adereços, cabana, vegetacao e rochas: montagem modular do RB-04 (art3d), com o sombreador estilizado.
-	var assembled := (load("res://actors/environment/dock_assembled.tscn") as PackedScene).instantiate()
+	var assembled := (load("res://episodes/ep01/world/harbor_slice.tscn") as PackedScene).instantiate()
 	assembled.name = "DockAssembled"
 	add_child(assembled)
 	Stylize.apply(assembled)
