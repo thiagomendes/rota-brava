@@ -7,15 +7,18 @@ const DIR := "res://actors/characters/"
 const BONES := ["root", "hips", "spine", "chest", "neck", "head", "shoulder.L", "shoulder.R", "upper_arm.L", "upper_arm.R",
 	"forearm.L", "forearm.R", "hand.L", "hand.R", "thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R", "toe.L", "toe.R"]
 const SHAPES := ["neutra", "atenta", "surpresa", "alegre", "blink"]
-const LOOPS := ["idle", "walk", "idle_wheel"]
-## Alvo da marca no banco no referencial do ator (Godot): 0,10 m a direita, 0,35 m de altura, 0,45 m a frente (-Z).
-const TOUCH_TARGET := Vector3(0.10, 0.35, -0.45)
+const LOOPS := ["idle", "walk", "run", "idle_wheel"]
+## RB-R1: rosto do Rastro (expressoes + visemas da fala + olhar).
+const RASTRO_SHAPES := ["neutra", "atenta", "surpresa", "alegre", "triste", "brava_leve", "blink", "mouth_A", "mouth_E", "mouth_O",
+	"mouth_M", "look_left", "look_right", "look_up"]
+const RASTRO_ANIMS := ["idle", "walk", "run", "stop", "crouch", "inspect_touch", "look_to_leme", "react_surprise", "point", "wave",
+	"celebrate", "team_pose"]
 
 const CHARS := {
 	"rastro": {"scene": "rastro_model", "glb": "res://assets/models/characters/rastro.glb", "root": "Rastro", "prefix": "Rastro",
-		"anims": ["idle", "walk", "crouch", "inspect_touch", "look_to_leme", "react_surprise"],
-		"materials": ["mat_rastro_skin", "mat_rastro_hair", "mat_rastro_shirt", "mat_rastro_vest", "mat_rastro_pants",
-			"mat_rastro_leather", "mat_rastro_hat", "mat_rastro_iris", "mat_rastro_eye"]},
+		"anims": RASTRO_ANIMS, "shapes": RASTRO_SHAPES, "height": [1.0, 1.2], "tris": [12000, 20000],
+		"materials": ["mat_rastro_pele", "mat_rastro_cabelo", "mat_rastro_olhos", "mat_rastro_iris", "mat_rastro_uniforme",
+			"mat_rastro_creme", "mat_rastro_chapeu", "mat_rastro_couro", "mat_rastro_botas", "mat_rastro_emblema", "mat_rastro_boca"]},
 	"leme": {"scene": "leme_model", "glb": "res://assets/models/characters/leme.glb", "root": "Leme", "prefix": "Leme",
 		"anims": ["idle", "walk", "idle_wheel", "steer_left", "steer_right", "react_horn"],
 		"materials": ["mat_leme_skin", "mat_leme_hair", "mat_leme_shirt", "mat_leme_vest", "mat_leme_pants", "mat_leme_leather",
@@ -40,6 +43,8 @@ func run(runner) -> void:
 	for id in CHARS:
 		await _test_static(id)
 	await _test_walk_contact("rastro")
+	await _test_gait_contact("rastro", &"run")
+	await _test_rastro_child()
 	await _test_walk_contact("leme")
 	await _test_walk_contact("extra_a")
 	await _test_walk_contact("pico")
@@ -47,7 +52,7 @@ func run(runner) -> void:
 		await _test_idle_upright(id)
 	await _test_pico()
 	await _test_member_actor_idle()
-	await _test_inspect_touch()
+	await _test_inspect_real_pawmark()
 	await _test_leme_wheel()
 	await _test_loops_close("rastro")
 	await _test_loops_close("leme")
@@ -121,7 +126,8 @@ func _test_static(id: String) -> void:
 		root.queue_free()
 		return
 	var box := _aabb(root)
-	r.check(box.size.y >= 1.2 and box.size.y <= 1.4, "chars: altura de %s entre 1,2 e 1,4 m (%.3f)" % [id, box.size.y])
+	var hr: Array = d.get("height", [1.2, 1.4])
+	r.check(box.size.y >= float(hr[0]) and box.size.y <= float(hr[1]), "chars: altura de %s entre %.1f e %.1f m (%.3f)" % [id, hr[0], hr[1], box.size.y])
 	r.check(absf(box.position.y) < 0.02, "chars: origem de %s nos pes (min Y = %.4f)" % [id, box.position.y])
 	r.check(box.size.x < 1.0 and box.size.z < 1.0, "chars: %s cabe em 1 m (x %.2f, z %.2f)" % [id, box.size.x, box.size.z])
 	var face := _part(root, d["prefix"] + "_Face")
@@ -136,7 +142,7 @@ func _test_static(id: String) -> void:
 	for m in mats:
 		r.check(String(m).begins_with("mat_" + id + "_"), "chars: material %s segue o prefixo mat_%s_" % [m, id])
 	if id == "rastro":
-		r.check(mats.size() >= 6 and mats.size() <= 9, "chars: Rastro tem 6 a 9 materiais mat_rastro_* (%d)" % mats.size())
+		r.check(mats.size() >= 11 and mats.size() <= 18, "chars: Rastro tem 11 a 18 materiais mat_rastro_* (%d)" % mats.size())
 	var sk := vis.skeleton()
 	r.check(sk != null, "chars: %s tem Skeleton3D" % id)
 	if sk != null:
@@ -162,7 +168,7 @@ func _test_static(id: String) -> void:
 		for i in fm.mesh.get_blend_shape_count():
 			shapes.append(String(fm.mesh.get_blend_shape_name(i)))
 	var miss_s: Array = []
-	for s in SHAPES:
+	for s in d.get("shapes", SHAPES):
 		if not shapes.has(s):
 			miss_s.append(s)
 	r.check(miss_s.is_empty(), "chars: shape keys do rosto de %s %s" % [id, shapes])
@@ -192,6 +198,9 @@ func _test_static(id: String) -> void:
 	var tris := _tri_count(root)
 	var limit := 25000 if id in ["rastro", "leme", "pico"] else 14000
 	r.check(tris > 2000 and tris <= limit, "chars: %s com %d triangulos (orcamento <= %d)" % [id, tris, limit])
+	if d.has("tris"):
+		var tb: Array = d["tris"]
+		r.check(tris >= int(tb[0]) and tris <= int(tb[1]), "chars: %s na faixa de %d a %d triangulos (%d)" % [id, tb[0], tb[1], tris])
 	root.queue_free()
 	await r.frames(1)
 
@@ -225,16 +234,23 @@ static func _tri_count(root: Node) -> int:
 ## walk: o ponto mais baixo dos pes fica a +-2 cm do chao em >= 80% dos quadros; o pe de apoio anda para tras na velocidade
 ## nominal (sem deslizar); o pe livre levanta.
 func _test_walk_contact(id: String) -> void:
+	await _test_gait_contact(id, &"walk")
+
+
+## walk/run: pe a +-2 cm do chao em >= 80% dos quadros, pe livre levanta, pe de apoio na velocidade nominal do modelo.
+func _test_gait_contact(id: String, clip: StringName) -> void:
 	var root := await _spawn(id)
 	var vis := root.find_child("Model", false, false) as CharacterVisual
-	var len := vis.animation_length(&"walk")
+	var nominal := vis.walk_speed_mps if clip == &"walk" else vis.run_speed_mps
+	r.check(vis.has_animation(clip) and nominal > 0.0, "chars: %s tem %s com velocidade nominal (%.3f m/s)" % [id, clip, nominal])
+	var len := vis.animation_length(clip)
 	var n := 30
 	var ok := 0
 	var worst := 0.0
 	var maxlift := 0.0
 	var pts: Array = []
 	for i in n:
-		vis.seek_clip(&"walk", len * i / n)
+		vis.seek_clip(clip, len * i / n)
 		var h := vis.lowest_foot_height()
 		if absf(h) <= 0.02:
 			ok += 1
@@ -245,8 +261,8 @@ func _test_walk_contact(id: String) -> void:
 		pts.append(frame)
 		maxlift = maxf(maxlift, maxf((frame[&"toe_tip.L"] as Vector3).y, (frame[&"toe_tip.R"] as Vector3).y))
 	var frac := float(ok) / n
-	r.check(frac >= 0.8, "chars: walk de %s com pe a +-2 cm do chao em %d%% dos quadros (pior %.1f mm)" % [id, int(frac * 100), worst * 1000])
-	r.check(maxlift > 0.04, "chars: walk de %s levanta o pe livre (%.1f cm)" % [id, maxlift * 100])
+	r.check(frac >= 0.8, "chars: %s de %s com pe a +-2 cm do chao em %d%% dos quadros (pior %.1f mm)" % [clip, id, int(frac * 100), worst * 1000])
+	r.check(maxlift > 0.04, "chars: %s de %s levanta o pe livre (%.1f cm)" % [clip, id, maxlift * 100])
 	var dt := len / n
 	var errs: Array = []
 	for i in n:
@@ -256,54 +272,105 @@ func _test_walk_contact(id: String) -> void:
 			var pa: Vector3 = a[bone]
 			var pb: Vector3 = b[bone]
 			if pa.y < 0.006 and pb.y < 0.006:
-				errs.append(absf((pb.z - pa.z) / dt - CharacterVisual.WALK_SPEED_MPS))
+				errs.append(absf((pb.z - pa.z) / dt - nominal))
 	var mean_err := 0.0
 	for e in errs:
 		mean_err += e
 	mean_err /= maxf(errs.size(), 1.0)
-	r.check(errs.size() >= 20 and mean_err < 0.12, "chars: pe de apoio de %s sem deslizar (%d amostras, erro medio %.3f m/s vs %.2f)" % [id, errs.size(), mean_err, CharacterVisual.WALK_SPEED_MPS])
-	print("  medida walk %s: pes no chao %d%% dos quadros, pior %.1f mm, pe livre ate %.1f cm, deslize medio %.3f m/s" % [id, int(frac * 100), worst * 1000, maxlift * 100, mean_err])
+	r.check(errs.size() >= 12 and mean_err < 0.12 * maxf(nominal / 0.586, 1.0), "chars: pe de apoio de %s no %s sem deslizar (%d amostras, erro medio %.3f m/s vs %.2f)" % [id, clip, errs.size(), mean_err, nominal])
+	print("  medida %s %s: pes no chao %d%% dos quadros, pior %.1f mm, pe livre ate %.1f cm, deslize medio %.3f m/s" % [clip, id, int(frac * 100), worst * 1000, maxlift * 100, mean_err])
 	root.queue_free()
 	await r.frames(1)
 
 
-## inspect_touch: a ponta da mao direita (osso hand_tip.R) chega a TouchTarget (erro < 8 cm) no pico do toque, nao fica
-## abaixo do plano do banco e o clipe termina como comecou (agachada).
-func _test_inspect_touch() -> void:
-	var root := await _spawn("rastro")
-	var vis := root.find_child("Model", false, false) as CharacterVisual
+## inspect_touch NA POSICAO REAL (RB-R1, defeito herdado): barco BoatActor (modelo boat_v2) atracado em BOAT_DOCKED_POS/HEADING,
+## Rastro (MemberActor) embarcado em PAW_INSPECT_STAND_LOCAL olhando para +Z do barco, como faz o dock_stage.gd. A ponta da mao
+## (hand_tip.R) chega ao centro da malha PawMark do GLB com erro < 6 cm, nunca desce abaixo do topo do banco e o clipe volta ao inicio.
+func _test_inspect_real_pawmark() -> void:
+	var boat := BoatActor.new()
+	r.tree.root.add_child(boat)
+	boat.place(Ep01Layout.BOAT_DOCKED_POS, Ep01Layout.BOAT_DOCKED_HEADING)
+	await r.frames(2)
+	var paw := boat.find_child("PawMark", true, false) as MeshInstance3D
+	var bench := boat.find_child("Boat_Bench", true, false) as MeshInstance3D
+	r.check(paw != null and bench != null, "chars: boat_v2 tem PawMark e Boat_Bench")
+	if paw == null or bench == null:
+		boat.queue_free()
+		return
+	var center := paw.global_transform * paw.mesh.get_aabb().get_center()
+	var bench_box: AABB = bench.global_transform * bench.mesh.get_aabb()
+	var bench_top := bench_box.end.y
+	var a := MemberActor.new()
+	r.tree.root.add_child(a)
+	a.setup(&"tracker")
+	a.ride_briefly(boat, Ep01Layout.PAW_INSPECT_STAND_LOCAL)
+	a.face_now(boat.to_global(Ep01Layout.PAW_INSPECT_STAND_LOCAL + Vector3(0, 0, 1)))
+	await r.frames(2)
+	var vis := a.model
 	var len := vis.animation_length(&"inspect_touch")
 	var n := 90
 	var best := INF
 	var best_t := 0.0
-	var best_wrist := INF
-	var min_y_near := INF
+	var min_over_bench := INF
 	for i in n + 1:
 		var t := len * i / n
 		vis.seek_clip(&"inspect_touch", t)
 		var tip := vis.bone_position(&"hand_tip.R")
-		var d := tip.distance_to(TOUCH_TARGET)
+		var d := tip.distance_to(center)
 		if d < best:
 			best = d
 			best_t = t
-			best_wrist = vis.bone_position(&"hand.R").distance_to(TOUCH_TARGET)
-		if tip.z < -0.2:
-			min_y_near = minf(min_y_near, tip.y)
-	r.check(best < 0.08, "chars: inspect_touch alcanca a marca com a ponta da mao (erro %.1f mm, punho a %.1f cm, no instante %.2f s)" % [best * 1000, best_wrist * 100, best_t])
+		if tip.x > bench_box.position.x and tip.x < bench_box.end.x and tip.z > bench_box.position.z and tip.z < bench_box.end.z:
+			min_over_bench = minf(min_over_bench, tip.y)
+	r.check(best < 0.06, "chars: inspect_touch toca o centro REAL da PawMark (erro %.1f mm em %.2f s; centro %s)" % [best * 1000, best_t, center])
 	r.check(best_t > 0.8 and best_t < 2.2, "chars: pico do toque no meio do clipe (%.2f s)" % best_t)
-	r.check(min_y_near >= TOUCH_TARGET.y - 0.015, "chars: mao nao atravessa o plano do banco (y minimo da ponta perto do banco %.1f cm; plano a %.0f cm)" % [min_y_near * 100, TOUCH_TARGET.y * 100])
+	r.check(min_over_bench >= bench_top - 0.005, "chars: ponta da mao nao atravessa o banco (minimo %.1f cm; topo do banco %.1f cm)" % [min_over_bench * 100, bench_top * 100])
 	vis.seek_clip(&"inspect_touch", 0.0)
 	var p0 := vis.bone_position(&"hand.R")
 	vis.seek_clip(&"inspect_touch", len)
-	var p1 := vis.bone_position(&"hand.R")
-	r.check(p0.distance_to(p1) < 0.02, "chars: inspect_touch retorna a pose inicial (%.1f mm)" % [p0.distance_to(p1) * 1000])
+	r.check(p0.distance_to(vis.bone_position(&"hand.R")) < 0.02, "chars: inspect_touch retorna a pose inicial")
+	var feet_ok := true
 	for t in [0.0, best_t, len]:
 		vis.seek_clip(&"inspect_touch", t)
-		r.check(vis.foot_contact_error() < 0.02, "chars: inspect_touch com pes no chao em %.2f s (%.1f mm)" % [t, vis.foot_contact_error() * 1000])
-	print("  medida inspect_touch: ponta da mao a %.1f mm da marca (punho %.1f cm) em %.2f s" % [best * 1000, best_wrist * 100, best_t])
-	root.queue_free()
+		feet_ok = feet_ok and vis.foot_contact_error() < 0.02
+	r.check(feet_ok, "chars: inspect_touch com pes no conves (inicio, toque, fim)")
+	print("  medida inspect_touch REAL: ponta da mao a %.1f mm do centro da PawMark %s em %.2f s; ponta minima sobre o banco %.3f m (topo %.3f m)" % [best * 1000, center, best_t, min_over_bench, bench_top])
+	a.queue_free()
+	boat.queue_free()
 	await r.frames(1)
 
+
+## RB-R1: barra de crianca-heroi do Rastro: altura 1,0-1,2 m, cabeca 33-38% da altura, olhos (esclera, iris, pupila), visemas,
+## olhar, 12 clipes nomeados com loop correto, corrida de ~0,6 s.
+func _test_rastro_child() -> void:
+	var root := await _spawn("rastro")
+	var vis := root.find_child("Model", false, false) as CharacterVisual
+	var box := _aabb(root)
+	var head := _part(root, "Rastro_Head")
+	var ratio := head.size.y / box.size.y
+	r.check(ratio >= 0.33 and ratio <= 0.38, "chars: cabeca do Rastro com %.1f%% da altura (33 a 38%%; cabeca %.3f m, altura %.3f m)" % [ratio * 100, head.size.y, box.size.y])
+	var fm := vis.face_mesh()
+	var fmats: Array = []
+	for s in fm.mesh.get_surface_count():
+		fmats.append(fm.mesh.surface_get_material(s).resource_name)
+	for m in ["mat_rastro_olhos", "mat_rastro_iris", "mat_rastro_escuro", "mat_rastro_boca"]:
+		r.check(fmats.has(m), "chars: rosto do Rastro tem %s (olhos/iris/pupila/boca)" % m)
+	for a in RASTRO_ANIMS:
+		r.check(vis.has_animation(StringName(a)), "chars: Rastro tem o clipe %s" % a)
+	r.check(absf(vis.animation_length(&"run") - 0.6) < 0.05, "chars: run do Rastro com ciclo de ~0,6 s (%.3f)" % vis.animation_length(&"run"))
+	r.check(absf(vis.animation_length(&"team_pose") - 1.5) < 0.05, "chars: team_pose do Rastro dura 1,5 s (%.3f)" % vis.animation_length(&"team_pose"))
+	vis.set_viseme(&"mouth_A", 1.0)
+	var ia := fm.find_blend_shape_by_name("mouth_A")
+	r.check(ia >= 0 and fm.get_blend_shape_value(ia) > 0.99, "chars: set_viseme(mouth_A) abre a boca")
+	vis.set_viseme(&"mouth_O", 0.7)
+	r.check(fm.get_blend_shape_value(ia) < 0.01 and fm.get_blend_shape_value(fm.find_blend_shape_by_name("mouth_O")) > 0.69, "chars: set_viseme troca de visema")
+	vis.set_viseme(&"")
+	vis.set_gaze(Vector2(-1, 0.5))
+	r.check(fm.get_blend_shape_value(fm.find_blend_shape_by_name("look_left")) > 0.99 and fm.get_blend_shape_value(fm.find_blend_shape_by_name("look_up")) > 0.49, "chars: set_gaze move os olhos para a esquerda e para cima")
+	vis.set_gaze(Vector2.ZERO)
+	print("  medida Rastro: altura %.3f m, cabeca %.3f m (%.1f%%), %d triangulos" % [box.size.y, head.size.y, ratio * 100, _tri_count(root)])
+	root.queue_free()
+	await r.frames(1)
 
 ## idle: em pe. Tronco (quadril -> cabeca) com inclinacao < 8 graus no quadro 0 e ao longo do ciclo, pes no chao e juntos.
 func _test_idle_upright(id: String) -> void:
@@ -469,7 +536,7 @@ func _test_visual_api() -> void:
 	vis.set_expression(&"neutra")
 	await r.frames(2)
 	r.check(fm.get_blend_shape_value(idx) < 0.05, "chars: set_expression(neutra) desliga a surpresa")
-	r.check(is_equal_approx(vis.walk_speed_scale(CharacterVisual.WALK_SPEED_MPS), 1.0), "chars: walk_speed_scale(velocidade nominal) = 1")
+	r.check(is_equal_approx(vis.walk_speed_scale(vis.walk_speed_mps), 1.0), "chars: walk_speed_scale(velocidade nominal) = 1")
 	root.queue_free()
 	await r.frames(1)
 

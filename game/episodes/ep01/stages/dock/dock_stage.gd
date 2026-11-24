@@ -247,16 +247,30 @@ func _frame_inspection(duration: float) -> void:
 func _act_examine(clue_id: StringName, discovery: bool) -> void:
 	var tracker := ctx.actors[&"tracker"] as MemberActor
 	var node: Node3D = _marks.get(clue_id)
-	if node != null:
+	# RB-R1: a pata fica no banco do barco, fora do alcance do cais; o Rastro sobe ao conves (sem fisica, como embarcado)
+	# no ponto PAW_INSPECT_STAND_LOCAL, toca a marca e volta ao cais onde estava.
+	var back := tracker.global_position
+	var on_boat := clue_id == PAW and tracker.riding_on == null
+	if on_boat:
+		tracker.ride_briefly(ctx.boat, Ep01Layout.PAW_INSPECT_STAND_LOCAL)
+	if on_boat:
+		var ahead := ctx.boat.to_global(Ep01Layout.PAW_INSPECT_STAND_LOCAL + Vector3(0.0, 0.0, 1.0))
+		tracker.face_now(ahead)
+		tracker.face_point(ahead)
+	elif node != null:
 		tracker.face_point(node.global_position)
 	tracker.set_expression(&"atenta")
 	var duration := tracker.play_action(&"inspect_touch")
 	if duration <= 0.0:
+		if on_boat:
+			tracker.dismount(back)
 		return
 	_frame_inspection(duration)
 	get_tree().create_timer(duration).timeout.connect(func() -> void:
 		if not is_inside_tree():
 			return
+		if on_boat and tracker.riding_on == ctx.boat:
+			tracker.dismount(back)
 		if discovery:
 			tracker.set_expression(&"surpresa")
 			tracker.play_action(&"react_surprise")
