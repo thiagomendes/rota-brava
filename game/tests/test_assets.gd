@@ -8,11 +8,13 @@ const BOAT_SCENE := "res://actors/boat_model/boat_model.tscn"
 const RASTRO_GLB := "res://assets/models/characters/rastro.glb"
 const BOAT_GLB := "res://assets/models/boat.glb"
 
-const RASTRO_NODES := ["Rastro_Body", "Rastro_Head", "Rastro_Face", "Rastro_Hat", "Rastro_Hair", "Rastro_Shirt", "Rastro_Vest",
-	"Rastro_Pants", "Rastro_BootL", "Rastro_BootR", "Rastro_HandL", "Rastro_HandR", "Rastro_GloveL", "Rastro_GloveR", "Rastro_Notebook",
-	"Rastro_Bag", "Rastro_Belt", "Skeleton3D", "AnimationPlayer"]
-const RASTRO_MATERIALS := ["mat_rastro_skin", "mat_rastro_hair", "mat_rastro_shirt", "mat_rastro_vest", "mat_rastro_pants", "mat_rastro_leather",
-	"mat_rastro_hat", "mat_rastro_iris", "mat_rastro_eye"]
+## RB-R1: Rastro refeito como crianca-heroi (hero_build.py).
+const RASTRO_NODES := ["Rastro_Head", "Rastro_Face", "Rastro_Hat", "Rastro_HatBand", "Rastro_Hair", "Rastro_Jacket", "Rastro_Collar",
+	"Rastro_Emblem", "Rastro_EmblemStar", "Rastro_Pants", "Rastro_BootL", "Rastro_BootR", "Rastro_SoleL", "Rastro_SoleR", "Rastro_HandL",
+	"Rastro_HandR", "Rastro_Notebook", "Rastro_Bag", "Rastro_Belt", "Rastro_Buckle", "Rastro_Lupa", "Skeleton3D", "AnimationPlayer"]
+const RASTRO_MATERIALS := ["mat_rastro_pele", "mat_rastro_cabelo", "mat_rastro_olhos", "mat_rastro_iris", "mat_rastro_escuro",
+	"mat_rastro_boca", "mat_rastro_uniforme", "mat_rastro_creme", "mat_rastro_calca", "mat_rastro_chapeu", "mat_rastro_couro",
+	"mat_rastro_botas", "mat_rastro_emblema", "mat_rastro_ouro", "mat_rastro_rubor", "mat_rastro_vidro"]
 const BOAT_NODES := ["Boat_Hull", "Boat_Deck", "Boat_Cabin", "Boat_CabinRoof", "Boat_Bench", "Boat_Helm", "Boat_Windows",
 	"DeckPoint", "BenchMark"]
 const BOAT_MATERIALS := ["mat_boat_hull", "mat_boat_deck", "mat_boat_cabin", "mat_boat_bench", "mat_boat_wheel", "mat_boat_glass"]
@@ -140,7 +142,7 @@ func _test_rastro() -> void:
 	var model := root.find_child("Model", false, false) as Node3D
 	r.check(model != null and model.get_script() != null, "assets: Rastro tem Model com script CharacterVisual")
 	var box := mesh_aabb(root)
-	r.check(box.size.y >= 1.2 and box.size.y <= 1.4, "assets: altura do Rastro entre 1,2 e 1,4 m (%.3f)" % box.size.y)
+	r.check(box.size.y >= 1.0 and box.size.y <= 1.2, "assets: altura do Rastro (crianca-heroi) entre 1,0 e 1,2 m (%.3f)" % box.size.y)
 	r.check(absf(box.position.y) < 0.02, "assets: origem do Rastro nos pes (min Y = %.4f)" % box.position.y)
 	var face := part_aabb(root, "Rastro_Face")
 	var head := part_aabb(root, "Rastro_Head")
@@ -169,7 +171,7 @@ func _test_rastro() -> void:
 	r.check(not model.find_children("*", "Skeleton3D", true, false).is_empty() and not model.find_children("*", "AnimationPlayer", true, false).is_empty(), "assets: Rastro tem rig (Skeleton3D) e AnimationPlayer (RB-04)")
 	r.check(_has_collision_outside(root), "assets: colisao do Rastro existe e fica fora da cena importada")
 	var cap := (root.find_child("Collision", false, false) as CollisionShape3D).shape as CapsuleShape3D
-	r.check(cap != null and cap.height >= 1.1 and cap.height <= 1.5, "assets: capsula do Rastro com altura compativel")
+	r.check(cap != null and cap.height >= 1.0 and cap.height <= 1.5, "assets: capsula do Rastro com altura compativel")
 	r.check(root.has_meta("provisional"), "assets: Rastro marcado como provisorio")
 	var imported := (load(RASTRO_GLB) as PackedScene).instantiate()
 	r.check(imported.find_children("*", "CollisionObject3D", true, false).is_empty() and imported.find_children("*", "CollisionShape3D", true, false).is_empty(), "assets: GLB do Rastro nao traz colisao")
