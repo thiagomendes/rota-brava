@@ -65,6 +65,83 @@ func run(runner) -> void:
 	await _team_pose()
 	await _collectibles()
 	await _feedback_and_camera()
+	await _framing()
+
+
+# ---------- enquadramento (style bible: heroi com 12 a 18% da altura da tela na exploracao) ----------
+
+## Altura da tela ocupada pelo heroi: projeta o pe e o topo da cabeca (AABB do modelo) com unproject_position.
+func _hero_fraction(m: Ep01Main, a: MemberActor) -> float:
+	var top := -INF
+	var bottom := INF
+	for mi in a.find_children("*", "MeshInstance3D", true, false):
+		var g := mi as MeshInstance3D
+		if not g.is_visible_in_tree() or g.mesh == null:
+			continue
+		var box := g.global_transform * g.get_aabb()
+		top = maxf(top, box.end.y)
+		bottom = minf(bottom, box.position.y)
+	if top == -INF:
+		return 0.0
+	var p := a.global_position
+	var cam := m.camera_rig.camera
+	var head := cam.unproject_position(Vector3(p.x, top, p.z))
+	var feet := cam.unproject_position(Vector3(p.x, bottom, p.z))
+	return absf(feet.y - head.y) / float(m.get_viewport().get_visible_rect().size.y)
+
+
+func _occluded(m: Ep01Main, from: Vector3, to: Vector3, exclude: Array[RID]) -> String:
+	var q := PhysicsRayQueryParameters3D.create(from, to, 1, exclude)
+	var hit := m.get_world_3d().direct_space_state.intersect_ray(q)
+	return "" if hit.is_empty() else String((hit["collider"] as Node).get_path())
+
+
+func _framing() -> void:
+	# [estado, integrante, alvo da acao do momento]
+	var cases := [
+		[&"dock_investigation", &"tracker", Ep01Layout.BENCH_INTERACT_POS + Vector3(0, 0.3, 0)],
+		[&"dock_investigation", &"tracker", Ep01Layout.BANK_PRINT_POS + Vector3(0, 0.2, 0)],
+		[&"river_search", &"pilot", Ep01Layout.BUOY_POS + Vector3(0, 0.5, 0)],
+		[&"island_crossing", &"climber", (Ep01Layout.ROCK_FOOTHOLDS[0] as Vector3) + Vector3(0, 0.1, 0)],
+		[&"docking", &"pilot", Ep01Layout.DOCKING_TARGET_POS],
+	]
+	var sizes := [Vector2i(1280, 720), Vector2i(1600, 720), Vector2i(960, 720)]
+	var root_vp: Window = r.tree.root
+	var old_size: Vector2i = root_vp.size
+	for c: Array in cases:
+		var m: Ep01Main = await _start(c[0] as StringName)
+		var a := m.actors[c[1] as StringName] as MemberActor
+		if c[2] == Ep01Layout.BANK_PRINT_POS + Vector3(0, 0.2, 0):
+			a.teleport(Ep01Layout.BANK_PRINT_POS + Vector3(0.8, 0.05, -1.0))
+			await _physics(3)
+		m.camera_rig.follow(m.camera_rig.target, true)
+		await r.frames(2)
+		for s: Vector2i in sizes:
+			r.tree.root.size = s
+			await r.frames(2)
+			m.camera_rig.follow(m.camera_rig.target, true)
+			var f := _hero_fraction(m, a)
+			r.check(f >= 0.12 and f <= 0.18, "%s %s em %dx%d: heroi ocupa %.1f%% da altura (12-18%%)" % [c[0], c[1], s.x, s.y, f * 100.0])
+		r.tree.root.size = old_size
+		await r.frames(1)
+		var cam_pos := m.camera_rig.camera.global_position
+		var ex: Array[RID] = [a.get_rid()]
+		var o1 := _occluded(m, cam_pos, a.global_position + Vector3(0, 0.7, 0), ex)
+		r.check(o1 == "", "%s: raio camera->heroi livre %s" % [c[0], o1])
+		var o2 := _occluded(m, cam_pos, c[2] as Vector3, ex)
+		r.check(o2 == "", "%s: raio camera->alvo livre %s" % [c[0], o2])
+		var tgt := m.camera_rig.camera.unproject_position(c[2] as Vector3)
+		var vr := m.get_viewport().get_visible_rect()
+		r.check(vr.has_point(tgt) and not m.camera_rig.camera.is_position_behind(c[2] as Vector3),
+			"%s: alvo da acao visivel no quadro (%.0f, %.0f)" % [c[0], tgt.x, tgt.y])
+		await _stop(m)
+	# MUTACAO: camera antiga do cais (0; 7,5; 9,5) reprova a faixa; restaurada.
+	var mm: Ep01Main = await _start(&"dock_investigation")
+	mm.camera_rig.set_view(Vector3(0, 7.5, 9.5), 0.0, 1.0)
+	mm.camera_rig.follow(mm.camera_rig.target, true)
+	var fm := _hero_fraction(mm, mm.actors[&"tracker"] as MemberActor)
+	r.check(fm < 0.12, "mutacao (camera antiga) reprova a faixa (%.1f%%)" % (fm * 100.0))
+	await _stop(mm)
 
 
 # ---------- a pe ----------

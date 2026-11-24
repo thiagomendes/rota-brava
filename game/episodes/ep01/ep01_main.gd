@@ -302,7 +302,7 @@ func set_controlled(node: Node3D) -> void:
 func _apply_view() -> void:
 	if current_stage:
 		var v := current_stage.camera_view()
-		camera_rig.set_view(v.get("offset", camera_rig.offset), v.get("yaw", 0.0))
+		camera_rig.set_view(v.get("offset", camera_rig.offset), v.get("yaw", 0.0), v.get("look", CameraRig.LOOK_Y))
 
 
 # ---------- inicio ----------

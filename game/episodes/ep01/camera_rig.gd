@@ -7,7 +7,8 @@ extends Node3D
 var camera: Camera3D
 var target: Node3D
 var offset: Vector3 = Vector3(0, 7.5, 9.5)
-var look_offset: Vector3 = Vector3(0, 1.0, 0)
+const LOOK_Y := 0.75
+var look_offset: Vector3 = Vector3(0, LOOK_Y, 0)
 ## Giro em Y do conjunto; a entrada de movimento usa este valor.
 var yaw: float = 0.0
 var smooth: float = 4.0
@@ -36,11 +37,12 @@ func _ready() -> void:
 	add_child(camera)
 
 
-func set_view(new_offset: Vector3, new_yaw: float = 0.0) -> void:
+## look_y: altura do ponto de mira acima do alvo (0,75 = peito de crianca de ~1,14 m).
+func set_view(new_offset: Vector3, new_yaw: float = 0.0, look_y: float = LOOK_Y) -> void:
 	offset = new_offset
 	yaw = new_yaw
 	framing_world = false
-	look_offset = Vector3(0, 1.0, 0)
+	look_offset = Vector3(0, look_y, 0)
 
 
 ## Enquadra `node` de frente: camera em `node + front * distance + altura`, olhando para o peito.
