@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://lookdev/materials/ld_vinyl.gdshader" id="1_sh"]
+
+[resource]
+resource_name = "mat_ld_vinyl_toy"
+render_priority = 0
+shader = ExtResource("1_sh")
+shader_parameter/roughness = 0.4
+shader_parameter/specular = 0.48
+shader_parameter/clearcoat = 0.3
+shader_parameter/clearcoat_roughness = 0.32
+shader_parameter/rim = 0.2
+shader_parameter/rim_tint = 0.6
+shader_parameter/micro_bump = 0.0022

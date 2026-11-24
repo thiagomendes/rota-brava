@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://lookdev/materials/ld_painted.gdshader" id="1_sh"]
+
+[resource]
+resource_name = "mat_ld_painted_gloss"
+render_priority = 0
+shader = ExtResource("1_sh")
+shader_parameter/roughness = 0.38
+shader_parameter/specular = 0.5
+shader_parameter/clearcoat = 0.35
+shader_parameter/grain_scale = 90.0
+shader_parameter/bump_strength = 0.4
+shader_parameter/variation = 0.05
+shader_parameter/rim = 0.12
+shader_parameter/grime = 0.05
