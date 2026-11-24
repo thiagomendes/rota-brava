@@ -58,11 +58,13 @@ def db(x):
 
 def true_peak_estimate(samples, channels, top=400):
     """Pico verdadeiro estimado: interpola 4x (Catmull-Rom) em torno das amostras de maior modulo."""
-    idx = sorted(range(0, len(samples), 1), key=lambda k: -abs(samples[k]))[:top] if len(samples) < 2_000_000 else None
-    if idx is None:
-        step = max(1, len(samples) // 1_000_000)
-        cand = range(0, len(samples), step)
-        idx = sorted(cand, key=lambda k: -abs(samples[k]))[:top]
+    # Varre TODAS as amostras e guarda as que ficam a menos de ~2 dB do pico de amostra: o pico verdadeiro
+    # so pode superar o de amostra perto dessas posicoes.
+    peak_int = max(abs(s) for s in samples) if samples else 0
+    threshold = int(peak_int * 0.79)
+    idx = [k for k, s in enumerate(samples) if abs(s) >= threshold]
+    if len(idx) > top * 5:
+        idx = sorted(idx, key=lambda k: -abs(samples[k]))[: top * 5]
     best = 0.0
     for k in idx:
         ch = k % channels
