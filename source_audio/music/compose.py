@@ -361,7 +361,7 @@ def main() -> int:
 
     e = explore()
     full = mixdown(e)
-    out("theme_explore", master(full, -18.0, True), True, ogg=False,
+    out("theme_explore", master(full, -18.0, True), True,
         extra={"bpm": 112, "bars": 32, "motif": "C5 F5 A5 G5 C6"})
     low = mixdown(e, stems=["uke", "bass", "arp", "shaker", "conga", "pizz", "perc"], extra_gain={"perc": -6, "uke": -2})
     L = len(low)

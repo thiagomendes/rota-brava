@@ -152,6 +152,32 @@ func _coverage(r) -> void:
 			if e.is_empty() or str(e.get("type")) != "radio":
 				radio_missing.append(k)
 	r.check(radio_missing.is_empty(), "audio: toda fala de radio/equipe e dica falada tem arquivo de radio (%s)" % ", ".join(radio_missing))
+	# ep01_dialogue.json: toda fala tem arquivo (babble ou radio) com a intencao/emotes do dialogo
+	var dlg: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://episodes/ep01/ep01_dialogue.json"))
+	var dl_missing: Array[String] = []
+	var dl_count := 0
+	if dlg is Dictionary and (dlg as Dictionary).get("lines") is Dictionary:
+		for id in (dlg["lines"] as Dictionary):
+			dl_count += 1
+			var d: Dictionary = dlg["lines"][id]
+			var e := VoiceCatalog.lookup(str(id))
+			var want_radio := str(d.get("speaker", "")) in RADIO_SPEAKERS or str(id).contains(".hint_spoken")
+			if e.is_empty() or not FileAccess.file_exists(str(e["file"])) or (str(e["type"]) == "radio") != want_radio \
+					or (not want_radio and str(d.get("intent")) != "narracao" and str(e["intent"]) != str(d.get("intent"))) \
+					or e.get("emotes", []) != d.get("emotes", []):
+				dl_missing.append(str(id))
+	r.check(dl_count >= 40 and dl_missing.is_empty(), "audio: toda fala de ep01_dialogue.json (%d) tem arquivo, tipo, intencao e emotes coerentes (%s)" % [dl_count, ", ".join(dl_missing)])
+	# pt_BR.radio.json: toda chave tem arquivo de radio
+	var rad: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://i18n/pt_BR.radio.json"))
+	var rad_missing: Array[String] = []
+	var rad_count := 0
+	if rad is Dictionary:
+		for k in (rad as Dictionary):
+			rad_count += 1
+			var e := VoiceCatalog.lookup(str(k))
+			if e.is_empty() or str(e["type"]) != "radio" or not FileAccess.file_exists(str(e["file"])):
+				rad_missing.append(str(k))
+	r.check(rad_count >= 25 and rad_missing.is_empty(), "audio: toda chave de pt_BR.radio.json (%d) tem arquivo de radio (%s)" % [rad_count, ", ".join(rad_missing)])
 
 
 func _stats(s: AudioStreamWAV) -> Dictionary:

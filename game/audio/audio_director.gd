@@ -35,6 +35,11 @@ const UI_SOUNDS: Dictionary = {
 	&"star": "sfx_ui_star",
 }
 const STING_DIP_DB := -10.0
+## Nomes de `ui_sound` emitidos pela UI v2 -> nomes de play_ui.
+const UI_V2_SOUNDS: Dictionary = {
+	&"focus": &"move", &"confirm": &"confirm", &"pop": &"open", &"handoff": &"swap", &"star": &"star",
+	&"emote": &"move", &"back": &"back", &"tick": &"move", &"select": &"confirm",
+}
 const POOL_START := 8
 const POOL_MAX := 24
 const ENGINE_PITCH_MIN := 0.8
@@ -388,6 +393,24 @@ func play_ui(ui_name: StringName) -> Node:
 		push_warning("AudioDirector: som de UI desconhecido: " + String(ui_name))
 		return null
 	return play_sfx(n)
+
+
+## Som da UI v2 pelo nome do sinal `ui_sound` (focus, confirm, pop, handoff, star, emote, back, tick, select).
+## Aceita tambem os nomes de play_ui. Devolve o player ou null.
+func play_ui_named(ui_name: StringName) -> Node:
+	return play_ui(UI_V2_SOUNDS.get(ui_name, ui_name))
+
+
+## Arquivo (res://) de uma entrada do catalogo de sons; aceita nomes curtos de musica (explore, discovery...).
+## "" se nao existe. Estatico: serve a quem toca audio sem um AudioDirector (ex.: demo de referencia).
+static func catalog_file(sound_name: String) -> String:
+	var n := str(MUSIC_ALIASES.get(StringName(sound_name), sound_name))
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(CATALOG_PATH)) if FileAccess.file_exists(CATALOG_PATH) else null
+	if parsed is Dictionary:
+		for e in (parsed as Dictionary).get("entries", []):
+			if str((e as Dictionary).get("name", "")) == n:
+				return str(e["file"])
+	return ""
 
 
 ## Troca as camadas de ambiente pela zona (dock, village, river, island) com crossfade de `fade` s.

@@ -17,6 +17,7 @@ SPEAKERS = {"tracker": "Rastro", "climber": "Pico", "pilot": "Leme", "captain": 
             "radio": "radio", "team": "team", "villager_a": "villager_a", "villager_b": "villager_b",
             "villager_c": "villager_c"}
 RADIO_SPEAKERS = {"radio", "team"}
+INTENT_MAP = {"narracao": "normal"}  # intencoes de ep01_dialogue.json sem curva propria no balbucio
 KEY = re.compile(r"^ep01\.([a-z_]+)\.([a-z_]+)\.([a-z_0-9]+)$")
 
 URGENT = ("segura", "escorreguei", "devagar", "cadê", "ei!", "muito perto", "buzina no porto")
@@ -41,36 +42,48 @@ def _intent(name: str, text: str) -> str:
 
 def gather() -> list[dict]:
     texts: dict[str, str] = {}
+    radio_keys: set[str] = set()
     for f in ["pt_BR.json", "pt_BR.audio.json", "pt_BR.radio.json"]:
         p = GAME / "i18n" / f
         if p.exists():
-            texts.update(load_json(p))
+            data = load_json(p)
+            texts.update(data)
+            if f == "pt_BR.radio.json":
+                radio_keys = set(data)
     dialogue = {}
     dp = GAME / "episodes" / "ep01" / "ep01_dialogue.json"
     if dp.exists():
         d = load_json(dp)
-        for e in (d.get("lines", d) if isinstance(d, dict) else d):
-            if isinstance(e, dict) and "id" in e:
-                dialogue[e["id"]] = e
+        src = d.get("lines", d) if isinstance(d, dict) else d
+        if isinstance(src, dict):
+            dialogue = {k: v for k, v in src.items() if isinstance(v, dict)}
+        else:
+            dialogue = {e["id"]: e for e in src if isinstance(e, dict) and "id" in e}
     out = []
     for key, text in texts.items():
         m = KEY.match(key)
-        if not m:
+        if m:
+            scene, spk, name = m.groups()
+        elif key in dialogue:  # chaves fora do padrao (ex.: ep01.complete.title) citadas no dialogo
+            scene, spk, name = key.split(".")[1], dialogue[key].get("speaker", ""), key.split(".")[-1]
+        else:
             continue
-        scene, spk, name = m.groups()
         dl = dialogue.get(key, {})
         spk = dl.get("speaker", spk)
-        if name == "objective" or name.startswith("objective"):
-            continue  # objetivos: texto de HUD; o radio cobre a instrucao essencial via hint_spoken
+        if key in radio_keys:  # pt_BR.radio.json: tudo e Farol 7 (objetivos e dicas inclusive)
+            spk = "radio"
+        elif name == "objective" or name.startswith("objective"):
+            continue  # objetivos de HUD fora do arquivo de radio
         if spk not in SPEAKERS:
             continue
         kind = "radio" if spk in RADIO_SPEAKERS or name.startswith("hint_spoken") else "babble"
         out.append({
             "id": key, "speaker": spk, "character": SPEAKERS[spk] if kind == "babble" else ("team" if spk == "team" else "radio"),
             "scene": scene, "text": text, "type": kind,
-            "intent": dl.get("intent", "radio" if kind == "radio" else _intent(name, text)),
+            "intent": "radio" if kind == "radio" else INTENT_MAP.get(dl.get("intent", ""), dl.get("intent") or _intent(name, text)),
+            "dialogue_intent": dl.get("intent", ""),
             "emotes": dl.get("emotes", []),
-            "origin_speaker": m.group(2),
+            "origin_speaker": m.group(2) if m else spk,
         })
     out.sort(key=lambda e: e["id"])
     return out

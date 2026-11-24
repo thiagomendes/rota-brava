@@ -12,20 +12,20 @@
   "tracks": [
     {
       "name": "theme_explore",
-      "file": "res://audio/music/theme_explore.wav",
+      "file": "res://audio/music/theme_explore.ogg",
       "loop": true,
       "duration": 68.571,
-      "peak_dbfs": -2.03,
-      "true_peak_dbtp": -1.99,
-      "lufs": -17.98,
-      "rms_dbfs": -21.15,
-      "sample_rate": 32000,
-      "bytes": 8777188,
+      "peak_dbfs": -1.82,
+      "true_peak_dbtp": -1.82,
+      "lufs": -17.99,
+      "rms_dbfs": -21.13,
+      "sample_rate": 44100,
+      "bytes": 1380014,
       "bpm": 112,
       "bars": 32,
       "motif": "C5 F5 A5 G5 C6",
-      "seam_jump": 0.00195,
-      "seam_ratio": 0.009
+      "seam_jump": 0.00263,
+      "seam_ratio": 0.017
     },
     {
       "name": "theme_explore_low",

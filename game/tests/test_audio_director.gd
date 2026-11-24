@@ -135,6 +135,10 @@ func _run_r1(r, d: AudioDirector) -> void:
 	for u in [&"move", &"confirm", &"back", &"open", &"swap", &"clue", &"star"]:
 		var p := d.play_ui(u)
 		ui_ok = ui_ok and p is AudioStreamPlayer and (p as AudioStreamPlayer).playing
+	var v2_ok := true
+	for u in [&"focus", &"confirm", &"pop", &"handoff", &"star", &"emote", &"back", &"tick", &"select"]:
+		v2_ok = v2_ok and d.play_ui_named(u) != null
+	r.check(v2_ok and AudioDirector.catalog_file("explore").ends_with(".ogg"), "director: play_ui_named cobre os ui_sound da UI v2; catalog_file resolve secoes")
 	r.check(ui_ok and d.play_ui(&"nao_existe") == null, "director: play_ui toca move/confirm/back/open/swap/clue/star e ignora nome desconhecido")
 	d.stop_all()
 

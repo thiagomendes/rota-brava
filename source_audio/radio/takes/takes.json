@@ -19,6 +19,16 @@
     "voice": "pt_BR-jeff-medium.onnx",
     "length_scale": 1.08
   },
+  "ep01.complete.body": {
+    "text": "O piloto e o filhote voltaram para casa. Boa equipe!",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.complete.title": {
+    "text": "Episódio concluído!",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
   "ep01.dock.tracker.hint_spoken": {
     "text": "Examina a marca do banco e a bota da margem. Depois escolhe a margem.",
     "voice": "pt_BR-jeff-medium.onnx",
@@ -31,6 +41,131 @@
   },
   "ep01.island.climber.hint_spoken": {
     "text": "Pisa na próxima pedra marcada. Quando chegar à última, prende a linha.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.dock.choice": {
+    "text": "Equipe, escolham juntos onde o barco vai procurar.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.dock.conclusion": {
+    "text": "Equipe, sigam a bota e a pegada: elas vão para a margem.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.dock.hint_bench": {
+    "text": "Rastro, chegue perto do banco e olhe a marca pequena.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.dock.hint_boot": {
+    "text": "Rastro, olhe a bota grande na lama, perto da água.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.dock.hint_examine": {
+    "text": "Rastro, depois de olhar as duas marcas, escolha a margem.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.dock.try_again": {
+    "text": "Rastro, olhe de novo a lama da margem, perto da água.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.docking.hint_approach": {
+    "text": "Leme, aponte o barco para a linha e vá devagar.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.docking.hint_line": {
+    "text": "Leme, olhe a linha esticada entre a ilha e o barco.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.island.hint_line": {
+    "text": "Pico, chegue na última pedra e prenda a linha.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.island.hint_stone": {
+    "text": "Pico, pise na pedra marcada com tinta amarela.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.objective.arrival": {
+    "text": "Equipe, vejam o barco amarelo chegando devagar no cais.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.objective.dock_investigation": {
+    "text": "Rastro, olhe o banco do barco e a lama da margem.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.objective.docking": {
+    "text": "Leme, siga a linha e encoste o barco na plataforma.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.objective.island_crossing": {
+    "text": "Pico, pise nas pedras marcadas e prenda a linha.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.objective.return_trip": {
+    "text": "Equipe, subam no barco para voltarmos para casa.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.objective.river_search": {
+    "text": "Leme, leve o barco rio acima até a enseada.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.return.hint_button": {
+    "text": "Leme, chegue perto do barco e aperte Partir.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.return.hint_press": {
+    "text": "Leme, aperte Partir e leve a equipe para casa.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.river.cove": {
+    "text": "Leme, siga agora para a enseada, devagar.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.river.hint_buoy": {
+    "text": "Leme, olhe a boia vermelha na frente do barco.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.river.hint_cove": {
+    "text": "Leme, contorne a boia vermelha e siga para a enseada.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.river.hint_leaves": {
+    "text": "Leme, olhe para onde as folhas correm na água.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.river.leaves": {
+    "text": "Leme, veja para onde as folhas vão: a água corre para lá.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.river.slow": {
+    "text": "Leme, vá devagar agora: tem pedra perto do barco.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.river.start": {
+    "text": "Leme, segure firme o leme e olhe a água na frente.",
     "voice": "pt_BR-jeff-medium.onnx",
     "length_scale": 1.08
   },

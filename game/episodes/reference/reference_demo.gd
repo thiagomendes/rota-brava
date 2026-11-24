@@ -16,10 +16,8 @@ const EXPRESSION_KEYS: Array[String] = ["ref.rastro.neutral", "ref.rastro.attent
 const CHARACTER_LABELS := {"team": "Equipe"}
 const INTENT_LABELS := {"normal": "normal", "urgencia": "urgência", "descoberta": "descoberta", "radio": "rádio"}
 const MUSIC_KEYS := {&"explore": "ref.music.explore", &"discovery": "ref.music.discovery"}
-const MUSIC := {
-	&"explore": "res://audio/music/theme_explore.wav",
-	&"discovery": "res://audio/music/theme_discovery.wav",
-}
+## Faixas por nome de secao; o arquivo vem do catalogo de audio (AudioDirector.catalog_file), nao de caminho fixo.
+const MUSIC: Array[StringName] = [&"explore", &"discovery"]
 
 var page_index: int = 0
 var variant: int = 0
@@ -359,7 +357,7 @@ func _page_music() -> void:
 	list.add_theme_constant_override("separation", 14)
 	list.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_content.add_child(list)
-	for key: StringName in [&"explore", &"discovery"]:
+	for key: StringName in MUSIC:
 		var b := Button.new()
 		b.text = Loc.t(String(MUSIC_KEYS[key]))
 		b.custom_minimum_size = Vector2(0, 120)
@@ -377,7 +375,8 @@ func _page_music() -> void:
 
 func play_music(key: StringName) -> void:
 	voice_player.stop()
-	var stream := load(MUSIC[key]) as AudioStream
+	var path := AudioDirector.catalog_file(String(key))
+	var stream := load(path) as AudioStream if path != "" and ResourceLoader.exists(path) else null
 	if stream == null:
 		return
 	music_player.stream = stream

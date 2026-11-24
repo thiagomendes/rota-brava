@@ -5,16 +5,18 @@
       "id": "ep01.arrival.pilot.ask_captain",
       "character": "Leme",
       "speaker": "pilot",
-      "intent": "urgencia",
+      "intent": "pergunta",
       "language": "pt_BR",
       "subtitle": "ep01.arrival.pilot.ask_captain",
       "type": "babble",
       "file": "res://audio/voice/ep01_arrival_pilot_ask_captain.wav",
-      "duration": 1.491,
-      "peak_dbfs": -3.43,
-      "lufs": -18.58,
+      "duration": 1.703,
+      "peak_dbfs": -3.82,
+      "lufs": -19.04,
       "visemes": "res://audio/voice/ep01_arrival_pilot_ask_captain.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "question"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -23,16 +25,19 @@
       "id": "ep01.arrival.pilot.react",
       "character": "Leme",
       "speaker": "pilot",
-      "intent": "urgencia",
+      "intent": "descoberta",
       "language": "pt_BR",
       "subtitle": "ep01.arrival.pilot.react",
       "type": "babble",
       "file": "res://audio/voice/ep01_arrival_pilot_react.wav",
-      "duration": 1.162,
-      "peak_dbfs": -3.77,
-      "lufs": -17.6,
+      "duration": 1.26,
+      "peak_dbfs": -2.62,
+      "lufs": -17.64,
       "visemes": "res://audio/voice/ep01_arrival_pilot_react.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "boat",
+        "exclamation"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -50,7 +55,10 @@
       "peak_dbfs": -2.3,
       "lufs": -18.48,
       "visemes": "res://audio/voice/ep01_arrival_radio_crate.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "boat",
+        "exclamation"
+      ],
       "status": "provisorio",
       "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
       "voice": "Piper pt_BR-jeff-medium (Farol 7)"
@@ -68,7 +76,9 @@
       "peak_dbfs": -2.3,
       "lufs": -18.36,
       "visemes": "res://audio/voice/ep01_arrival_radio_hint_gesture.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "look"
+      ],
       "status": "provisorio",
       "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
       "voice": "Piper pt_BR-jeff-medium (Farol 7)"
@@ -86,7 +96,9 @@
       "peak_dbfs": -2.3,
       "lufs": -18.25,
       "visemes": "res://audio/voice/ep01_arrival_radio_hint_spoken.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "star"
+      ],
       "status": "provisorio",
       "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
       "voice": "Piper pt_BR-jeff-medium (Farol 7)"
@@ -104,7 +116,10 @@
       "peak_dbfs": -2.3,
       "lufs": -18.04,
       "visemes": "res://audio/voice/ep01_arrival_radio_horn.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "horn",
+        "boat"
+      ],
       "status": "provisorio",
       "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
       "voice": "Piper pt_BR-jeff-medium (Farol 7)"
@@ -122,10 +137,55 @@
       "peak_dbfs": -3.74,
       "lufs": -17.82,
       "visemes": "res://audio/voice/ep01_arrival_tracker_take_over.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "look",
+        "notebook"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Rastro"
+    },
+    {
+      "id": "ep01.complete.body",
+      "character": "team",
+      "speaker": "team",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.complete.body",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_complete_body.wav",
+      "duration": 3.616,
+      "peak_dbfs": -2.3,
+      "lufs": -18.05,
+      "visemes": "res://audio/voice/ep01_complete_body.visemes.json",
+      "emotes": [
+        "heart",
+        "star"
+      ],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.complete.title",
+      "character": "team",
+      "speaker": "team",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.complete.title",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_complete_title.wav",
+      "duration": 1.662,
+      "peak_dbfs": -2.3,
+      "lufs": -18.55,
+      "visemes": "res://audio/voice/ep01_complete_title.visemes.json",
+      "emotes": [
+        "star",
+        "heart"
+      ],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
     },
     {
       "id": "ep01.dock.tracker.ask_destination",
@@ -140,7 +200,10 @@
       "peak_dbfs": -5.33,
       "lufs": -18.74,
       "visemes": "res://audio/voice/ep01_dock_tracker_ask_destination.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "question",
+        "idea"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Rastro"
@@ -167,16 +230,19 @@
       "id": "ep01.dock.tracker.boot_observation",
       "character": "Rastro",
       "speaker": "tracker",
-      "intent": "normal",
+      "intent": "descoberta",
       "language": "pt_BR",
       "subtitle": "ep01.dock.tracker.boot_observation",
       "type": "babble",
       "file": "res://audio/voice/ep01_dock_tracker_boot_observation.wav",
-      "duration": 2.278,
-      "peak_dbfs": -4.43,
-      "lufs": -18.86,
+      "duration": 2.137,
+      "peak_dbfs": -3.81,
+      "lufs": -17.85,
       "visemes": "res://audio/voice/ep01_dock_tracker_boot_observation.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "boot",
+        "look"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Rastro"
@@ -185,16 +251,20 @@
       "id": "ep01.dock.tracker.deduction",
       "character": "Rastro",
       "speaker": "tracker",
-      "intent": "normal",
+      "intent": "descoberta",
       "language": "pt_BR",
       "subtitle": "ep01.dock.tracker.deduction",
       "type": "babble",
       "file": "res://audio/voice/ep01_dock_tracker_deduction.wav",
-      "duration": 3.139,
-      "peak_dbfs": -4.95,
-      "lufs": -18.9,
+      "duration": 3.007,
+      "peak_dbfs": -3.49,
+      "lufs": -17.86,
       "visemes": "res://audio/voice/ep01_dock_tracker_deduction.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "paw",
+        "boot",
+        "idea"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Rastro"
@@ -212,7 +282,10 @@
       "peak_dbfs": -6.79,
       "lufs": -19.75,
       "visemes": "res://audio/voice/ep01_dock_tracker_hint_gesture_bench.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "look",
+        "paw"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Rastro"
@@ -230,7 +303,10 @@
       "peak_dbfs": -6.28,
       "lufs": -19.59,
       "visemes": "res://audio/voice/ep01_dock_tracker_hint_gesture_boot.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "look",
+        "boot"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Rastro"
@@ -248,7 +324,10 @@
       "peak_dbfs": -2.14,
       "lufs": -18.0,
       "visemes": "res://audio/voice/ep01_dock_tracker_hint_spoken.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "notebook",
+        "paw"
+      ],
       "status": "provisorio",
       "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
       "voice": "Piper pt_BR-jeff-medium (Farol 7)"
@@ -275,16 +354,19 @@
       "id": "ep01.dock.tracker.small_print",
       "character": "Rastro",
       "speaker": "tracker",
-      "intent": "normal",
+      "intent": "descoberta",
       "language": "pt_BR",
       "subtitle": "ep01.dock.tracker.small_print",
       "type": "babble",
       "file": "res://audio/voice/ep01_dock_tracker_small_print.wav",
-      "duration": 1.809,
-      "peak_dbfs": -5.65,
-      "lufs": -18.78,
+      "duration": 1.76,
+      "peak_dbfs": -4.65,
+      "lufs": -17.76,
       "visemes": "res://audio/voice/ep01_dock_tracker_small_print.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "paw",
+        "exclamation"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Rastro"
@@ -311,16 +393,19 @@
       "id": "ep01.dock.tracker.wrong_destination",
       "character": "Rastro",
       "speaker": "tracker",
-      "intent": "normal",
+      "intent": "dica",
       "language": "pt_BR",
       "subtitle": "ep01.dock.tracker.wrong_destination",
       "type": "babble",
       "file": "res://audio/voice/ep01_dock_tracker_wrong_destination.wav",
-      "duration": 3.183,
-      "peak_dbfs": -4.36,
-      "lufs": -18.93,
+      "duration": 3.506,
+      "peak_dbfs": -5.21,
+      "lufs": -19.89,
       "visemes": "res://audio/voice/ep01_dock_tracker_wrong_destination.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "look",
+        "heart"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Rastro"
@@ -329,16 +414,19 @@
       "id": "ep01.docking.pilot.aligned",
       "character": "Leme",
       "speaker": "pilot",
-      "intent": "descoberta",
+      "intent": "alegria",
       "language": "pt_BR",
       "subtitle": "ep01.docking.pilot.aligned",
       "type": "babble",
       "file": "res://audio/voice/ep01_docking_pilot_aligned.wav",
-      "duration": 1.381,
-      "peak_dbfs": -3.45,
-      "lufs": -19.0,
+      "duration": 1.344,
+      "peak_dbfs": -3.04,
+      "lufs": -17.69,
       "visemes": "res://audio/voice/ep01_docking_pilot_aligned.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "thumbs_up",
+        "star"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -356,7 +444,9 @@
       "peak_dbfs": -4.36,
       "lufs": -18.76,
       "visemes": "res://audio/voice/ep01_docking_pilot_assist.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "helm"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -374,7 +464,10 @@
       "peak_dbfs": -4.51,
       "lufs": -19.81,
       "visemes": "res://audio/voice/ep01_docking_pilot_hint_gesture.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "look",
+        "rope"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -392,7 +485,10 @@
       "peak_dbfs": -2.16,
       "lufs": -18.0,
       "visemes": "res://audio/voice/ep01_docking_pilot_hint_spoken.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "helm",
+        "look"
+      ],
       "status": "provisorio",
       "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
       "voice": "Piper pt_BR-jeff-medium (Farol 7)"
@@ -410,7 +506,10 @@
       "peak_dbfs": -3.32,
       "lufs": -19.64,
       "visemes": "res://audio/voice/ep01_docking_pilot_retry.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "sweat",
+        "helm"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -428,7 +527,10 @@
       "peak_dbfs": -4.24,
       "lufs": -18.85,
       "visemes": "res://audio/voice/ep01_docking_pilot_start.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "helm",
+        "look"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -446,7 +548,9 @@
       "peak_dbfs": -2.82,
       "lufs": -19.26,
       "visemes": "res://audio/voice/ep01_island_climber_foothold.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "star"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Pico"
@@ -464,7 +568,10 @@
       "peak_dbfs": -4.48,
       "lufs": -19.79,
       "visemes": "res://audio/voice/ep01_island_climber_hint_gesture.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "look",
+        "star"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Pico"
@@ -482,7 +589,10 @@
       "peak_dbfs": -2.3,
       "lufs": -18.09,
       "visemes": "res://audio/voice/ep01_island_climber_hint_spoken.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "rope",
+        "star"
+      ],
       "status": "provisorio",
       "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
       "voice": "Piper pt_BR-jeff-medium (Farol 7)"
@@ -491,16 +601,19 @@
       "id": "ep01.island.climber.line_ready",
       "character": "Pico",
       "speaker": "climber",
-      "intent": "descoberta",
+      "intent": "alegria",
       "language": "pt_BR",
       "subtitle": "ep01.island.climber.line_ready",
       "type": "babble",
       "file": "res://audio/voice/ep01_island_climber_line_ready.wav",
-      "duration": 1.267,
-      "peak_dbfs": -2.47,
-      "lufs": -18.02,
+      "duration": 1.248,
+      "peak_dbfs": -2.66,
+      "lufs": -17.92,
       "visemes": "res://audio/voice/ep01_island_climber_line_ready.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "rope",
+        "thumbs_up"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Pico"
@@ -518,7 +631,10 @@
       "peak_dbfs": -2.43,
       "lufs": -17.53,
       "visemes": "res://audio/voice/ep01_island_climber_missed.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "sweat",
+        "exclamation"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Pico"
@@ -536,7 +652,10 @@
       "peak_dbfs": -4.65,
       "lufs": -18.75,
       "visemes": "res://audio/voice/ep01_island_climber_start.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "rope",
+        "look"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Pico"
@@ -554,7 +673,9 @@
       "peak_dbfs": -2.3,
       "lufs": -18.82,
       "visemes": "res://audio/voice/ep01_island_climber_tug_1.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "rope"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Pico"
@@ -563,19 +684,472 @@
       "id": "ep01.island.climber.tug_2",
       "character": "Pico",
       "speaker": "climber",
-      "intent": "descoberta",
+      "intent": "alegria",
       "language": "pt_BR",
       "subtitle": "ep01.island.climber.tug_2",
       "type": "babble",
       "file": "res://audio/voice/ep01_island_climber_tug_2.wav",
-      "duration": 1.446,
-      "peak_dbfs": -2.52,
-      "lufs": -18.05,
+      "duration": 1.408,
+      "peak_dbfs": -4.06,
+      "lufs": -19.27,
       "visemes": "res://audio/voice/ep01_island_climber_tug_2.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "rope",
+        "star"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Pico"
+    },
+    {
+      "id": "ep01.radio.dock.choice",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.dock.choice",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_dock_choice.wav",
+      "duration": 3.097,
+      "peak_dbfs": -2.3,
+      "lufs": -18.29,
+      "visemes": "res://audio/voice/ep01_radio_dock_choice.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.dock.conclusion",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.dock.conclusion",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_dock_conclusion.wav",
+      "duration": 4.124,
+      "peak_dbfs": -2.3,
+      "lufs": -18.36,
+      "visemes": "res://audio/voice/ep01_radio_dock_conclusion.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.dock.hint_bench",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.dock.hint_bench",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_dock_hint_bench.wav",
+      "duration": 3.443,
+      "peak_dbfs": -2.3,
+      "lufs": -18.39,
+      "visemes": "res://audio/voice/ep01_radio_dock_hint_bench.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.dock.hint_boot",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.dock.hint_boot",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_dock_hint_boot.wav",
+      "duration": 3.694,
+      "peak_dbfs": -2.3,
+      "lufs": -18.12,
+      "visemes": "res://audio/voice/ep01_radio_dock_hint_boot.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.dock.hint_examine",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.dock.hint_examine",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_dock_hint_examine.wav",
+      "duration": 4.048,
+      "peak_dbfs": -2.3,
+      "lufs": -18.5,
+      "visemes": "res://audio/voice/ep01_radio_dock_hint_examine.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.dock.try_again",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.dock.try_again",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_dock_try_again.wav",
+      "duration": 3.379,
+      "peak_dbfs": -2.3,
+      "lufs": -18.28,
+      "visemes": "res://audio/voice/ep01_radio_dock_try_again.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.docking.hint_approach",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.docking.hint_approach",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_docking_hint_approach.wav",
+      "duration": 2.729,
+      "peak_dbfs": -2.3,
+      "lufs": -18.28,
+      "visemes": "res://audio/voice/ep01_radio_docking_hint_approach.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.docking.hint_line",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.docking.hint_line",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_docking_hint_line.wav",
+      "duration": 2.836,
+      "peak_dbfs": -2.3,
+      "lufs": -18.25,
+      "visemes": "res://audio/voice/ep01_radio_docking_hint_line.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.island.hint_line",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.island.hint_line",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_island_hint_line.wav",
+      "duration": 2.914,
+      "peak_dbfs": -2.52,
+      "lufs": -18.0,
+      "visemes": "res://audio/voice/ep01_radio_island_hint_line.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.island.hint_stone",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.island.hint_stone",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_island_hint_stone.wav",
+      "duration": 2.879,
+      "peak_dbfs": -2.3,
+      "lufs": -18.13,
+      "visemes": "res://audio/voice/ep01_radio_island_hint_stone.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.objective.arrival",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.objective.arrival",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_objective_arrival.wav",
+      "duration": 3.253,
+      "peak_dbfs": -2.3,
+      "lufs": -18.05,
+      "visemes": "res://audio/voice/ep01_radio_objective_arrival.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.objective.dock_investigation",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.objective.dock_investigation",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_objective_dock_investigation.wav",
+      "duration": 3.332,
+      "peak_dbfs": -2.3,
+      "lufs": -18.21,
+      "visemes": "res://audio/voice/ep01_radio_objective_dock_investigation.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.objective.docking",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.objective.docking",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_objective_docking.wav",
+      "duration": 3.261,
+      "peak_dbfs": -2.3,
+      "lufs": -18.2,
+      "visemes": "res://audio/voice/ep01_radio_objective_docking.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.objective.island_crossing",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.objective.island_crossing",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_objective_island_crossing.wav",
+      "duration": 3.158,
+      "peak_dbfs": -2.3,
+      "lufs": -18.12,
+      "visemes": "res://audio/voice/ep01_radio_objective_island_crossing.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.objective.return_trip",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.objective.return_trip",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_objective_return_trip.wav",
+      "duration": 3.288,
+      "peak_dbfs": -2.3,
+      "lufs": -18.63,
+      "visemes": "res://audio/voice/ep01_radio_objective_return_trip.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.objective.river_search",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.objective.river_search",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_objective_river_search.wav",
+      "duration": 3.484,
+      "peak_dbfs": -2.3,
+      "lufs": -18.22,
+      "visemes": "res://audio/voice/ep01_radio_objective_river_search.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.return.hint_button",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.return.hint_button",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_return_hint_button.wav",
+      "duration": 3.254,
+      "peak_dbfs": -2.3,
+      "lufs": -18.45,
+      "visemes": "res://audio/voice/ep01_radio_return_hint_button.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.return.hint_press",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.return.hint_press",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_return_hint_press.wav",
+      "duration": 3.294,
+      "peak_dbfs": -2.3,
+      "lufs": -18.25,
+      "visemes": "res://audio/voice/ep01_radio_return_hint_press.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.river.cove",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.river.cove",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_river_cove.wav",
+      "duration": 2.893,
+      "peak_dbfs": -2.3,
+      "lufs": -18.05,
+      "visemes": "res://audio/voice/ep01_radio_river_cove.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.river.hint_buoy",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.river.hint_buoy",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_river_hint_buoy.wav",
+      "duration": 3.082,
+      "peak_dbfs": -2.3,
+      "lufs": -18.21,
+      "visemes": "res://audio/voice/ep01_radio_river_hint_buoy.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.river.hint_cove",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.river.hint_cove",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_river_hint_cove.wav",
+      "duration": 3.077,
+      "peak_dbfs": -2.43,
+      "lufs": -18.0,
+      "visemes": "res://audio/voice/ep01_radio_river_hint_cove.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.river.hint_leaves",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.river.hint_leaves",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_river_hint_leaves.wav",
+      "duration": 3.114,
+      "peak_dbfs": -2.59,
+      "lufs": -18.0,
+      "visemes": "res://audio/voice/ep01_radio_river_hint_leaves.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.river.leaves",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.river.leaves",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_river_leaves.wav",
+      "duration": 4.415,
+      "peak_dbfs": -2.3,
+      "lufs": -18.18,
+      "visemes": "res://audio/voice/ep01_radio_river_leaves.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.river.slow",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.river.slow",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_river_slow.wav",
+      "duration": 4.509,
+      "peak_dbfs": -2.3,
+      "lufs": -18.39,
+      "visemes": "res://audio/voice/ep01_radio_river_slow.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
+    },
+    {
+      "id": "ep01.radio.river.start",
+      "character": "radio",
+      "speaker": "radio",
+      "intent": "radio",
+      "language": "pt_BR",
+      "subtitle": "ep01.radio.river.start",
+      "type": "radio",
+      "file": "res://audio/voice/ep01_radio_river_start.wav",
+      "duration": 3.287,
+      "peak_dbfs": -2.12,
+      "lufs": -18.0,
+      "visemes": "res://audio/voice/ep01_radio_river_start.visemes.json",
+      "emotes": [],
+      "status": "provisorio",
+      "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
+      "voice": "Piper pt_BR-jeff-medium (Farol 7)"
     },
     {
       "id": "ep01.radio.team.found_boat",
@@ -608,7 +1182,10 @@
       "peak_dbfs": -2.21,
       "lufs": -18.0,
       "visemes": "res://audio/voice/ep01_return_captain_thanks.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "heart",
+        "thumbs_up"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:captain"
@@ -617,16 +1194,19 @@
       "id": "ep01.return.pilot.depart",
       "character": "Leme",
       "speaker": "pilot",
-      "intent": "alegria",
+      "intent": "pergunta",
       "language": "pt_BR",
       "subtitle": "ep01.return.pilot.depart",
       "type": "babble",
       "file": "res://audio/voice/ep01_return_pilot_depart.wav",
-      "duration": 1.59,
-      "peak_dbfs": -4.92,
-      "lufs": -17.81,
+      "duration": 1.704,
+      "peak_dbfs": -3.99,
+      "lufs": -18.74,
       "visemes": "res://audio/voice/ep01_return_pilot_depart.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "question",
+        "boat"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -644,7 +1224,10 @@
       "peak_dbfs": -5.18,
       "lufs": -19.8,
       "visemes": "res://audio/voice/ep01_return_pilot_hint_gesture.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "look",
+        "star"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -662,7 +1245,10 @@
       "peak_dbfs": -2.3,
       "lufs": -18.34,
       "visemes": "res://audio/voice/ep01_return_pilot_hint_spoken.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "star",
+        "thumbs_up"
+      ],
       "status": "provisorio",
       "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
       "voice": "Piper pt_BR-jeff-medium (Farol 7)"
@@ -680,7 +1266,10 @@
       "peak_dbfs": -2.3,
       "lufs": -20.18,
       "visemes": "res://audio/voice/ep01_return_pup_horn.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "horn",
+        "music"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:pup"
@@ -698,7 +1287,10 @@
       "peak_dbfs": -2.3,
       "lufs": -18.2,
       "visemes": "res://audio/voice/ep01_return_radio_joke.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "music",
+        "heart"
+      ],
       "status": "provisorio",
       "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
       "voice": "Piper pt_BR-jeff-medium (Farol 7)"
@@ -716,7 +1308,10 @@
       "peak_dbfs": -2.3,
       "lufs": -18.14,
       "visemes": "res://audio/voice/ep01_river_captain_wave.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "wave",
+        "heart"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:captain"
@@ -725,16 +1320,19 @@
       "id": "ep01.river.pilot.bank_guide",
       "character": "Leme",
       "speaker": "pilot",
-      "intent": "urgencia",
+      "intent": "normal",
       "language": "pt_BR",
       "subtitle": "ep01.river.pilot.bank_guide",
       "type": "babble",
       "file": "res://audio/voice/ep01_river_pilot_bank_guide.wav",
-      "duration": 1.703,
-      "peak_dbfs": -2.42,
-      "lufs": -17.5,
+      "duration": 1.935,
+      "peak_dbfs": -2.6,
+      "lufs": -18.78,
       "visemes": "res://audio/voice/ep01_river_pilot_bank_guide.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "sweat",
+        "wave"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -743,16 +1341,19 @@
       "id": "ep01.river.pilot.buoy",
       "character": "Leme",
       "speaker": "pilot",
-      "intent": "descoberta",
+      "intent": "alegria",
       "language": "pt_BR",
       "subtitle": "ep01.river.pilot.buoy",
       "type": "babble",
       "file": "res://audio/voice/ep01_river_pilot_buoy.wav",
-      "duration": 1.639,
-      "peak_dbfs": -3.93,
-      "lufs": -17.8,
+      "duration": 1.575,
+      "peak_dbfs": -4.74,
+      "lufs": -17.79,
       "visemes": "res://audio/voice/ep01_river_pilot_buoy.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "buoy",
+        "star"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -770,7 +1371,10 @@
       "peak_dbfs": -6.45,
       "lufs": -19.7,
       "visemes": "res://audio/voice/ep01_river_pilot_hint_gesture_buoy.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "buoy",
+        "look"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -788,7 +1392,10 @@
       "peak_dbfs": -5.76,
       "lufs": -19.43,
       "visemes": "res://audio/voice/ep01_river_pilot_hint_gesture_leaves.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "leaf",
+        "look"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -806,7 +1413,10 @@
       "peak_dbfs": -2.53,
       "lufs": -18.0,
       "visemes": "res://audio/voice/ep01_river_pilot_hint_spoken.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "buoy",
+        "helm"
+      ],
       "status": "provisorio",
       "tool": "piper-tts 1.8.0 (local) + source_audio/radio/radio.py",
       "voice": "Piper pt_BR-jeff-medium (Farol 7)"
@@ -815,16 +1425,19 @@
       "id": "ep01.river.pilot.leaves",
       "character": "Leme",
       "speaker": "pilot",
-      "intent": "normal",
+      "intent": "descoberta",
       "language": "pt_BR",
       "subtitle": "ep01.river.pilot.leaves",
       "type": "babble",
       "file": "res://audio/voice/ep01_river_pilot_leaves.wav",
-      "duration": 1.942,
-      "peak_dbfs": -3.29,
-      "lufs": -18.81,
+      "duration": 1.892,
+      "peak_dbfs": -3.24,
+      "lufs": -17.84,
       "visemes": "res://audio/voice/ep01_river_pilot_leaves.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "leaf",
+        "look"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -842,7 +1455,10 @@
       "peak_dbfs": -3.04,
       "lufs": -17.24,
       "visemes": "res://audio/voice/ep01_river_pilot_slow_down.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "sweat",
+        "boat"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -860,7 +1476,10 @@
       "peak_dbfs": -2.9,
       "lufs": -17.78,
       "visemes": "res://audio/voice/ep01_river_pilot_spot_captain.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "look",
+        "island"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
@@ -878,7 +1497,10 @@
       "peak_dbfs": -2.64,
       "lufs": -17.37,
       "visemes": "res://audio/voice/ep01_river_pilot_start.visemes.json",
-      "emotes": [],
+      "emotes": [
+        "helm",
+        "exclamation"
+      ],
       "status": "provisorio",
       "tool": "source_audio/babble/babble.py (sintese formante original)",
       "voice": "balbucio:Leme"
