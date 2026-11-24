@@ -1,0 +1,57 @@
+{
+  "ep01.arrival.radio.crate": {
+    "text": "A caixa de pêssegos desliza pelo convés.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.arrival.radio.hint_gesture": {
+    "text": "Olha a caixa de pêssegos no convés.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.arrival.radio.hint_spoken": {
+    "text": "Aperta o botão de pular, ou espera o barco parar.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.arrival.radio.horn": {
+    "text": "Buzina no porto! Um barco amarelo está chegando.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.dock.tracker.hint_spoken": {
+    "text": "Examina a marca do banco e a bota da margem. Depois escolhe a margem.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.docking.pilot.hint_spoken": {
+    "text": "Aponta o barco para a linha e vai devagar até a plataforma.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.island.climber.hint_spoken": {
+    "text": "Pisa na próxima pedra marcada. Quando chegar à última, prende a linha.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.radio.team.found_boat": {
+    "text": "Farol 7, aqui é Rota Brava. Achamos o barco.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.return.pilot.hint_spoken": {
+    "text": "Aperta o botão de partida do barco.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.return.radio.joke": {
+    "text": "Era o filhote que tocava a buzina! Aqui no Farol 7 todo mundo riu.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  },
+  "ep01.river.pilot.hint_spoken": {
+    "text": "Contorna a boia vermelha e segue para a enseada.",
+    "voice": "pt_BR-jeff-medium.onnx",
+    "length_scale": 1.08
+  }
+}
