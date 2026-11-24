@@ -25,6 +25,14 @@ Levar o jogo ao padrão audiovisual de uma série de aventura pré-escolar em 3D
 - **D5 · Modelos dos agentes:** `art3d`, `gameplay`, `ux`, `audio`, `reviewer` → `anthropic/claude-opus-5-5#low`; `adventure`, `build-qa` → `opencode/deepseek-v4.1-flash-free#max`. O revisor fica no Opus porque precisa ler imagens.
 - **D6 · Portões:** Portão 1 (direção) e Portão 2 (primeiro minuto + mapa). Entre portões, execução sem parar.
 
+## Reabertura da direção (Thiago, 2026-11-24)
+Thiago viu as capturas do jogo (render por software na nuvem) e reprovou a direção atual: os heróis não remetem a uma série de heróis infantil (referência de espírito: Patrulha Canina / PJ Masks), o mundo tem planos vazios, rochas que parecem blocos e luz chapada, e o som (balbucio) ficou estranho. Decisões:
+- **D7 · Heróis v2:** continuam crianças humanas (SPEC §2), agora com **traje de herói**: uniforme de equipe marcante, capacete/máscara/viseira, cor dominante forte, emblema grande, equipamento-assinatura que mostra a habilidade, proporção mais de desenho e sombreamento de desenho (dois tons + contorno). Nada copiado das séries de referência.
+- **D8 · Ordem:** (1) heróis v2 em vitrine de estudos → Thiago aprova antes de entrar no jogo; (2) proposta de mundo refinada, também em vitrine; (3) som profissional. O Portão 1 volta a ficar aberto para heróis e mundo.
+- **D9 · Esforço:** `art3d` e `ux` em esforço alto (trabalho visual); demais subagentes seguem baixos.
+- **D10 · Som (a decidir na fase 3):** Thiago propõe usar a API do Google AI Studio (vozes Gemini e trilha gerada) para substituir o balbucio e melhorar a música. Antes: conferir termos de uso comercial do áudio gerado e vozes adequadas em pt-BR. Se adotado, substitui D2 (balbucio + Piper) e flexibiliza D3 (só CC0). A chave entra só como segredo do ambiente, nunca no repositório.
+- Seguem em paralelo as tarefas que não dependem do visual (contador de emblemas, opções no jogo, duração em modo humano).
+
 ## Barra de qualidade (mensurável e perceptual)
 **Personagens (crianças-heróis)**
 - Altura ~1,05 a 1,15 m no mundo; **cabeça 33 a 38% da altura** (~3 cabeças); olhos grandes (altura do olho ≥ 20% da altura da cabeça) com íris, pupila e dois brilhos; mãos de 4 dedos legíveis; pés grandes e arredondados.

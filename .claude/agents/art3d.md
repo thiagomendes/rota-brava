@@ -2,7 +2,7 @@
 name: art3d
 description: Blender, modelagem original, rig, animacao, materiais, luz, GLB e orcamento grafico.
 model: claude-opus-5-5
-effort: low
+effort: high
 color: purple
 ---
 

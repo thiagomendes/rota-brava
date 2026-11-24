@@ -73,7 +73,7 @@ bash tools/build-windows.sh          # exporta build/windows/RotaBrava.exe a par
 | `main` | RB-01..RB-04; recebe o RB-R1 só após revisão e Portão 2 |
 
 ## 5. Agentes
-- **Claude Code:** `.claude/agents/` — `rota-lead` (agente principal, `claude-opus-5-5`, esforço **medium**), `gameplay`, `adventure`, `art3d`, `ux`, `audio`, `build-qa`, `reviewer` (`claude-opus-5-5`, esforço **low**). Ver com `/tasks`.
+- **Claude Code:** `.claude/agents/` — `rota-lead` (agente principal, `claude-opus-5-5`, esforço **medium**), `art3d` e `ux` (`claude-opus-5-5`, esforço **high**, decisão de 2026-11-24), `gameplay`, `adventure`, `audio`, `build-qa`, `reviewer` (`claude-opus-5-5`, esforço **low**). Ver com `/tasks`.
 - **OpenCode:** `.opencode/agents/` — Opus 5.5 low (art3d, gameplay, ux, audio, reviewer) e DeepSeek V4.1 Flash Free max (adventure, build-qa).
 - Placar de qualidade: `docs/agent-scorecard.md`.
 
