@@ -2,6 +2,9 @@ class_name MemberActor
 extends CharacterBody3D
 ## Integrante da equipe a pe (bloco PROVISORIO). Anda relativo a camera; so responde a entrada quando `controlled`.
 
+## Emitido a cada contato de pe com o chao (so a pe, nao embarcado), para o som dos passos acompanhar o movimento.
+signal footstep(speed: float, position: Vector3)
+
 const SPEED := 2.6
 const GRAVITY := 20.0
 const TURN_SPEED := 12.0
@@ -29,6 +32,7 @@ var speed_scale: float = 1.0
 var model: CharacterVisual
 var riding_on: Node3D = null
 var _action_until: float = 0.0
+var _step_clock: float = 0.0
 var ride_offset: Vector3 = Vector3.ZERO
 var _visual: Node3D
 var _face_target: Variant = null
@@ -63,6 +67,7 @@ func _mount_model(member_id: StringName) -> void:
 		inst.queue_free()
 		return
 	inst.remove_child(m)
+	m.owner = null
 	inst.queue_free()
 	_visual.add_child(m)
 	model = m as CharacterVisual
@@ -102,8 +107,15 @@ func _update_animation() -> void:
 				want = &"idle_wheel"
 		model.play(want)
 	elif planar > 0.2 and model.has_animation(&"walk"):
-		model.play(&"walk", minf(model.walk_speed_scale(planar), WALK_ANIM_MAX_SCALE))
+		var anim_scale := minf(model.walk_speed_scale(planar), WALK_ANIM_MAX_SCALE)
+		model.play(&"walk", anim_scale)
+		# Um passo a cada meio ciclo do clipe, no ritmo real da animacao.
+		_step_clock += get_physics_process_delta_time() * anim_scale
+		if _step_clock >= 0.5 and is_on_floor():
+			_step_clock = 0.0
+			footstep.emit(planar, global_position)
 	else:
+		_step_clock = 0.0
 		model.play(&"idle")
 
 

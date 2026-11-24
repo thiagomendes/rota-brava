@@ -6,6 +6,12 @@ extends Node3D
 signal soft_hit
 
 const COLOR_HULL := Color("f5c518")
+## Posicoes da tripulacao no convés do barco v2 (referencial do barco; convés em y = 0,40).
+const CREW := {
+	&"pilot": Vector3(0.0, 0.40, 0.10),
+	&"tracker": Vector3(-0.55, 0.40, -0.85),
+	&"climber": Vector3(0.50, 0.40, -1.30),
+}
 const MAX_SPEED := 7.0
 const ACCEL := 4.0
 const BRAKE := 6.0

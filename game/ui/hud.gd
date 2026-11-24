@@ -13,12 +13,18 @@ signal menu_requested
 signal resume_requested
 signal skip_requested
 signal pause_requested
+signal help_requested
 
 const MEMBER_COLORS := MemberActor.COLORS
 const SKILL_ICONS := {&"tracker": &"notebook", &"climber": &"line", &"pilot": &"helm"}
 const HANDOFF_MIN_SECONDS := 0.45
 const FONT := 34
 ## Alvo de toque minimo em unidades virtuais (>= 48 dp em aparelho com lado curto >= ~410 dp; ver README).
+## Ganchos do jogo: devolve a duracao (s) da fala ao iniciar a legenda (0.0 se nao ha audio) e interrompe a fala.
+var voice_hook: Callable = Callable()
+var voice_stop_hook: Callable = Callable()
+var _help_button: Button
+
 const MIN_TOUCH := 128.0
 ## Margem da area segura: fracao do lado, com minimo em unidades virtuais.
 const SAFE_FRACTION := 0.05
@@ -192,10 +198,16 @@ func _build_top_left(safe: Control) -> void:
 	_objective_label.custom_minimum_size = Vector2(620, 0)
 	_objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_objective_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_skip_label = _label(col, 30, &"AccentLabel")
+	_help_button = _button(col, Loc.t("ui.help.repeat_button", {"control": "H"}), 360)
+	_help_button.name = "HelpButton"
+	_help_button.focus_mode = Control.FOCUS_NONE
+	_help_button.pressed.connect(func() -> void: help_requested.emit())
+	var skip_panel := _panel(col)
+	skip_panel.name = "SkipPanel"
+	_skip_label = _label(skip_panel, 30, &"AccentLabel")
 	_skip_label.name = "SkipHint"
 	_skip_label.text = Loc.t("ui.skip")
-	_skip_label.visible = false
+	skip_panel.visible = false
 
 
 func _build_member(safe: Control) -> void:
@@ -399,7 +411,7 @@ func prompt_text() -> String:
 
 
 func set_skip_hint(on: bool) -> void:
-	_skip_label.visible = on
+	_skip_label.get_parent().visible = on
 
 
 # ---------- legendas ----------
@@ -441,6 +453,8 @@ func is_speaking() -> bool:
 
 func skip_line() -> void:
 	_skip_current = true
+	if voice_stop_hook.is_valid():
+		voice_stop_hook.call()
 
 
 func clear_speech(only_hints: bool = false) -> void:
@@ -466,6 +480,10 @@ func _pump() -> void:
 		_skip_current = false
 		line_started.emit(String(entry["key"]))
 		var seconds := maxf(2.4, 1.3 + 0.055 * text.length())
+		if voice_hook.is_valid():
+			var voice_len := float(voice_hook.call(String(entry["key"])))
+			if voice_len > 0.0:
+				seconds = voice_len + 0.35
 		var t := 0.0
 		while t < seconds and not _skip_current:
 			await get_tree().process_frame

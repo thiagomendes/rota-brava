@@ -17,8 +17,8 @@ const BOUND_EAST := 100.0
 const BOUND_NORTH := -9.0
 const BOUND_SOUTH := 16.0
 
-const RIDE_PILOT := Vector3(-0.45, 0.6, 0.9)
-const RIDE_TRACKER := Vector3(0.5, 0.6, -0.4)
+const RIDE_PILOT := BoatActor.CREW[&"pilot"]
+const RIDE_TRACKER := BoatActor.CREW[&"tracker"]
 const CAPTAIN_ON_BOAT := Vector3(-0.5, 0.6, -1.0)
 const PUP_ON_BOAT := Vector3(0.4, 0.6, -1.7)
 

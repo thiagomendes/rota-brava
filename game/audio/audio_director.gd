@@ -253,6 +253,11 @@ func _cancel_voice() -> void:
 		old.stop()
 
 
+## Interrompe a fala atual (ex.: a crianca avancou a legenda).
+func stop_voice() -> void:
+	_cancel_voice()
+
+
 func is_voice_playing() -> bool:
 	return current_voice_id != ""
 

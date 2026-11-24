@@ -156,7 +156,7 @@ func enter() -> void:
 		climber.teleport(tracker.global_position + Vector3(-2.5, 0, 0.5))
 		climber.face_now(tracker.global_position)
 	var pilot: MemberActor = ctx.actors[&"pilot"]
-	pilot.ride(ctx.boat, Vector3(-0.45, 0.6, 0.9))
+	pilot.ride(ctx.boat, BoatActor.CREW[&"pilot"])
 	if ctx.director.state == &"dock_investigation":
 		ctx.boat.place(Ep01Layout.BOAT_DOCKED_POS, Ep01Layout.BOAT_DOCKED_HEADING)
 	refresh_world()
@@ -180,7 +180,7 @@ func control_started(_member: StringName) -> void:
 
 
 func camera_view() -> Dictionary:
-	return {"offset": Vector3(0.0, 7.5, 8.5), "yaw": 0.0}
+	return {"offset": Vector3(0.0, 4.6, 6.2), "yaw": 0.0}
 
 
 func gesture_hint(key: String) -> void:
@@ -225,8 +225,45 @@ func examine_clue(clue_id: StringName) -> Dictionary:
 		else:
 			keys.append(String(clue.get("partial_key", "")))
 		refresh_world()
+		_act_examine(clue_id, follow_choice)
 	_speak_clue(keys, follow_choice)
 	return res
+
+
+## Camera dirigida: aproxima-se da pista durante a inspecao e volta depois (a mao nao encobre o alvo: enquadra de cima).
+func _frame_inspection(duration: float) -> void:
+	var cam := ctx.camera_rig
+	if cam.reduced_motion:
+		return
+	var base := cam.offset
+	var tw := create_tween()
+	tw.tween_property(cam, "offset", Vector3(base.x, base.y * 0.72, base.z * 0.62), 0.7).set_trans(Tween.TRANS_SINE)
+	tw.tween_interval(maxf(duration - 1.4, 0.2))
+	tw.tween_property(cam, "offset", base, 0.7).set_trans(Tween.TRANS_SINE)
+
+
+## Rastro olha para a pista, toca nela (agacha e estende a mao) e reage; a segunda pista traz o susto da descoberta.
+func _act_examine(clue_id: StringName, discovery: bool) -> void:
+	var tracker := ctx.actors[&"tracker"] as MemberActor
+	var node: Node3D = _marks.get(clue_id)
+	if node != null:
+		tracker.face_point(node.global_position)
+	tracker.set_expression(&"atenta")
+	var duration := tracker.play_action(&"inspect_touch")
+	if duration <= 0.0:
+		return
+	_frame_inspection(duration)
+	get_tree().create_timer(duration).timeout.connect(func() -> void:
+		if not is_inside_tree():
+			return
+		if discovery:
+			tracker.set_expression(&"surpresa")
+			tracker.play_action(&"react_surprise")
+			get_tree().create_timer(1.2).timeout.connect(func() -> void:
+				if is_inside_tree():
+					tracker.set_expression(&"neutra"))
+		else:
+			tracker.set_expression(&"neutra"))
 
 
 func _speak_clue(keys: Array[String], then_choice: bool) -> void:

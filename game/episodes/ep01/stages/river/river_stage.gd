@@ -11,9 +11,9 @@ const COVE_LOOK_SECONDS := 2.0
 const LOOK_BACK_SECONDS := 1.8
 const KEY_HINT_BUOY := "ep01.river.pilot.hint_gesture_buoy"
 
-const RIDE_PILOT := Vector3(-0.5, 0.6, 0.3)
-const RIDE_TRACKER := Vector3(0.5, 0.6, -1.0)
-const RIDE_CLIMBER := Vector3(-0.5, 0.6, -1.7)
+const RIDE_PILOT := BoatActor.CREW[&"pilot"]
+const RIDE_TRACKER := BoatActor.CREW[&"tracker"]
+const RIDE_CLIMBER := BoatActor.CREW[&"climber"]
 
 var tracker := RiverBuoyTracker.new(Ep01Layout.BUOY_POS, BUOY_TRACK_RADIUS)
 var buoy_node: Node3D

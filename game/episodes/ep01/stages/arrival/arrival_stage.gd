@@ -38,7 +38,7 @@ func enter() -> void:
 	_active = true
 	ctx.boat.place(Ep01Layout.BOAT_ARRIVAL_START, Ep01Layout.BOAT_DOCKED_HEADING)
 	var pilot: MemberActor = ctx.actors[&"pilot"]
-	pilot.ride(ctx.boat, Vector3(-0.45, 0.6, 0.9))
+	pilot.ride(ctx.boat, BoatActor.CREW[&"pilot"])
 	pilot.face_point(Ep01Layout.BOAT_DOCKED_POS + Vector3(-20, 0, 0))
 	var tracker: MemberActor = ctx.actors[&"tracker"]
 	tracker.teleport(Ep01Layout.RASTRO_START)
@@ -65,14 +65,22 @@ func exit() -> void:
 func _play() -> void:
 	var lines := Ep01Content.lines(&"arrival", "enter")
 	ctx.hud.say(lines[0])
+	# A buzina soa fora do quadro ANTES de o barco aparecer (SPEC secao 6: o som revela a chegada).
+	ctx.audio.play_sfx("sfx_horn_boat", Vector3(80, 0.5, -5))
+	(ctx.actors[&"pilot"] as MemberActor).play_action(&"react_horn")
+	await get_tree().create_timer(1.4).timeout
+	if _done:
+		return
 	_tween = create_tween()
 	_tween.tween_property(ctx.boat, "global_position", Ep01Layout.BOAT_DOCKED_POS, 6.0) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	await _tween.finished
 	if _done:
 		return
+	ctx.audio.play_sfx("sfx_hull_bump", ctx.boat.global_position)
 	_tween = create_tween()
 	_tween.tween_property(_crate, "position", _crate_end(), 1.0).set_trans(Tween.TRANS_SINE)
+	ctx.audio.play_sfx("sfx_crate_slide", ctx.boat.global_position)
 	ctx.hud.say(lines[1])
 	await _tween.finished
 	if _done:

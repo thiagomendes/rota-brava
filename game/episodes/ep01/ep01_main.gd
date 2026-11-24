@@ -23,6 +23,8 @@ const STAGE_DIR := {
 
 var director := EpisodeDirector.new()
 var hud: Hud
+var audio: AudioDirector
+var help_level: int = 0
 var camera_rig: CameraRig
 var boat: BoatActor
 var actors: Dictionary = {}
@@ -54,6 +56,7 @@ func _ready() -> void:
 		# Nascem longe do mapa: cada estagio reposiciona quem usa (evita atores empilhados na origem).
 		a.position = Vector3(500, 5, 500)
 		world.add_child(a)
+		a.footstep.connect(_on_footstep)
 		actors[m] = a
 	boat = BoatActor.new()
 	world.add_child(boat)
@@ -65,6 +68,8 @@ func _ready() -> void:
 	hud = Hud.new()
 	hud.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(hud)
+	_setup_audio()
+	hud.help_requested.connect(_on_help)
 	director.state_changed.connect(_on_state_changed)
 	director.event_accepted.connect(_on_event_accepted)
 	director.event_rejected.connect(func(e: StringName, r: StringName) -> void: print("[RB] rejected %s %s" % [e, r]))
@@ -138,6 +143,8 @@ func _on_event_accepted(event: StringName, payload: Dictionary) -> void:
 	idle_seconds = 0.0
 	hint_index = 0
 	print("[RB] event %s %s" % [event, payload])
+	help_level = 0
+	_event_sound(event)
 
 
 func _on_state_changed(old: StringName, new: StringName) -> void:
@@ -284,6 +291,8 @@ func fast_forward(target: StringName) -> void:
 # ---------- interacao contextual ----------
 
 func _process(delta: float) -> void:
+	if audio != null:
+		audio.set_engine_rpm(clampf(boat.speed / BoatActor.MAX_SPEED, 0.0, 1.0) if boat.controlled else -1.0)
 	for m: StringName in actors:
 		(actors[m] as MemberActor).move_yaw = camera_rig.yaw
 	if current_stage:
@@ -361,9 +370,84 @@ func _update_idle(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_echo():
 		return
-	if event.is_action_pressed(&"interact"):
+	if event.is_action_pressed(&"help"):
+		get_viewport().set_input_as_handled()
+		_on_help()
+	elif event.is_action_pressed(&"interact"):
 		if try_interact():
 			get_viewport().set_input_as_handled()
+
+
+# ---------- audio e ajuda ----------
+
+func _setup_audio() -> void:
+	audio = AudioDirector.new()
+	audio.name = "AudioDirector"
+	add_child(audio)
+	audio.start_ambience()
+	hud.voice_hook = func(key: String) -> float:
+		var length := audio.play_voice(key)
+		if length > 0.0:
+			audio.duck_music(true)
+		return length
+	hud.voice_stop_hook = func() -> void:
+		audio.stop_voice()
+		audio.duck_music(false)
+	hud.line_finished.connect(func() -> void:
+		if not hud.is_speaking():
+			audio.duck_music(false))
+	hud.handoff_confirmed.connect(func() -> void: audio.play_sfx("sfx_ui_confirm"))
+
+
+func _on_footstep(speed: float, pos: Vector3) -> void:
+	if audio != null:
+		audio.play_footstep(speed, &"wood", pos)
+
+
+func _event_sound(event: StringName) -> void:
+	if audio == null:
+		return
+	match event:
+		&"intro_finished":
+			audio.play_music("theme_explore", 2.0)
+		&"clue_examined":
+			audio.play_sfx("sfx_notebook")
+			audio.play_sfx("sfx_clue_found")
+			if director.clues_found.size() >= 2:
+				audio.play_music("theme_discovery", 0.2)
+				get_tree().create_timer(6.0).timeout.connect(func() -> void: audio.play_music("theme_explore_low", 1.5))
+		&"destination_chosen":
+			audio.play_sfx("sfx_ui_confirm")
+		&"line_fixed":
+			audio.play_sfx("sfx_rope_tug")
+			get_tree().create_timer(1.4).timeout.connect(func() -> void: audio.play_sfx("sfx_rope_tug"))
+		&"boat_docked":
+			audio.play_sfx("sfx_hull_bump", boat.global_position)
+		&"departure_confirmed":
+			audio.play_sfx("sfx_horn_boat", boat.global_position)
+
+
+## Repetir instrucao (H, botao Y ou toque no botao): 1a vez repete o objetivo e mostra o gesto; depois avanca as dicas.
+func _on_help() -> void:
+	if controlled_node == null or _blocked():
+		return
+	idle_seconds = 0.0
+	var state := director.state
+	var hints := Ep01Content.hints(state)
+	if help_level == 0 or hints.is_empty():
+		hud.clear_speech(true)
+		hud.say(Ep01Content.objective_key(state), {}, true)
+		for h: Dictionary in hints:
+			if String(h.get("kind", "")) == "gesture" and current_stage:
+				current_stage.gesture_hint(String(h["key"]))
+				break
+	else:
+		var h: Dictionary = hints[mini(help_level - 1, hints.size() - 1)]
+		hud.say(String(h["key"]), {}, true)
+		if String(h.get("kind", "")) == "gesture" and current_stage:
+			current_stage.gesture_hint(String(h["key"]))
+	help_level += 1
+	print("[RB] help level=%d" % help_level)
 
 
 func _pause() -> void:
