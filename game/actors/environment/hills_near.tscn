@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/hills_near.glb" id="1_0b81d"]
+
+[node name="Hills_Near" type="Node3D" unique_id=1832748587]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=874192909 instance=ExtResource("1_0b81d")]

@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/bush_round.glb" id="1_xweyo"]
 
-[node name="Bush_Round" type="Node3D" unique_id=508008126]
+[node name="Bush_Round" type="Node3D" unique_id=1828002097]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=106143522 instance=ExtResource("1_xweyo")]
+[node name="Model" parent="." unique_id=2020948287 instance=ExtResource("1_xweyo")]

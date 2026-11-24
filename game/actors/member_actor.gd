@@ -16,6 +16,8 @@ const MODEL_SCENES := {
 }
 ## Velocidade de caminhada; o clipe `walk` anda ~0,69 m/s, entao a animacao e acelerada (limitada) para o pe nao patinar.
 const WALK_ANIM_MAX_SCALE := 3.2
+## Acima desta velocidade (m/s) o integrante corre, se o modelo tiver o clipe `run` (RB-R1: criancas correm).
+const RUN_THRESHOLD := 1.1
 
 const COLORS := {
 	&"tracker": Color("f28c28"),
@@ -32,6 +34,8 @@ var model: CharacterVisual
 var riding_on: Node3D = null
 var _action_until: float = 0.0
 var _step_clock: float = 0.0
+var _was_moving: bool = false
+var _brief_ride: bool = false
 var ride_offset: Vector3 = Vector3.ZERO
 var _visual: Node3D
 var _face_target: Variant = null
@@ -71,6 +75,7 @@ func _mount_model(member_id: StringName) -> void:
 	_visual.add_child(m)
 	model = m as CharacterVisual
 	Stylize.apply(m)
+	Stylize.add_outline(m, 0.008)
 	if model != null:
 		model.play(&"idle")
 
@@ -106,15 +111,25 @@ func _update_animation() -> void:
 				want = &"idle_wheel"
 		model.play(want)
 	elif planar > 0.2 and model.has_animation(&"walk"):
+		var anim := &"walk"
 		var anim_scale := minf(model.walk_speed_scale(planar), WALK_ANIM_MAX_SCALE)
-		model.play(&"walk", anim_scale)
+		if planar > RUN_THRESHOLD and model.has_animation(&"run") and model.run_speed_scale(planar) > 0.0:
+			anim = &"run"
+			anim_scale = model.run_speed_scale(planar)
+		model.play(anim, anim_scale)
+		_was_moving = true
 		# Um passo a cada meio ciclo do clipe, no ritmo real da animacao.
 		_step_clock += get_physics_process_delta_time() * anim_scale
-		if _step_clock >= 0.5 and is_on_floor():
+		if _step_clock >= model.animation_length(anim) * 0.5 and is_on_floor():
 			_step_clock = 0.0
 			footstep.emit(planar, global_position)
 	else:
 		_step_clock = 0.0
+		if _was_moving and model.has_animation(&"stop"):
+			_was_moving = false
+			play_action(&"stop")
+			return
+		_was_moving = false
 		model.play(&"idle")
 
 
@@ -164,6 +179,10 @@ func _physics_process(delta: float) -> void:
 
 
 func teleport(pos: Vector3) -> void:
+	if _brief_ride:
+		riding_on = null
+		collision_layer = 2
+		_brief_ride = false
 	global_position = pos
 	velocity = Vector3.ZERO
 
@@ -175,7 +194,15 @@ func ride(node: Node3D, local_offset: Vector3 = Vector3.ZERO) -> void:
 	collision_layer = 0
 
 
+## Embarque breve (RB-R1: subir ao conves para tocar a pista do banco); um teleport ou dismount encerra.
+func ride_briefly(node: Node3D, local_offset: Vector3) -> void:
+	ride(node, local_offset)
+	_brief_ride = true
+	global_position = node.to_global(local_offset)
+
+
 func dismount(pos: Vector3) -> void:
+	_brief_ride = false
 	riding_on = null
 	collision_layer = 2
 	teleport(pos)

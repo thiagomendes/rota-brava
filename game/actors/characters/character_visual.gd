@@ -7,19 +7,29 @@ extends Node3D
 ## Uso pelo integrador: `visual.play(&"walk", visual.walk_speed_scale(velocity.length()))` quando velocity > 0.1,
 ## `visual.play(&"idle")` parado, `visual.set_expression(&"atenta")`.
 
-const LOOPING: Array[StringName] = [&"idle", &"walk", &"idle_wheel"]
-const EXPRESSIONS: Array[StringName] = [&"atenta", &"surpresa", &"alegre", &"blink"]
+const LOOPING: Array[StringName] = [&"idle", &"walk", &"run", &"idle_wheel"]
+const EXPRESSIONS: Array[StringName] = [&"atenta", &"surpresa", &"alegre", &"triste", &"brava_leve", &"blink"]
+## Visemas de boca (RB-R1): somados por cima da expressao para a boca acompanhar o balbucio.
+const VISEMES: Array[StringName] = [&"mouth_A", &"mouth_E", &"mouth_O", &"mouth_M"]
+## Olhar por shape keys (RB-R1): esquerda/direita do personagem e para cima.
+const GAZE_KEYS: Array[StringName] = [&"look_left", &"look_right", &"look_up"]
 ## Velocidade (m/s) em que o clipe `walk` (ciclo de 1,0 s) nao desliza o pe no chao.
 const WALK_SPEED_MPS := 0.586
 const SOLE_BONES: Array[StringName] = [&"heel.L", &"heel.R", &"toe.L", &"toe.R", &"toe_tip.L", &"toe_tip.R"]
 
 @export var blend_time: float = 0.18
+## Velocidade (m/s) em que o `walk` deste modelo nao desliza (cada GLB tem a sua; o padrao e o do RB-04).
+@export var walk_speed_mps: float = WALK_SPEED_MPS
+## Velocidade (m/s) em que o `run` nao desliza (0 = modelo sem corrida).
+@export var run_speed_mps: float = 0.0
 
 var _player: AnimationPlayer
 var _skeleton: Skeleton3D
 var _face: MeshInstance3D
 var _expression: StringName = &"neutra"
 var _expression_weight: float = 1.0
+var _visemes: Dictionary = {}
+var _gaze: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
@@ -50,6 +60,7 @@ func _process(delta: float) -> void:
 		return
 	_player.advance(delta)
 	_apply_expression()
+	_apply_face_extras()
 
 
 ## Toca um clipe com crossfade curto. `speed` escala a velocidade; `blend` < 0 usa `blend_time`. Retorna false se nao existe.
@@ -102,7 +113,58 @@ func current_animation() -> StringName:
 
 ## Fator de velocidade do `walk` para um deslocamento de `mps` metros por segundo (sem deslizar).
 func walk_speed_scale(mps: float) -> float:
-	return clampf(mps / WALK_SPEED_MPS, 0.3, 3.0)
+	return clampf(mps / maxf(walk_speed_mps, 0.01), 0.3, 3.0)
+
+
+## Fator de velocidade do `run` (sem deslizar ate o limite de 2,5x). 0 se o modelo nao corre.
+func run_speed_scale(mps: float) -> float:
+	if run_speed_mps <= 0.0:
+		return 0.0
+	return clampf(mps / run_speed_mps, 0.5, 2.5)
+
+
+## Visema da boca (mouth_A, mouth_E, mouth_O, mouth_M) com peso 0..1; os outros visemas zeram. `&""` fecha a boca.
+func set_viseme(viseme: StringName, weight: float = 1.0) -> void:
+	_bind()
+	_visemes.clear()
+	if viseme in VISEMES:
+		_visemes[viseme] = clampf(weight, 0.0, 1.0)
+	_apply_face_extras()
+
+
+## Olhar: x < 0 para a esquerda do personagem, x > 0 para a direita, y > 0 para cima (cada eixo -1..1).
+func set_gaze(dir: Vector2) -> void:
+	_bind()
+	_gaze = dir.clamp(Vector2(-1, -1), Vector2(1, 1))
+	_apply_face_extras()
+
+
+## Olha para um ponto do mundo (so os olhos; a cabeca segue o clipe).
+func look_at_point(point: Vector3) -> void:
+	var local := global_transform.affine_inverse() * point
+	var head := bone_position(&"head")
+	var origin := global_transform.affine_inverse() * head if head != Vector3.INF else Vector3(0, 0.8, 0)
+	var d := local - origin
+	if d.length() < 0.01:
+		set_gaze(Vector2.ZERO)
+		return
+	d = d.normalized()
+	# frente = -Z; direita do personagem = +X
+	set_gaze(Vector2(clampf(d.x * 1.6, -1, 1), clampf(d.y * 1.6, -1, 1)))
+
+
+func _apply_face_extras() -> void:
+	if _face == null or _face.mesh == null:
+		return
+	for key in VISEMES:
+		var idx := _face.find_blend_shape_by_name(String(key))
+		if idx >= 0:
+			_face.set_blend_shape_value(idx, float(_visemes.get(key, 0.0)))
+	var g := {&"look_left": maxf(-_gaze.x, 0.0), &"look_right": maxf(_gaze.x, 0.0), &"look_up": maxf(_gaze.y, 0.0)}
+	for key in GAZE_KEYS:
+		var idx := _face.find_blend_shape_by_name(String(key))
+		if idx >= 0:
+			_face.set_blend_shape_value(idx, float(g[key]))
 
 
 ## Expressao do rosto: neutra, atenta, surpresa ou alegre. Soma-se (maximo) ao que o clipe anima (ex.: piscar).

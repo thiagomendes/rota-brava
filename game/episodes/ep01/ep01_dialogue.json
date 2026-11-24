@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "emotes": ["paw", "boot", "notebook", "rope", "helm", "boat", "buoy", "leaf", "island", "horn", "question", "exclamation", "idea", "heart", "star", "sweat", "music", "look", "wave", "thumbs_up"],
+  "speakers": {
+    "tracker": {"voice": "babble", "babble_profile": "rastro"},
+    "climber": {"voice": "babble", "babble_profile": "pico"},
+    "pilot":   {"voice": "babble", "babble_profile": "leme"},
+    "captain": {"voice": "babble", "babble_profile": "captain"},
+    "pup":     {"voice": "babble", "babble_profile": "pup"},
+    "radio":   {"voice": "radio_tts"},
+    "team":    {"voice": "radio_tts"}
+  },
+  "lines": {
+    "ep01.arrival.radio.horn": {"speaker": "radio", "intent": "narracao", "emotes": ["horn", "boat"], "radio_key": null},
+    "ep01.arrival.radio.crate": {"speaker": "radio", "intent": "narracao", "emotes": ["boat", "exclamation"], "radio_key": null},
+    "ep01.arrival.pilot.react": {"speaker": "pilot", "intent": "descoberta", "emotes": ["boat", "exclamation"], "radio_key": null},
+    "ep01.arrival.pilot.ask_captain": {"speaker": "pilot", "intent": "pergunta", "emotes": ["question"], "radio_key": null},
+    "ep01.arrival.tracker.take_over": {"speaker": "tracker", "intent": "descoberta", "emotes": ["look", "notebook"], "radio_key": null},
+    "ep01.arrival.radio.hint_gesture": {"speaker": "radio", "intent": "dica", "emotes": ["look"], "radio_key": null},
+    "ep01.arrival.radio.hint_spoken": {"speaker": "radio", "intent": "dica", "emotes": ["star"], "radio_key": null},
+
+    "ep01.dock.tracker.small_print": {"speaker": "tracker", "intent": "descoberta", "emotes": ["paw", "exclamation"], "radio_key": null},
+    "ep01.dock.tracker.boot_observation": {"speaker": "tracker", "intent": "descoberta", "emotes": ["boot", "look"], "radio_key": null},
+    "ep01.dock.tracker.deduction": {"speaker": "tracker", "intent": "descoberta", "emotes": ["paw", "boot", "idea"], "radio_key": "ep01.radio.dock.conclusion"},
+    "ep01.dock.tracker.ask_destination": {"speaker": "tracker", "intent": "pergunta", "emotes": ["question", "idea"], "radio_key": "ep01.radio.dock.choice"},
+    "ep01.dock.tracker.wrong_destination": {"speaker": "tracker", "intent": "dica", "emotes": ["look", "heart"], "radio_key": "ep01.radio.dock.try_again"},
+    "ep01.dock.tracker.hint_gesture_bench": {"speaker": "tracker", "intent": "dica", "emotes": ["look", "paw"], "radio_key": "ep01.radio.dock.hint_bench"},
+    "ep01.dock.tracker.hint_gesture_boot": {"speaker": "tracker", "intent": "dica", "emotes": ["look", "boot"], "radio_key": "ep01.radio.dock.hint_boot"},
+    "ep01.dock.tracker.hint_spoken": {"speaker": "tracker", "intent": "dica", "emotes": ["notebook", "paw"], "radio_key": "ep01.radio.dock.hint_examine"},
+
+    "ep01.river.pilot.start": {"speaker": "pilot", "intent": "urgencia", "emotes": ["helm", "exclamation"], "radio_key": "ep01.radio.river.start"},
+    "ep01.river.pilot.leaves": {"speaker": "pilot", "intent": "descoberta", "emotes": ["leaf", "look"], "radio_key": "ep01.radio.river.leaves"},
+    "ep01.river.pilot.bank_guide": {"speaker": "pilot", "intent": "normal", "emotes": ["sweat", "wave"], "radio_key": null},
+    "ep01.river.pilot.slow_down": {"speaker": "pilot", "intent": "urgencia", "emotes": ["sweat", "boat"], "radio_key": "ep01.radio.river.slow"},
+    "ep01.river.pilot.buoy": {"speaker": "pilot", "intent": "alegria", "emotes": ["buoy", "star"], "radio_key": "ep01.radio.river.cove"},
+    "ep01.river.pilot.spot_captain": {"speaker": "pilot", "intent": "descoberta", "emotes": ["look", "island"], "radio_key": null},
+    "ep01.river.captain.wave": {"speaker": "captain", "intent": "alegria", "emotes": ["wave", "heart"], "radio_key": null},
+    "ep01.river.pilot.hint_gesture_buoy": {"speaker": "pilot", "intent": "dica", "emotes": ["buoy", "look"], "radio_key": "ep01.radio.river.hint_buoy"},
+    "ep01.river.pilot.hint_gesture_leaves": {"speaker": "pilot", "intent": "dica", "emotes": ["leaf", "look"], "radio_key": "ep01.radio.river.hint_leaves"},
+    "ep01.river.pilot.hint_spoken": {"speaker": "pilot", "intent": "dica", "emotes": ["buoy", "helm"], "radio_key": "ep01.radio.river.hint_cove"},
+
+    "ep01.island.climber.start": {"speaker": "climber", "intent": "normal", "emotes": ["rope", "look"], "radio_key": null},
+    "ep01.island.climber.foothold": {"speaker": "climber", "intent": "alegria", "emotes": ["star"], "radio_key": null},
+    "ep01.island.climber.missed": {"speaker": "climber", "intent": "urgencia", "emotes": ["sweat", "exclamation"], "radio_key": null},
+    "ep01.island.climber.line_ready": {"speaker": "climber", "intent": "alegria", "emotes": ["rope", "thumbs_up"], "radio_key": null},
+    "ep01.island.climber.tug_1": {"speaker": "climber", "intent": "normal", "emotes": ["rope"], "radio_key": null},
+    "ep01.island.climber.tug_2": {"speaker": "climber", "intent": "alegria", "emotes": ["rope", "star"], "radio_key": null},
+    "ep01.island.climber.hint_gesture": {"speaker": "climber", "intent": "dica", "emotes": ["look", "star"], "radio_key": "ep01.radio.island.hint_stone"},
+    "ep01.island.climber.hint_spoken": {"speaker": "climber", "intent": "dica", "emotes": ["rope", "star"], "radio_key": "ep01.radio.island.hint_line"},
+
+    "ep01.docking.pilot.start": {"speaker": "pilot", "intent": "normal", "emotes": ["helm", "look"], "radio_key": null},
+    "ep01.docking.pilot.assist": {"speaker": "pilot", "intent": "normal", "emotes": ["helm"], "radio_key": null},
+    "ep01.docking.pilot.retry": {"speaker": "pilot", "intent": "normal", "emotes": ["sweat", "helm"], "radio_key": null},
+    "ep01.docking.pilot.aligned": {"speaker": "pilot", "intent": "alegria", "emotes": ["thumbs_up", "star"], "radio_key": null},
+    "ep01.docking.pilot.hint_gesture": {"speaker": "pilot", "intent": "dica", "emotes": ["look", "rope"], "radio_key": "ep01.radio.docking.hint_line"},
+    "ep01.docking.pilot.hint_spoken": {"speaker": "pilot", "intent": "dica", "emotes": ["helm", "look"], "radio_key": "ep01.radio.docking.hint_approach"},
+
+    "ep01.return.pilot.depart": {"speaker": "pilot", "intent": "pergunta", "emotes": ["question", "boat"], "radio_key": null},
+    "ep01.return.captain.thanks": {"speaker": "captain", "intent": "alegria", "emotes": ["heart", "thumbs_up"], "radio_key": null},
+    "ep01.return.pup.horn": {"speaker": "pup", "intent": "alegria", "emotes": ["horn", "music"], "radio_key": null},
+    "ep01.return.radio.joke": {"speaker": "radio", "intent": "alegria", "emotes": ["music", "heart"], "radio_key": null},
+    "ep01.return.pilot.hint_gesture": {"speaker": "pilot", "intent": "dica", "emotes": ["look", "star"], "radio_key": "ep01.radio.return.hint_button"},
+    "ep01.return.pilot.hint_spoken": {"speaker": "pilot", "intent": "dica", "emotes": ["star", "thumbs_up"], "radio_key": "ep01.radio.return.hint_press"},
+
+    "ep01.complete.title": {"speaker": "team", "intent": "alegria", "emotes": ["star", "heart"], "radio_key": null},
+    "ep01.complete.body": {"speaker": "team", "intent": "alegria", "emotes": ["heart", "star"], "radio_key": null}
+  }
+}

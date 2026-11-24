@@ -28,8 +28,11 @@ $sets = @(
     @{ id = 'nature'; script = 'source_art/environment/build_nature.py'; blend = 'source_art/environment/nature.blend';
        note = 'Ladrilhos de chao 4x13 m, 3 arvores, 2 arbustos, grama, juncos, 3 rochas.' },
     @{ id = 'boat_v2'; script = 'source_art/environment/build_boat_v2.py'; blend = 'source_art/environment/boat_v2.blend';
-       note = 'Barco v2 (evolucao do RB-03): cabine na popa, banco com PawMark, volante, motor, bandeirola, lampiao, corda. Pivo a 40% da popa.' }
+       note = 'Barco v2 (evolucao do RB-03): cabine na popa, banco com PawMark, volante, motor, bandeirola, lampiao, corda. Pivo a 40% da popa.' },
+    @{ id = 'village_kit'; script = 'source_art/environment/build_village.py'; blend = 'source_art/environment/village_kit.blend';
+       note = 'RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas.' }
 )
+$harborComp = 'B'   # composicao recomendada (RB-R1, ver game/episodes/ep01/world/LAYOUT_PROPOSTO.md)
 $common = @('source_art/environment/envlib.py', 'source_art/scripts/rbart.py')
 $entries = @()
 foreach ($s in $sets) {
@@ -57,7 +60,9 @@ foreach ($s in $sets) {
         }
     }
 }
-$manifest = [ordered]@{ projeto = 'Rota Brava'; ticket = 'RB-04-env'; agente = 'art3d'; ativos = $entries }
+# layout do trecho do porto (fonte unica em Python) -> JSON lido por game/episodes/ep01/world/gen_harbor_slice.gd
+Invoke-Blender @('--factory-startup') 'source_art/environment/village_layout.py' @('--json', $harborComp, 'game/episodes/ep01/world/harbor_layout.json')
+$manifest = [ordered]@{ projeto = 'Rota Brava'; ticket = 'RB-04-env + RB-R1-mundo'; agente = 'art3d'; ativos = $entries }
 $manifest | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $root 'source_art/manifest_environment.json') -Encoding utf8
 $tot = 0; foreach ($e in $entries) { $tot += [int]$e.triangulos }
 Write-Host ("manifest: source_art/manifest_environment.json ({0} ativos, {1} triangulos)" -f $entries.Count, $tot)
@@ -89,5 +94,8 @@ if ($Scenes) {
     Write-Host 'COMANDO: ./tools/godot.ps1 --headless --path game --script res://actors/environment/gen_env_scenes.gd'
     & "$PSScriptRoot/godot.ps1" --headless --path game --script res://actors/environment/gen_env_scenes.gd | Select-Object -Last 2 | ForEach-Object { Write-Host $_ }
     if ($LASTEXITCODE -ne 0) { throw 'gen_env_scenes falhou' }
+    Write-Host 'COMANDO: ./tools/godot.ps1 --headless --path game --script res://episodes/ep01/world/gen_harbor_slice.gd'
+    & "$PSScriptRoot/godot.ps1" --headless --path game --script res://episodes/ep01/world/gen_harbor_slice.gd | Select-Object -Last 3 | ForEach-Object { Write-Host $_ }
+    if ($LASTEXITCODE -ne 0) { throw 'gen_harbor_slice falhou' }
 }
 Write-Host 'OK export-environment'

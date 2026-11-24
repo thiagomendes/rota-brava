@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/rope_coil.glb" id="1_b25we"]
 
-[node name="Rope_Coil" type="Node3D" unique_id=137585890]
+[node name="Rope_Coil" type="Node3D" unique_id=852783972]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=2015961316 instance=ExtResource("1_b25we")]
+[node name="Model" parent="." unique_id=678277818 instance=ExtResource("1_b25we")]

@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/rowboat.glb" id="1_p0jb5"]
+
+[node name="Rowboat" type="Node3D" unique_id=1333535471]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=1745628135 instance=ExtResource("1_p0jb5")]

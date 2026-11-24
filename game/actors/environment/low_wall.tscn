@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/low_wall.glb" id="1_kjkfi"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_j4pmx"]
+size = Vector3(4, 0.74, 0.55)
+
+[node name="Low_Wall" type="Node3D" unique_id=253200932]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=768808591 instance=ExtResource("1_kjkfi")]
+
+[node name="Body" type="StaticBody3D" parent="." unique_id=497744383]
+collision_mask = 0
+
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=580149244]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.37, 0)
+shape = SubResource("BoxShape3D_j4pmx")

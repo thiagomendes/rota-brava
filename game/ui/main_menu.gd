@@ -1,31 +1,19 @@
 class_name MainMenu
-extends Control
-## Menu inicial: Jogar, Opcoes, Sair. Foco inicial em Jogar (SPEC secao 5, Menu e retomada).
+extends TitleScreen
+## Menu inicial = tela-titulo v2 (game/ui/title/). Jogar, Opcoes, Referencias, Sair. Foco inicial em Jogar
+## (SPEC secao 5, Menu e retomada). Os visuais vem de TitleScreen; aqui fica o comportamento.
 
 const PLAY_SCENE := "res://episodes/ep01/ep01_main.tscn"
 const REFERENCE_SCENE := "res://episodes/reference/reference_demo.tscn"
-## Alvo de toque minimo (referencia de 1080 de altura), igual ao HUD.
-const BUTTON_HEIGHT := 128.0
-
-@onready var menu: VBoxContainer = %Menu
-@onready var play_button: Button = %PlayButton
-@onready var options_button: Button = %OptionsButton
-@onready var references_button: Button = %ReferencesButton
-@onready var quit_button: Button = %QuitButton
-@onready var options_panel: PanelContainer = %OptionsPanel
-@onready var back_button: Button = %BackButton
 
 
 func _ready() -> void:
-	theme = UiTheme.build(&"a")
-	for b: Button in [play_button, options_button, references_button, quit_button, back_button]:
-		b.custom_minimum_size.y = BUTTON_HEIGHT
-		UiTheme.make_focusable(b)
+	super._ready()
 	play_button.pressed.connect(_on_play_pressed)
 	options_button.pressed.connect(_open_options)
 	references_button.pressed.connect(_on_references_pressed)
 	quit_button.pressed.connect(_on_quit_pressed)
-	back_button.pressed.connect(_close_options)
+	options_panel.back_requested.connect(_close_options)
 	play_button.grab_focus()
 	print("[RB] menu_ready focus=%s" % play_button.name)
 	# Gravacao/demonstracao da build exportada: o exe so abre o menu, entao o bot entra por aqui.
@@ -38,6 +26,7 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if options_panel.visible and event.is_action_pressed(&"ui_cancel"):
 		get_viewport().set_input_as_handled()
+		ui_sound.emit(&"back")
 		_close_options()
 
 
@@ -53,14 +42,16 @@ func _on_references_pressed() -> void:
 
 func _open_options() -> void:
 	menu.visible = false
-	options_panel.visible = true
-	back_button.grab_focus()
+	logo.visible = false
+	_layout()
+	options_panel.open()
 	print("[RB] options_open")
 
 
 func _close_options() -> void:
 	options_panel.visible = false
 	menu.visible = true
+	logo.visible = true
 	options_button.grab_focus()
 	print("[RB] options_close")
 

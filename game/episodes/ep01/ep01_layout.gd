@@ -19,6 +19,9 @@ const BOAT_DOCKED_HEADING := PI / 2.0
 const BOAT_ARRIVAL_START := Vector3(34, 0, -5.0)
 const BENCH_LOCAL := Vector3(0.0, 0.5, 0.6)            # no referencial do barco
 const BENCH_INTERACT_POS := Vector3(0.0, 0.0, -2.4)    # na borda do cais, junto ao banco
+## RB-R1: onde o Rastro pisa NO BARCO (referencial do barco, sobre o conves y = 0,41) para tocar a marca da pata: de frente para
+## o banco (+Z do barco), 0,44 m antes do centro da PawMark e 0,08 m a esquerda dela (a pata fica a direita do Rastro).
+const PAW_INSPECT_STAND_LOCAL := Vector3(0.08, 0.41, 0.16)
 const RASTRO_START := Vector3(-3.0, 0.0, 1.5)
 const BANK_PRINT_POS := Vector3(-6.0, 0.0, 10.0)       # pegada de bota na margem
 

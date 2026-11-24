@@ -1,8 +1,10 @@
 class_name Hud
 extends CanvasLayer
-## HUD do episodio: objetivo, quem controla, acao contextual, legendas, escolha, troca, pausa e conclusao.
-## Responde "quem controla, o que posso fazer agora, o que mudou" (SPEC secao 5). Visual PROVISORIO (tema candidato A ate Thiago escolher).
-## Layout em unidades virtuais (viewport de referencia 1080 de altura; stretch canvas_items/expand). Ver game/ui/study/README.md.
+## HUD v2 do episodio (RB-R1, style-bible secao 9): cartao de objetivo ilustrado, retratos dos 3 herois (ativo maior),
+## botao de acao redondo e grande com o glifo do ultimo dispositivo, balao de legenda com retrato do falante e emotes,
+## botao de ajuda discreto, cartao de equipe na troca, conclusao com estrelas e entradas com mola.
+## Responde "quem controla, o que posso fazer agora, o que mudou" (SPEC secao 5).
+## Layout em unidades virtuais (viewport de referencia 1080 de altura; stretch canvas_items/expand).
 
 signal line_started(key: String)
 signal line_finished
@@ -14,54 +16,83 @@ signal resume_requested
 signal skip_requested
 signal pause_requested
 signal help_requested
+## Novo (RB-R1): o botao de acao foi tocado/clicado (alem de injetar a intencao `interact`).
+signal action_pressed
+## Novo: sons de UI (&"pop", &"confirm", &"focus", &"handoff", &"star", &"emote"). O lead liga ao AudioDirector.
+signal ui_sound(name: StringName)
+## Novo: ultimo dispositivo usado (&"keyboard", &"pad", &"touch") mudou. Nao altera estado do jogo.
+signal device_changed(device: StringName)
+## Novo: uma fala com emotes comecou (para o lead disparar o balbucio/emote 3D se quiser).
+signal emotes_shown(speaker: StringName, emotes: Array[StringName])
 
-const MEMBER_COLORS := MemberActor.COLORS
-const SKILL_ICONS := {&"tracker": &"notebook", &"climber": &"line", &"pilot": &"helm"}
+const MEMBERS: Array[StringName] = [&"tracker", &"climber", &"pilot"]
+## Cores-assinatura da style-bible (secao 3).
+const MEMBER_COLORS := {&"tracker": Color("FF8A1F"), &"climber": Color("3DBE5A"), &"pilot": Color("2F8CFF")}
+const SKILL_ICONS := {&"tracker": &"notebook", &"climber": &"rope", &"pilot": &"helm"}
 const HANDOFF_MIN_SECONDS := 0.45
 const FONT := 34
 ## Alvo de toque minimo em unidades virtuais (>= 48 dp em aparelho com lado curto >= ~410 dp; ver README).
-## Ganchos do jogo: devolve a duracao (s) da fala ao iniciar a legenda (0.0 se nao ha audio) e interrompe a fala.
-var voice_hook: Callable = Callable()
-var voice_stop_hook: Callable = Callable()
-var _help_button: Button
-
 const MIN_TOUCH := 128.0
+const ACTION_SIZE := 236.0
+const PORTRAIT_ACTIVE := 148.0
+const PORTRAIT_IDLE := 96.0
 ## Margem da area segura: fracao do lado, com minimo em unidades virtuais.
 const SAFE_FRACTION := 0.05
 const SAFE_MIN := 48.0
-const DEFAULT_THEME := "res://ui/study/theme_a.tres"
 
+## Ganchos do jogo: devolve a duracao (s) da fala ao iniciar a legenda (0.0 se nao ha audio) e interrompe a fala.
+var voice_hook: Callable = Callable()
+## Gancho de dados: (key: String) -> Array[StringName] com os emotes da fala quando quem chama nao os informa.
+var emotes_hook: Callable = Callable()
+var voice_stop_hook: Callable = Callable()
 var ui_theme: Theme
+var last_device: StringName = &"keyboard"
+
 var _root: Control
 var _safe_rects: Array[Control] = []
+var _help_button: Button
 var _objective_icon: IconView
 var _objective_label: Label
-var _member_panel: PanelContainer
-var _member_icon: IconView
+var _member_panel: HBoxContainer
 var _member_label: Label
-var _prompt_panel: PanelContainer
+var _member_pill: PanelContainer
+var _portraits: Dictionary = {}
+var _portrait_textures: Dictionary = {}
+var _active_member: StringName = &""
+var _prompt_panel: VBoxContainer
 var _prompt_icon: IconView
 var _prompt_label: Label
+var _action_button: Button
+var _glyph_badge: PanelContainer
+var _glyph_label: Label
 var _sub_panel: PanelContainer
+var _sub_portrait: IconView
 var _sub_speaker: Label
 var _sub_text: Label
+var _emote_box: HBoxContainer
 var _skip_label: Label
 var _choice_panel: PanelContainer
 var _choice_box: VBoxContainer
 var _choice_title: Label
 var _handoff_panel: Control
+var _handoff_card: PanelContainer
 var _handoff_icon: IconView
+var _handoff_title: Label
 var _handoff_text: Label
 var _handoff_button: Button
 var _handoff_since: float = 0.0
 var _complete_panel: Control
+var _complete_box: Control
+var _complete_stars: Array[IconView] = []
 var _complete_replay: Button
 var _pause_panel: Control
+var _pause_box: Control
 var _pause_resume: Button
 var _queue: Array[Dictionary] = []
 var _speaking: bool = false
 var _skip_current: bool = false
 var _hint_active: bool = false
+var _pulse: Tween
 var choice_open: bool = false
 var handoff_open: bool = false
 var pause_open: bool = false
@@ -80,28 +111,28 @@ func _ready() -> void:
 	safe.name = "Safe"
 	_build_top_left(safe)
 	_build_member(safe)
+	_build_action(safe)
 	_build_bottom_stack(safe)
 	_build_choice(_root)
 	_build_handoff(_root)
 	_build_complete(_root)
 	_build_pause(_root)
 	_root.resized.connect(_layout)
-	apply_theme(load(DEFAULT_THEME) as Theme)
+	apply_theme(ThemeV2.build())
+	_update_glyph()
 	_layout()
 
 
-## Troca o tema (candidatos A/B/C do estudo). Nao altera textos nem estado.
+## Troca o tema (o estudo RB-03 ainda alterna A/B/C). Nao altera textos nem estado.
 func apply_theme(th: Theme) -> void:
 	ui_theme = th
 	_root.theme = th
-	if _prompt_icon:
-		_prompt_icon.color = accent_color()
 
 
 func accent_color() -> Color:
 	if ui_theme != null and ui_theme.has_color("accent", "Hud"):
 		return ui_theme.get_color("accent", "Hud")
-	return Color("ffd24d")
+	return ThemeV2.ACTION
 
 
 ## Retangulo da area segura em coordenadas do viewport.
@@ -123,9 +154,10 @@ func _layout() -> void:
 		c.offset_right = -m.x
 		c.offset_top = m.y
 		c.offset_bottom = -m.y
-	var width := clampf(vp.x - m.x * 2.0 - 36.0, 640.0, 1180.0)
-	_sub_text.custom_minimum_size.x = minf(width, vp.x * 0.62)
-	_objective_label.custom_minimum_size.x = minf(620.0, vp.x * 0.3)
+	# Balao: no maximo 62% da largura, centrado entre os polegares; o texto desconta retrato e margens.
+	var bubble := minf(clampf(vp.x - m.x * 2.0 - 36.0, 640.0, 1180.0), vp.x * 0.62)
+	_sub_text.custom_minimum_size.x = bubble - 190.0
+	_objective_label.custom_minimum_size.x = minf(560.0, vp.x * 0.27)
 
 
 # ---------- construcao ----------
@@ -171,11 +203,29 @@ func _label(parent: Node, size: int = FONT, variant: StringName = &"") -> Label:
 	return l
 
 
-func _button(parent: Node, text: String, width: float = 520.0) -> Button:
+func _icon(parent: Node, kind: StringName, px: float, ring_color: Color = ThemeV2.ACTION, plain: bool = false) -> IconView:
+	var i := IconView.new()
+	i.kind = kind
+	i.color = ring_color
+	i.custom_minimum_size = Vector2(px, px)
+	if plain:
+		i.back_color = Color(0, 0, 0, 0)
+	parent.add_child(i)
+	return i
+
+
+func _button(parent: Node, text: String, width: float = 520.0, icon: StringName = &"", variant: StringName = &"Button") -> Button:
 	var b := Button.new()
 	b.text = text
+	b.theme_type_variation = variant
 	b.custom_minimum_size = Vector2(maxf(width, MIN_TOUCH), MIN_TOUCH)
-	UiTheme.make_focusable(b)
+	if icon != &"":
+		b.icon = IconView.texture_for(icon)
+		b.expand_icon = true
+		b.add_theme_constant_override("icon_max_width", 84)
+	ThemeV2.springify(b, 0.05)
+	b.focus_entered.connect(func() -> void: ui_sound.emit(&"focus"))
+	b.pressed.connect(func() -> void: ui_sound.emit(&"confirm"))
 	parent.add_child(b)
 	return b
 
@@ -184,81 +234,159 @@ func _build_top_left(safe: Control) -> void:
 	var col := VBoxContainer.new()
 	col.name = "TopLeft"
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	col.add_theme_constant_override("separation", 10)
+	col.add_theme_constant_override("separation", 6)
 	safe.add_child(col)
 	var p := _panel(col)
 	p.name = "ObjectivePanel"
 	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 16)
+	h.add_theme_constant_override("separation", 18)
 	p.add_child(h)
-	_objective_icon = IconView.new()
-	_objective_icon.custom_minimum_size = Vector2(80, 80)
-	h.add_child(_objective_icon)
+	_objective_icon = _icon(h, &"notebook", 96)
 	_objective_label = _label(h, 32)
-	_objective_label.custom_minimum_size = Vector2(620, 0)
+	_objective_label.custom_minimum_size = Vector2(560, 0)
 	_objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_objective_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_help_button = _button(col, Loc.t("ui.help.repeat_button", {"control": "H"}), 360)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(row)
+	# Ajuda: disco pequeno (72) dentro de um alvo de toque de 128 transparente.
+	_help_button = Button.new()
 	_help_button.name = "HelpButton"
+	_help_button.theme_type_variation = &"GhostButton"
+	_help_button.custom_minimum_size = Vector2(MIN_TOUCH, MIN_TOUCH)
 	_help_button.focus_mode = Control.FOCUS_NONE
-	_help_button.pressed.connect(func() -> void: help_requested.emit())
-	var skip_panel := _panel(col)
+	_help_button.tooltip_text = Loc.t("ui.help.repeat_button", {"control": "H"})
+	_help_button.pressed.connect(func() -> void:
+		ui_sound.emit(&"confirm")
+		help_requested.emit())
+	row.add_child(_help_button)
+	var hi := _icon(_help_button, &"help", 72, ThemeV2.NAVY, false)
+	hi.set_anchors_preset(Control.PRESET_CENTER)
+	hi.offset_left = -36
+	hi.offset_top = -36
+	hi.offset_right = 36
+	hi.offset_bottom = 36
+	hi.ring = 0.05
+	var skip_panel := _panel(row, &"PillPanel")
 	skip_panel.name = "SkipPanel"
-	_skip_label = _label(skip_panel, 30, &"AccentLabel")
+	skip_panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_skip_label = _label(skip_panel, 30, &"LightLabel")
 	_skip_label.name = "SkipHint"
 	_skip_label.text = Loc.t("ui.skip")
 	skip_panel.visible = false
 
 
 func _build_member(safe: Control) -> void:
-	_member_panel = _panel(safe)
+	_member_panel = HBoxContainer.new()
 	_member_panel.name = "MemberPanel"
+	_member_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_member_panel.add_theme_constant_override("separation", 14)
+	_member_panel.alignment = BoxContainer.ALIGNMENT_END
+	safe.add_child(_member_panel)
 	_anchor(_member_panel, 1.0, 0.0, 0.0, 0.0, Control.GROW_DIRECTION_BEGIN, Control.GROW_DIRECTION_END)
-	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 16)
-	_member_panel.add_child(h)
-	_member_icon = IconView.new()
-	_member_icon.custom_minimum_size = Vector2(80, 80)
-	h.add_child(_member_icon)
-	_member_label = _label(h, 34)
-	_member_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	for m in MEMBERS:
+		var v := VBoxContainer.new()
+		v.name = "Portrait_%s" % m
+		v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		v.add_theme_constant_override("separation", -14)
+		_member_panel.add_child(v)
+		var ic := _icon(v, SKILL_ICONS[m], PORTRAIT_IDLE, MEMBER_COLORS[m])
+		ic.name = "Portrait"
+		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		ic.ring = 0.09
+		_portraits[m] = ic
+	_member_pill = PanelContainer.new()
+	_member_pill.theme_type_variation = &"PillPanel"
+	_member_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_member_pill.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_member_label = _label(_member_pill, 30, &"LightLabel")
+	_member_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_member_panel.visible = false
 
 
-## Pilha na base e ao centro: acao contextual acima, legenda abaixo. Nunca se sobrepoem e ficam entre os polegares.
+## Botao de acao: embaixo a direita (zona do polegar), redondo, com pictograma, rotulo e glifo do dispositivo.
+func _build_action(safe: Control) -> void:
+	_prompt_panel = VBoxContainer.new()
+	_prompt_panel.name = "PromptPanel"
+	_prompt_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_prompt_panel.add_theme_constant_override("separation", 10)
+	_prompt_panel.alignment = BoxContainer.ALIGNMENT_END
+	safe.add_child(_prompt_panel)
+	_anchor(_prompt_panel, 1.0, 1.0, 0.0, 0.0, Control.GROW_DIRECTION_BEGIN, Control.GROW_DIRECTION_BEGIN)
+	var pill := _panel(_prompt_panel, &"PillPanel")
+	pill.name = "ActionLabel"
+	pill.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_prompt_label = _label(pill, 40, &"LightLabel")
+	_prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_action_button = Button.new()
+	_action_button.name = "ActionButton"
+	_action_button.focus_mode = Control.FOCUS_NONE
+	_action_button.custom_minimum_size = Vector2(ACTION_SIZE, ACTION_SIZE)
+	_action_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var r := int(ACTION_SIZE * 0.5)
+	var normal := ThemeV2.box(ThemeV2.ACTION, r, 0, 10, Color.WHITE, 12)
+	var hover := ThemeV2.box(ThemeV2.ACTION.lightened(0.15), r, 0, 10, Color.WHITE, 12)
+	var pressed := ThemeV2.box(ThemeV2.ACTION.darkened(0.1), r, 0, 10, Color.WHITE, 3)
+	_action_button.add_theme_stylebox_override("normal", normal)
+	_action_button.add_theme_stylebox_override("hover", hover)
+	_action_button.add_theme_stylebox_override("pressed", pressed)
+	_action_button.add_theme_stylebox_override("hover_pressed", pressed)
+	_action_button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	_action_button.button_down.connect(func() -> void: _prompt_icon.position.y = ACTION_SIZE * 0.2 + 6.0)
+	_action_button.button_up.connect(func() -> void: _prompt_icon.position.y = ACTION_SIZE * 0.2)
+	_action_button.pressed.connect(_on_action_pressed)
+	_prompt_panel.add_child(_action_button)
+	_prompt_icon = _icon(_action_button, &"magnifier", ACTION_SIZE * 0.6, ThemeV2.ACTION, true)
+	_prompt_icon.position = Vector2(ACTION_SIZE * 0.2, ACTION_SIZE * 0.2)
+	_prompt_icon.size = Vector2(ACTION_SIZE * 0.6, ACTION_SIZE * 0.6)
+	_glyph_badge = PanelContainer.new()
+	_glyph_badge.name = "GlyphBadge"
+	_glyph_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_glyph_badge.add_theme_stylebox_override("panel", ThemeV2.box(ThemeV2.NAVY, 34, 4, 5, Color.WHITE, 0))
+	_glyph_badge.custom_minimum_size = Vector2(68, 68)
+	_glyph_badge.position = Vector2(4, ACTION_SIZE - 72)
+	_action_button.add_child(_glyph_badge)
+	_glyph_label = _label(_glyph_badge, 38, &"LightLabel")
+	_glyph_label.name = "KeyHint"
+	_glyph_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_glyph_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_prompt_panel.visible = false
+
+
+## Base ao centro: balao de legenda (retrato do falante, nome, emotes e texto). Fica entre os polegares.
 func _build_bottom_stack(safe: Control) -> void:
 	var v := VBoxContainer.new()
 	v.name = "BottomStack"
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	v.add_theme_constant_override("separation", 14)
 	v.alignment = BoxContainer.ALIGNMENT_END
 	_anchor(v, 0.5, 1.0, 0.0, 0.0, Control.GROW_DIRECTION_BOTH, Control.GROW_DIRECTION_BEGIN)
 	safe.add_child(v)
-	_prompt_panel = _panel(v, &"PromptPanel")
-	_prompt_panel.name = "PromptPanel"
-	_prompt_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 18)
-	_prompt_panel.add_child(h)
-	_prompt_icon = IconView.new()
-	_prompt_icon.custom_minimum_size = Vector2(96, 96)
-	h.add_child(_prompt_icon)
-	var pv := VBoxContainer.new()
-	pv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	h.add_child(pv)
-	_prompt_label = _label(pv, 44, &"AccentLabel")
-	var hint := _label(pv, 26, &"DimLabel")
-	hint.name = "KeyHint"
-	hint.text = Loc.t("ui.control.interact")
-	_prompt_panel.visible = false
 	_sub_panel = _panel(v, &"SubtitlePanel")
 	_sub_panel.name = "SubtitlePanel"
 	_sub_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 20)
+	_sub_panel.add_child(h)
+	_sub_portrait = _icon(h, &"horn", 120, ThemeV2.NAVY)
+	_sub_portrait.name = "SpeakerPortrait"
+	_sub_portrait.ring = 0.08
+	_sub_portrait.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	var sv := VBoxContainer.new()
-	_sub_panel.add_child(sv)
-	_sub_speaker = _label(sv, 30, &"AccentLabel")
+	sv.add_theme_constant_override("separation", 2)
+	h.add_child(sv)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 10)
+	sv.add_child(head)
+	_sub_speaker = _label(head, 30, &"AccentLabel")
+	_sub_speaker.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_emote_box = HBoxContainer.new()
+	_emote_box.name = "Emotes"
+	_emote_box.add_theme_constant_override("separation", 6)
+	_emote_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	head.add_child(_emote_box)
 	_sub_text = _label(sv, FONT)
-	_sub_text.custom_minimum_size = Vector2(1100, 0)
+	_sub_text.custom_minimum_size = Vector2(900, 0)
 	_sub_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_sub_panel.visible = false
 
@@ -276,19 +404,20 @@ func _build_choice(root: Control) -> void:
 	_choice_box = VBoxContainer.new()
 	_choice_box.add_theme_constant_override("separation", 20)
 	_choice_panel.add_child(_choice_box)
-	_choice_title = _label(_choice_box, 38)
+	_choice_title = _label(_choice_box, 44, &"TitleLabel")
 	_choice_title.custom_minimum_size = Vector2(760, 0)
 	_choice_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_choice_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_choice_panel.visible = false
 
 
-func _overlay(root: Control, name_: String) -> Control:
+func _overlay(root: Control, name_: String, dim_alpha: float = 0.45) -> Control:
 	var c := Control.new()
 	c.name = name_
 	c.set_anchors_preset(Control.PRESET_FULL_RECT)
 	c.mouse_filter = Control.MOUSE_FILTER_STOP
 	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.6)
+	dim.color = Color(ThemeV2.NAVY_DEEP, dim_alpha)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.add_child(dim)
@@ -303,74 +432,101 @@ func _centered_box(overlay: Control) -> VBoxContainer:
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	safe.add_child(center)
-	# Painel opaco: titulo e botoes nao brigam com o cenario (o titulo amarelo se perdia sobre o casco amarelo).
 	var panel := _panel(center, &"ModalPanel")
+	panel.name = "Card"
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 24)
+	v.add_theme_constant_override("separation", 22)
 	v.alignment = BoxContainer.ALIGNMENT_CENTER
 	panel.add_child(v)
 	return v
 
 
+## Cartao de equipe: retrato grande de quem vai agir, "Sua vez!" na cor dele e Confirmar. Sem escurecer a cena:
+## a camera enquadra no centro quem vai agir, e a crianca precisa ve-lo.
 func _build_handoff(root: Control) -> void:
-	_handoff_panel = _overlay(root, "HandoffOverlay")
-	# Sem escurecer a cena e na parte baixa: a camera enquadra no centro quem vai agir, e a crianca precisa ve-lo.
-	(_handoff_panel.get_child(0) as ColorRect).color = Color(0, 0, 0, 0.0)
+	_handoff_panel = _overlay(root, "HandoffOverlay", 0.0)
 	var safe := _safe_rect(_handoff_panel)
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 36)
-	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	safe.add_child(v)
-	_anchor(v, 0.5, 1.0, 0.0, 0.0, Control.GROW_DIRECTION_BOTH, Control.GROW_DIRECTION_BEGIN)
-	var p := _panel(v)
+	_handoff_card = _panel(safe, &"ModalPanel")
+	_handoff_card.name = "TeamCard"
+	_handoff_card.mouse_filter = Control.MOUSE_FILTER_STOP
+	_anchor(_handoff_card, 0.5, 1.0, 0.0, 0.0, Control.GROW_DIRECTION_BOTH, Control.GROW_DIRECTION_BEGIN)
 	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 20)
-	p.add_child(h)
-	_handoff_icon = IconView.new()
-	_handoff_icon.custom_minimum_size = Vector2(120, 120)
-	h.add_child(_handoff_icon)
-	_handoff_text = _label(h, 38)
-	_handoff_text.custom_minimum_size = Vector2(760, 0)
+	h.add_theme_constant_override("separation", 28)
+	_handoff_card.add_child(h)
+	_handoff_icon = _icon(h, &"rope", 176, MEMBER_COLORS[&"climber"])
+	_handoff_icon.ring = 0.09
+	_handoff_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 14)
+	h.add_child(v)
+	_handoff_title = _label(v, 56, &"LightLabel")
+	_handoff_title.text = Loc.t("ui.hud.your_turn")
+	_handoff_text = _label(v, 36)
+	_handoff_text.custom_minimum_size = Vector2(620, 0)
 	_handoff_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_handoff_text.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_handoff_button = _button(v, Loc.t("ui.menu.confirm"), 420)
+	_handoff_button = _button(v, Loc.t("ui.menu.confirm"), 420, &"thumbs_up", &"PrimaryButton")
 	_handoff_button.name = "ConfirmButton"
-	_handoff_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_handoff_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	_handoff_button.pressed.connect(_confirm_handoff)
 
 
 func _build_complete(root: Control) -> void:
 	_complete_panel = _overlay(root, "CompleteOverlay")
 	var v := _centered_box(_complete_panel)
-	var title := _label(v, 84, &"AccentLabel")
+	_complete_box = v.get_parent() as Control
+	var stars := HBoxContainer.new()
+	stars.name = "Stars"
+	stars.alignment = BoxContainer.ALIGNMENT_CENTER
+	stars.add_theme_constant_override("separation", 18)
+	stars.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(stars)
+	for i in 3:
+		var s := _icon(stars, &"star", 150.0 if i == 1 else 120.0, ThemeV2.ACTION, true)
+		s.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if i == 1 else Control.SIZE_SHRINK_END
+		_complete_stars.append(s)
+	var title := _label(v, 76, &"TitleLabel")
 	title.name = "Title"
 	title.text = Loc.t("ep01.complete.title")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var body := _label(v, 40)
+	var body := _label(v, 36)
 	body.name = "Body"
 	body.text = Loc.t("ep01.complete.body")
-	body.custom_minimum_size = Vector2(1000, 0)
+	body.custom_minimum_size = Vector2(900, 0)
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_complete_replay = _button(v, Loc.t("ui.menu.review"))
-	_complete_replay.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var team := HBoxContainer.new()
+	team.alignment = BoxContainer.ALIGNMENT_CENTER
+	team.add_theme_constant_override("separation", 24)
+	team.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.add_child(team)
+	for m in MEMBERS:
+		_icon(team, SKILL_ICONS[m], 104, MEMBER_COLORS[m]).ring = 0.09
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 28)
+	v.add_child(row)
+	_complete_replay = _button(row, Loc.t("ui.menu.review"), 400, &"star", &"PrimaryButton")
 	_complete_replay.pressed.connect(func() -> void: replay_requested.emit())
-	var menu := _button(v, Loc.t("ui.menu.menu"))
-	menu.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var menu := _button(row, Loc.t("ui.menu.menu"), 320, &"home")
 	menu.pressed.connect(func() -> void: menu_requested.emit())
 
 
 func _build_pause(root: Control) -> void:
 	_pause_panel = _overlay(root, "PauseOverlay")
 	var v := _centered_box(_pause_panel)
-	var title := _label(v, 76, &"AccentLabel")
+	_pause_box = v.get_parent() as Control
+	var head := HBoxContainer.new()
+	head.alignment = BoxContainer.ALIGNMENT_CENTER
+	head.add_theme_constant_override("separation", 18)
+	v.add_child(head)
+	_icon(head, &"pause", 96, ThemeV2.NAVY, true)
+	var title := _label(head, 76, &"TitleLabel")
 	title.text = Loc.t("ui.pause.title")
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_pause_resume = _button(v, Loc.t("ui.pause.resume"))
+	_pause_resume = _button(v, Loc.t("ui.pause.resume"), 520, &"boat", &"PrimaryButton")
 	_pause_resume.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_pause_resume.pressed.connect(func() -> void: resume_requested.emit())
-	var menu := _button(v, Loc.t("ui.menu.menu"))
+	var menu := _button(v, Loc.t("ui.menu.menu"), 520, &"home")
 	menu.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	menu.pressed.connect(func() -> void: menu_requested.emit())
 
@@ -378,28 +534,71 @@ func _build_pause(root: Control) -> void:
 # ---------- objetivo, integrante e acao contextual ----------
 
 func set_objective(text: String, icon: StringName) -> void:
+	var changed := _objective_label.text != Loc.t("ui.hud.objective", {"text": text})
 	_objective_label.text = Loc.t("ui.hud.objective", {"text": text})
 	_objective_icon.kind = icon
+	if changed and is_inside_tree():
+		ThemeV2.pop_in(_objective_icon, 0.5)
+		ui_sound.emit(&"pop")
+
+
+## Retrato do heroi (ex.: render do modelo 3D). null volta ao pictograma da habilidade.
+func set_portrait_texture(member: StringName, tex: Texture2D) -> void:
+	_portrait_textures[member] = tex
+	if _portraits.has(member):
+		(_portraits[member] as IconView).texture_override = tex
+	if _handoff_icon and handoff_open:
+		_handoff_icon.texture_override = tex
+
+
+func portrait_texture(member: StringName) -> Texture2D:
+	return _portrait_textures.get(member, null)
 
 
 func set_member(member: StringName) -> void:
 	if member == &"":
 		_member_panel.visible = false
+		_active_member = &""
 		return
 	_member_panel.visible = true
-	_member_icon.kind = SKILL_ICONS.get(member, &"notebook")
-	_member_icon.color = MEMBER_COLORS.get(member, Color.WHITE)
-	_member_label.text = Loc.t("ui.hud.controls_label", {"name": Loc.member_name(member)})
+	var changed := member != _active_member
+	_active_member = member
+	for m in MEMBERS:
+		var ic := _portraits[m] as IconView
+		var active := m == member
+		var px := PORTRAIT_ACTIVE if active else PORTRAIT_IDLE
+		ic.custom_minimum_size = Vector2(px, px)
+		ic.modulate = Color.WHITE if active else Color(1, 1, 1, 0.85)
+		var holder := ic.get_parent()
+		if active:
+			if _member_pill.get_parent() != holder:
+				if _member_pill.get_parent():
+					_member_pill.get_parent().remove_child(_member_pill)
+				holder.add_child(_member_pill)
+	# O ativo fica sempre na ponta direita (mais perto do canto), os outros a esquerda.
+	_member_panel.move_child(_member_panel.get_node("Portrait_%s" % member), -1)
+	_member_label.text = Loc.member_name(member)
+	(_member_pill as PanelContainer).add_theme_stylebox_override("panel",
+		ThemeV2.box(MEMBER_COLORS.get(member, ThemeV2.NAVY), 28, 8, 5, Color.WHITE, 6))
+	if changed and is_inside_tree():
+		ThemeV2.pop_in(_portraits[member], 0.6)
 
 
 func show_prompt(label: String, icon: StringName) -> void:
+	var was := _prompt_panel.visible
 	_prompt_label.text = label
 	_prompt_icon.kind = icon
 	_prompt_panel.visible = true
+	if not was:
+		ThemeV2.pop_in(_action_button, 0.5)
+		ui_sound.emit(&"pop")
+		_start_pulse()
 
 
 func hide_prompt() -> void:
 	_prompt_panel.visible = false
+	if _pulse:
+		_pulse.kill()
 
 
 func prompt_visible() -> bool:
@@ -410,24 +609,95 @@ func prompt_text() -> String:
 	return _prompt_label.text
 
 
+func _start_pulse() -> void:
+	if _pulse:
+		_pulse.kill()
+	_action_button.self_modulate = Color.WHITE
+	if Options.reduced_motion() or not is_inside_tree():
+		return
+	# A acao do momento e a unica cor que pulsa (style-bible 5): brilho, sem mudar o tamanho.
+	_pulse = create_tween().set_loops()
+	_pulse.tween_property(_action_button, "self_modulate", Color(1.18, 1.12, 1.0), 0.6).set_trans(Tween.TRANS_SINE)
+	_pulse.tween_property(_action_button, "self_modulate", Color.WHITE, 0.6).set_trans(Tween.TRANS_SINE)
+
+
+func _on_action_pressed() -> void:
+	ui_sound.emit(&"confirm")
+	action_pressed.emit()
+	# O toque/clique vira a mesma intencao do teclado/controle: o jogo nao precisa saber de onde veio.
+	for p in [true, false]:
+		var ev := InputEventAction.new()
+		ev.action = &"interact"
+		ev.pressed = p
+		Input.parse_input_event(ev)
+
+
+func action_button() -> Button:
+	return _action_button
+
+
 func set_skip_hint(on: bool) -> void:
 	_skip_label.get_parent().visible = on
+
+
+# ---------- dispositivo ----------
+
+func _input(event: InputEvent) -> void:
+	var dev := last_device
+	if event is InputEventKey or event is InputEventMouseButton:
+		dev = &"keyboard"
+	elif event is InputEventJoypadButton or (event is InputEventJoypadMotion and absf((event as InputEventJoypadMotion).axis_value) > 0.5):
+		dev = &"pad"
+	elif event is InputEventScreenTouch:
+		dev = &"touch"
+	if dev != last_device:
+		set_device(dev)
+
+
+## Troca o glifo exibido (teclado E / controle A / toque sem glifo). Nao altera estado do jogo.
+func set_device(dev: StringName) -> void:
+	last_device = dev
+	_update_glyph()
+	device_changed.emit(dev)
+
+
+func glyph_text() -> String:
+	return _glyph_label.text
+
+
+func _update_glyph() -> void:
+	match last_device:
+		&"pad":
+			_glyph_label.text = Loc.t("ui.glyph.pad")
+		&"touch":
+			_glyph_label.text = ""
+		_:
+			_glyph_label.text = Loc.t("ui.glyph.keyboard")
+	_glyph_badge.visible = not _glyph_label.text.is_empty()
 
 
 # ---------- legendas ----------
 
 func speaker_name_for(key: String) -> String:
-	var parts := key.split(".")
-	if parts.size() >= 3:
-		var who := parts[2]
-		var name_key := "member.%s.name" % who
-		if Loc.has_key(name_key):
-			return Loc.t(name_key)
+	var who := speaker_for(key)
+	if who != &"":
+		return Loc.member_name(who)
 	return ""
 
 
-func say(key: String, params: Dictionary = {}, is_hint: bool = false) -> void:
-	_queue.append({"key": key, "params": params, "hint": is_hint})
+func speaker_for(key: String) -> StringName:
+	var parts := key.split(".")
+	if parts.size() >= 3 and Loc.has_key("member.%s.name" % parts[2]):
+		return StringName(parts[2])
+	return &""
+
+
+## Fala com legenda. `emotes`: pictogramas de res://ui/brand/icons (ex.: [&"question", &"paw"]) ao lado do nome.
+func say(key: String, params: Dictionary = {}, is_hint: bool = false, emotes: Array[StringName] = []) -> void:
+	var use_emotes := emotes
+	if use_emotes.is_empty() and emotes_hook.is_valid():
+		use_emotes = emotes_hook.call(key)
+	_queue.append({"key": key, "params": params, "hint": is_hint, "emotes": use_emotes})
 	if not _speaking:
 		_pump()
 
@@ -467,15 +737,58 @@ func clear_speech(only_hints: bool = false) -> void:
 		_skip_current = true
 
 
+func current_emotes() -> Array[StringName]:
+	var out: Array[StringName] = []
+	for c in _emote_box.get_children():
+		if c is IconView and not c.is_queued_for_deletion():
+			out.append((c as IconView).kind)
+	return out
+
+
+func _show_line(entry: Dictionary) -> void:
+	var key := String(entry["key"])
+	var who := speaker_for(key)
+	_sub_speaker.text = speaker_name_for(key)
+	_sub_speaker.visible = not _sub_speaker.text.is_empty()
+	if who != &"":
+		_sub_portrait.kind = SKILL_ICONS.get(who, &"notebook")
+		_sub_portrait.color = MEMBER_COLORS.get(who, ThemeV2.NAVY)
+		_sub_portrait.texture_override = _portrait_textures.get(who, null)
+		_sub_speaker.add_theme_color_override("font_color", (MEMBER_COLORS.get(who, ThemeV2.NAVY) as Color).darkened(0.2))
+	else:
+		# Sem falante (dica de Farol 7 no radio, sons): buzina/radio.
+		_sub_portrait.kind = &"horn"
+		_sub_portrait.color = ThemeV2.NAVY
+		_sub_portrait.texture_override = null
+	for c in _emote_box.get_children():
+		_emote_box.remove_child(c)
+		c.queue_free()
+	var emotes: Array = entry.get("emotes", [])
+	for e in emotes:
+		var ic := _icon(_emote_box, StringName(e), 64, ThemeV2.NAVY)
+		ic.ring = 0.06
+		ThemeV2.pop_in(ic, 0.3, 0.4, 0.1 * _emote_box.get_child_count())
+	_emote_box.visible = not emotes.is_empty()
+	if not emotes.is_empty():
+		var typed: Array[StringName] = []
+		for e in emotes:
+			typed.append(StringName(e))
+		emotes_shown.emit(who, typed)
+		ui_sound.emit(&"emote")
+	_sub_text.add_theme_font_size_override("font_size", int(round(FONT * Options.subtitle_scale())))
+	_sub_text.text = Loc.t(key, entry["params"])
+	var was := _sub_panel.visible
+	_sub_panel.visible = true
+	if not was:
+		ThemeV2.pop_in(_sub_panel, 0.85, 0.3)
+
+
 func _pump() -> void:
 	_speaking = true
 	while not _queue.is_empty():
 		var entry: Dictionary = _queue.pop_front()
-		var text := Loc.t(String(entry["key"]), entry["params"])
-		_sub_speaker.text = speaker_name_for(String(entry["key"]))
-		_sub_speaker.visible = not _sub_speaker.text.is_empty()
-		_sub_text.text = text
-		_sub_panel.visible = true
+		_show_line(entry)
+		var text := _sub_text.text
 		_hint_active = bool(entry["hint"])
 		_skip_current = false
 		line_started.emit(String(entry["key"]))
@@ -508,24 +821,24 @@ func open_choice(title: String, options: Array[Dictionary]) -> void:
 	var first: Button = null
 	for o in options:
 		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 32)
-		var icon := IconView.new()
-		icon.kind = StringName(o.get("icon", "bank"))
-		icon.custom_minimum_size = Vector2(88, 88)
-		row.add_child(icon)
+		row.add_theme_constant_override("separation", 28)
+		_choice_box.add_child(row)
+		var icon := _icon(row, StringName(o.get("icon", "bank")), 112)
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		var b := _button(row, String(o["label"]), 560)
 		var id := StringName(o["id"])
 		b.pressed.connect(func() -> void: _pick(id))
-		_choice_box.add_child(row)
 		if first == null:
 			first = b
 	# Voltar visivel para mouse/toque (Esc/cancelar ja fazia o mesmo).
-	var back := _button(_choice_box, Loc.t("ui.menu.back"), 360)
+	var back := _button(_choice_box, Loc.t("ui.menu.back"), 360, &"", &"QuietButton")
 	back.name = "BackButton"
 	back.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	back.pressed.connect(func() -> void: _pick(&""))
 	_choice_panel.visible = true
 	choice_open = true
+	ThemeV2.pop_in(_choice_panel, 0.8)
+	ui_sound.emit(&"pop")
 	if first:
 		first.grab_focus()
 
@@ -540,15 +853,23 @@ func _pick(id: StringName) -> void:
 	choice_made.emit(id)
 
 
-# ---------- troca de integrante ----------
+# ---------- troca de integrante (cartao de equipe) ----------
 
 func open_handoff(text: String, member: StringName) -> void:
 	_handoff_icon.kind = SKILL_ICONS.get(member, &"notebook")
-	_handoff_icon.color = MEMBER_COLORS.get(member, Color.WHITE)
+	var col: Color = MEMBER_COLORS.get(member, ThemeV2.NAVY)
+	_handoff_icon.color = col
+	_handoff_icon.texture_override = _portrait_textures.get(member, null)
+	_handoff_title.add_theme_color_override("font_color", col)
+	_handoff_title.add_theme_color_override("font_outline_color", Color.WHITE)
+	_handoff_card.add_theme_stylebox_override("panel", ThemeV2.box(ThemeV2.PAPER, 40, 30, 10, col, 12))
 	_handoff_text.text = text
 	_handoff_panel.visible = true
 	handoff_open = true
 	_handoff_since = Time.get_ticks_msec() / 1000.0
+	ThemeV2.pop_in(_handoff_card, 0.6, 0.45)
+	ThemeV2.pop_in(_handoff_icon, 0.3, 0.6, 0.15)
+	ui_sound.emit(&"handoff")
 	_handoff_button.grab_focus()
 
 
@@ -572,6 +893,7 @@ func _confirm_handoff() -> void:
 func open_pause() -> void:
 	pause_open = true
 	_pause_panel.visible = true
+	ThemeV2.pop_in(_pause_box, 0.85, 0.25)
 	_pause_resume.grab_focus()
 
 
@@ -583,6 +905,11 @@ func close_pause() -> void:
 func open_complete() -> void:
 	complete_open = true
 	_complete_panel.visible = true
+	ThemeV2.pop_in(_complete_box, 0.7, 0.4)
+	for i in _complete_stars.size():
+		ThemeV2.pop_in(_complete_stars[i], 0.2, 0.5, 0.35 + i * 0.25)
+		if is_inside_tree() and not Options.reduced_motion():
+			get_tree().create_timer(0.35 + i * 0.25).timeout.connect(func() -> void: ui_sound.emit(&"star"))
 	_complete_replay.grab_focus()
 
 
