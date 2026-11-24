@@ -19,7 +19,7 @@ Levar o jogo ao padrão audiovisual de uma série de aventura pré-escolar em 3D
 
 ## Decisões de produto (Thiago, 2026-11-23)
 - **D1 · Elenco:** crianças-heróis humanas (SPEC §2 mantida), proporções infantis estilizadas, uniformes de equipe com **emblema próprio da Rota Brava** e cor-assinatura: Rastro laranja, Pico verde, Leme azul. Cada um com equipamento próprio (lupa/caderno; corda/mosquetões/capacete com lanterna; colete náutico/bússola de pulso).
-- **D2 · Vozes:** TTS neural **local** (Piper, offline) só na produção; vozes pt-BR com licença verificada e registrada; o jogo distribuído continua sem IA. Gravação humana prevista antes do lançamento.
+- **D2 · Vozes (híbrido, decisão de Thiago):** heróis, piloto, filhote e moradores falam em **balbucio** (dialeto de desenho: sílabas rápidas sintetizadas por script, timbre e altura próprios por personagem, entonação por intenção: normal, urgência, descoberta, pergunta, alegria), com **legenda verbal e não verbal** (texto + ícones/emotes no balão, ex.: pata, interrogação, coração, gotas de esforço). As **instruções essenciais e as dicas faladas** vêm de **Farol 7 pelo rádio**, em voz adulta **Piper** (TTS local, offline, só na produção; licença da voz verificada e registrada) com filtro de rádio, para atender quem ainda não lê (SPEC §5). O jogo distribuído continua sem IA. Gravação humana possível antes do lançamento. **Mudança de produto em relação à SPEC §6** (“uma voz consistente por integrante”): a consistência passa a ser do timbre do balbucio; a fala de Farol 7 “Farol 7, aqui é Rota Brava. Achamos o barco.” continua sendo o teste de pronúncia e de filtro de rádio.
 - **D3 · Música e efeitos:** permitido usar amostras e instrumentos de terceiros **CC0/domínio público**, com procedência registrada por arquivo. Composição e mixagem originais. Qualquer licença que não seja CC0/PD exige consulta a Thiago.
 - **D4 · Arte conceitual:** **sem modelo de imagem** (decisão de Thiago após a falha do provedor padrão). O alvo visual sai de **estudos renderizados no Blender** feitos pelo `art3d` (proporção, silhueta, paleta, luz, composição de cena na câmera de jogo) e de **SVG** feito pelo `ux` (logo, emblema, pictogramas, telas de UI). Os estudos são fonte do projeto e podem evoluir para arte final; renders ficam fora do Git, scripts e `.blend`/`.svg` dentro.
 - **D5 · Modelos dos agentes:** `art3d`, `gameplay`, `ux`, `audio`, `reviewer` → `anthropic/claude-opus-5-5#low`; `adventure`, `build-qa` → `opencode/deepseek-v4.1-flash-free#max`. O revisor fica no Opus porque precisa ler imagens.
@@ -48,7 +48,7 @@ Levar o jogo ao padrão audiovisual de uma série de aventura pré-escolar em 3D
 - Opções: volumes por bus, tamanho de legenda, movimento reduzido, assistência de pilotagem. Tudo testado em 16:9, 20:9 e 4:3.
 
 **Áudio**
-- Vozes Piper por personagem com timbre distinto e infantilizado quando possível (ajuste de altura e formante registrado), intenção por fala, sincronizadas com a boca.
+- Balbucio por personagem: timbre e altura distintos (Rastro baixo e calmo, Pico curto e vivo, Leme rápido e melódico, piloto grave, filhote em latidinhos), sílabas variadas sem repetição perceptível, entonação por intenção, duração proporcional ao texto, **boca sincronizada**; legenda com ícones/emotes. Rádio de Farol 7 em Piper com filtro, inteligível com motor e água ligados.
 - Música original com instrumentos reais (CC0): tema da equipe com motivo memorável, versões exploração, descoberta, travessia e retorno, e vinhetas curtas (pista, troca de herói, vitória).
 - Efeitos CC0 em camadas: água, vento, gaivotas, multidão da vila, passos por superfície, barco/motor por RPM, corda, UI.
 - Mixagem: loudness integrada medida (alvo ~−16 LUFS no master), pico ≤ −1 dBTP, ducking audível nas falas. **Audição de Thiago obrigatória no Portão 2.**
@@ -81,6 +81,14 @@ Fora do escopo: save/retomada, locução humana, Android/iOS (RB-05 e RB-06).
 8. Suíte de testes verde, bot ponta a ponta concluindo o episódio, build Windows, vídeo com som, capturas nas 3 proporções.
 9. Revisão independente aprovada → **Portão 2:** Thiago joga, ouve e decide.
 
+## Defeitos herdados do RB-04 (revisão parcial) — corrigir neste ticket
+- A mão do Rastro **não alcança a marca real do banco** no jogo; o teste media contra um alvo sintético → o teste deve usar a posição real da marca no barco.
+- Câmera ocluída por uma peça na inspeção da bota → teste de oclusão da câmera nos enquadramentos de inspeção.
+- Sem testes para a ajuda (H), `BoatActor.CREW`, `Stylize` e volume do passo → cobrir.
+- `tools/measure_video_audio.py` pode dar pico verdadeiro menor que o de amostra → corrigir e testar.
+- Relatório de desempenho sem RAM do processo nem transparência → acrescentar.
+- Captura 4:3 válida nunca feita no jogo → método de captura com `override.cfg` documentado em `tools/`.
+
 ## Casos de falha
 Ativo ou áudio sem procedência, ou com licença diferente de CC0/PD sem aprovação → reprovado. Pranchas de conceito dentro do jogo ou no Git → reprovado. Personagem fora da barra (proporção adulta, sem identidade de equipe) → reprovado. Plano vazio na câmera de jogo → reprovado.
 
@@ -108,7 +116,7 @@ python tools/measure_video_audio.py captures/ep01-playthrough.avi
 ```
 
 ## Riscos
-- **Vozes infantis por TTS:** vozes Piper pt-BR são adultas; a infantilização por ajuste de altura e formante pode soar artificial. Mitigação: registrar e escolher a melhor no Portão 2; a gravação humana resolve.
+- **Compreensão sem leitura:** com balbucio, o pré-leitor depende do rádio, de gestos e de ícones; mitigação: toda instrução essencial também vai ao rádio e à dica de gesto; testar uma passagem “sem ler” (só áudio do rádio + imagem).
 - **Alvo visual sem ilustração:** estudos Blender são mais crus que arte conceitual pintada; mitigação: render com luz, materiais e contorno da bíblia de estilo, na câmera real, e iteração antes do Portão 1.
 - **Custo do Opus** em execuções longas de arte; **tamanho do repositório** com mais áudio e modelos (medir e registrar).
 - **Nenhum agente ouve áudio**: o aceite sonoro depende de Thiago.
