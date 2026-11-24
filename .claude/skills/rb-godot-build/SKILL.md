@@ -4,9 +4,18 @@ description: Instalar a Godot fixada, importar, testar, exportar e dar smoke tes
 ---
 
 ## Entradas
-Checkout do repositorio no Windows com PowerShell 7. Versoes e SHA-256 em `tools/toolchain.json`.
+Checkout do repositorio no Windows (PowerShell 7) ou no Linux/nuvem (bash). Versoes e SHA-256 em `tools/toolchain.json` e `tools/setup-linux.sh`.
 
 ## Procedimento
+Linux/nuvem (bash, a partir da raiz):
+```bash
+bash tools/setup-linux.sh      # Godot 4.7.2 + templates e Blender 4.5.16 em .tools/ (SHA-256)
+bash tools/test.sh             # import + suite com timeout; filtro: bash tools/test.sh dialogue
+bash tools/build-windows.sh    # build/windows/RotaBrava.exe
+```
+O smoke test do exe so roda no Windows (`tools/smoke-test.ps1`); no Linux registre-o como pendente.
+
+Windows:
 Rodar em primeiro plano, a partir da raiz (o shell em background nao inicia `pwsh`):
 ```powershell
 ./tools/setup-toolchain.ps1                                   # instala em .tools/ (idempotente)

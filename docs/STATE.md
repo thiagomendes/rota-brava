@@ -79,7 +79,7 @@ bash tools/build-windows.sh          # exporta build/windows/RotaBrava.exe a par
 - Placar de qualidade: `docs/agent-scorecard.md`.
 
 ## 6. Regras que não mudam
-SDD (ticket antes do código, evidências no ticket); merge pelo lead depois da revisão; push da branch em uso pelo lead a cada etapa (autorizado por Thiago em 2026-11-24), nunca force; geometria 100% do zero; áudio de terceiros só CC0/PD com procedência por arquivo; sem modelo de imagem; balbucio + rádio Piper; nunca afirmar que viu/ouviu/mediu sem ter feito; Thiago ouve e aprova o som.
+SDD (ticket antes do código, evidências no ticket); merge pelo lead depois da revisão; push da branch em uso pelo lead a cada etapa (autorizado por Thiago em 2026-11-24; inclui o merge em `main` e o push de `main` na tarefa 11, depois da revisão), nunca force; geometria 100% do zero; áudio de terceiros só CC0/PD com procedência por arquivo; sem modelo de imagem; balbucio + rádio Piper; nunca afirmar que viu/ouviu/mediu sem ter feito; Thiago ouve e aprova o som.
 
 ## 7. Histórico curto
 RB-01 fundação → RB-02 missão em blocos → RB-03 referências → RB-04 primeiro minuto (base técnica; arte reprovada) → **RB-R1 reorientação premium (ativo, ~85%)** → (pausa de análise) → RB-05 episódio final → RB-06 portabilidade → RB-07 candidato.
