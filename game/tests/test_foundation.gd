@@ -87,8 +87,9 @@ func run(runner) -> void:
 			r.check(_has_button(action, index), "'%s' tem o botao de controle %d" % [action, index])
 	for action: StringName in AXES:
 		r.check(_has_axis(action, AXES[action][0], AXES[action][1]), "'%s' tem o eixo do analogico" % action)
-	r.check(String(ProjectSettings.get_setting("rendering/renderer/rendering_method")) == "mobile",
-		"renderizador configurado: mobile")
+	# RB-R1 D12: Windows primeiro, com qualidade -> renderizador completo (Forward+). Celular fica para depois.
+	r.check(String(ProjectSettings.get_setting("rendering/renderer/rendering_method")) == "forward_plus",
+		"renderizador configurado: forward_plus (D12)")
 
 	var menu := await _swap_to("res://ui/main_menu.tscn") as MainMenu
 	r.check(_focus(menu) == menu.play_button, "foco inicial em Jogar")
