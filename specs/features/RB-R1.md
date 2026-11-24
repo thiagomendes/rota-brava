@@ -128,8 +128,14 @@ python tools/measure_video_audio.py captures/ep01-playthrough.avi
 - **Câmera:** os heróis têm 1,14 m e ficaram com ~80 px em 720p; alvo da bible (12 a 18% da altura da tela na exploração) passa a ser medido em teste em todos os estágios.
 - **Portão 1:** aprovado pelo lead com base nos estudos (vila B, heróis A, marca e UI v2), por delegação de Thiago; reversível.
 
-## Evidências
-_(preencher)_
+## Evidências (parciais — pausa em 2026-11-24; continuar em `docs/STATE.md`)
+- **Suíte na integração:** `RESULTADO: OK (2650 PASS, 0 FALHA(S))` (Windows, Godot 4.7.2, commit de merge `ea8e4a8` + runner corrigido).
+- **Heróis (vistos em render e no jogo):** Rastro 1,140 m, cabeça 36,9%; Pico 1,083 m / 37,0%; Leme 1,114 m / 37,7%; ~19–20 mil triângulos; pés ±2 cm em 100% do walk; mão do Rastro a 31 mm da PawMark **real** (defeito herdado corrigido); mão da Leme a 44 mm do volante.
+- **Mundo (visto):** vila B, margem sul, rio de 152 m com ponte (vão 3,49 m medido), ilha; draw calls 118–1029 por vista; desktop 1080p p95 ≈ 6,5 ms com o porto (medido antes do mapa completo).
+- **Câmera:** herói 12,4–16,2% da altura da tela em 16:9, 20:9 e 4:3 (teste); sem oclusão (teste pegou a cabana na pegada).
+- **Áudio (medido, não ouvido):** mixagem de referência −16,2 LUFS / −1,05 dBTP; voz ≥ 9,6 LU acima do fundo; licenças verificadas (Piper `jeff` base CC0; FreePats, Kenney, OpenGameArt CC0).
+- **UI:** HUD v2 e tela-título com heróis 3D vistos em 16:9; retratos renderizados no HUD.
+- **Pendentes:** ver `docs/STATE.md` §2 (pedras duplicadas na ilha, piloto/filhote no mundo, entrada norte na atracação, moradores, grama, contador de emblemas, opções no jogo, duração humana, capturas, desempenho final, vídeo, revisão, Portão 2).
 
 ## Revisão
 _(pendente)_

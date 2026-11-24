@@ -1,69 +1,84 @@
 # Rota Brava · Estado do projeto (passagem entre sessões)
 
-> **Leia este arquivo primeiro** ao abrir uma nova sessão, com qualquer modelo. Ele é atualizado e commitado a cada etapa.
-> Depois leia: `AGENTS.md`, `SPEC.md`, `specs/features/RB-R1.md` (ticket ativo), `docs/style-bible.md`, `docs/agent-scorecard.md`.
-> Nunca confie só neste resumo: confirme com `git log`, `git worktree list` e rodando os testes.
+> **Leia este arquivo primeiro** ao abrir uma nova sessão, com qualquer modelo/ferramenta. Atualize e commite a cada etapa.
+> Depois leia: `CLAUDE.md`/`AGENTS.md`, `SPEC.md`, `specs/features/RB-R1.md` (ticket ativo), `docs/style-bible.md`, `docs/agent-scorecard.md`.
+> Nunca confie só neste resumo: confirme com `git log`, `git worktree list`/branches e rodando os testes.
 
-**Atualizado em:** 2026-11-24 · **Branch de integração ativa:** `feature/rb-r1-reorientacao` · **`main`:** RB-01 a RB-04 (RB-04 só como base técnica).
+**Atualizado em:** 2026-11-24 (pausa pedida por Thiago; migração do OpenCode/Windows para o Claude Code na nuvem).
+**Remoto:** `https://github.com/thiagomendes/rota-brava` (todas as branches enviadas).
+**Branch de integração ativa:** `feature/rb-r1-reorientacao` (commit no topo = estado mais recente). **`main`:** RB-01 a RB-04 (RB-04 só base técnica).
+**Última suíte medida na integração:** `RESULTADO: OK (2650 PASS, 0 FALHA(S))` (Windows, Godot 4.7.2).
 
 ## 1. Onde estamos
-- **Ticket ativo:** `RB-R1 · Reorientação de qualidade (premium)` (`specs/features/RB-R1.md`). Origem: Thiago reprovou a arte/som/UI do RB-04.
-- **Portão 1:** decidido pelo lead por delegação de Thiago (vila **B** “na orla”; heróis direção **A** “brinquedo brilhante”; UI v2). Reversível.
-- **Próximo marco:** **Portão 2** (Thiago joga o primeiro minuto + mapa completo e OUVE o som). **Instrução de Thiago: PARAR ao final do RB-R1** (não iniciar RB-05) para uma pausa de análise da sequência.
+- **Ticket ativo:** `RB-R1 · Reorientação de qualidade (premium)`. Origem: Thiago reprovou arte/som/UI do RB-04 (“personagens nada infantis, gráfico ruim, som primitivo, mapa sem tamanho/densidade”).
+- **Portão 1:** decidido pelo lead por delegação (vila **B** “na orla”; heróis **A** “brinquedo brilhante”; UI v2). Reversível.
+- **Próximo marco:** **Portão 2** — Thiago joga o primeiro minuto + mapa completo e **ouve** o som.
+- **Instrução de Thiago:** concluir o RB-R1 e **PARAR** (não iniciar RB-05) para uma pausa de análise da sequência.
 
 ## 2. Kanban do RB-R1
-**Concluído e integrado em `feature/rb-r1-reorientacao`:**
-- Bíblia de estilo (`docs/style-bible.md`); decisões D1–D6 no ticket; modelos dos agentes em `.opencode/agents/` (Opus 5.5 low: art3d, gameplay, ux, audio, reviewer; DeepSeek V4.1 Flash Free max: adventure, build-qa).
-- Diálogos híbridos (`game/episodes/ep01/ep01_dialogue.json`, `game/i18n/pt_BR.radio.json`).
-- Heróis A: Rastro, Pico, Leme (rig 28 ossos, rosto, visemas, corrida, pose de equipe), piloto, filhote, 3 moradores, retratos (`game/ui/portraits/`).
-- Mundo: vila Farol 7 + porto (`game/episodes/ep01/world/harbor_slice.tscn`, já no jogo), margem sul, `river_world.tscn`, `island_world.tscn`, `horizon.tscn` (existem; **ainda não ligadas aos estágios**), mapa em `world/LAYOUT_PROPOSTO.md` (adotado).
-- UI v2: marca SVG (`game/ui/brand/`), tema v2, tela-título com heróis 3D, HUD com retratos/emotes/botão de ação, opções.
-- Áudio: balbucio + rádio Piper + música/foley CC0, `AudioDirector` ligado (fala com boca sincronizada, rádio após instruções, zonas, passos por piso).
-- Visual v2: céu com nuvens (`game/art/sky.gdshader`), contorno (`outline.gdshader`), atmosfera.
-- Testes: **2563 PASS** (último resultado medido no commit `c69fecc`).
+**Concluído e integrado (`feature/rb-r1-reorientacao`):**
+- Bíblia de estilo (`docs/style-bible.md`); decisões D1–D6 no ticket.
+- Diálogos híbridos: `game/episodes/ep01/ep01_dialogue.json` (emotes, intenção, `radio_key`), `game/i18n/pt_BR.radio.json` (25 falas de Farol 7).
+- Heróis direção A: Rastro, Pico, Leme (rig 28 ossos, 7 expressões + visemas, olhar, walk/run/stop/jump/team_pose…), piloto, filhote, 3 moradores, retratos `game/ui/portraits/` — no HUD e na tela-título.
+- Mundo: `game/episodes/ep01/world/` — `harbor_slice.tscn` (vila Farol 7 + porto + margem sul), `river_world.tscn` (rio 152 m, ponte, banco de areia, enseada), `island_world.tscn`, `horizon.tscn` — **todos ligados aos estágios**. Mapa: `world/LAYOUT_PROPOSTO.md` (adotado; ilha +90 m em x).
+- UI v2: marca SVG (`game/ui/brand/`), tema v2, tela-título com heróis 3D animados, HUD com retratos/emotes/botão de ação, opções (`user://options.cfg`).
+- Áudio: balbucio (personagens) + rádio Piper (Farol 7) com boca sincronizada; rádio repete instruções após o balbucio; música e foley CC0; zonas de ambiente; passos por piso; `AudioDirector`. Mixagem de referência −16,2 LUFS / −1,05 dBTP (medida; **ninguém ouviu**).
+- Visual v2: céu com nuvens, contorno nos personagens, atmosfera.
+- Jogabilidade (merge `ea8e4a8`): mapa em tamanho final, correr com rampa, pulo do Pico (automático na borda + mira assistida; erro volta ao último apoio), pose de equipe 1,2 s na troca (`team_pose_started/finished`), retorno visual (`game/actors/feedback/`), 10 emblemas (`Ep01Main.collectible_found(count,total)`), câmera com herói em 12,4–16,2% da tela nas 3 proporções e sem oclusão. Bot completa o episódio no mapa novo (238 s de jogo no modo rápido).
+- Claude Code: `.claude/agents/` (Opus 5.5; lead medium, subagentes low), `.claude/settings.json`, `CLAUDE.md`, skills; toolchain Linux `tools/*.sh`.
 
-**Em andamento:** frente **jogabilidade** (agente `gameplay`, worktree `C:\Git\rota-brava-wt\rb-r1-jogo`, branch `feature/rb-r1-jogo`): mapa em tamanho final (constantes do LAYOUT), correr, pulo do Pico, pose de equipe na troca, retorno visual, 10 colecionáveis, câmera (herói 12–18% da tela, sem oclusão), ligar cenas de mundo, duração ≥ 8 min. **Incidente 2026-11-24:** teste `game_feel` travou ~12 h; processos encerrados e tarefa devolvida com regra de limite de tempo.
+**A fazer para fechar o RB-R1 (nesta ordem):**
+1. **Ilha: pedras duplicadas** (cubos do estágio antigo sobre as rochas de `island_world`) e **piloto/filhote ainda em blocos** — esconder os blocos do `island_stage.gd` quando `island_world` existir; instanciar `captain_model.tscn` e `pup_model.tscn` no acampamento (`PILOT_CAPTAIN_POS`) e o filhote pisando na buzina no final (`step_on_horn`).
+2. Atracação: barco entra no braço do rio pelo **norte** (z < 1,5), não pelo sul (z 13); conferir com `river_world` (língua de terra x 175,5–182, z 1,5–18).
+3. Moradores animados na vila (12–20, rotinas simples) usando `villager_a/b/c.tscn`.
+4. Grama menos saturada (verde-limão) — materiais `mat_env_*` em `source_art/environment` ou atmosfera.
+5. Contador de emblemas no HUD (ligar `collectible_found`).
+6. Opções ligadas ao jogo (volumes por bus, tamanho de legenda, movimento reduzido, assistência de pilotagem).
+7. Medir duração em **modo humano** (`--ep01-demo-human`; meta ≥ 8 min) e registrar.
+8. Capturas 16:9 / 20:9 / 4:3 (menu, cais, inspeção, pulo do Pico, troca de equipe, atracação).
+9. Desempenho (3 passagens) e vídeo com som medido.
+10. Evidências no `specs/features/RB-R1.md`; revisão independente (`reviewer`); correções; nova revisão.
+11. Merge em `main`, build Windows, pacote do **Portão 2** e **PARAR**.
 
-**A fazer pelo lead depois da jogabilidade (nesta ordem):**
-1. Merge de `feature/rb-r1-jogo` na integração; resolver conflitos com áudio/elenco.
-2. Piloto + filhote no acampamento da ilha; filhote pisando na buzina no final.
-3. 12–20 moradores animados na vila.
-4. Grama menos saturada (verde-limão) — materiais `mat_env_*` / atmosfera.
-5. Contador de colecionáveis no HUD.
-6. Opções ligadas ao jogo (volumes por bus, legenda, movimento reduzido, assistência).
-7. Capturas 16:9 / 20:9 / 4:3 (menu, cais, inspeção, atracação).
-8. Desempenho: `./tools/perf-capture.ps1` (3 passagens).
-9. Vídeo com som: `./tools/record-playthrough.ps1` + `python tools/measure_video_audio.py captures/ep01-playthrough.avi`.
-10. Revisão independente (`reviewer`); corrigir; nova revisão.
-11. Merge em `main`, build, pacote do **Portão 2** e **parar**.
+**Dívida conhecida (backlog):** capitão adulto fraco; mancha no olho do filhote ao piscar; faixas do colete da Leme; sem marimba/pizzicato CC0 (xilofone/harpa); ~1000 draw calls (celular); teste de retrato fraco; Godot reescreve `game/audio/default_bus_layout.tres` (só comentários; restaurar com `git checkout` antes de commitar — `tools/test.sh` já faz).
 
-**Dívida conhecida (backlog):** capitão adulto fraco; mancha no olho do filhote ao piscar; faixas do colete da Leme; sem marimba/pizzicato CC0 (xilofone/harpa); ~1000 draw calls (celular); teste de retrato fraco; Godot reescreve `game/audio/default_bus_layout.tres` (só remove comentários; restaurar com `git checkout` antes de commitar).
-
-## 3. Como retomar (comandos)
-```powershell
-cd C:\Git\rota-brava
-git status ; git log --oneline -15 ; git worktree list
-./tools/setup-toolchain.ps1                 # Godot 4.7.2 + Blender 4.5.16 em .tools/ (hash conferido)
-./tools/setup-audio-tools.ps1               # só para regenerar áudio (Piper, FluidSynth, CC0); roda no worktree de áudio
-./tools/godot.ps1 --headless --path game --import
-./tools/godot.ps1 --headless --path game --script res://tests/run_tests.gd   # suíte; -- --only=<parte> filtra
-./tools/build-windows.ps1                   # build/windows/RotaBrava.exe
-git checkout -- game/audio/default_bus_layout.tres   # antes de commitar
+## 3. Como retomar
+### Na nuvem / Linux (Claude Code)
+```bash
+git clone https://github.com/thiagomendes/rota-brava && cd rota-brava
+git checkout feature/rb-r1-reorientacao
+sudo apt-get update && sudo apt-get install -y curl unzip xz-utils python3 python3-venv \
+  libxi6 libxkbcommon0 libsm6 libgl1 libegl1 libvulkan1 mesa-vulkan-drivers xvfb   # libs para Godot/Blender
+bash tools/setup-linux.sh            # Godot 4.7.2 (+templates) e Blender 4.5.16 em .tools/ (SHA-256)
+bash tools/test.sh                   # import + suíte com timeout (filtro: bash tools/test.sh dialogue)
+bash tools/build-windows.sh          # exporta build/windows/RotaBrava.exe a partir do Linux
 ```
-- Ver o jogo sem desktop livre: `./tools/godot.ps1 --path game res://episodes/ep01/ep01_main.tscn --ep01-start=<estado> --write-movie <pasta>\f.png --fixed-fps 10 --resolution 1280x720 --quit-after 30`. Outra resolução exige `game/override.cfg` temporário (nunca versionar).
-- `--ep01-demo` = bot com entrada real; `--ref-demo` = tela de referências; `--perf-probe` = sonda de desempenho.
-- Shell: PowerShell 7; use `workdir` (não `cd`); se falhar ao iniciar com “Acesso negado”, repita. Em background o shell não inicia `pwsh`.
-- **Limite de tempo:** todo teste com laço de espera precisa de limite; rode suíte com timeout ≤ 15 min.
+- **Ver o jogo sem GPU** (não verificado na nuvem): `xvfb-run -a bash tools/godot.sh --path game --rendering-driver vulkan res://episodes/ep01/ep01_main.tscn --ep01-start=dock_investigation --write-movie /tmp/f/f.png --fixed-fps 10 --quit-after 30` (Vulkan por software via lavapipe; se falhar, tente `--rendering-method gl_compatibility`, mas o visual do renderizador Mobile pode diferir). Se não houver renderização possível, registre a captura como pendente para Windows.
+- **Áudio** (Piper/FluidSynth): `tools/setup-audio-tools.ps1` é Windows; no Linux use `python3 -m venv .tools/py && .tools/py/bin/pip install piper-tts==1.8.0 numpy scipy soundfile mido onnxruntime` e `apt-get install fluidsynth`; os takes Piper já gerados estão em `source_audio/radio/takes/` (reuso garante WAV idênticos). Só regenere se mudar falas.
+### No Windows (OpenCode ou Claude Code)
+```powershell
+./tools/setup-toolchain.ps1 ; ./tools/godot.ps1 --headless --path game --import
+./tools/godot.ps1 --headless --path game --script res://tests/run_tests.gd ; ./tools/build-windows.ps1
+```
+### Comum
+- `--ep01-start=<estado>` inicia num estado; `--ep01-demo` bot com entrada real; `--ep01-demo-human` bot com ritmo humano; `--ref-demo` tela de referências; `--perf-probe` sonda de desempenho.
+- **Limite de tempo em testes**: todo laço de espera precisa de limite; suíte com timeout ≤ 15 min (`tools/test.sh`).
+- Outra resolução de captura exige `game/override.cfg` temporário (o projeto ignora `--resolution`); nunca versionar.
 
-## 4. Worktrees e branches
-| Worktree | Branch | Situação |
-|---|---|---|
-| `C:\Git\rota-brava` | `feature/rb-r1-reorientacao` | integração ativa |
-| `C:\Git\rota-brava-wt\rb-r1-jogo` | `feature/rb-r1-jogo` | **em andamento** (não integrado) |
-| `rb-r1-herois`, `rb-r1-mundo`, `rb-r1-marca-ui`, `rb-r1-audio`, `rb-r1-conteudo` | idem | integrados; podem ser reutilizados para follow-ups |
+## 4. Branches
+| Branch | Situação |
+|---|---|
+| `feature/rb-r1-reorientacao` | **integração ativa** (tudo do RB-R1 até agora) |
+| `feature/rb-r1-{jogo,herois,mundo,marca-ui,audio,conteudo}` | já integradas; podem ser reusadas para follow-ups |
+| `main` | RB-01..RB-04; recebe o RB-R1 só após revisão e Portão 2 |
 
-## 5. Regras que não mudam
-SDD (ticket antes do código, evidências no ticket); merge só LOCAL; nunca `git push`; geometria 100% do zero; áudio de terceiros só CC0/PD com procedência por arquivo; sem modelo de imagem; balbucio + rádio Piper; nunca afirmar que viu/ouviu/mediu sem ter feito; Thiago é quem ouve e aprova o som.
+## 5. Agentes
+- **Claude Code:** `.claude/agents/` — `rota-lead` (agente principal, `claude-opus-5-5`, esforço **medium**), `gameplay`, `adventure`, `art3d`, `ux`, `audio`, `build-qa`, `reviewer` (`claude-opus-5-5`, esforço **low**). Ver com `/tasks`.
+- **OpenCode:** `.opencode/agents/` — Opus 5.5 low (art3d, gameplay, ux, audio, reviewer) e DeepSeek V4.1 Flash Free max (adventure, build-qa).
+- Placar de qualidade: `docs/agent-scorecard.md`.
 
-## 6. Histórico curto
-RB-01 fundação → RB-02 missão em blocos → RB-03 referências → RB-04 primeiro minuto (base técnica; arte reprovada) → **RB-R1 reorientação premium (ativo)** → (pausa de análise) → RB-05 episódio final → RB-06 portabilidade → RB-07 candidato.
+## 6. Regras que não mudam
+SDD (ticket antes do código, evidências no ticket); merge local pelo lead; push só quando Thiago pedir, nunca force; geometria 100% do zero; áudio de terceiros só CC0/PD com procedência por arquivo; sem modelo de imagem; balbucio + rádio Piper; nunca afirmar que viu/ouviu/mediu sem ter feito; Thiago ouve e aprova o som.
+
+## 7. Histórico curto
+RB-01 fundação → RB-02 missão em blocos → RB-03 referências → RB-04 primeiro minuto (base técnica; arte reprovada) → **RB-R1 reorientação premium (ativo, ~85%)** → (pausa de análise) → RB-05 episódio final → RB-06 portabilidade → RB-07 candidato.
