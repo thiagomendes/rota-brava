@@ -10,7 +10,7 @@
 **Última suíte medida na integração:** `RESULTADO: OK (2650 PASS, 0 FALHA(S))` (Windows, Godot 4.7.2).
 **Nuvem (2026-11-24):** `tools/setup-linux.sh` e `tools/test.sh` verificados no Linux: 2650 PASS em 1 min 42 s no `5f877ec`. Ambiente pessoal `rota-brava` libera `download.blender.org` (o Default bloqueava o Blender).
 
-## 0. PAUSA (2026-11-24, pedido de Thiago para economizar créditos) — retomar daqui
+## 0. Retomada após a pausa (Thiago pediu retomar com art3d/ux em esforço medium)
 - **Feito e no GitHub:** trio v2 aprovado por Thiago ("gostei muito"): `feature/rb-r1-rastro-v2` (`b1dcd27`, Rastro v2.1 pronto), `feature/rb-r1-pico-v2` (`7d293d5`), `feature/rb-r1-leme-v2` (`003ea04`). Visualizador 3D: https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (fonte da página fica no scratchpad da sessão; regerar com os GLB em base64 `.glb.txt`, o servidor de artefatos não serve `.glb`).
 - **Interrompido:** acabamento do Pico e da Leme (lista no ticket, "Trio aprovado"). Scripts parcialmente editados, GLB **não** regerado, salvos sem prova em `wip/rb-r1-pico-v2-acabamento` (`625d9b0`) e `wip/rb-r1-leme-v2-acabamento` (`c1d970d`). Retomar: `art3d` parte da branch wip, termina, regera GLB, mede folga das botas (≥ 2 cm), roda suíte; depois o lead leva para a feature branch (fast-forward) e apaga a wip.
 - **Depois:** integrar rastro/pico/leme v2 (conflito esperado só no fim de `source_art/manifest.json`; Pico e Leme ainda não têm a calibração de brilho do import, que vem do Rastro), `reviewer`, atualizar a página 3D, proposta de mundo (vitrine antes), som. `feature/rb-r1-lookdev` (Forward+) ainda não integrada na `feature/rb-r1-reorientacao`.
@@ -84,7 +84,7 @@ bash tools/build-windows.sh          # exporta build/windows/RotaBrava.exe a par
 | `main` | RB-01..RB-04; recebe o RB-R1 só após revisão e Portão 2 |
 
 ## 5. Agentes
-- **Claude Code:** `.claude/agents/` — `rota-lead` (agente principal, `claude-opus-5-5`, esforço **medium**), `art3d` e `ux` (`claude-opus-5-5`, esforço **high**, decisão de 2026-11-24), `gameplay`, `adventure`, `audio`, `build-qa`, `reviewer` (`claude-opus-5-5`, esforço **low**). Ver com `/tasks`.
+- **Claude Code:** `.claude/agents/` — `rota-lead` (agente principal, `claude-opus-5-5`, esforço **medium**), `art3d` e `ux` (`claude-opus-5-5`, esforço **medium**; eram high em 2026-11-24, Thiago baixou na retomada), `gameplay`, `adventure`, `audio`, `build-qa`, `reviewer` (`claude-opus-5-5`, esforço **low**). Ver com `/tasks`.
 - **OpenCode:** `.opencode/agents/` — Opus 5.5 low (art3d, gameplay, ux, audio, reviewer) e DeepSeek V4.1 Flash Free max (adventure, build-qa).
 - Placar de qualidade: `docs/agent-scorecard.md`.
 

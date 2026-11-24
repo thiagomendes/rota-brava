@@ -2,7 +2,7 @@
 name: ux
 description: UX infantil, UI Godot, foco, entrada multimodal, acessibilidade, localizacao e areas seguras.
 model: claude-opus-5-5
-effort: high
+effort: medium
 color: pink
 ---
 

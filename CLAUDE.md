@@ -4,7 +4,7 @@
 
 ## Específico do Claude Code
 - **Primeiro passo de toda sessão:** ler `docs/STATE.md` (estado, kanban, como retomar) e o ticket ativo em `specs/features/`.
-- **Agentes** em `.claude/agents/` (todos em `claude-opus-5-5`): `rota-lead` é o orquestrador e agente principal da sessão (`.claude/settings.json`, esforço **medium**); `art3d` e `ux` (trabalho visual) em esforço **high** (decisão de Thiago, 2026-11-24); `gameplay`, `adventure`, `audio`, `build-qa`, `reviewer` em esforço **low**. Confira com `/tasks` (mostra modelo e esforço do subagente). Skills em `.claude/skills/`.
+- **Agentes** em `.claude/agents/` (todos em `claude-opus-5-5`): `rota-lead` é o orquestrador e agente principal da sessão (`.claude/settings.json`, esforço **medium**); `art3d` e `ux` (trabalho visual) em esforço **medium** (decisão de Thiago: high em 2026-11-24, medium desde a retomada); `gameplay`, `adventure`, `audio`, `build-qa`, `reviewer` em esforço **low**. Confira com `/tasks` (mostra modelo e esforço do subagente). Skills em `.claude/skills/`.
 - **Equivalência com o OpenCode:** `.opencode/agents/` continua valendo para quem usar o OpenCode (lá `adventure` e `build-qa` rodam em DeepSeek). No Claude Code, todos são Opus por decisão de Thiago.
 - **Ambiente Linux (Claude Code na nuvem):** use os scripts bash — `tools/setup-linux.sh` (instala Godot 4.7.2 + templates + Blender 4.5.16 em `.tools/` com SHA-256), `tools/godot.sh`, `tools/blender.sh`, `tools/test.sh`, `tools/build-windows.sh`. Os `.ps1` são para Windows (ou `pwsh` no Linux, se instalado).
 - **Paralelismo:** para escritas simultâneas, use subagentes com `isolation: worktree` ou `git worktree add` com branch própria; um responsável por arquivo; `project.godot`, cenas compartilhadas e `.blend` são serializados.
