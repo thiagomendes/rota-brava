@@ -120,6 +120,13 @@ func run(runner) -> void:
 	r.check(main.hud.speaker_name_for(radio) == Loc.member_name(&"radio"), "fala de radio identifica Farol 7 como falante")
 	main.hud.clear_speech()
 
+	# Retratos renderizados no HUD para os 5 personagens.
+	var missing_portraits: Array[String] = []
+	for member: StringName in Ep01Main.PORTRAIT_FILES:
+		if main.hud.portrait_texture(member) == null:
+			missing_portraits.append(String(member))
+	r.check(missing_portraits.is_empty(), "HUD tem retrato renderizado de todos os personagens %s" % str(missing_portraits))
+
 	# Piso dos passos e zonas de som.
 	r.check(Ep01Main.surface_at(Vector3(0, 0, 0)) == &"wood", "passo no cais e madeira")
 	r.check(Ep01Main.surface_at(Vector3(0, 0, -16)) == &"stone", "passo na rua do porto e pedra")

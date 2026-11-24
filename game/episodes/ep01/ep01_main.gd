@@ -69,6 +69,7 @@ func _ready() -> void:
 	hud.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(hud)
 	_setup_audio()
+	_setup_portraits()
 	hud.help_requested.connect(_on_help)
 	director.state_changed.connect(_on_state_changed)
 	director.event_accepted.connect(_on_event_accepted)
@@ -412,6 +413,19 @@ const UI_SOUNDS := {
 func _on_ui_sound(sound: StringName) -> void:
 	if audio != null:
 		audio.play_ui_named(sound)
+
+
+## Retratos renderizados dos personagens (RB-R1) no HUD e na legenda.
+const PORTRAIT_FILES := {
+	&"tracker": "rastro", &"climber": "pico", &"pilot": "leme", &"captain": "captain", &"pup": "pup",
+}
+
+
+func _setup_portraits() -> void:
+	for member: StringName in PORTRAIT_FILES:
+		var path := "res://ui/portraits/%s_neutra.png" % PORTRAIT_FILES[member]
+		if ResourceLoader.exists(path):
+			hud.set_portrait_texture(member, load(path) as Texture2D)
 
 
 func _on_footstep(speed: float, pos: Vector3) -> void:
