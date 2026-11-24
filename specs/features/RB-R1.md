@@ -124,7 +124,9 @@ python tools/measure_video_audio.py captures/ep01-playthrough.avi
 ## Decisões do lead durante a execução (autonomia delegada por Thiago em 2026-11-23, reversíveis)
 - **Vila:** composição **B “vila na orla”** (rua do mercado paralela ao cais, farol ao fundo). Motivo: com a câmera do cais só se vê ~4 m de altura além de 15 m; na B essa faixa é a rua do mercado (toldos, bandeirolas, flores, portas). A encosta da A pode voltar como fundo.
 - **Mapa:** adotadas as coordenadas de `game/episodes/ep01/world/LAYOUT_PROPOSTO.md` (rio de 152 m, ilha +90 m em x).
-- **Câmera do cais:** offset (0; 4,6; 6,2) mantido; heróis ocupam ~110 px de altura em 720p.
+- **Heróis:** direção **A “brinquedo brilhante”** (cabeça 36,9% da altura, olhos grandes; lê como criança de série pré-escolar a 48 px). Pico e Leme finais, piloto, filhote e figurantes seguem essa direção.
+- **Câmera:** os heróis têm 1,14 m e ficaram com ~80 px em 720p; alvo da bible (12 a 18% da altura da tela na exploração) passa a ser medido em teste em todos os estágios.
+- **Portão 1:** aprovado pelo lead com base nos estudos (vila B, heróis A, marca e UI v2), por delegação de Thiago; reversível.
 
 ## Evidências
 _(preencher)_
