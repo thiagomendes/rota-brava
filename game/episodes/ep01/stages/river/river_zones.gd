@@ -7,6 +7,8 @@ const ZONE_CHANNEL := &"channel"
 const ZONE_BANK := &"bank"
 const ZONE_HARBOR := &"harbor"
 const ZONE_COVE := &"cove"
+## Rota opcional ao sul do banco de areia: canal raso de tras, corrente mais suave (SPEC 3, profundidade opcional).
+const ZONE_BACK_CHANNEL := &"back_channel"
 
 ## Canal central: |z| <= CHANNEL_HALF_WIDTH dentro do corredor do rio.
 const CHANNEL_HALF_WIDTH := 6.0
@@ -21,17 +23,19 @@ static var STRENGTH := {
 	ZONE_BANK: 0.4,
 	ZONE_HARBOR: 0.3,
 	ZONE_COVE: 0.1,
+	ZONE_BACK_CHANNEL: 0.15,
 }
 
 ## Regioes de agua permitidas (Rect2 em x,z): porto + rio, e a baia da enseada.
 const WATER_RECTS := [
-	Rect2(-20.0, -14.0, 108.0, 28.0),   # x -20..88, z -14..14
-	Rect2(76.0, 3.0, 13.0, 15.0),       # enseada: x 76..89, z 3..18
+	Rect2(-20.0, -14.0, 202.0, 28.0),   # x -20..182, z -14..14
+	Rect2(157.0, 3.0, 17.0, 25.0),      # enseada: x 157..174, z 3..28
 ]
 ## Obstaculos retangulares (x,z): cais e margem de terra ao sul do porto.
 const BOX_OBSTACLES := [
 	Rect2(-8.0, -3.0, 16.0, 6.0),
 	Rect2(-10.0, 3.0, 20.0, 13.0),
+	Ep01Layout.SANDBAR_RECT,            # banco de areia: desacelera e desvia o barco
 ]
 
 
@@ -39,11 +43,19 @@ static func zone_at(pos: Vector3) -> StringName:
 	var p := Vector2(pos.x, pos.z)
 	if p.distance_to(Vector2(Ep01Layout.ENSEADA_POS.x, Ep01Layout.ENSEADA_POS.z)) <= COVE_ZONE_RADIUS:
 		return ZONE_COVE
+	if in_back_channel(pos):
+		return ZONE_BACK_CHANNEL
 	if pos.x < Ep01Layout.RIVER_X_MIN:
 		return ZONE_HARBOR
 	if absf(pos.z) <= CHANNEL_HALF_WIDTH:
 		return ZONE_CHANNEL
 	return ZONE_BANK
+
+
+## Faixa entre o banco de areia e a margem sul (e um pouco antes/depois dele).
+static func in_back_channel(pos: Vector3) -> bool:
+	var s := Ep01Layout.SANDBAR_RECT
+	return pos.x >= s.position.x - 3.0 and pos.x <= s.end.x + 3.0 and pos.z >= s.end.y - 0.5 and pos.z <= Ep01Layout.RIVER_Z_HALF
 
 
 static func zone_current(pos: Vector3) -> Vector3:

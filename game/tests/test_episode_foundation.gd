@@ -43,7 +43,10 @@ func run(runner) -> void:
 		"uma pressao imediata nao confirma (protecao contra pressao mantida)")
 	await r.tree.create_timer(0.6).timeout
 	await _press(&"interact")
-	r.check(not main.hud.handoff_open and main.controlled_node == main.actors[&"tracker"],
+	r.check(not main.hud.handoff_open and main.posing and main.controlled_node == null,
+		"confirmar abre a pose de equipe; o controle ainda nao voltou")
+	await r.tree.create_timer(Ep01Main.TEAM_POSE_SECONDS + 0.2).timeout
+	r.check(not main.posing and main.controlled_node == main.actors[&"tracker"],
 		"confirmar passa o controle a Rastro")
 	r.check((main.actors[&"tracker"] as MemberActor).controlled, "Rastro responde a entrada")
 	r.check(not (main.actors[&"pilot"] as MemberActor).controlled, "os outros integrantes nao respondem")
@@ -97,6 +100,7 @@ func run(runner) -> void:
 	r.check(not r.tree.paused and swap.hud.handoff_open, "D1: retomar mantem a troca pendente")
 	await r.tree.create_timer(0.6).timeout
 	await _press(&"interact")
+	await r.tree.create_timer(Ep01Main.TEAM_POSE_SECONDS + 0.2).timeout
 	r.check(swap.controlled_node == swap.actors[&"tracker"], "D1: depois de retomar, interact confirma")
 	r.tree.paused = false
 	swap.queue_free()

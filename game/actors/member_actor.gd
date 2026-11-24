@@ -4,10 +4,19 @@ extends CharacterBody3D
 
 ## Emitido a cada contato de pe com o chao (so a pe, nao embarcado), para o som dos passos acompanhar o movimento.
 signal footstep(speed: float, position: Vector3)
+## Fim de um salto programado (`jump_to`).
+signal landed(position: Vector3)
 
-const SPEED := 2.6
+## Velocidade alvo de crianca correndo (m/s) e rampas de partida/parada (s) - sensacao a pe (RB-R1).
+const SPEED := 3.2
+const ACCEL_TIME := 0.12
+const STOP_TIME := 0.08
+## Analogico pouco inclinado: anda devagar (ate WALK_SPEED) antes de chegar a corrida.
+const WALK_SPEED := 1.3
+const WALK_INPUT := 0.55
+const RUN_THRESHOLD := 1.8
 const GRAVITY := 20.0
-const TURN_SPEED := 12.0
+const TURN_SPEED := 14.0
 
 const MODEL_SCENES := {
 	&"tracker": "res://actors/characters/rastro_model.tscn",
@@ -35,6 +44,10 @@ var _step_clock: float = 0.0
 var ride_offset: Vector3 = Vector3.ZERO
 var _visual: Node3D
 var _face_target: Variant = null
+## Em salto programado: a fisica de caminhada fica parada ate pousar.
+var airborne: bool = false
+var _was_moving_fast: bool = false
+var _jump_tween: Tween
 
 
 func setup(member_id: StringName) -> void:
@@ -106,9 +119,18 @@ func _update_animation() -> void:
 			elif model.has_animation(&"idle_wheel"):
 				want = &"idle_wheel"
 		model.play(want)
+	elif planar > RUN_THRESHOLD and model.has_animation(&"run"):
+		var run_scale := clampf(planar / SPEED, 0.75, 1.4)
+		model.play(&"run", run_scale)
+		_was_moving_fast = true
+		_step_clock += get_physics_process_delta_time() * run_scale * 1.4
+		if _step_clock >= 0.5 and is_on_floor():
+			_step_clock = 0.0
+			footstep.emit(planar, global_position)
 	elif planar > 0.2 and model.has_animation(&"walk"):
 		var anim_scale := minf(model.walk_speed_scale(planar), WALK_ANIM_MAX_SCALE)
 		model.play(&"walk", anim_scale)
+		_was_moving_fast = _was_moving_fast and planar > 1.2
 		# Um passo a cada meio ciclo do clipe, no ritmo real da animacao.
 		_step_clock += get_physics_process_delta_time() * anim_scale
 		if _step_clock >= 0.5 and is_on_floor():
@@ -116,6 +138,11 @@ func _update_animation() -> void:
 			footstep.emit(planar, global_position)
 	else:
 		_step_clock = 0.0
+		if _was_moving_fast and model.has_animation(&"stop"):
+			_was_moving_fast = false
+			play_action(&"stop")
+			return
+		_was_moving_fast = false
 		model.play(&"idle")
 
 
@@ -142,12 +169,18 @@ func _physics_process(delta: float) -> void:
 			if f.length() > 0.01:
 				_visual.rotation.y = lerp_angle(_visual.rotation.y, atan2(-f.x, -f.z), clampf(TURN_SPEED * delta, 0.0, 1.0))
 		return
+	if airborne:
+		return
 	var dir := Vector2.ZERO
 	if controlled:
 		dir = Input.get_vector(&"move_left", &"move_right", &"move_up", &"move_down")
 	var world := Basis(Vector3.UP, move_yaw) * Vector3(dir.x, 0.0, dir.y)
-	velocity.x = world.x * SPEED * speed_scale
-	velocity.z = world.z * SPEED * speed_scale
+	var want := Vector3.ZERO
+	if world.length() > 0.01:
+		want = world.normalized() * target_speed(dir.length()) * speed_scale
+	var planar_v := step_planar(Vector3(velocity.x, 0.0, velocity.z), want, delta)
+	velocity.x = planar_v.x
+	velocity.z = planar_v.z
 	if is_on_floor():
 		velocity.y = -0.5
 	else:
@@ -164,7 +197,60 @@ func _physics_process(delta: float) -> void:
 			_visual.rotation.y = lerp_angle(_visual.rotation.y, atan2(-d.x, -d.z), clampf(TURN_SPEED * delta, 0.0, 1.0))
 
 
+## Velocidade alvo para uma inclinacao do analogico (0..1): ate WALK_INPUT anda devagar; acima, rampa ate a corrida.
+static func target_speed(tilt: float) -> float:
+	tilt = clampf(tilt, 0.0, 1.0)
+	if tilt < 0.12:
+		return 0.0
+	if tilt <= WALK_INPUT:
+		return WALK_SPEED * tilt / WALK_INPUT
+	return lerpf(WALK_SPEED, SPEED, (tilt - WALK_INPUT) / (1.0 - WALK_INPUT))
+
+
+## Um passo da rampa: acelera ate SPEED em ACCEL_TIME e para em STOP_TIME (freia tambem ao inverter).
+static func step_planar(current: Vector3, want: Vector3, delta: float) -> Vector3:
+	var rate := SPEED / ACCEL_TIME
+	if want.length() < current.length() - 0.01 or want.dot(current) < 0.0:
+		rate = SPEED / STOP_TIME
+	return current.move_toward(want, rate * delta)
+
+
+## Direcao para onde o ator olha (plano XZ).
+func facing() -> Vector3:
+	return Basis(Vector3.UP, _visual.rotation.y) * Vector3.FORWARD
+
+
+## Salto programado em arco ate `to` (posicao dos pes). Suspende a caminhada; emite `landed` ao pousar.
+## Usa o clipe `jump` se o modelo tiver; o arco e sempre programatico (o clipe so anima o corpo).
+func jump_to(to: Vector3, duration: float = 0.55, height: float = 1.0) -> void:
+	if _jump_tween and _jump_tween.is_valid():
+		_jump_tween.kill()
+	airborne = true
+	velocity = Vector3.ZERO
+	var from := global_position
+	var d := to - from
+	d.y = 0.0
+	if d.length() > 0.05:
+		_face_target = null
+		_visual.rotation.y = atan2(-d.x, -d.z)
+	if model != null and model.has_animation(&"jump"):
+		play_action(&"jump", model.animation_length(&"jump") / maxf(duration, 0.1))
+	_jump_tween = create_tween()
+	_jump_tween.tween_method(func(t: float) -> void:
+		var p := from.lerp(to, t)
+		p.y += height * 4.0 * t * (1.0 - t)
+		global_position = p, 0.0, 1.0, duration)
+	_jump_tween.finished.connect(func() -> void:
+		global_position = to
+		airborne = false
+		velocity = Vector3.ZERO
+		landed.emit(to))
+
+
 func teleport(pos: Vector3) -> void:
+	if _jump_tween and _jump_tween.is_valid():
+		_jump_tween.kill()
+	airborne = false
 	global_position = pos
 	velocity = Vector3.ZERO
 

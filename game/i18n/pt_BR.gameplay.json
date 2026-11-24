@@ -1,0 +1,5 @@
+{
+  "ui.action.jump": "Pular",
+  "ui.collectible.name": "Emblema da Rota Brava",
+  "ui.collectible.count": "Emblemas: {count} de {total}"
+}
