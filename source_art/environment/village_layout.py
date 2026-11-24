@@ -55,8 +55,7 @@ def south_bank():
 
 
 def sky_and_far():
-    L = [P("hills_far", 20, -0.2, -190, 0, 1.0), P("hills_far", -150, -0.2, -120, 60, 0.9),
-         P("hills_far", 190, -0.2, -110, -50, 0.9)]
+    L = [P("hills_far", 20, -0.2, -190, 0, 1.0)]   # o resto do perimetro fica em horizon.tscn
     rng = random.Random(7)
     for i in range(9):
         L.append(P("cloud", rng.uniform(-120, 160), rng.uniform(38, 60), rng.uniform(-260, -120), rng.uniform(0, 360),
@@ -174,8 +173,8 @@ def comp_B():
     for x, z in ((-16, -26), (20, -26), (-1.5, -32), (10.5, -33), (-8, -34)):
         L.append(P("tree_round" if int(x) % 2 else "tree_round_dark", x, 1.2, z, x * 11))
     # farol no fim da baia (ponta leste, alem da praia de rochas)
-    L += [P("lighthouse", 31.0, 2.4, -24.0, 200), P("rock_a", 26.0, 0.2, -15.0, 20, 2.4), P("rock_b", 29.0, 0.0, -14.0, 70, 2.8),
-          P("rock_c", 33.0, 0.4, -16.0, 140, 2.4), P("tree_tall", 25.0, 1.5, -22.0)]
+    L += [P("headland", 0, 0, 0), P("lighthouse", 31.0, 2.4, -24.0, 200), P("tree_round", 26.4, 1.85, -27.5, 40, 0.9),
+          P("tree_tall", 35.5, 1.85, -27.0, 0, 0.8), P("flower_bed", 33.6, 2.4, -21.2, 0, 0.6)]
     L += [P("hills_near", 0, 0, -58, 0, 1.0)]
     return L
 

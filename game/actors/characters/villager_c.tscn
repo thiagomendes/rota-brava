@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/characters/villager_c.glb" id="1_glb"]
+[ext_resource type="Script" path="res://actors/characters/character_visual.gd" id="2_cv"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.24
+height = 0.9
+
+[node name="VillagerC" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 1
+metadata/provisional = true
+
+[node name="Model" type="Node3D" parent="."]
+script = ExtResource("2_cv")
+walk_speed_mps = 0.4034
+run_speed_mps = 0.8571
+
+[node name="Rig" parent="Model" instance=ExtResource("1_glb")]
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="HeadAnchor" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.765, 0)

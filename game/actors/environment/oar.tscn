@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/oar.glb" id="1_2a541"]
 
-[node name="Oar" type="Node3D" unique_id=1415706600]
+[node name="Oar" type="Node3D" unique_id=1579437586]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=338889623 instance=ExtResource("1_2a541")]
+[node name="Model" parent="." unique_id=688165935 instance=ExtResource("1_2a541")]

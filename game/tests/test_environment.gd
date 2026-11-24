@@ -24,6 +24,214 @@ func run(runner) -> void:
 	_test_paw()
 	_test_glb_folder(ids)
 	_test_harbor()
+	await _test_world()
+
+
+# ------------------------------------------------------------------ RB-R1: rio, ilha, horizonte e margem sul
+const WORLD_DIR := "res://episodes/ep01/world/"
+## Coordenadas adotadas pelo lead (LAYOUT_PROPOSTO.md): apoios da travessia +90 m em x.
+const W_FOOTHOLDS := [Vector3(183.5, 0.3, 6.5), Vector3(186.0, 0.5, 5.0), Vector3(188.5, 0.3, 4.2)]
+const W_BRIDGE_X := 62.0
+const W_MIN_CLEARANCE := 3.4          # vao livre sobre a agua (y -0,4) no corredor do barco |z| <= 10
+const W_MIN_PER_20M := 8              # pecas de margem (vegetacao/rochas) por 20 m de cada margem
+const VEG := ["tree_round", "tree_round_dark", "tree_tall", "bush_round", "bush_flower", "reeds", "rock_a", "rock_b",
+	"rock_c", "grass_tuft", "flower_clump", "palm_tree", "boulder"]
+
+
+static func _world_verts(root: Node3D, pattern: String) -> PackedVector3Array:
+	var out := PackedVector3Array()
+	for mi in root.find_children(pattern, "MeshInstance3D", true, false):
+		var m := mi as MeshInstance3D
+		var t := Transform3D.IDENTITY
+		var p: Node = m
+		while p != null and p != root:
+			t = (p as Node3D).transform * t
+			p = p.get_parent()
+		for s in m.mesh.get_surface_count():
+			for v in (m.mesh.surface_get_arrays(s)[Mesh.ARRAY_VERTEX] as PackedVector3Array):
+				out.append(t * v)
+	return out
+
+
+static func _range_y(vs: PackedVector3Array, x0: float, x1: float, z0: float, z1: float) -> Vector2:
+	var lo := 1e9
+	var hi := -1e9
+	for v in vs:
+		if v.x >= x0 and v.x <= x1 and v.z >= z0 and v.z <= z1:
+			lo = minf(lo, v.y)
+			hi = maxf(hi, v.y)
+	return Vector2(lo, hi)
+
+
+static func world_bridge_clearance(river: Node3D) -> float:
+	var br := river.find_child("arch_bridge_*", true, false) as Node3D
+	if br == null:
+		return -1.0
+	var lo := 1e9
+	for v in _world_verts(river, "Arch_Bridge_*"):
+		if absf(v.z) <= 10.0 and absf(v.x - W_BRIDGE_X) <= 1.5:
+			lo = minf(lo, v.y)
+	return lo - Ep01Layout.WATER_Y
+
+
+static func world_foothold_errors(island: Node3D) -> Array:
+	var errs: Array = []
+	for i in W_FOOTHOLDS.size():
+		var n := island.find_child("SafeRock%d" % i, true, false) as Node3D
+		if n == null:
+			errs.append("SafeRock%d ausente" % i)
+			continue
+		var top := (n.transform * TA.mesh_aabb(n)).end.y
+		var f: Vector3 = W_FOOTHOLDS[i]
+		if absf(top - f.y) > 0.02 or Vector2(n.position.x - f.x, n.position.z - f.z).length() > 0.05:
+			errs.append("SafeRock%d topo %.3f em %s" % [i, top, n.position])
+	return errs
+
+
+static func world_bank_density(river: Node3D) -> Array:
+	## [minimo, trecho] de pecas por 20 m em cada margem (x 40..180).
+	var counts := {}
+	for mm in river.find_children("MM_*", "MultiMeshInstance3D", true, false):
+		var id := String(mm.name).trim_prefix("MM_")
+		var ok := false
+		for v in VEG:
+			if id.begins_with(v + "_") or id == v:
+				ok = true
+		if not ok:
+			continue
+		for xf in (mm as EnvMultiMesh).xforms:
+			var o := (xf as Transform3D).origin
+			if o.x < 40.0 or o.x >= 180.0 or absf(o.z) > 40.0:
+				continue
+			var key := "%s%d" % ["N" if o.z < 0 else "S", int((o.x - 40.0) / 20.0)]
+			counts[key] = int(counts.get(key, 0)) + 1
+	var worst := 1 << 30
+	var where := ""
+	for side in ["N", "S"]:
+		for k in 7:
+			var c := int(counts.get("%s%d" % [side, k], 0))
+			if c < worst:
+				worst = c
+				where = "%s x %d..%d" % [side, 40 + 20 * k, 60 + 20 * k]
+	return [worst, where]
+
+
+func _path_hits(space: PhysicsDirectSpaceState3D) -> int:
+	var a := Ep01Layout.RASTRO_START
+	var b := Ep01Layout.BANK_PRINT_POS
+	var sph := SphereShape3D.new()
+	sph.radius = 0.3
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = sph
+	q.collide_with_areas = false
+	var hits := 0
+	var n := int(a.distance_to(b) / 0.25)
+	for i in n + 1:
+		var p := a.lerp(b, float(i) / n) + Vector3(0, 0.65, 0)
+		q.transform = Transform3D(Basis(), p)
+		hits += space.intersect_shape(q, 4).size()
+	return hits
+
+
+func _test_world() -> void:
+	var scenes := {}
+	for nm in ["river_world", "island_world", "horizon"]:
+		var ps := load(WORLD_DIR + nm + ".tscn") as PackedScene
+		r.check(ps != null, "world: %s.tscn carrega" % nm)
+		if ps == null:
+			return
+		var n := ps.instantiate() as Node3D
+		r.check(n.get_meta("provisional", false) == true, "world: %s marcado como provisorio" % nm)
+		scenes[nm] = n
+	var river: Node3D = scenes["river_world"]
+	var island: Node3D = scenes["island_world"]
+	var horizon: Node3D = scenes["horizon"]
+	r.check(river.name == "RiverWorld" and island.name == "IslandWorld" and horizon.name == "Horizon", "world: nomes dos nos raiz")
+	# topos onde se anda
+	var iv := _world_verts(island, "Island_Ground_*")
+	var camp := _range_y(iv, 193.5, 200.0, -2.0, 8.0)
+	r.check(absf(camp.x) <= 0.01 and absf(camp.y) <= 0.01, "world: chao da ilha (acampamento) em y = 0 +-1 cm (%.4f..%.4f)" % [camp.x, camp.y])
+	var rv := _world_verts(river, "River_Bank_South_*")
+	var land := _range_y(rv, 177.0, 181.0, 3.0, 16.0)
+	r.check(absf(land.x) <= 0.01 and absf(land.y) <= 0.01, "world: pouso de Pico (margem oeste do braco) em y = 0 +-1 cm (%.4f..%.4f)" % [land.x, land.y])
+	var errs := world_foothold_errors(island)
+	r.check(errs.is_empty(), "world: 3 apoios seguros no topo e posicao previstos %s" % [errs])
+	var decoys := 0
+	for c in island.find_children("DecoyRock*", "Node3D", true, false):
+		decoys += 1
+		var top := ((c as Node3D).transform * TA.mesh_aabb(c as Node3D)).end.y
+		r.check(top < 0.2 and TA.material_names(c).has("mat_env_rock_wet"), "world: %s escura/molhada e baixa (topo %.2f)" % [c.name, top])
+	r.check(decoys >= 3 and decoys <= 4, "world: 3 a 4 iscas na travessia (%d)" % decoys)
+	var safe_mat := TA.material_names(island.find_child("SafeRock0", true, false))
+	r.check(safe_mat.has("mat_env_rock_safe"), "world: apoio seguro usa mat_env_rock_safe (claro)")
+	for need in ["CampTent", "CampFire", "CampCrate", "CampFlag", "IslandPier"]:
+		r.check(island.find_child(need, true, false) != null, "world: acampamento/atracadouro tem %s" % need)
+	var pier := island.find_child("IslandPier", true, false) as Node3D
+	var ptop := (pier.transform * TA.mesh_aabb(pier)).end.y if pier != null else 9.0
+	r.check(ptop >= -0.01 and ptop <= 0.3, "world: atracadouro da ilha com topo em y ~ 0 (%.3f)" % ptop)
+	# ponte
+	var clr := world_bridge_clearance(river)
+	r.check(clr >= W_MIN_CLEARANCE, "world: vao livre da ponte >= 3,4 m sobre a agua no corredor do barco (%.2f m)" % clr)
+	# densidade das margens
+	var dens := world_bank_density(river)
+	r.check(int(dens[0]) >= W_MIN_PER_20M, "world: densidade minima de %d pecas por 20 m de margem (pior: %d em %s)" % [W_MIN_PER_20M, dens[0], dens[1]])
+	# horizonte em todo o perimetro
+	var hills := 0
+	var quad := {}
+	for mm in horizon.find_children("MM_hills_*", "MultiMeshInstance3D", true, false):
+		for xf in (mm as EnvMultiMesh).xforms:
+			hills += 1
+			var o := (xf as Transform3D).origin - Vector3(85, 0, -10)
+			quad[int(posmod(int(rad_to_deg(atan2(o.z, o.x)) + 360.0), 360) / 90)] = true
+	r.check(hills >= 20 and quad.size() == 4, "world: morros de horizonte nos 4 quadrantes (%d)" % hills)
+	# malhas do projeto
+	var ext: Array = []
+	for root in [river, island, horizon]:
+		for mi in (root as Node).find_children("*", "MeshInstance3D", true, false):
+			var rp := (mi as MeshInstance3D).mesh.resource_path
+			if not rp.begins_with("res://assets/models/environment/"):
+				ext.append(rp)
+		for mm in (root as Node).find_children("MM_*", "MultiMeshInstance3D", true, false):
+			if not (mm as EnvMultiMesh).source_mesh.resource_path.begins_with("res://episodes/ep01/world/meshes/"):
+				ext.append((mm as EnvMultiMesh).source_mesh.resource_path)
+	r.check(ext.is_empty(), "world: nenhuma malha externa ao projeto %s" % [ext.slice(0, 3)])
+	# mutacoes
+	var sr := island.find_child("SafeRock0", true, false) as Node3D
+	sr.position.y += 0.3
+	var m1 := world_foothold_errors(island).is_empty()
+	sr.position.y -= 0.3
+	r.check(not m1 and world_foothold_errors(island).is_empty(), "world: mutacao (apoio +30 cm) reprova e restaura")
+	var br := river.find_child("arch_bridge_*", true, false) as Node3D
+	br.position.y -= 1.0
+	var m2 := world_bridge_clearance(river) >= W_MIN_CLEARANCE
+	br.position.y += 1.0
+	r.check(not m2 and world_bridge_clearance(river) >= W_MIN_CLEARANCE, "world: mutacao (ponte 1 m mais baixa) reprova e restaura")
+	for n in scenes.values():
+		(n as Node).free()
+	# caminho livre na margem sul (fisica real do trecho do porto)
+	var harbor := (load(HARBOR) as PackedScene).instantiate() as Node3D
+	r.tree.root.add_child(harbor)
+	await r.frames(3)
+	var space := harbor.get_world_3d().direct_space_state
+	var hits := _path_hits(space)
+	r.check(hits == 0, "margem: caminho livre de RASTRO_START ate BANK_PRINT_POS (%d contatos)" % hits)
+	var block := StaticBody3D.new()
+	var cs := CollisionShape3D.new()
+	var bx := BoxShape3D.new()
+	bx.size = Vector3(1, 1, 1)
+	cs.shape = bx
+	block.add_child(cs)
+	harbor.add_child(block)
+	block.global_position = Ep01Layout.RASTRO_START.lerp(Ep01Layout.BANK_PRINT_POS, 0.5) + Vector3(0, 0.5, 0)
+	await r.frames(3)
+	var hits2 := _path_hits(space)
+	block.queue_free()
+	await r.frames(3)
+	r.check(hits2 > 0 and _path_hits(space) == 0, "margem: mutacao (caixa no caminho) reprova e restaura (%d)" % hits2)
+	var bp := harbor.find_child("BootPrint", true, false) as Node3D
+	r.check(bp != null and Vector2(bp.global_position.x - Ep01Layout.BANK_PRINT_POS.x, bp.global_position.z - Ep01Layout.BANK_PRINT_POS.z).length() < 0.05, "margem: BootPrint em BANK_PRINT_POS")
+	harbor.queue_free()
+	await r.frames(1)
 
 
 # ------------------------------------------------------------------ RB-R1: trecho do porto/vila Farol 7
@@ -337,7 +545,20 @@ func _test_assembly() -> void:
 		covered_x += tb.size.x
 		r.check(tb.size.z >= 12.99, "env: ladrilho %s cobre 13 m em z" % t.name)
 	r.check(tiles.size() == 3 and absf(covered_x - 20.0) < 0.1, "env: 3 ladrilhos (8+4+8 m) cobrem 20 m em x (%.2f)" % covered_x)
-	r.check(absf(worst_top) < 0.01 and worst_low > -0.03, "env: chao da margem com topo em y = 0 e relevo <= 3 cm (%.4f / %.4f)" % [worst_top, worst_low])
+	# RB-R1: a grama tem morrinhos (ate ~22 cm) longe do caminho; o caminho de terra (parte *_Path) fica em y = 0 +-1 cm
+	r.check(worst_top < 0.3 and worst_top > 0.08, "env: margem com relevo leve na grama (topo %.3f m)" % worst_top)
+	var path_lo := 1.0
+	var path_hi := -1.0
+	var path_parts := 0
+	for t in [root.find_child("BankPath", true, false)]:
+		if t == null:
+			continue
+		for mi in (t as Node).find_children("Bank_Path_*", "MeshInstance3D", true, false):
+			path_parts += 1
+			for v in (mi as MeshInstance3D).mesh.get_faces():
+				path_lo = minf(path_lo, v.y)
+				path_hi = maxf(path_hi, v.y)
+	r.check(path_parts >= 2 and absf(path_lo) <= 0.01 and absf(path_hi) <= 0.01, "env: caminho de terra da margem em y = 0 +-1 cm (%d partes, %.4f..%.4f)" % [path_parts, path_lo, path_hi])
 	# colisao do chao da margem e do deck existe
 	var floors := 0
 	for n in root.find_children("Collision", "CollisionShape3D", true, false):

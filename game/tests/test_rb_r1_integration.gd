@@ -99,6 +99,41 @@ func run(runner) -> void:
 	r.check(main.help_level == before, "H nao age com a pausa aberta")
 	await _press(&"pause")
 
+	# Radio de Farol 7 repete a instrucao depois do balbucio do personagem (pre-leitores).
+	main.hud.clear_speech()
+	await r.frames(2)
+	said.clear()
+	var babble_key := "ep01.dock.tracker.hint_gesture_bench"
+	var radio := Ep01Content.radio_key(babble_key)
+	main.hud.say(babble_key)
+	# Pula so quando a fala do Rastro estiver de fato em exibicao (pode haver uma fala anterior na fila).
+	for i in 600:
+		if said.has(babble_key) and main._line_key == babble_key:
+			break
+		if main.hud.is_speaking() and not said.has(babble_key):
+			main.hud.skip_line()
+		await r.tree.process_frame
+	main.hud.skip_line()
+	for i in 20:
+		await r.tree.process_frame
+	r.check(said.has(babble_key) and said.has(radio), "apos a fala do Rastro com instrucao, Farol 7 repete no radio %s" % str(said))
+	r.check(main.hud.speaker_name_for(radio) == Loc.member_name(&"radio"), "fala de radio identifica Farol 7 como falante")
+	main.hud.clear_speech()
+
+	# Retratos renderizados no HUD para os 5 personagens.
+	var missing_portraits: Array[String] = []
+	for member: StringName in Ep01Main.PORTRAIT_FILES:
+		if main.hud.portrait_texture(member) == null:
+			missing_portraits.append(String(member))
+	r.check(missing_portraits.is_empty(), "HUD tem retrato renderizado de todos os personagens %s" % str(missing_portraits))
+
+	# Piso dos passos e zonas de som.
+	r.check(Ep01Main.surface_at(Vector3(0, 0, 0)) == &"wood", "passo no cais e madeira")
+	r.check(Ep01Main.surface_at(Vector3(0, 0, -16)) == &"stone", "passo na rua do porto e pedra")
+	r.check(Ep01Main.surface_at(Vector3(200, 0, 0)) == &"sand", "passo na ilha e areia")
+	r.check(Ep01Main.surface_at(Vector3(-5, 0, 10)) == &"grass", "passo na margem e grama")
+	r.check(Ep01Main.ZONE_BY_STATE.size() == 7, "toda etapa tem zona de ambiente")
+
 	r.tree.paused = false
 	main.queue_free()
 	await r.frames(2)

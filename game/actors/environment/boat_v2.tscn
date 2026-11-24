@@ -5,19 +5,19 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_pwgha"]
 size = Vector3(2.2, 0.8, 5)
 
-[node name="BoatV2" type="Node3D" unique_id=618430006]
+[node name="BoatV2" type="Node3D" unique_id=165131245]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=1469070213 instance=ExtResource("1_8tyiv")]
+[node name="Model" parent="." unique_id=1246346694 instance=ExtResource("1_8tyiv")]
 
-[node name="Body" type="StaticBody3D" parent="." unique_id=900067851]
+[node name="Body" type="StaticBody3D" parent="." unique_id=2081589244]
 collision_mask = 0
 
-[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=2113706654]
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1069473734]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -0.5)
 shape = SubResource("BoxShape3D_pwgha")
 
-[node name="BowLight" type="OmniLight3D" parent="." unique_id=1630963344]
+[node name="BowLight" type="OmniLight3D" parent="." unique_id=953425578]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.325, -2.3)
 light_color = Color(1, 0.84705883, 0.5411765, 1)
 light_energy = 0.8

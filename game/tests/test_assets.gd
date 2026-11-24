@@ -254,6 +254,16 @@ func _test_manifest() -> void:
 	for a in (man as Dictionary)["ativos"]:
 		var d := a as Dictionary
 		r.check(d.get("agente") == "art3d" and d.get("status") == "provisorio", "assets: manifesto %s com agente art3d e status provisorio" % d.get("id"))
+		if not d.has("saida_glb"):
+			# ativos sem GLB (RB-R1: retratos do HUD): cada arquivo listado existe e confere o sha256
+			var bad: Array = []
+			var files: Dictionary = d.get("arquivos_sha256", {})
+			for fname in files:
+				var fp := ProjectSettings.globalize_path("res://").path_join("../" + String(d.get("saida", "")) + "/" + String(fname))
+				if FileAccess.get_sha256(fp) != String(files[fname]):
+					bad.append(fname)
+			r.check(files.size() > 0 and bad.is_empty(), "assets: arquivos do manifesto conferem (%s) %s" % [d.get("id"), bad])
+			continue
 		var glb: String = d.get("saida_glb", "")
 		var abs_glb := ProjectSettings.globalize_path("res://").path_join("../" + glb)
 		r.check(FileAccess.file_exists(abs_glb), "assets: GLB %s existe" % glb)

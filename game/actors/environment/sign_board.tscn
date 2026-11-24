@@ -6,14 +6,14 @@
 height = 1.6
 radius = 0.1
 
-[node name="Sign_Board" type="Node3D" unique_id=671923512]
+[node name="Sign_Board" type="Node3D" unique_id=1074852109]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=1051620593 instance=ExtResource("1_j1ft0")]
+[node name="Model" parent="." unique_id=442449857 instance=ExtResource("1_j1ft0")]
 
-[node name="Body" type="StaticBody3D" parent="." unique_id=595537563]
+[node name="Body" type="StaticBody3D" parent="." unique_id=1257126668]
 collision_mask = 0
 
-[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1654720423]
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=199735549]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0.06)
 shape = SubResource("CylinderShape3D_qbwny")

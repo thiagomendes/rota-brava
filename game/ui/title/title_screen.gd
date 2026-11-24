@@ -99,10 +99,10 @@ func _build_heroes() -> void:
 	sv.own_world_3d = true
 	hero_stage.add_child(sv)
 	var cam := Camera3D.new()
-	cam.position = Vector3(0, 1.0, 4.6)
+	cam.position = Vector3(0, 0.82, 3.3)
 	cam.fov = 34.0
 	sv.add_child(cam)
-	cam.look_at_from_position(cam.position, Vector3(0, 0.75, 0))
+	cam.look_at_from_position(cam.position, Vector3(0, 0.58, 0))
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-45, 30, 0)
 	sun.light_color = Color("FFE6BE")
@@ -110,9 +110,26 @@ func _build_heroes() -> void:
 	hero_root = Node3D.new()
 	hero_root.name = "Heroes"
 	sv.add_child(hero_root)
+	var fill := DirectionalLight3D.new()
+	fill.rotation_degrees = Vector3(-20, -140, 0)
+	fill.light_color = Color("9CC8E8")
+	fill.light_energy = 0.45
+	fill.shadow_enabled = false
+	sv.add_child(fill)
+	var env := Environment.new()
+	env.background_mode = Environment.BG_CLEAR_COLOR
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color("dfeaf2")
+	env.ambient_light_energy = 0.6
+	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	var we := WorldEnvironment.new()
+	we.environment = env
+	sv.add_child(we)
+	if _mount_hero_models():
+		return
 	var i := 0
 	for m: StringName in [&"tracker", &"climber", &"pilot"]:
-		# PROVISORIO: capsulas na cor-assinatura ate o lead colocar os modelos dos herois.
+		# Reserva se os modelos nao carregarem: capsulas na cor-assinatura.
 		var mi := MeshInstance3D.new()
 		mi.name = "Placeholder_%s" % m
 		var cap := CapsuleMesh.new()
@@ -125,6 +142,49 @@ func _build_heroes() -> void:
 		mi.position = Vector3((i - 1) * 0.95, 0.55 + (0.12 if i == 1 else 0.0), 0)
 		hero_root.add_child(mi)
 		i += 1
+
+
+## Herois 3D animados no palco da tela-titulo (RB-R1): pose de equipe uma vez, depois o idle de cada um.
+const HERO_SCENES := {
+	&"pilot": "res://actors/characters/leme_model.tscn",
+	&"tracker": "res://actors/characters/rastro_model.tscn",
+	&"climber": "res://actors/characters/pico_model.tscn",
+}
+var hero_models: Array[CharacterVisual] = []
+
+
+func _mount_hero_models() -> bool:
+	var spots := {&"pilot": Vector3(-0.95, 0, 0.1), &"tracker": Vector3(0, 0, 0.35), &"climber": Vector3(0.95, 0, 0.1)}
+	for m: StringName in HERO_SCENES:
+		if not ResourceLoader.exists(HERO_SCENES[m]):
+			return false
+	for m: StringName in HERO_SCENES:
+		var inst := (load(HERO_SCENES[m]) as PackedScene).instantiate()
+		var visual := inst.get_node_or_null("Model") as CharacterVisual
+		if visual == null:
+			inst.queue_free()
+			return false
+		inst.remove_child(visual)
+		visual.owner = null
+		inst.queue_free()
+		var holder := Node3D.new()
+		holder.name = "Hero_%s" % m
+		holder.position = spots[m]
+		# Frente dos modelos em -Z; a camera esta em +Z: gira para encarar a crianca, levemente para o centro.
+		holder.rotation.y = PI - (spots[m] as Vector3).x * 0.28
+		hero_root.add_child(holder)
+		holder.add_child(visual)
+		Stylize.apply(visual)
+		Stylize.add_outline(visual, 0.006)
+		hero_models.append(visual)
+		var first := &"team_pose" if visual.has_animation(&"team_pose") else &"idle"
+		visual.play(first)
+		if first != &"idle":
+			get_tree().create_timer(visual.animation_length(first) + 0.2).timeout.connect(func() -> void:
+				if is_instance_valid(visual):
+					visual.play(&"idle"))
+		visual.set_expression(&"alegre", 0.6)
+	return true
 
 
 func _button(node_name: String, key: String, icon: StringName, variant: StringName, h: float = BUTTON_HEIGHT) -> Button:

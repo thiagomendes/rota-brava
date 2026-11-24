@@ -85,6 +85,7 @@ func _ready() -> void:
 	hud.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(hud)
 	_setup_audio()
+	_setup_portraits()
 	hud.help_requested.connect(_on_help)
 	director.state_changed.connect(_on_state_changed)
 	director.event_accepted.connect(_on_event_accepted)
@@ -221,6 +222,7 @@ func _enter_stage(state: StringName) -> void:
 	for s: StageBase in _unique_stages():
 		s.refresh_world()
 	hud.set_objective(Loc.t(Ep01Content.objective_key(state)), Ep01Content.objective_icon(state))
+	_apply_audio_zone(state)
 	hud.set_skip_hint(false)
 	idle_seconds = 0.0
 	hint_index = 0
@@ -349,6 +351,7 @@ func fast_forward(target: StringName) -> void:
 # ---------- interacao contextual ----------
 
 func _process(delta: float) -> void:
+	_update_lipsync()
 	if audio != null:
 		audio.set_engine_rpm(clampf(boat.speed / BoatActor.MAX_SPEED, 0.0, 1.0) if boat.controlled else -1.0)
 	for m: StringName in actors:
@@ -447,18 +450,17 @@ func _setup_audio() -> void:
 	audio.name = "AudioDirector"
 	add_child(audio)
 	audio.start_ambience()
+	# Fala (RB-R1): balbucio dos personagens ou radio de Farol 7 (Piper), com boca sincronizada por visemas.
 	hud.voice_hook = func(key: String) -> float:
-		var length := audio.play_voice(key)
-		if length > 0.0:
-			audio.duck_music(true)
-		return length
+		var info := audio.play_line(key)
+		_speaker_actor = _actor_for_line(key)
+		return float(info.get("duration", 0.0))
 	hud.voice_stop_hook = func() -> void:
 		audio.stop_voice()
 		audio.duck_music(false)
-	hud.line_finished.connect(func() -> void:
-		if not hud.is_speaking():
-			audio.duck_music(false))
-	hud.handoff_confirmed.connect(func() -> void: audio.play_sfx("sfx_ui_confirm"))
+	hud.line_started.connect(_on_line_started)
+	hud.line_finished.connect(_on_line_finished)
+	hud.handoff_confirmed.connect(func() -> void: audio.play_music("team_call", 0.1))
 	hud.emotes_hook = func(key: String) -> Array[StringName]: return Ep01Content.line_emotes(key)
 	hud.ui_sound.connect(_on_ui_sound)
 
@@ -471,13 +473,93 @@ const UI_SOUNDS := {
 
 
 func _on_ui_sound(sound: StringName) -> void:
-	if audio != null and UI_SOUNDS.has(sound):
-		audio.play_sfx(String(UI_SOUNDS[sound]), Vector3.ZERO, -6.0)
+	if audio != null:
+		audio.play_ui_named(sound)
+
+
+## Retratos renderizados dos personagens (RB-R1) no HUD e na legenda.
+const PORTRAIT_FILES := {
+	&"tracker": "rastro", &"climber": "pico", &"pilot": "leme", &"captain": "captain", &"pup": "pup",
+}
+
+
+func _setup_portraits() -> void:
+	for member: StringName in PORTRAIT_FILES:
+		var path := "res://ui/portraits/%s_neutra.png" % PORTRAIT_FILES[member]
+		if ResourceLoader.exists(path):
+			hud.set_portrait_texture(member, load(path) as Texture2D)
 
 
 func _on_footstep(speed: float, pos: Vector3) -> void:
 	if audio != null:
-		audio.play_footstep(speed, &"wood", pos)
+		audio.play_footstep(speed, surface_at(pos), pos)
+
+
+## Piso sob o heroi para o som do passo: madeira no cais e no barco, pedra na rua do porto, areia na ilha, grama no resto.
+static func surface_at(pos: Vector3) -> StringName:
+	if absf(pos.x) <= 8.2 and pos.z >= -3.2 and pos.z <= 3.2:
+		return &"wood"
+	if pos.z <= -12.5 and pos.x < 30.0:
+		return &"stone"
+	if pos.x >= 182.0:
+		return &"sand"
+	return &"grass"
+
+
+## Ambiente e musica por trecho do mapa (RB-R1).
+const ZONE_BY_STATE := {
+	&"arrival": &"dock", &"dock_investigation": &"dock", &"river_search": &"river",
+	&"island_crossing": &"island", &"docking": &"island", &"return_trip": &"river", &"complete": &"dock",
+}
+const MUSIC_BY_STATE := {
+	&"river_search": "explore", &"island_crossing": "crossing", &"docking": "explore", &"return_trip": "return",
+}
+
+
+func _apply_audio_zone(state: StringName) -> void:
+	if audio == null:
+		return
+	audio.set_ambience_zone(ZONE_BY_STATE.get(state, &"dock"))
+	if MUSIC_BY_STATE.has(state):
+		audio.play_music(String(MUSIC_BY_STATE[state]), 2.0)
+	elif state == &"complete":
+		audio.play_music("victory", 0.2)
+
+
+# ---------- fala: boca e radio ----------
+
+var _speaker_actor: MemberActor
+var _line_key: String = ""
+
+
+func _actor_for_line(key: String) -> MemberActor:
+	var parts := key.split(".")
+	if parts.size() >= 3 and actors.has(StringName(parts[2])):
+		return actors[StringName(parts[2])] as MemberActor
+	return null
+
+
+func _on_line_started(key: String) -> void:
+	_line_key = key
+
+
+## Depois da fala (balbucio) de um personagem com instrucao, Farol 7 repete pelo radio para quem ainda nao le.
+func _on_line_finished() -> void:
+	if _speaker_actor != null and _speaker_actor.model != null:
+		_speaker_actor.model.set_viseme(&"mouth_A", 0.0)
+	_speaker_actor = null
+	var radio := Ep01Content.radio_key(_line_key)
+	_line_key = ""
+	if radio != "" and Loc.has_key(radio):
+		hud.say(radio, {}, false, [&"horn"])
+	elif not hud.is_speaking() and audio != null:
+		audio.duck_music(false)
+
+
+func _update_lipsync() -> void:
+	if audio == null or _speaker_actor == null or _speaker_actor.model == null:
+		return
+	_speaker_actor.model.set_viseme(&"mouth_A", clampf(audio.current_viseme(), 0.0, 1.0))
 
 
 func _event_sound(event: StringName) -> void:
@@ -485,13 +567,12 @@ func _event_sound(event: StringName) -> void:
 		return
 	match event:
 		&"intro_finished":
-			audio.play_music("theme_explore", 2.0)
+			audio.play_music("explore", 2.0)
 		&"clue_examined":
 			audio.play_sfx("sfx_notebook")
 			audio.play_sfx("sfx_clue_found")
 			if director.clues_found.size() >= 2:
-				audio.play_music("theme_discovery", 0.2)
-				get_tree().create_timer(6.0).timeout.connect(func() -> void: audio.play_music("theme_explore_low", 1.5))
+				audio.play_music("discovery", 0.2)
 		&"destination_chosen":
 			audio.play_sfx("sfx_ui_confirm")
 		&"line_fixed":

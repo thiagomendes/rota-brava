@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/tent.glb" id="1_63hqk"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_53xy2"]
+size = Vector3(2.2, 1.6, 2.4)
+
+[node name="Tent" type="Node3D" unique_id=1554285784]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=183170715 instance=ExtResource("1_63hqk")]
+
+[node name="Body" type="StaticBody3D" parent="." unique_id=2144365853]
+collision_mask = 0
+
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1825982559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("BoxShape3D_53xy2")

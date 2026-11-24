@@ -587,7 +587,7 @@
   },
   "lighthouse": {
     "glb": "game/assets/models/environment/lighthouse.glb",
-    "tris": 3554,
+    "tris": 3334,
     "materials": [
       "mat_env_lh_dark",
       "mat_env_lh_glass",
@@ -799,26 +799,26 @@
   },
   "tree_tall": {
     "glb": "game/assets/models/environment/tree_tall.glb",
-    "tris": 224,
+    "tris": 336,
     "materials": [
       "mat_env_foliage_b",
       "mat_env_trunk"
     ],
-    "vertices": 116,
+    "vertices": 172,
     "bbox_min": [
-      -0.975,
+      -1.112,
       0.0,
-      -0.951
+      -1.085
     ],
     "bbox_max": [
-      0.975,
+      1.112,
       6.2,
-      0.951
+      1.085
     ],
     "size": [
-      1.951,
+      2.225,
       6.2,
-      1.902
+      2.169
     ],
     "objects": [
       "Tree_Tall_Canopy",
