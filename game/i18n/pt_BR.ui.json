@@ -40,5 +40,7 @@
   "ui.glyph.pad": "A",
   "ui.hud.help_short": "Ajuda",
   "ui.hud.your_turn": "Sua vez!",
-  "ui.complete.stars": "{count} estrelas"
+  "ui.complete.stars": "{count} estrelas",
+  "ui.collectibles.count": "{count}/{total}",
+  "ui.collectibles.tooltip": "Emblemas da Rota Brava encontrados"
 }

@@ -84,6 +84,8 @@ func _ready() -> void:
 	hud = Hud.new()
 	hud.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(hud)
+	collectible_found.connect(func(count: int, total: int) -> void: hud.set_collectibles(count, total))
+	hud.set_collectibles(Ep01Collectibles.count(), Ep01Collectibles.total(), false)
 	_setup_audio()
 	_setup_portraits()
 	hud.help_requested.connect(_on_help)

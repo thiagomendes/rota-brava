@@ -71,6 +71,10 @@ var _sub_speaker: Label
 var _sub_text: Label
 var _emote_box: HBoxContainer
 var _skip_label: Label
+## Contador de emblemas (colecionaveis): aparece no primeiro emblema achado e pulsa a cada novo.
+var _emblem_panel: PanelContainer
+var _emblem_label: Label
+var _emblem_tween: Tween
 var _choice_panel: PanelContainer
 var _choice_box: VBoxContainer
 var _choice_title: Label
@@ -275,6 +279,38 @@ func _build_top_left(safe: Control) -> void:
 	_skip_label.name = "SkipHint"
 	_skip_label.text = Loc.t("ui.skip")
 	skip_panel.visible = false
+	_emblem_panel = _panel(row, &"PillPanel")
+	_emblem_panel.name = "EmblemCounter"
+	_emblem_panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_emblem_panel.pivot_offset = Vector2(90, 36)
+	var eh := HBoxContainer.new()
+	eh.add_theme_constant_override("separation", 10)
+	_emblem_panel.add_child(eh)
+	var ei := _icon(eh, &"star", 56, ThemeV2.ACTION)
+	ei.texture_override = load("res://ui/brand/emblem_simple.svg") as Texture2D
+	_emblem_label = _label(eh, 30, &"LightLabel")
+	_emblem_label.name = "EmblemCount"
+	_emblem_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_emblem_panel.visible = false
+
+
+## Mostra "n/total" emblemas. Com `celebrate`, o contador da um pulo (novo emblema). Zero esconde o contador.
+func set_collectibles(count: int, total: int, celebrate: bool = true) -> void:
+	_emblem_label.text = Loc.t("ui.collectibles.count", {"count": count, "total": total})
+	_emblem_label.tooltip_text = Loc.t("ui.collectibles.tooltip")
+	_emblem_panel.visible = count > 0
+	if not celebrate or count <= 0:
+		return
+	if _emblem_tween and _emblem_tween.is_valid():
+		_emblem_tween.kill()
+	_emblem_panel.scale = Vector2.ONE
+	_emblem_tween = create_tween()
+	_emblem_tween.tween_property(_emblem_panel, "scale", Vector2(1.25, 1.25), 0.12)
+	_emblem_tween.tween_property(_emblem_panel, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+func collectibles_text() -> String:
+	return _emblem_label.text if _emblem_panel.visible else ""
 
 
 func _build_member(safe: Control) -> void:

@@ -374,12 +374,14 @@ func _collectibles() -> void:
 	r.check(free_ok == foot, "emblemas a pe sem colisao bloqueando (shape cast %d/%d)" % [free_ok, foot])
 	r.check(floor_ok == foot, "emblemas a pe tem chao para pisar (%d/%d)" % [floor_ok, foot])
 
+	r.check(m.hud.collectibles_text() == "", "sem emblema achado o contador fica escondido")
 	var counts: Array[int] = []
 	m.collectible_found.connect(func(n: int, _t: int) -> void: counts.append(n))
 	var tracker := m.actors[&"tracker"] as MemberActor
 	tracker.teleport(Ep01Collectibles.SPOTS[0][0] as Vector3)
 	await r.frames(3)
 	r.check(Ep01Collectibles.count() == 1 and counts == [1], "encostar coleta o emblema (sinal 1/10)")
+	r.check(m.hud.collectibles_text() == "1/%d" % Ep01Collectibles.total(), "HUD mostra o contador de emblemas (%s)" % m.hud.collectibles_text())
 	await r.frames(3)
 	r.check(not c.collect(0) and Ep01Collectibles.count() == 1 and counts.size() == 1, "a contagem nao duplica")
 	r.check(not c.emblems[0].visible, "emblema coletado some")
@@ -396,6 +398,7 @@ func _collectibles() -> void:
 	# Recarga na mesma execucao: o emblema continua coletado.
 	var m2: Ep01Main = await _start(&"dock_investigation")
 	r.check(not m2.collectibles.emblems[0].visible and Ep01Collectibles.count() == 1, "contagem sobrevive a recarga da cena")
+	r.check(m2.hud.collectibles_text() == "1/%d" % Ep01Collectibles.total(), "o contador do HUD volta com a contagem apos a recarga")
 	await _stop(m2)
 	Ep01Collectibles.reset_run()
 
