@@ -133,11 +133,23 @@ func _build_rock() -> void:
 		var h := p.y - Ep01Layout.WATER_Y + 0.6
 		var b := Blocks.solid_box(self, "Foothold%d" % (i + 1), Vector3(FOOT_SIZE, h, FOOT_SIZE), Vector3(p.x, p.y - h * 0.5, p.z), Color("d9d4c0"))
 		_marks.append(Blocks.box(b, "Mark", Vector3(0.8, 0.02, 0.8), Vector3(0, h * 0.5 + 0.01, 0), Color("ffd24d"), 0.6))
+		_hide_block_if_world(b)
 	for j in DECOYS.size():
 		var d: Vector3 = DECOYS[j]
 		var h := d.y - Ep01Layout.WATER_Y + 0.6
 		var m := Blocks.solid_box(self, "Decoy%d" % (j + 1), Vector3(1.1, h, 1.1), Vector3(d.x, d.y - h * 0.5, d.z), Color("22303a"))
 		m.set_meta(&"decoy", true)
+		_hide_block_if_world(m)
+
+
+## Com a cena de mundo, as rochas visiveis sao `SafeRock*`/`DecoyRock*` de `island_world`; o bloco fica so como colisao
+## (e o brilho do apoio). Sem isso apareciam pedras duplicadas (cubo sobre a rocha).
+func _hide_block_if_world(body: StaticBody3D) -> void:
+	if not world_mounted:
+		return
+	var mesh := body.get_node_or_null(String(body.name) + "Mesh") as MeshInstance3D
+	if mesh != null:
+		mesh.visible = false
 
 
 func _build_anchors() -> void:

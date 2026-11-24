@@ -37,6 +37,24 @@ func run(runner) -> void:
 	r.check(m.boat.global_position.distance_to(Ep01Layout.ENSEADA_POS) < 0.5, "barco parado na enseada")
 	r.check(not st.rope_visible, "a corda ainda nao aparece")
 
+	# Sem pedras duplicadas (RB-R1): com island_world, os blocos dos apoios e iscas ficam so como colisao.
+	if st.world_mounted:
+		var dup := 0
+		var bodies := 0
+		for n in st.get_children():
+			var nm := String(n.name)
+			if n is StaticBody3D and (nm.begins_with("Foothold") or nm.begins_with("Decoy")):
+				bodies += 1
+				var mesh := n.get_node_or_null(nm + "Mesh") as MeshInstance3D
+				if mesh == null or mesh.visible:
+					dup += 1
+		r.check(bodies == 7 and dup == 0, "com island_world, %d blocos de apoio/isca sem malha visivel (%d duplicados)" % [bodies, dup])
+		var marks_on := true
+		for i in 3:
+			var mk := st.get_node("Foothold%d/Mark" % (i + 1)) as MeshInstance3D
+			marks_on = marks_on and mk.is_visible_in_tree()
+		r.check(marks_on, "o brilho dos apoios seguros continua visivel sobre as rochas")
+
 	# Chao: Pico na margem nao cai.
 	await r.frames(60)
 	r.check(pico.global_position.y >= -0.5 and _hz(pico.global_position, Ep01Layout.LANDING_POS) < 0.5,

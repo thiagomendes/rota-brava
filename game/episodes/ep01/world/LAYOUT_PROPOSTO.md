@@ -36,7 +36,7 @@ A composição A rende um plano aberto mais "cartão-postal" (casario em encosta
 | Ilha | x 190..212, z −14..16; centro (198, 0, 0) | era `ISLAND_POS` (108, 0, 0) |
 | Acampamento do piloto | (195, 0, 3) | era `PILOT_CAPTAIN_POS` (105, 0, 3) |
 | Travessia de rochas | âncoras (182, 1,2, 4) → (190, 1,2, 4); apoios (183,5; 0,3; 6,5), (186; 0,5; 5), (188,5; 0,3; 4,2) | +90 m em x sobre os atuais |
-| Atracadouro da ilha | `PIER_POS` (190,5, 0, −2); alvo (187, 0, −2); entrada do braço (186, 0, 13) | +90 m em x |
+| Atracadouro da ilha | `PIER_POS` (190,5, 0, −2); alvo (187, 0, −2); entrada do braço pelo norte (185,5, 0, −12), rumo alvo π (proa ao sul); partida para (174, 0, −6) | +90 m em x |
 
 Constantes propostas para `ep01_layout.gd` (o lead decide): `RIVER_X_MIN 30`, `RIVER_X_MAX 182`, `BUOY_POS (90,0,−3)`,
 `ENSEADA_POS (166,0,21)`, `ENSEADA_RADIUS 8`, e **+90 m em x** para todas as constantes da etapa 3–5 (pouso, âncoras,

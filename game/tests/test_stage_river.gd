@@ -150,6 +150,8 @@ func run(runner) -> void:
 		"com boia, cove_reached leva a island_crossing")
 	r.check(main.director.active_member == &"climber", "Pico fica ativo")
 	r.check(stage.captain_figure.visible and stage.pup_figure.visible, "sinalizacao do piloto e do filhote visivel")
+	r.check(StoryFigure.current(stage.captain_figure) == &"wave" and StoryFigure.current(stage.pup_figure) == &"wag",
+		"no acampamento o piloto acena e o filhote abana o rabo (modelos finais)")
 	await r.frames(2)
 	r.check(boat.global_position.distance_to(Ep01Layout.ENSEADA_POS) < 8.0, "o barco fica na enseada")
 	await _free_main(main)
@@ -185,6 +187,8 @@ func run(runner) -> void:
 	for n in stage.find_children("*", "MeshInstance3D", true, false):
 		if (n as Node).get_path().get_concatenated_names().contains("RiverWorld") or (n as Node).get_path().get_concatenated_names().contains("Horizon"):
 			continue   # cena de mundo final (art3d), nao e bloco
+		if (n as Node).get_path().get_concatenated_names().contains("Signal"):
+			continue   # piloto e filhote: modelos finais (StoryFigure), nao sao blocos
 		meshes += 1
 		if (n as Node).get_meta(Blocks.PROVISIONAL, false) != true:
 			unmarked += 1

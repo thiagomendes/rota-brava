@@ -51,8 +51,11 @@ const PILOT_CAPTAIN_POS := Vector3(195.0, 0, 3.0)      # piloto resgatado e filh
 # Etapa 4/5 - atracar e voltar
 const PIER_POS := Vector3(190.5, 0.0, -2.0)            # atracadouro do lado protegido
 const DOCKING_TARGET_POS := Vector3(187.0, 0, -2.0)
-const DOCKING_TARGET_HEADING := 0.0                    # proa para o norte (-Z)
+const DOCKING_TARGET_HEADING := PI                     # proa para o sul (+Z): entra pelo norte e para ao lado do pier
 const DOCKING_POS_TOLERANCE := 1.5
 const DOCKING_HEADING_TOLERANCE := 0.35
 const DOCKING_SPEED_TOLERANCE := 1.2
-const BOAT_ARM_START := Vector3(186.0, 0, 13.0)         # onde o barco entra no braco ao atracar
+## O barco entra no braco pelo NORTE (z < 1,5): ao sul ficam a lingua de terra (x < 182), as pedras da travessia
+## (z 3..7,6) e a corda baixa (z 4). Parte pelo noroeste, de volta ao rio.
+const BOAT_ARM_START := Vector3(185.5, 0, -12.0)        # onde o barco entra no braco ao atracar
+const DOCKING_EXIT_POS := Vector3(174.0, 0, -6.0)       # para onde o barco parte no fim (rio, a oeste)

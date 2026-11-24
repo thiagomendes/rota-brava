@@ -581,7 +581,7 @@ func _event_sound(event: StringName) -> void:
 		&"boat_docked":
 			audio.play_sfx("sfx_hull_bump", boat.global_position)
 		&"departure_confirmed":
-			audio.play_sfx("sfx_horn_boat", boat.global_position)
+			pass  # a buzina final e do filhote (DockingStage.pup_on_horn, na fala ep01.return.pup.horn)
 
 
 ## Repetir instrucao (H, botao Y ou toque no botao): 1a vez repete o objetivo e mostra o gesto; depois avanca as dicas.

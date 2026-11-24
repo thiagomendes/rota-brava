@@ -26,7 +26,6 @@ var leaves: Array[MeshInstance3D] = []
 
 var _scenery: Node3D
 var _halo: MeshInstance3D
-var _arm_pivot: Node3D
 var _rng := RandomNumberGenerator.new()
 var _clock: float = 0.0
 var _active: bool = false
@@ -156,36 +155,24 @@ func _random_leaf_pos(anywhere: bool) -> Vector3:
 	return Vector3(x, Ep01Layout.WATER_Y + 0.04, z)
 
 
-## Sinalizacao do reencontro: dois bonequinhos em blocos na ilha (piloto acenando e filhote). Escondidos ate a enseada.
+## Sinalizacao do reencontro: piloto acenando e filhote abanando o rabo no acampamento da ilha (modelos finais).
+## Escondidos ate a enseada.
 func _build_captain_signal() -> void:
-	captain_figure = Node3D.new()
-	captain_figure.name = "CaptainSignal"
-	captain_figure.set_meta(Blocks.PROVISIONAL, true)
-	add_child(captain_figure)
+	captain_figure = StoryFigure.spawn(self, "captain_model", "CaptainSignal")
 	captain_figure.position = Ep01Layout.PILOT_CAPTAIN_POS
-	Blocks.box(captain_figure, "CaptainBody", Vector3(0.7, 1.1, 0.5), Vector3(0, 0.55, 0), Color("2d5fa8"))
-	Blocks.sphere(captain_figure, "CaptainHead", 0.3, Vector3(0, 1.4, 0), Color("e8b98a"))
-	Blocks.cylinder(captain_figure, "CaptainHat", 0.34, 0.16, Vector3(0, 1.72, 0), Color("fafafa"))
-	_arm_pivot = Node3D.new()
-	_arm_pivot.name = "CaptainArmPivot"
-	_arm_pivot.position = Vector3(0.45, 1.0, 0)
-	captain_figure.add_child(_arm_pivot)
-	Blocks.box(_arm_pivot, "CaptainArm", Vector3(0.2, 0.8, 0.2), Vector3(0, 0.4, 0), Color("2d5fa8"))
-	pup_figure = Node3D.new()
-	pup_figure.name = "PupSignal"
-	pup_figure.set_meta(Blocks.PROVISIONAL, true)
-	add_child(pup_figure)
+	pup_figure = StoryFigure.spawn(self, "pup_model", "PupSignal")
 	pup_figure.position = Ep01Layout.PILOT_CAPTAIN_POS + Vector3(-1.4, 0, 0.8)
-	Blocks.box(pup_figure, "PupBody", Vector3(0.6, 0.45, 0.9), Vector3(0, 0.4, 0), Color("c98f4e"))
-	Blocks.sphere(pup_figure, "PupHead", 0.28, Vector3(0, 0.75, -0.55), Color("c98f4e"))
-	Blocks.box(pup_figure, "PupEarLeft", Vector3(0.12, 0.2, 0.1), Vector3(-0.17, 1.0, -0.55), Color("7a4e26"))
-	Blocks.box(pup_figure, "PupEarRight", Vector3(0.12, 0.2, 0.1), Vector3(0.17, 1.0, -0.55), Color("7a4e26"))
-	Blocks.box(pup_figure, "PupTail", Vector3(0.1, 0.1, 0.4), Vector3(0, 0.6, 0.6), Color("7a4e26"))
+	# Os dois olham para a enseada, de onde o barco chega.
+	for fig: Node3D in [captain_figure, pup_figure]:
+		StoryFigure.face(fig, Ep01Layout.ENSEADA_POS)
 	captain_figure.visible = false
 	pup_figure.visible = false
 
 
 func _show_signal(on: bool) -> void:
+	if on and not captain_figure.visible:
+		StoryFigure.loop(captain_figure, &"wave")
+		StoryFigure.loop(pup_figure, &"wag")
 	captain_figure.visible = on
 	pup_figure.visible = on
 
@@ -314,8 +301,6 @@ func _animate(delta: float) -> void:
 		s += 0.8 * absf(sin(_clock * 5.0))
 	for leaf in leaves:
 		leaf.scale = Vector3(s, 1.0, s)
-	if captain_figure.visible:
-		_arm_pivot.rotation.z = 2.4 + 0.5 * sin(_clock * 9.0)
 
 
 func _look_back() -> void:

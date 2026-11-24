@@ -6,21 +6,26 @@ extends StageBase
 const ASSIST_RANGE := 10.0
 const ASSIST_MAX := 0.9
 const ASSIST_SPEECH_COOLDOWN_MS := 20000
-const OVERSHOOT_Z := -9.0
+## Passar do alvo para o sul (rumo as pedras da travessia) pede nova aproximacao.
+const OVERSHOOT_Z := 1.0
 const STUCK_HITS := 5
 const STUCK_WINDOW := 3.0
 ## Corrente fraca do braco (m/s); some conforme a assistencia cresce. Ajustavel.
 const ARM_CURRENT := Vector3(-0.3, 0.0, -0.2)
-## Limites do braco (clearance): margem oeste, ilha/pier a leste, norte, entrada sul.
+## Limites do braco (clearance): margem oeste, ilha/pier a leste, entrada norte, pedras da travessia ao sul.
 const BOUND_WEST := 92.0 + Ep01Layout.STAGE3_SHIFT
 const BOUND_EAST := 100.0 + Ep01Layout.STAGE3_SHIFT
-const BOUND_NORTH := -9.0
-const BOUND_SOUTH := 16.0
+const BOUND_NORTH := -14.0
+const BOUND_SOUTH := 2.0
 
 const RIDE_PILOT := BoatActor.CREW[&"pilot"]
 const RIDE_TRACKER := BoatActor.CREW[&"tracker"]
 const CAPTAIN_ON_BOAT := Vector3(-0.5, 0.6, -1.0)
 const PUP_ON_BOAT := Vector3(0.4, 0.6, -1.7)
+const CAPTAIN_THANKS_KEY := "ep01.return.captain.thanks"
+const PUP_HORN_KEY := "ep01.return.pup.horn"
+## Fracao do clipe `step_on_horn` em que a pata aperta a buzina (provisorio: ajustar vendo o clipe).
+const HORN_AT := 0.45
 
 const COLOR_OFF := Color("7fd6c2")
 const COLOR_ON := Color("fff27a")
@@ -43,6 +48,8 @@ var _clock: float = 0.0
 var _departing: bool = false
 var _tween: Tween
 var _retry_count: int = 0
+## O filhote ja apertou a buzina nesta execucao (testes e bot).
+var horn_pressed: bool = false
 
 
 # ---------- cenografia ----------
@@ -125,11 +132,11 @@ func _build_target() -> void:
 	_glow_box(target_zone, "RingE", Vector3(0.18, 0.04, hl * 2.0), Vector3(hw, 0, 0))
 	_glow_box(target_zone, "RingN", Vector3(hw * 2.0, 0.04, 0.18), Vector3(0, 0, -hl))
 	_glow_box(target_zone, "RingS", Vector3(hw * 2.0, 0.04, 0.18), Vector3(0, 0, hl))
-	# Seta para o rumo alvo (proa ao norte: -Z), fora do casco, a frente da zona.
+	# Seta para o rumo alvo, fora do casco, a frente da zona (lado para onde a proa aponta).
 	var arrow := Node3D.new()
 	arrow.name = "Arrow"
 	target_zone.add_child(arrow)
-	arrow.position = Vector3(0, 0, -hl - 1.4)
+	arrow.position = Vector3(0, 0, -hl - 1.4).rotated(Vector3.UP, Ep01Layout.DOCKING_TARGET_HEADING)
 	arrow.rotation.y = Ep01Layout.DOCKING_TARGET_HEADING
 	_glow_box(arrow, "Shaft", Vector3(0.3, 0.04, 1.4), Vector3(0, 0, 0.3))
 	var l := _glow_box(arrow, "HeadL", Vector3(0.3, 0.04, 0.9), Vector3(-0.3, 0, -0.5))
@@ -151,7 +158,7 @@ func _build_beacons() -> void:
 	beacons.name = "ApproachBeacons"
 	beacons.set_meta(Blocks.PROVISIONAL, true)
 	add_child(beacons)
-	for z in [11.0, 7.0, 3.0]:
+	for z in [-11.0, -8.0, -5.0]:
 		Blocks.cylinder(beacons, "BeaconL", 0.22, 1.2, Vector3(BOUND_WEST + 2.0, Ep01Layout.WATER_Y + 0.5, z), Color("e04a3a"), 0.3)
 		Blocks.sphere(beacons, "BeaconLTop", 0.28, Vector3(BOUND_WEST + 2.0, Ep01Layout.WATER_Y + 1.2, z), Color("ff7a6a"), 0.8)
 		Blocks.cylinder(beacons, "BeaconR", 0.22, 1.2, Vector3(BOUND_EAST - 1.0, Ep01Layout.WATER_Y + 0.5, z), Color("3aa86a"), 0.3)
@@ -159,25 +166,36 @@ func _build_beacons() -> void:
 	beacons.visible = false
 
 
+## Piloto e filhote (modelos finais): esperam no pier e embarcam no convés na volta.
 func _build_passengers() -> void:
 	passengers = Node3D.new()
 	passengers.name = "Passengers"
 	add_child(passengers)
-	var captain := Node3D.new()
-	captain.name = "PierCaptain"
-	captain.set_meta(Blocks.PROVISIONAL, true)
-	passengers.add_child(captain)
-	Blocks.cylinder(captain, "Body", 0.32, 1.0, Vector3(0, 0.6, 0), Color("8a8f98"))
-	Blocks.sphere(captain, "Head", 0.26, Vector3(0, 1.4, 0), Color("f1d2b0"))
-	Blocks.box(captain, "Cap", Vector3(0.6, 0.18, 0.6), Vector3(0, 1.7, 0), Color("22344f"))
-	var pup := Node3D.new()
-	pup.name = "PierPup"
-	pup.set_meta(Blocks.PROVISIONAL, true)
-	passengers.add_child(pup)
-	Blocks.box(pup, "Body", Vector3(0.35, 0.3, 0.6), Vector3(0, 0.25, 0), Color("c98f4f"))
-	Blocks.box(pup, "Head", Vector3(0.28, 0.26, 0.28), Vector3(0, 0.45, -0.4), Color("c98f4f"))
-	Blocks.box(pup, "Ear", Vector3(0.08, 0.16, 0.08), Vector3(0.1, 0.65, -0.4), Color("7a5530"))
+	StoryFigure.spawn(passengers, "captain_model", "PierCaptain")
+	StoryFigure.spawn(passengers, "pup_model", "PierPup")
 	_place_passengers_on_pier()
+
+
+## As falas finais puxam a acao: o piloto agradece e o filhote pisa na buzina (o "fom fom" resolve a piada da abertura).
+func _on_line_started(key: String) -> void:
+	if not is_instance_valid(passengers):
+		return
+	if key == CAPTAIN_THANKS_KEY:
+		StoryFigure.once(passengers.get_node("PierCaptain") as Node3D, &"thanks")
+	elif key == PUP_HORN_KEY:
+		pup_on_horn()
+
+
+## O filhote pisa na buzina; a buzina soa no meio do clipe (quando a pata desce). Devolve a duracao do clipe.
+func pup_on_horn() -> float:
+	var pup := passengers.get_node("PierPup") as Node3D
+	var length := StoryFigure.once(pup, &"step_on_horn", &"wag")
+	horn_pressed = true
+	var delay := length * HORN_AT if length > 0.0 else 0.0
+	get_tree().create_timer(delay).timeout.connect(func() -> void:
+		if ctx.audio != null:
+			ctx.audio.play_sfx("sfx_horn_boat", ctx.boat.global_position))
+	return length
 
 
 func _place_passengers_on_pier() -> void:
@@ -188,6 +206,9 @@ func _place_passengers_on_pier() -> void:
 	var pup := passengers.get_node("PierPup") as Node3D
 	cap.position = Ep01Layout.PIER_POS + Vector3(-0.4, 0.15, 1.0)
 	pup.position = Ep01Layout.PIER_POS + Vector3(0.3, 0.15, 2.0)
+	# No pier, os dois olham para o barco que chega pelo norte.
+	StoryFigure.face(cap, Ep01Layout.DOCKING_TARGET_POS + Vector3(0, 0, -4.0))
+	StoryFigure.face(pup, Ep01Layout.DOCKING_TARGET_POS + Vector3(0, 0, -4.0))
 
 
 func _place_passengers_on_boat() -> void:
@@ -195,8 +216,10 @@ func _place_passengers_on_boat() -> void:
 		passengers.reparent(ctx.boat, false)
 	passengers.position = Vector3.ZERO
 	passengers.rotation = Vector3.ZERO
-	(passengers.get_node("PierCaptain") as Node3D).position = CAPTAIN_ON_BOAT
-	(passengers.get_node("PierPup") as Node3D).position = PUP_ON_BOAT
+	for pair: Array in [["PierCaptain", CAPTAIN_ON_BOAT], ["PierPup", PUP_ON_BOAT]]:
+		var fig := passengers.get_node(String(pair[0])) as Node3D
+		fig.position = pair[1]
+		fig.rotation = Vector3.ZERO  # no convés olham para a proa (-Z local do barco)
 
 
 # ---------- mundo coerente com o diretor ----------
@@ -225,6 +248,9 @@ func refresh_world() -> void:
 
 func enter() -> void:
 	var st: StringName = ctx.director.state
+	# O HUD nasce depois dos estagios: liga as falas finais aqui.
+	if ctx.hud != null and not ctx.hud.line_started.is_connected(_on_line_started):
+		ctx.hud.line_started.connect(_on_line_started)
 	_reset_flags()
 	var boat := ctx.boat
 	boat.visible = true
@@ -250,7 +276,7 @@ func enter() -> void:
 	var in_arm := boat.global_position.x >= BOUND_WEST and boat.global_position.x <= BOUND_EAST \
 		and boat.global_position.z >= BOUND_NORTH and boat.global_position.z <= BOUND_SOUTH
 	if not in_arm:
-		boat.place(Ep01Layout.BOAT_ARM_START, 0.0)
+		boat.place(Ep01Layout.BOAT_ARM_START, Ep01Layout.DOCKING_TARGET_HEADING)
 	pilot.ride(boat, RIDE_PILOT)
 	tracker.ride(boat, RIDE_TRACKER)
 	boat.current_func = _current_at
@@ -301,8 +327,9 @@ func focus_node(member: StringName) -> Node3D:
 
 
 func camera_view() -> Dictionary:
-	# Alta e a oeste/sul do barco: linha (z=4), barco (alvo) e pier (a leste) ficam juntos e livres.
-	return {"offset": Vector3(-2.4, 4.2, 4.6), "yaw": 0.0}
+	# Alta, a noroeste do barco (lado do rio, aberto) olhando para o sul: o barco desce o braco vindo do norte com o
+	# alvo e o pier (a leste) a frente. yaw PI gira o offset (2,4; 4,2; 4,6) para (-2,4; 4,2; -4,6).
+	return {"offset": Vector3(2.4, 4.2, 4.6), "yaw": PI}
 
 
 func gesture_hint(_key: String) -> void:
@@ -375,7 +402,7 @@ func update_docking() -> void:
 	board_it.global_position = boat.global_position
 	board_it.enabled = ok
 	_apply_light(ok)
-	if boat.global_position.z < OVERSHOOT_Z:
+	if boat.global_position.z > OVERSHOOT_Z:
 		restart_approach()
 		return
 	while not _hits.is_empty() and _clock - _hits[0] > STUCK_WINDOW:
@@ -402,7 +429,7 @@ func _on_soft_hit() -> void:
 func restart_approach() -> void:
 	_hits.clear()
 	_retry_count += 1
-	ctx.boat.place(Ep01Layout.BOAT_ARM_START, 0.0)
+	ctx.boat.place(Ep01Layout.BOAT_ARM_START, Ep01Layout.DOCKING_TARGET_HEADING)
 	ctx.boat.assist = 0.0
 	board_it.enabled = false
 	_say_keys(Ep01Content.lines(&"docking", "retry"))
@@ -464,10 +491,13 @@ func _start_departure() -> void:
 	boat.clearance_func = Callable()
 	_say_keys(Ep01Content.lines(&"return_trip", "departure_confirmed"))
 	var from := boat.global_position
-	var to := Ep01Layout.BOAT_ARM_START + Vector3(0, 0, 14.0)
+	var to := Ep01Layout.DOCKING_EXIT_POS
+	var d := to - from
+	var h0 := boat.heading
+	var h1 := h0 + wrapf(atan2(-d.x, -d.z) - h0, -PI, PI)
 	_tween = create_tween()
 	_tween.tween_method(func(t: float) -> void:
-		boat.heading = lerpf(0.0, PI, smoothstep(0.0, 0.35, t))
+		boat.heading = lerpf(h0, h1, smoothstep(0.0, 0.35, t))
 		boat.rotation.y = boat.heading
 		boat.global_position = from.lerp(to, t * t * (3.0 - 2.0 * t)), 0.0, 1.0, 6.0)
 	_tween.finished.connect(_finish_departure)

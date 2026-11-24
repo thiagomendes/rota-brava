@@ -370,8 +370,9 @@ func _dock(delta: float) -> void:
 			_tap(&"interact")
 		return
 	_idle = 0.0
-	var approach := Vector3(target.x, 0, target.z + 8.0)
-	var aim := target if boat.global_position.z < approach.z + 1.0 else approach
+	# Entrada pelo norte: alinha no eixo do braco ao norte do alvo e desce rumo ao sul.
+	var approach := Vector3(target.x, 0, target.z - 8.0)
+	var aim := target if boat.global_position.z > approach.z - 1.0 else approach
 	var d := aim - boat.global_position
 	d.y = 0.0
 	var dist := to_target.length()
