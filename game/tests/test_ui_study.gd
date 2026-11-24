@@ -90,6 +90,8 @@ func _focus_in(hud: Hud, overlay_name: String) -> bool:
 
 func run(runner) -> void:
 	r = runner
+	# Layout final, sem tweens de mola no meio da medicao.
+	Options.motion_override = 1
 	# --- fontes e temas ---
 	for o in UiTheme.OPTIONS:
 		var base := load(UiTheme.FONTS[o]) as FontFile
@@ -155,11 +157,14 @@ func run(runner) -> void:
 		r.check(not obj.get_global_rect().intersects(mem.get_global_rect()), "[%s] objetivo e quem controla nao se sobrepoem" % ratio)
 		var left_thumb := Rect2(0, size.y * 0.55, size.x * 0.18, size.y * 0.45)
 		var right_thumb := Rect2(size.x * 0.82, size.y * 0.55, size.x * 0.18, size.y * 0.45)
-		var stack_ok := true
-		for p: Control in [sub, prompt]:
-			if p.get_global_rect().intersects(left_thumb) or p.get_global_rect().intersects(right_thumb):
-				stack_ok = false
-		r.check(stack_ok, "[%s] legenda e acao ficam entre as zonas dos polegares (18%% laterais, base)" % ratio)
+		var sub_rect := sub.get_global_rect()
+		r.check(not sub_rect.intersects(left_thumb) and not sub_rect.intersects(right_thumb),
+			"[%s] a legenda fica entre as zonas dos polegares (18%% laterais, base)" % ratio)
+		var action := hud.action_button()
+		r.check(right_thumb.encloses(action.get_global_rect()),
+			"[%s] o botao de acao fica na zona do polegar direito (%s)" % [ratio, str(action.get_global_rect())])
+		r.check(action.size.x >= Hud.MIN_TOUCH and action.size.y >= Hud.MIN_TOUCH,
+			"[%s] o botao de acao tem alvo >= %d px (%s)" % [ratio, int(Hud.MIN_TOUCH), str(action.size)])
 		hud.clear_speech()
 		sv.queue_free()
 		await r.frames(2)
@@ -207,3 +212,4 @@ func run(runner) -> void:
 		"menu: todos os botoes tem alvo de toque >= 120 px na referencia de 1080 (%s)" % str(heights))
 	menu.queue_free()
 	await r.frames(2)
+	Options.motion_override = -1
