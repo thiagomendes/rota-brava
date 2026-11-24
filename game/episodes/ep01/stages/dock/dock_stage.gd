@@ -1,7 +1,7 @@
 class_name DockStage
 extends StageBase
 ## Etapa 1 - Investigar (Rastro): pegada de pata no banco do barco + pegada de bota na margem; escolher o destino.
-## Cenografia toda em blocos PROVISORIOS. O progresso e decidido pelo EpisodeDirector (via ctx.submit).
+## Cenografia: vila harbor_slice + moradores animados; marcas e limites em blocos PROVISORIOS. O progresso e decidido pelo EpisodeDirector (via ctx.submit).
 
 const PAW := &"paw_print_bench"
 const BOOT := &"boot_print_bank"
@@ -19,6 +19,7 @@ var _glows: Dictionary = {}   # clue_id -> Array[Node3D] (brilho: some ao examin
 var _pulse: Tween
 var _choice_active: bool = false
 var _active: bool = false
+var villagers: HarborVillagers
 
 
 func setup(main: Ep01Main) -> void:
@@ -71,13 +72,11 @@ func _build_scenery() -> void:
 	add_child(assembled)
 	Stylize.apply(assembled)
 	Stylize.trim_small_shadows(assembled)
-	var dark_wood := Color("7a5636")
-	# Moradores/multidao em blocos neutros (sem colisao)
-	var spots: Array[Vector3] = [Vector3(5.5, 0, 12.5), Vector3(6.6, 0, 13.4), Vector3(7.6, 0, 12.2), Vector3(4.6, 0, 14.0), Vector3(8.2, 0, 14.2)]
-	var tones: Array[Color] = [Color("9aa5ab"), Color("b9b3a4"), Color("8e9aa0"), Color("a9a2b4"), Color("b0b8a8")]
-	for i in spots.size():
-		Blocks.cylinder(self, "CrowdBody%d" % i, 0.28, 0.9, spots[i] + Vector3(0, 0.45, 0), tones[i])
-		Blocks.sphere(self, "CrowdHead%d" % i, 0.22, spots[i] + Vector3(0, 1.1, 0), tones[i].lightened(0.2))
+	# Moradores animados (RB-R1): rua do mercado, cais oeste e gramado; sem colisao, fora do caminho jogavel.
+	villagers = HarborVillagers.new()
+	villagers.name = "Villagers"
+	add_child(villagers)
+	villagers.watch_target = ctx.boat
 	# Limites (colisao): margem e extremos do cais; trilho visivel baixo na borda do cais
 	_wall("FenceWest", Vector3(0.4, 3.0, 13.0), Vector3(-10.2, 1.5, 9.5))
 	_wall("FenceEast", Vector3(0.4, 3.0, 13.0), Vector3(10.2, 1.5, 9.5))
