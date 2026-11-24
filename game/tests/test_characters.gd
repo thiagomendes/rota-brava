@@ -20,6 +20,10 @@ const CHARS := {
 		"anims": ["idle", "walk", "idle_wheel", "steer_left", "steer_right", "react_horn"],
 		"materials": ["mat_leme_skin", "mat_leme_hair", "mat_leme_shirt", "mat_leme_vest", "mat_leme_pants", "mat_leme_leather",
 			"mat_leme_hat", "mat_leme_band", "mat_leme_scarf", "mat_leme_iris", "mat_leme_eye"]},
+	"pico": {"scene": "pico_model", "glb": "res://assets/models/characters/pico.glb", "root": "Pico", "prefix": "Pico",
+		"anims": ["idle", "walk", "react_surprise", "pull_rope", "look_up"],
+		"materials": ["mat_pico_skin", "mat_pico_hair", "mat_pico_shirt", "mat_pico_vest", "mat_pico_pants", "mat_pico_leather", "mat_pico_hat",
+			"mat_pico_rope", "mat_pico_metal", "mat_pico_iris", "mat_pico_eye"]},
 	"extra_a": {"scene": "extra_a", "glb": "res://assets/models/characters/extra_a.glb", "root": "ExtraA", "prefix": "ExtraA",
 		"anims": ["idle", "walk"], "materials": ["mat_extra_a_skin", "mat_extra_a_hat", "mat_extra_a_shirt"]},
 	"extra_b": {"scene": "extra_b", "glb": "res://assets/models/characters/extra_b.glb", "root": "ExtraB", "prefix": "ExtraB",
@@ -38,6 +42,11 @@ func run(runner) -> void:
 	await _test_walk_contact("rastro")
 	await _test_walk_contact("leme")
 	await _test_walk_contact("extra_a")
+	await _test_walk_contact("pico")
+	for id in ["extra_a", "extra_b", "extra_c", "pico", "rastro", "leme"]:
+		await _test_idle_upright(id)
+	await _test_pico()
+	await _test_member_actor_idle()
 	await _test_inspect_touch()
 	await _test_leme_wheel()
 	await _test_loops_close("rastro")
@@ -181,7 +190,7 @@ func _test_static(id: String) -> void:
 	r.check(tn.has("atenta") and tn.has("blink"), "chars: GLB de %s declara targetNames %s" % [id, tn])
 	r.check(String((js.get("asset", {}) as Dictionary).get("generator", "")).contains("Blender"), "chars: GLB de %s gerado pelo Blender" % id)
 	var tris := _tri_count(root)
-	var limit := 25000 if id in ["rastro", "leme"] else 14000
+	var limit := 25000 if id in ["rastro", "leme", "pico"] else 14000
 	r.check(tris > 2000 and tris <= limit, "chars: %s com %d triangulos (orcamento <= %d)" % [id, tris, limit])
 	root.queue_free()
 	await r.frames(1)
@@ -296,6 +305,112 @@ func _test_inspect_touch() -> void:
 	await r.frames(1)
 
 
+## idle: em pe. Tronco (quadril -> cabeca) com inclinacao < 8 graus no quadro 0 e ao longo do ciclo, pes no chao e juntos.
+func _test_idle_upright(id: String) -> void:
+	var root := await _spawn(id)
+	var vis := root.find_child("Model", false, false) as CharacterVisual
+	var worst_tilt := 0.0
+	var worst_foot := 0.0
+	var tilt0 := 0.0
+	var gap := 0.0
+	var len := vis.animation_length(&"idle")
+	for i in 25:
+		vis.seek_clip(&"idle", len * i / 24.0)
+		var h := vis.bone_position(&"hips")
+		var hd := vis.bone_position(&"head")
+		var tilt := rad_to_deg(atan2(Vector2(hd.x - h.x, hd.z - h.z).length(), hd.y - h.y))
+		if i == 0:
+			tilt0 = tilt
+		worst_tilt = maxf(worst_tilt, tilt)
+		worst_foot = maxf(worst_foot, vis.foot_contact_error())
+		gap = maxf(gap, absf(vis.bone_position(&"heel.R").x - vis.bone_position(&"heel.L").x))
+	var limit := 8.0 if id != "rastro" else 12.0   # o Rastro observa inclinada de proposito
+	r.check(tilt0 < limit, "chars: idle de %s em pe, tronco a %.1f graus no quadro 0 (limite %.0f)" % [id, tilt0, limit])
+	r.check(worst_tilt < limit, "chars: idle de %s nunca passa de %.1f graus de inclinacao" % [id, worst_tilt])
+	r.check(worst_foot < 0.01, "chars: idle de %s com pes no chao (pior %.1f mm)" % [id, worst_foot * 1000])
+	r.check(gap < 0.30, "chars: idle de %s com pes juntos/levemente afastados (%.1f cm entre calcanhares)" % [id, gap * 100])
+	print("  medida idle %s: tronco %.1f graus (quadro 0), pior %.1f graus, pe a %.1f mm do chao, calcanhares a %.1f cm" % [id, tilt0, worst_tilt, worst_foot * 1000, gap * 100])
+	root.queue_free()
+	await r.frames(1)
+
+
+## Pico: pull_rope dura 1,6 s e tem exatamente dois puxoes (maos descem duas vezes); look_up levanta a cabeca; mochila/corda no modelo.
+func _test_pico() -> void:
+	var root := await _spawn("pico")
+	var vis := root.find_child("Model", false, false) as CharacterVisual
+	r.check(absf(vis.animation_length(&"pull_rope") - 1.6) < 0.05, "chars: pull_rope do Pico dura 1,6 s (%.3f)" % vis.animation_length(&"pull_rope"))
+	var len := vis.animation_length(&"pull_rope")
+	var ys: Array = []
+	var zs: Array = []
+	for i in 49:
+		vis.seek_clip(&"pull_rope", len * i / 48.0)
+		var tip := vis.bone_position(&"hand_tip.R")
+		ys.append(tip.y)
+		zs.append(tip.z)
+	var ymax: float = ys.max()
+	var ymin: float = ys.min()
+	var pulls := 0
+	for i in range(1, ys.size() - 1):
+		var y: float = ys[i]
+		if y < ys[i - 1] and y <= ys[i + 1] and y > 0.55 and y < 0.85 and (float(ys[maxi(i - 6, 0)]) - y) > 0.12:
+			pulls += 1
+	r.check(pulls == 2, "chars: pull_rope do Pico tem dois puxoes (%d; maos de %.0f a %.0f cm)" % [pulls, ymax * 100, ymin * 100])
+	r.check(ymax - ymin > 0.25, "chars: puxoes com curso > 25 cm (%.1f cm)" % [(ymax - ymin) * 100])
+	r.check(float(zs.min()) < -0.15, "chars: maos do Pico a frente do corpo no puxao (z %.2f)" % float(zs.min()))
+	var worst := 0.0
+	for i in 17:
+		vis.seek_clip(&"pull_rope", len * i / 16.0)
+		worst = maxf(worst, vis.foot_contact_error())
+	r.check(worst < 0.01, "chars: pes do Pico plantados no pull_rope (%.1f mm)" % [worst * 1000])
+	vis.seek_clip(&"look_up", 0.0)
+	var h0 := vis.bone_position(&"head")
+	var n0 := vis.bone_position(&"neck")
+	var look0 := h0 - n0
+	vis.seek_clip(&"look_up", 0.9)
+	var look1 := vis.bone_position(&"head") - vis.bone_position(&"neck")
+	r.check(look1.distance_to(look0) < 0.2, "chars: look_up mantem a cabeca no pescoco")
+	var fm := vis.face_mesh()
+	var aabb := fm.get_aabb()
+	r.check(aabb.size.y > 0.0, "chars: rosto do Pico presente")
+	for part in ["Pico_RopeCoil", "Pico_Carabiners", "Pico_Backpack", "Pico_RopeSash"]:
+		r.check(root.find_child(part, true, false) != null, "chars: Pico tem %s" % part)
+	var rope := _part(root, "Pico_RopeCoil")
+	r.check(rope.get_center().z > 0.12 and rope.size.x > 0.18, "chars: corda do Pico nas costas (+Z), larga o bastante para ler a 48 px (z=%.2f, largura %.2f)" % [rope.get_center().z, rope.size.x])
+	root.queue_free()
+	await r.frames(1)
+
+
+## Ator de verdade (MemberActor) parado no chao: toca idle, em pe, pes no chao (reproduz o caso do figurante/Pico tombado no jogo).
+func _test_member_actor_idle() -> void:
+	var floor_body := StaticBody3D.new()
+	var cs := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(20, 1, 20)
+	cs.shape = box
+	cs.position.y = -0.5
+	floor_body.add_child(cs)
+	floor_body.collision_layer = 1
+	r.tree.root.add_child(floor_body)
+	for who in [&"climber", &"tracker", &"pilot"]:
+		var a := MemberActor.new()
+		r.tree.root.add_child(a)
+		a.setup(who)
+		a.position = Vector3(0, 0.05, 0)
+		await r.frames(90)
+		var vis := a.model
+		r.check(vis != null and vis.current_animation() == &"idle", "chars: MemberActor %s parado toca idle (%s)" % [who, vis.current_animation() if vis != null else "sem modelo"])
+		if vis != null:
+			var h := vis.bone_position(&"hips")
+			var hd := vis.bone_position(&"head")
+			var tilt := rad_to_deg(atan2(Vector2(hd.x - h.x, hd.z - h.z).length(), hd.y - h.y))
+			r.check(tilt < 12.0, "chars: MemberActor %s parado em pe, tronco a %.1f graus" % [who, tilt])
+			r.check(vis.foot_contact_error() < 0.02, "chars: MemberActor %s parado com pes no chao (%.1f mm)" % [who, vis.foot_contact_error() * 1000])
+			print("  medida MemberActor %s: anim=%s tronco %.1f graus pe a %.1f mm" % [who, vis.current_animation(), tilt, vis.foot_contact_error() * 1000])
+		a.queue_free()
+	floor_body.queue_free()
+	await r.frames(1)
+
+
 func _test_leme_wheel() -> void:
 	var root := await _spawn("leme")
 	var vis := root.find_child("Model", false, false) as CharacterVisual
@@ -375,7 +490,7 @@ func _test_no_foreign_models() -> void:
 	for f in files:
 		if f.ends_with(".import") or f.ends_with(".uid"):
 			continue
-		if not (f in ["rastro.glb", "leme.glb", "extra_a.glb", "extra_b.glb", "extra_c.glb"]):
+		if not (f in ["rastro.glb", "leme.glb", "pico.glb", "extra_a.glb", "extra_b.glb", "extra_c.glb"]):
 			foreign.append(f)
 	r.check(foreign.is_empty(), "chars: pasta de personagens so tem GLB do manifesto %s" % [foreign])
 	var man: Variant = JSON.parse_string(FileAccess.get_file_as_string(ProjectSettings.globalize_path("res://").path_join("../source_art/manifest.json")))
@@ -389,4 +504,7 @@ func _test_no_foreign_models() -> void:
 					"chars: manifesto de %s registra ossos, animacoes e shape keys" % d["id"])
 	for id in CHARS:
 		r.check(ids.has(id), "chars: manifesto lista %s" % id)
+
+
+
 

@@ -10,7 +10,7 @@ extends Node3D
 const LOOPING: Array[StringName] = [&"idle", &"walk", &"idle_wheel"]
 const EXPRESSIONS: Array[StringName] = [&"atenta", &"surpresa", &"alegre", &"blink"]
 ## Velocidade (m/s) em que o clipe `walk` (ciclo de 1,0 s) nao desliza o pe no chao.
-const WALK_SPEED_MPS := 0.69
+const WALK_SPEED_MPS := 0.586
 const SOLE_BONES: Array[StringName] = [&"heel.L", &"heel.R", &"toe.L", &"toe.R", &"toe_tip.L", &"toe_tip.R"]
 
 @export var blend_time: float = 0.18
@@ -60,7 +60,14 @@ func play(anim: StringName, speed: float = 1.0, blend: float = -1.0) -> bool:
 	if _player.current_animation == String(anim) and _player.is_playing():
 		_player.speed_scale = speed
 		return true
-	_player.play(anim, blend_time if blend < 0.0 else blend, speed)
+	# Sem processamento (arvore pausada, fora da cena, process_mode desligado) o crossfade nunca avancaria e o corpo ficaria
+	# congelado na ultima pose (ex.: passo da caminhada): nesse caso troca na hora para o primeiro quadro do novo clipe.
+	var instant := not is_inside_tree() or not can_process()
+	_player.play(anim, 0.0 if instant else (blend_time if blend < 0.0 else blend), speed)
+	if instant:
+		_player.seek(0.0, true)
+		if _skeleton != null:
+			_skeleton.force_update_all_bone_transforms()
 	return true
 
 
@@ -183,3 +190,5 @@ func seek_clip(anim: StringName, t: float) -> bool:
 	if _skeleton != null:
 		_skeleton.force_update_all_bone_transforms()
 	return true
+
+

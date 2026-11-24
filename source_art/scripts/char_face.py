@@ -78,8 +78,9 @@ def build_face(rig, name, mats, hc=(0, 0, 1.06), hr=(0.165, 0.17, 0.18), eye_x=0
     F = []          # (indices, slot)
     parts = []      # dicts: kind, start, count, params
     sph_u, sph_v = 18, 10
-    unit, ufaces = _unit_sphere(sph_u, sph_v)
-    lunit, lfaces = _unit_sphere(14, 8)
+    SPH = {"sclera": _unit_sphere(16, 10), "iris": _unit_sphere(14, 8), "pupil": _unit_sphere(10, 6), "shine": _unit_sphere(8, 6),
+           "shine2": _unit_sphere(6, 4)}
+    lunit, lfaces = _unit_sphere(12, 7)
 
     def add_ellipsoid(kind, slot, side, un, uf, **kw):
         start = len(P)
@@ -102,11 +103,11 @@ def build_face(rig, name, mats, hc=(0, 0, 1.06), hr=(0.165, 0.17, 0.18), eye_x=0
         cy = surf(cx, cz) - 0.012
         ex, ez = 0.040 * es, 0.050 * es
         info[s] = dict(sx=sx, c=Vector((cx, cy, cz)), ex=ex, ez=ez)
-        add_ellipsoid("sclera", "eye", s, unit, ufaces)
-        add_ellipsoid("iris", "iris", s, unit, ufaces)
-        add_ellipsoid("pupil", "dark", s, unit, ufaces)
-        add_ellipsoid("shine", "eye", s, unit, ufaces)
-        add_ellipsoid("shine2", "eye", s, unit, ufaces)
+        add_ellipsoid("sclera", "eye", s, *SPH["sclera"])
+        add_ellipsoid("iris", "iris", s, *SPH["iris"])
+        add_ellipsoid("pupil", "dark", s, *SPH["pupil"])
+        add_ellipsoid("shine", "eye", s, *SPH["shine"])
+        add_ellipsoid("shine2", "eye", s, *SPH["shine2"])
         add_ellipsoid("lid", "skin", s, lunit, lfaces)
         add_tube("lash", "dark", s, 7, 4)
         add_tube("brow", "dark", s, 7, 6)
@@ -231,5 +232,6 @@ def build_face(rig, name, mats, hc=(0, 0, 1.06), hr=(0.165, 0.17, 0.18), eye_x=0
     ob.parent = rig
     cl.bind_to_rig(ob, rig, single_bone="head")
     return ob
+
 
 

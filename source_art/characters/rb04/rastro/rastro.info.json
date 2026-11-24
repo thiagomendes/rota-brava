@@ -1,5 +1,5 @@
 {
-  "tris": 22588,
+  "tris": 14944,
   "materials": [
     "mat_rastro_eye",
     "mat_rastro_hair",
@@ -11,8 +11,8 @@
     "mat_rastro_skin",
     "mat_rastro_vest"
   ],
-  "height_m": 1.2979,
-  "min_z": -0.0,
+  "height_m": 1.2986,
+  "min_z": -0.0007,
   "objects": [
     "Rastro_Bag",
     "Rastro_Belt",
@@ -21,6 +21,8 @@
     "Rastro_BootR",
     "Rastro_Braid",
     "Rastro_Cord",
+    "Rastro_CuffL",
+    "Rastro_CuffR",
     "Rastro_Face",
     "Rastro_GloveL",
     "Rastro_GloveR",
@@ -37,6 +39,32 @@
     "Rastro_Vest",
     "Rastro_VestDetails"
   ],
+  "tris_por_objeto": {
+    "Rastro_Body": 400,
+    "Rastro_HandR": 716,
+    "Rastro_HandL": 716,
+    "Rastro_Shirt": 2496,
+    "Rastro_Vest": 1440,
+    "Rastro_Pants": 368,
+    "Rastro_BootR": 112,
+    "Rastro_BootL": 112,
+    "Rastro_GloveR": 136,
+    "Rastro_GloveL": 136,
+    "Rastro_Head": 1312,
+    "Rastro_Hair": 2144,
+    "Rastro_Hat": 768,
+    "Rastro_HatBand": 336,
+    "Rastro_Belt": 348,
+    "Rastro_VestDetails": 288,
+    "Rastro_Notebook": 60,
+    "Rastro_NotebookPages": 60,
+    "Rastro_Cord": 48,
+    "Rastro_Bag": 208,
+    "Rastro_CuffR": 240,
+    "Rastro_CuffL": 240,
+    "Rastro_Braid": 160,
+    "Rastro_Face": 2100
+  },
   "bones": [
     "root",
     "hips",

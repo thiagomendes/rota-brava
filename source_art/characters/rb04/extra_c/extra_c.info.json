@@ -1,5 +1,5 @@
 {
-  "tris": 10696,
+  "tris": 7844,
   "materials": [
     "mat_extra_c_eye",
     "mat_extra_c_hair",
@@ -10,12 +10,14 @@
     "mat_extra_c_shirt",
     "mat_extra_c_skin"
   ],
-  "height_m": 1.2558,
+  "height_m": 1.2839,
   "min_z": 0.0019,
   "objects": [
     "ExtraC_Body",
     "ExtraC_BootL",
     "ExtraC_BootR",
+    "ExtraC_CuffL",
+    "ExtraC_CuffR",
     "ExtraC_Face",
     "ExtraC_Hair",
     "ExtraC_HandL",
@@ -25,6 +27,21 @@
     "ExtraC_Pants",
     "ExtraC_Shirt"
   ],
+  "tris_por_objeto": {
+    "ExtraC_Body": 400,
+    "ExtraC_HandR": 228,
+    "ExtraC_HandL": 228,
+    "ExtraC_Shirt": 624,
+    "ExtraC_Pants": 368,
+    "ExtraC_BootR": 112,
+    "ExtraC_BootL": 112,
+    "ExtraC_Head": 1312,
+    "ExtraC_Hair": 1480,
+    "ExtraC_Hat": 400,
+    "ExtraC_CuffR": 240,
+    "ExtraC_CuffL": 240,
+    "ExtraC_Face": 2100
+  },
   "bones": [
     "root",
     "hips",

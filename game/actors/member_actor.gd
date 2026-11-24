@@ -12,8 +12,7 @@ const TURN_SPEED := 12.0
 const MODEL_SCENES := {
 	&"tracker": "res://actors/characters/rastro_model.tscn",
 	&"pilot": "res://actors/characters/leme_model.tscn",
-	# Pico ainda nao tem modelo proprio: figurante como substituto PROVISORIO ate o RB-05.
-	&"climber": "res://actors/characters/extra_a.tscn",
+	&"climber": "res://actors/characters/pico_model.tscn",
 }
 ## Velocidade de caminhada; o clipe `walk` anda ~0,69 m/s, entao a animacao e acelerada (limitada) para o pe nao patinar.
 const WALK_ANIM_MAX_SCALE := 3.2
@@ -180,3 +179,4 @@ func dismount(pos: Vector3) -> void:
 	riding_on = null
 	collision_layer = 2
 	teleport(pos)
+
