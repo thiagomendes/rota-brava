@@ -53,7 +53,8 @@ func _run() -> void:
 	for f in files:
 		print("== ", f)
 		var script := load("res://tests/" + f) as GDScript
-		if script == null:
+		# Script com erro de sintaxe carrega mas nao instancia: falhar e seguir (antes travava a suite).
+		if script == null or not script.can_instantiate():
 			failures += 1
 			printerr("FAIL  nao foi possivel carregar ", f)
 			continue
