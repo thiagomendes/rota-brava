@@ -1,5 +1,6 @@
 # Rota Brava — instruções para agentes
 
+**Ao iniciar uma sessão, leia primeiro `docs/STATE.md`** (estado, kanban, como retomar); atualize-o e commite a cada etapa.
 Contrato de produto: `SPEC.md`. Processo: seções 10 a 13. Perfis em `.opencode/agents/`, procedimentos em `.opencode/skills/`.
 
 ## Regras
