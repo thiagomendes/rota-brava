@@ -91,8 +91,13 @@ func run(runner) -> void:
 	var marked := 0
 	for n in dock.find_children("*", "MeshInstance3D", true, false):
 		total += 1
-		if n.get_meta(Blocks.PROVISIONAL, false) == true:
-			marked += 1
+		# A marca pode estar na propria malha ou numa cena-mae (as cenas do ambiente marcam a raiz).
+		var cursor: Node = n
+		while cursor != null and cursor != dock.get_parent():
+			if cursor.get_meta(Blocks.PROVISIONAL, false) == true:
+				marked += 1
+				break
+			cursor = cursor.get_parent()
 	r.check(total > 10 and marked == total, "todos os blocos do cais sao provisorios (%d/%d)" % [marked, total])
 
 	# Chao

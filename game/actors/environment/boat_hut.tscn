@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/boat_hut.glb" id="1_jswkj"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1js7y"]
+size = Vector3(3.56, 2.2, 2.96)
+
+[node name="Boat_Hut" type="Node3D" unique_id=260531167]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=362413713 instance=ExtResource("1_jswkj")]
+
+[node name="Body" type="StaticBody3D" parent="." unique_id=345015263]
+collision_mask = 0
+
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=617902954]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+shape = SubResource("BoxShape3D_1js7y")

@@ -1,0 +1,130 @@
+{
+  "tris": 16568,
+  "materials": [
+    "mat_pico_band",
+    "mat_pico_eye",
+    "mat_pico_hair",
+    "mat_pico_hat",
+    "mat_pico_iris",
+    "mat_pico_leather",
+    "mat_pico_metal",
+    "mat_pico_pants",
+    "mat_pico_rope",
+    "mat_pico_shirt",
+    "mat_pico_skin",
+    "mat_pico_vest"
+  ],
+  "height_m": 1.3134,
+  "min_z": -0.0008,
+  "objects": [
+    "Pico_Backpack",
+    "Pico_Belt",
+    "Pico_Body",
+    "Pico_BootL",
+    "Pico_BootR",
+    "Pico_Carabiners",
+    "Pico_CuffL",
+    "Pico_CuffR",
+    "Pico_Face",
+    "Pico_GloveL",
+    "Pico_GloveR",
+    "Pico_Hair",
+    "Pico_HandL",
+    "Pico_HandR",
+    "Pico_Hat",
+    "Pico_HatBand",
+    "Pico_Head",
+    "Pico_Pants",
+    "Pico_RopeCoil",
+    "Pico_RopeSash",
+    "Pico_Shirt",
+    "Pico_Vest",
+    "Pico_VestDetails"
+  ],
+  "tris_por_objeto": {
+    "Pico_Body": 400,
+    "Pico_HandR": 720,
+    "Pico_HandL": 720,
+    "Pico_Shirt": 2496,
+    "Pico_Vest": 1456,
+    "Pico_Pants": 368,
+    "Pico_BootR": 112,
+    "Pico_BootL": 112,
+    "Pico_GloveR": 136,
+    "Pico_GloveL": 136,
+    "Pico_Head": 1312,
+    "Pico_Hair": 1480,
+    "Pico_Hat": 820,
+    "Pico_HatBand": 336,
+    "Pico_Belt": 348,
+    "Pico_VestDetails": 288,
+    "Pico_CuffR": 240,
+    "Pico_CuffL": 240,
+    "Pico_Backpack": 60,
+    "Pico_RopeCoil": 1392,
+    "Pico_RopeSash": 96,
+    "Pico_Carabiners": 1200,
+    "Pico_Face": 2100
+  },
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "hand_tip.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "hand_tip.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R",
+    "toe.R",
+    "toe_tip.R",
+    "heel.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "toe.L",
+    "toe_tip.L",
+    "heel.L"
+  ],
+  "bone_count": 28,
+  "animations": {
+    "idle": [
+      0,
+      72
+    ],
+    "look_up": [
+      0,
+      60
+    ],
+    "pull_rope": [
+      0,
+      48
+    ],
+    "react_surprise": [
+      0,
+      27
+    ],
+    "walk": [
+      0,
+      30
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "blink"
+  ]
+}

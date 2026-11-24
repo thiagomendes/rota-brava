@@ -15,3 +15,35 @@
 - **Orientacao:** frente do personagem/barco em +Y no Blender = -Z na Godot (verificado por teste: nariz com z < 0, proa em -Z).
 - **Pivos:** Rastro nos pes; barco no centro de giro (eixo longitudinal, 40% do comprimento a partir da popa; popa y=-2,0, proa y=+3,0 no Blender).
 - **Convencao Godot:** nao nomear objetos com sufixo `-wheel`/`_wheel` etc. (o importador cria `VehicleWheel3D`); o volante chama-se `Boat_Helm`.
+
+
+## RB-04-chars: personagens organicos com rig e animacao (PROVISORIO)
+
+- **Agente:** `art3d`. **Status:** `provisorio`; aprovacao artistica pendente (Thiago). Substitui o Rastro de bastoes do RB-03
+  (`rastro.blend`, `build_rastro.py`, `params/rastro.json` ficam so como historico; o GLB antigo foi removido e nao e mais exportado).
+- **Originalidade:** geometria 100% procedural em Python do Blender (`source_art/scripts/char_*.py`): modificador SKIN + SUBSURF a partir
+  de grafos de vertices com raio, elipsoides/tubos/revolucoes `bmesh`, cascas deslocadas pela normal (colete). Rig (28 ossos), pesos
+  (distancia ao segmento do osso + suavizacao + copia por vizinho mais proximo para camadas de roupa), shape keys do rosto e animacoes
+  (FK + IK de dois ossos, 30 fps) sao escritos por script. **Nenhum** modelo, malha, rig, animacao/mocap, textura ou personagem-base de
+  terceiros; nenhum design de serie existente foi imitado. Materiais sao cores do projeto (Principled BSDF, sem imagens).
+- **Fontes:** `source_art/characters/rb04/<id>/<id>.blend` (+ `.info.json`) para `rastro`, `leme`, `extra_a`, `extra_b`, `extra_c`.
+  Scripts: `char_build.py` (malha, rig, pesos, export), `char_lib.py` (SKIN, tubos, rig, pesos, IK), `char_face.py` (olhos, palpebras,
+  sobrancelhas, boca e shape keys `neutra/atenta/surpresa/alegre/blink`), `char_anim.py` (clipes), `char_render.py` e `char_montage.py`
+  (imagens de verificacao, fora do Git). Base compartilhada: `rbart.py`.
+- **Saidas:** `game/assets/models/characters/{rastro,leme,extra_a,extra_b,extra_c}.glb` (metros, +Y up, skin, morph targets, animacoes
+  exportadas por trilhas NLA com o nome do clipe). Manifesto: `source_art/manifest.json` (ossos, animacoes e duracoes, shape keys, triangulos).
+- **Reproducao:** `./tools/export-assets.ps1` (`-Images` regenera vistas, expressoes, malha e poses extremas em `captures/rb-04/chars`,
+  fora do Git). Como no RB-03, os **bytes** do GLB mudam a cada exportacao; o manifesto guarda o hash do arquivo versionado.
+  Procedimento das demais imagens (tiras de clipes, camera do jogo): `source_art/characters/EVIDENCE.md`.
+- **Convencoes:** origem nos pes; frente +Y no Blender = -Z na Godot; lado direito (`.R`) = +X. Ossos: root, hips, spine, chest, neck, head,
+  shoulder/upper_arm/forearm/hand/thigh/shin/foot/toe `.L/.R` e auxiliares sem deformacao (`hand_tip`, `toe_tip`, `heel`) usados para medir
+  contato dos pes e alcance da mao. Loop dos clipes `idle`, `walk`, `idle_wheel` e definido em `CharacterVisual` (o glTF nao tem flag de loop).
+- **Limites conhecidos:** triangulos altos para o tamanho em tela (Rastro ~22,6 mil); sem LOD; roupa nao tem simulacao (caderno/bolsa
+  acompanham o quadril); cabelo e colete mostram arestas duras em poses extremas; `walk` tem velocidade nominal de ~0,69 m/s no referencial do corpo.
+
+
+### Atualizacao RB-04-chars (2a rodada)
+- **Pico (`climber`)** criado: `char_build.py --id pico` (capacete leve, corda enrolada nas costas + tiracolo, 4 mosquetoes, mochila, luvas, jaqueta verde #5AA469), mesmo rig de 28 ossos e as mesmas shape keys, `mat_pico_*`. Clipes: `idle`, `walk`, `react_surprise`, `pull_rope` (1,6 s, dois puxoes), `look_up`. Cena `game/actors/characters/pico_model.tscn`.
+- **Idle dos figurantes/Pico:** pes quase juntos (calcanhares ~12 cm), tronco < 2 graus; `CharacterVisual.play` agora troca de clipe na hora quando o no nao esta processando (evita congelar a ultima pose da caminhada).
+- **Polimento:** cabelo sem o bloco lateral, mangas mais finas com punho, colete e peso da camisa mais suaves, `walk` com passo de 0,34 m (velocidade nominal 0,586 m/s, `CharacterVisual.WALK_SPEED_MPS`), agachada com tronco a 24 graus.
+- **Triangulos (antes -> depois):** Rastro 22.588 -> 14.944; Leme 20.208 -> 14.076; figurantes 11.448/11.920/10.696 -> 8.420/9.212/7.844; Pico 16.568 (novo).

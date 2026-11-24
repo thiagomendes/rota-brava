@@ -2,9 +2,20 @@ class_name MemberActor
 extends CharacterBody3D
 ## Integrante da equipe a pe (bloco PROVISORIO). Anda relativo a camera; so responde a entrada quando `controlled`.
 
-const SPEED := 4.5
+## Emitido a cada contato de pe com o chao (so a pe, nao embarcado), para o som dos passos acompanhar o movimento.
+signal footstep(speed: float, position: Vector3)
+
+const SPEED := 2.6
 const GRAVITY := 20.0
 const TURN_SPEED := 12.0
+
+const MODEL_SCENES := {
+	&"tracker": "res://actors/characters/rastro_model.tscn",
+	&"pilot": "res://actors/characters/leme_model.tscn",
+	&"climber": "res://actors/characters/pico_model.tscn",
+}
+## Velocidade de caminhada; o clipe `walk` anda ~0,69 m/s, entao a animacao e acelerada (limitada) para o pe nao patinar.
+const WALK_ANIM_MAX_SCALE := 3.2
 
 const COLORS := {
 	&"tracker": Color("f28c28"),
@@ -17,7 +28,10 @@ var controlled: bool = false
 ## Giro (rad, em Y) da camera; define o que significa "para cima" na entrada.
 var move_yaw: float = 0.0
 var speed_scale: float = 1.0
+var model: CharacterVisual
 var riding_on: Node3D = null
+var _action_until: float = 0.0
+var _step_clock: float = 0.0
 var ride_offset: Vector3 = Vector3.ZERO
 var _visual: Node3D
 var _face_target: Variant = null
@@ -38,17 +52,70 @@ func setup(member_id: StringName) -> void:
 	_visual = Node3D.new()
 	_visual.name = "Visual"
 	add_child(_visual)
-	var c: Color = COLORS.get(member_id, Color.WHITE)
-	Blocks.cylinder(_visual, "Body", 0.32, 1.0, Vector3(0, 0.6, 0), c)
-	Blocks.sphere(_visual, "Head", 0.26, Vector3(0, 1.4, 0), Color("f1d2b0"))
-	Blocks.box(_visual, "Nose", Vector3(0.1, 0.1, 0.16), Vector3(0, 1.38, -0.28), Color("e0b48a"))
-	match member_id:
-		&"tracker":
-			Blocks.box(_visual, "Notebook", Vector3(0.08, 0.4, 0.3), Vector3(0.38, 0.8, 0.0), Color("fff3c4"))
-		&"climber":
-			Blocks.cylinder(_visual, "RopeCoil", 0.26, 0.2, Vector3(0, 0.95, 0.3), Color("ffd24d"))
-		&"pilot":
-			Blocks.box(_visual, "Vest", Vector3(0.7, 0.45, 0.5), Vector3(0, 0.85, 0.0), Color("f4f4f4"))
+	_mount_model(member_id)
+
+
+## Monta o modelo animado (rig do RB-04) dentro do pivo visual; o corpo fisico continua sendo este CharacterBody3D.
+func _mount_model(member_id: StringName) -> void:
+	var path: String = MODEL_SCENES.get(member_id, "")
+	if path.is_empty() or not ResourceLoader.exists(path):
+		return
+	var inst := (load(path) as PackedScene).instantiate()
+	var m := inst.get_node_or_null("Model")
+	if m == null:
+		inst.queue_free()
+		return
+	inst.remove_child(m)
+	m.owner = null
+	inst.queue_free()
+	_visual.add_child(m)
+	model = m as CharacterVisual
+	Stylize.apply(m)
+	if model != null:
+		model.play(&"idle")
+
+
+## Toca um clipe de uma vez (agachar, tocar a pista, olhar, susto); a selecao automatica espera o fim. Retorna a duracao.
+func play_action(anim: StringName, speed: float = 1.0) -> float:
+	if model == null or not model.has_animation(anim):
+		return 0.0
+	var length := model.animation_length(anim) / maxf(speed, 0.01)
+	_action_until = Time.get_ticks_msec() / 1000.0 + length
+	model.play(anim, speed)
+	return length
+
+
+func set_expression(expr: StringName, weight: float = 1.0) -> void:
+	if model != null:
+		model.set_expression(expr, weight)
+
+
+func _update_animation() -> void:
+	if model == null or Time.get_ticks_msec() / 1000.0 < _action_until:
+		return
+	var planar := Vector2(velocity.x, velocity.z).length()
+	if riding_on != null and is_instance_valid(riding_on):
+		var want: StringName = &"idle"
+		if member == &"pilot" and riding_on is BoatActor:
+			var boat := riding_on as BoatActor
+			if boat.steer > 0.35 and model.has_animation(&"steer_left"):
+				want = &"steer_left"
+			elif boat.steer < -0.35 and model.has_animation(&"steer_right"):
+				want = &"steer_right"
+			elif model.has_animation(&"idle_wheel"):
+				want = &"idle_wheel"
+		model.play(want)
+	elif planar > 0.2 and model.has_animation(&"walk"):
+		var anim_scale := minf(model.walk_speed_scale(planar), WALK_ANIM_MAX_SCALE)
+		model.play(&"walk", anim_scale)
+		# Um passo a cada meio ciclo do clipe, no ritmo real da animacao.
+		_step_clock += get_physics_process_delta_time() * anim_scale
+		if _step_clock >= 0.5 and is_on_floor():
+			_step_clock = 0.0
+			footstep.emit(planar, global_position)
+	else:
+		_step_clock = 0.0
+		model.play(&"idle")
 
 
 func face_point(point: Vector3) -> void:
@@ -67,6 +134,7 @@ func _physics_process(delta: float) -> void:
 	if riding_on != null and is_instance_valid(riding_on):
 		global_position = riding_on.to_global(ride_offset)
 		velocity = Vector3.ZERO
+		_update_animation()
 		if _face_target != null:
 			var f: Vector3 = (_face_target as Vector3) - global_position
 			f.y = 0.0
@@ -84,6 +152,7 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.y -= GRAVITY * delta
 	move_and_slide()
+	_update_animation()
 	if world.length() > 0.1:
 		_face_target = null
 		_visual.rotation.y = lerp_angle(_visual.rotation.y, atan2(-world.x, -world.z), clampf(TURN_SPEED * delta, 0.0, 1.0))
@@ -110,3 +179,4 @@ func dismount(pos: Vector3) -> void:
 	riding_on = null
 	collision_layer = 2
 	teleport(pos)
+

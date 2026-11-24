@@ -3,16 +3,16 @@ extends RefCounted
 ## Confere nos, escala em metros, origem, frente em -Z, materiais, shape keys, colisao fora do importado e proveniencia.
 ## Nao comprova gosto nem aparencia: so contrato tecnico.
 
-const RASTRO_SCENE := "res://actors/rastro/rastro.tscn"
+const RASTRO_SCENE := "res://actors/rastro/rastro.tscn"   # herda actors/characters/rastro_model.tscn
 const BOAT_SCENE := "res://actors/boat_model/boat_model.tscn"
-const RASTRO_GLB := "res://assets/models/rastro.glb"
+const RASTRO_GLB := "res://assets/models/characters/rastro.glb"
 const BOAT_GLB := "res://assets/models/boat.glb"
 
-const RASTRO_NODES := ["Rastro_Body", "Rastro_Head", "Rastro_Nose", "Rastro_Face", "Rastro_Hat", "Rastro_HatBrim",
-	"Rastro_Notebook", "Rastro_NotebookPages", "Rastro_LegL", "Rastro_LegR", "Rastro_BootL", "Rastro_BootR",
-	"Rastro_ArmL", "Rastro_ArmR", "Rastro_HandL", "Rastro_HandR", "Rastro_Pants"]
-const RASTRO_MATERIALS := ["mat_rastro_skin", "mat_rastro_jacket", "mat_rastro_pants", "mat_rastro_boots", "mat_rastro_hat",
-	"mat_rastro_notebook", "mat_rastro_paper", "mat_rastro_face", "mat_rastro_skin_dark"]
+const RASTRO_NODES := ["Rastro_Body", "Rastro_Head", "Rastro_Face", "Rastro_Hat", "Rastro_Hair", "Rastro_Shirt", "Rastro_Vest",
+	"Rastro_Pants", "Rastro_BootL", "Rastro_BootR", "Rastro_HandL", "Rastro_HandR", "Rastro_GloveL", "Rastro_GloveR", "Rastro_Notebook",
+	"Rastro_Bag", "Rastro_Belt", "Skeleton3D", "AnimationPlayer"]
+const RASTRO_MATERIALS := ["mat_rastro_skin", "mat_rastro_hair", "mat_rastro_shirt", "mat_rastro_vest", "mat_rastro_pants", "mat_rastro_leather",
+	"mat_rastro_hat", "mat_rastro_iris", "mat_rastro_eye"]
 const BOAT_NODES := ["Boat_Hull", "Boat_Deck", "Boat_Cabin", "Boat_CabinRoof", "Boat_Bench", "Boat_Helm", "Boat_Windows",
 	"DeckPoint", "BenchMark"]
 const BOAT_MATERIALS := ["mat_boat_hull", "mat_boat_deck", "mat_boat_cabin", "mat_boat_bench", "mat_boat_wheel", "mat_boat_glass"]
@@ -128,6 +128,7 @@ func run(runner) -> void:
 
 
 func _test_rastro() -> void:
+	# O Rastro organico (rig, animacoes, medicoes) e coberto por test_characters.gd; aqui fica o contrato do caminho antigo.
 	var ps := load(RASTRO_SCENE) as PackedScene
 	r.check(ps != null, "assets: rastro.tscn carrega")
 	if ps == null:
@@ -137,14 +138,13 @@ func _test_rastro() -> void:
 	var missing := _missing(root, RASTRO_NODES)
 	r.check(missing.is_empty(), "assets: nos estaveis do Rastro presentes %s" % [missing])
 	var model := root.find_child("Model", false, false) as Node3D
-	r.check(model != null, "assets: Rastro instancia o GLB como no Model")
+	r.check(model != null and model.get_script() != null, "assets: Rastro tem Model com script CharacterVisual")
 	var box := mesh_aabb(root)
-	r.check(box.size.y >= 1.1 and box.size.y <= 1.5, "assets: altura do Rastro entre 1,1 e 1,5 m (%.3f)" % box.size.y)
+	r.check(box.size.y >= 1.2 and box.size.y <= 1.4, "assets: altura do Rastro entre 1,2 e 1,4 m (%.3f)" % box.size.y)
 	r.check(absf(box.position.y) < 0.02, "assets: origem do Rastro nos pes (min Y = %.4f)" % box.position.y)
-	var nose := part_aabb(root, "Rastro_Nose")
+	var face := part_aabb(root, "Rastro_Face")
 	var head := part_aabb(root, "Rastro_Head")
-	r.check(nose.get_center().z < head.get_center().z - 0.1, "assets: nariz do Rastro na frente da cabeca (-Z): nariz z=%.3f, cabeca z=%.3f" % [nose.get_center().z, head.get_center().z])
-	r.check(nose.get_center().z < -0.1, "assets: frente do Rastro em -Z (nariz z=%.3f)" % nose.get_center().z)
+	r.check(face.get_center().z < head.get_center().z - 0.08, "assets: frente do Rastro em -Z (rosto z=%.3f, cabeca z=%.3f)" % [face.get_center().z, head.get_center().z])
 	var mats := material_names(model)
 	var miss_m: Array = []
 	for m in RASTRO_MATERIALS:
@@ -152,13 +152,12 @@ func _test_rastro() -> void:
 			miss_m.append(m)
 	r.check(miss_m.is_empty(), "assets: materiais nomeados do Rastro presentes %s" % [miss_m])
 	r.check(mats.size() == RASTRO_MATERIALS.size(), "assets: Rastro tem %d materiais (esperado %d)" % [mats.size(), RASTRO_MATERIALS.size()])
-	# shape keys (expressoes): a neutra e a base; atenta e surpresa sao alvos
-	var face := model.find_child("Rastro_Face", true, false) as MeshInstance3D
+	var face_mi := model.find_child("Rastro_Face", true, false) as MeshInstance3D
 	var shapes: Array = []
-	if face != null:
-		for i in face.mesh.get_blend_shape_count():
-			shapes.append(String(face.mesh.get_blend_shape_name(i)))
-	r.check(shapes.has("atenta") and shapes.has("surpresa"), "assets: shape keys do rosto importadas na Godot %s" % [shapes])
+	if face_mi != null:
+		for i in face_mi.mesh.get_blend_shape_count():
+			shapes.append(String(face_mi.mesh.get_blend_shape_name(i)))
+	r.check(shapes.has("atenta") and shapes.has("surpresa") and shapes.has("alegre") and shapes.has("blink"), "assets: shape keys do rosto importadas na Godot %s" % [shapes])
 	var js := read_glb_json(RASTRO_GLB)
 	var names_in_glb: Array = []
 	for m in js.get("meshes", []):
@@ -167,18 +166,15 @@ func _test_rastro() -> void:
 			names_in_glb.append_array((ex as Dictionary)["targetNames"])
 	r.check(names_in_glb.has("atenta") and names_in_glb.has("surpresa"), "assets: GLB do Rastro declara targetNames atenta/surpresa %s" % [names_in_glb])
 	r.check(String((js.get("asset", {}) as Dictionary).get("generator", "")).contains("Blender"), "assets: GLB do Rastro gerado pelo Blender")
-	# sem rig nem animacao (RB-04)
-	r.check(model.find_children("*", "Skeleton3D", true, false).is_empty() and model.find_children("*", "AnimationPlayer", true, false).is_empty(), "assets: Rastro sem rig nem animacao (fica para RB-04)")
+	r.check(not model.find_children("*", "Skeleton3D", true, false).is_empty() and not model.find_children("*", "AnimationPlayer", true, false).is_empty(), "assets: Rastro tem rig (Skeleton3D) e AnimationPlayer (RB-04)")
 	r.check(_has_collision_outside(root), "assets: colisao do Rastro existe e fica fora da cena importada")
 	var cap := (root.find_child("Collision", false, false) as CollisionShape3D).shape as CapsuleShape3D
 	r.check(cap != null and cap.height >= 1.1 and cap.height <= 1.5, "assets: capsula do Rastro com altura compativel")
 	r.check(root.has_meta("provisional"), "assets: Rastro marcado como provisorio")
-	r.check(_scene_text_only_glb(RASTRO_SCENE, RASTRO_GLB), "assets: rastro.tscn so referencia o GLB (sem malha propria)")
 	var imported := (load(RASTRO_GLB) as PackedScene).instantiate()
 	r.check(imported.find_children("*", "CollisionObject3D", true, false).is_empty() and imported.find_children("*", "CollisionShape3D", true, false).is_empty(), "assets: GLB do Rastro nao traz colisao")
 	imported.free()
 	root.free()
-
 
 func _test_boat() -> void:
 	var ps := load(BOAT_SCENE) as PackedScene
@@ -225,7 +221,7 @@ func _test_boat() -> void:
 
 
 func _test_external_meshes() -> void:
-	for pair in [[RASTRO_SCENE, RASTRO_GLB], [BOAT_SCENE, BOAT_GLB]]:
+	for pair in [[BOAT_SCENE, BOAT_GLB]]:
 		var root := (load(pair[0]) as PackedScene).instantiate()
 		r.check(_meshes_from_glb_only(root, pair[1]), "assets: toda malha de %s vem do GLB do projeto" % pair[0])
 		var outside := 0
@@ -241,7 +237,7 @@ func _test_external_meshes() -> void:
 	for f in files:
 		if f.ends_with(".import") or f.ends_with(".uid"):
 			continue
-		if not (f in ["rastro.glb", "boat.glb"]):
+		if not (f in ["boat.glb"]):
 			foreign.append(f)
 	r.check(foreign.is_empty(), "assets: pasta de modelos so tem ativos do manifesto %s" % [foreign])
 
@@ -266,5 +262,6 @@ func _test_manifest() -> void:
 				missing_src.append(s)
 		r.check(missing_src.is_empty(), "assets: arquivos de origem do manifesto existem (%s) %s" % [d.get("id"), missing_src])
 		r.check(int(d.get("triangulos", 0)) > 0 and (d.get("materiais", []) as Array).size() > 0, "assets: manifesto registra triangulos e materiais (%s)" % d.get("id"))
+
 
 

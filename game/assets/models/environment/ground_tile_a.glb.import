@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://du48tqw1bat66"
-path="res://.godot/imported/rastro.glb-1c952fd6b7e8652748dbd82665e2a391.scn"
+uid="uid://bwhdq2h0de5xx"
+path="res://.godot/imported/ground_tile_a.glb-a7c043a3cefb7f998d5fa8878300cf05.scn"
 
 [deps]
 
-source_file="res://assets/models/rastro.glb"
-dest_files=["res://.godot/imported/rastro.glb-1c952fd6b7e8652748dbd82665e2a391.scn"]
+source_file="res://assets/models/environment/ground_tile_a.glb"
+dest_files=["res://.godot/imported/ground_tile_a.glb-a7c043a3cefb7f998d5fa8878300cf05.scn"]
 
 [params]
 
@@ -35,7 +35,7 @@ animation/fps=30
 animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
-import_script/path=""
+import_script/path="res://assets/models/environment/vertex_color_postimport.gd"
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""

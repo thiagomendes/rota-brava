@@ -1,0 +1,80 @@
+{
+  "boat_v2": {
+    "glb": "game/assets/models/environment/boat_v2.glb",
+    "tris": 13364,
+    "materials": [
+      "mat_env_boat_bench",
+      "mat_env_boat_cabin",
+      "mat_env_boat_deck",
+      "mat_env_boat_flag",
+      "mat_env_boat_glass",
+      "mat_env_boat_hull",
+      "mat_env_boat_lamp",
+      "mat_env_boat_motor",
+      "mat_env_boat_name",
+      "mat_env_boat_roof",
+      "mat_env_boat_stripe",
+      "mat_env_boat_trim",
+      "mat_env_boat_wheel",
+      "mat_env_metal",
+      "mat_env_paw",
+      "mat_env_rope",
+      "mat_env_white",
+      "mat_env_wood_dark",
+      "mat_env_wood_light"
+    ],
+    "vertices": 6852,
+    "bbox_min": [
+      -1.295,
+      -0.717,
+      -3.0
+    ],
+    "bbox_max": [
+      1.295,
+      2.45,
+      2.635
+    ],
+    "size": [
+      2.59,
+      3.167,
+      5.635
+    ],
+    "objects": [
+      "Boat_Bench",
+      "Boat_BenchLegs",
+      "Boat_Cabin",
+      "Boat_CabinRoof",
+      "Boat_Cleat",
+      "Boat_Deck",
+      "Boat_DeckPlanks",
+      "Boat_Fenders",
+      "Boat_Flag",
+      "Boat_FlagPole",
+      "Boat_Helm",
+      "Boat_HelmColumn",
+      "Boat_HelmStand",
+      "Boat_Horn",
+      "Boat_Hull",
+      "Boat_Lantern",
+      "Boat_LanternGlass",
+      "Boat_Motor",
+      "Boat_MotorCowl",
+      "Boat_MotorLeg",
+      "Boat_MotorTiller",
+      "Boat_Name",
+      "Boat_Rail",
+      "Boat_Rope",
+      "Boat_Stripe",
+      "Boat_WindowFrames",
+      "Boat_Windows",
+      "PawMark"
+    ],
+    "empties": [
+      "BenchMark",
+      "DeckPoint",
+      "HornPoint",
+      "PivotMark",
+      "WheelPoint"
+    ]
+  }
+}

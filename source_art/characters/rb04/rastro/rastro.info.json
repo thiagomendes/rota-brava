@@ -1,0 +1,133 @@
+{
+  "tris": 14944,
+  "materials": [
+    "mat_rastro_eye",
+    "mat_rastro_hair",
+    "mat_rastro_hat",
+    "mat_rastro_iris",
+    "mat_rastro_leather",
+    "mat_rastro_pants",
+    "mat_rastro_shirt",
+    "mat_rastro_skin",
+    "mat_rastro_vest"
+  ],
+  "height_m": 1.2986,
+  "min_z": -0.0007,
+  "objects": [
+    "Rastro_Bag",
+    "Rastro_Belt",
+    "Rastro_Body",
+    "Rastro_BootL",
+    "Rastro_BootR",
+    "Rastro_Braid",
+    "Rastro_Cord",
+    "Rastro_CuffL",
+    "Rastro_CuffR",
+    "Rastro_Face",
+    "Rastro_GloveL",
+    "Rastro_GloveR",
+    "Rastro_Hair",
+    "Rastro_HandL",
+    "Rastro_HandR",
+    "Rastro_Hat",
+    "Rastro_HatBand",
+    "Rastro_Head",
+    "Rastro_Notebook",
+    "Rastro_NotebookPages",
+    "Rastro_Pants",
+    "Rastro_Shirt",
+    "Rastro_Vest",
+    "Rastro_VestDetails"
+  ],
+  "tris_por_objeto": {
+    "Rastro_Body": 400,
+    "Rastro_HandR": 716,
+    "Rastro_HandL": 716,
+    "Rastro_Shirt": 2496,
+    "Rastro_Vest": 1440,
+    "Rastro_Pants": 368,
+    "Rastro_BootR": 112,
+    "Rastro_BootL": 112,
+    "Rastro_GloveR": 136,
+    "Rastro_GloveL": 136,
+    "Rastro_Head": 1312,
+    "Rastro_Hair": 2144,
+    "Rastro_Hat": 768,
+    "Rastro_HatBand": 336,
+    "Rastro_Belt": 348,
+    "Rastro_VestDetails": 288,
+    "Rastro_Notebook": 60,
+    "Rastro_NotebookPages": 60,
+    "Rastro_Cord": 48,
+    "Rastro_Bag": 208,
+    "Rastro_CuffR": 240,
+    "Rastro_CuffL": 240,
+    "Rastro_Braid": 160,
+    "Rastro_Face": 2100
+  },
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "hand_tip.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "hand_tip.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R",
+    "toe.R",
+    "toe_tip.R",
+    "heel.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "toe.L",
+    "toe_tip.L",
+    "heel.L"
+  ],
+  "bone_count": 28,
+  "animations": {
+    "crouch": [
+      0,
+      30
+    ],
+    "idle": [
+      0,
+      72
+    ],
+    "inspect_touch": [
+      0,
+      90
+    ],
+    "look_to_leme": [
+      0,
+      72
+    ],
+    "react_surprise": [
+      0,
+      27
+    ],
+    "walk": [
+      0,
+      30
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "blink"
+  ]
+}

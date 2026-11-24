@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/rope_coil.glb" id="1_b25we"]
+
+[node name="Rope_Coil" type="Node3D" unique_id=137585890]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=2015961316 instance=ExtResource("1_b25we")]

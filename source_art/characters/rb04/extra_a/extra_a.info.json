@@ -1,0 +1,96 @@
+{
+  "tris": 8420,
+  "materials": [
+    "mat_extra_a_eye",
+    "mat_extra_a_hair",
+    "mat_extra_a_hat",
+    "mat_extra_a_iris",
+    "mat_extra_a_leather",
+    "mat_extra_a_pants",
+    "mat_extra_a_shirt",
+    "mat_extra_a_skin"
+  ],
+  "height_m": 1.2912,
+  "min_z": 0.0018,
+  "objects": [
+    "ExtraA_Body",
+    "ExtraA_BootL",
+    "ExtraA_BootR",
+    "ExtraA_CuffL",
+    "ExtraA_CuffR",
+    "ExtraA_Face",
+    "ExtraA_Hair",
+    "ExtraA_HandL",
+    "ExtraA_HandR",
+    "ExtraA_Hat",
+    "ExtraA_HatBand",
+    "ExtraA_Head",
+    "ExtraA_Pants",
+    "ExtraA_Shirt"
+  ],
+  "tris_por_objeto": {
+    "ExtraA_Body": 400,
+    "ExtraA_HandR": 228,
+    "ExtraA_HandL": 228,
+    "ExtraA_Shirt": 624,
+    "ExtraA_Pants": 368,
+    "ExtraA_BootR": 112,
+    "ExtraA_BootL": 112,
+    "ExtraA_Head": 1312,
+    "ExtraA_Hair": 1480,
+    "ExtraA_Hat": 640,
+    "ExtraA_HatBand": 336,
+    "ExtraA_CuffR": 240,
+    "ExtraA_CuffL": 240,
+    "ExtraA_Face": 2100
+  },
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "hand_tip.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "hand_tip.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R",
+    "toe.R",
+    "toe_tip.R",
+    "heel.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "toe.L",
+    "toe_tip.L",
+    "heel.L"
+  ],
+  "bone_count": 28,
+  "animations": {
+    "idle": [
+      0,
+      72
+    ],
+    "walk": [
+      0,
+      30
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "blink"
+  ]
+}

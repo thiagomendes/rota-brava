@@ -4,21 +4,22 @@ extends RefCounted
 ## Toda peca criada aqui recebe o metadado `provisional = true`.
 
 const PROVISIONAL := &"provisional"
+const STYLIZED := preload("res://art/stylized.gdshader")
 
 static var _materials: Dictionary = {}
 
 
-static func material(color: Color, emission: float = 0.0) -> StandardMaterial3D:
+static func material(color: Color, emission: float = 0.0) -> ShaderMaterial:
 	var key := "%s|%s" % [color.to_html(), emission]
 	if _materials.has(key):
 		return _materials[key]
-	var m := StandardMaterial3D.new()
-	m.albedo_color = color
-	m.roughness = 0.85
+	var m := ShaderMaterial.new()
+	m.shader = STYLIZED
+	m.set_shader_parameter("albedo", color)
+	m.set_shader_parameter("use_vertex_color", false)
 	if emission > 0.0:
-		m.emission_enabled = true
-		m.emission = color
-		m.emission_energy_multiplier = emission
+		m.set_shader_parameter("emission_color", color)
+		m.set_shader_parameter("emission_energy", emission)
 	_materials[key] = m
 	return m
 

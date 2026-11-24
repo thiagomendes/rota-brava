@@ -1,0 +1,123 @@
+{
+  "tris": 14076,
+  "materials": [
+    "mat_leme_band",
+    "mat_leme_eye",
+    "mat_leme_hair",
+    "mat_leme_hat",
+    "mat_leme_iris",
+    "mat_leme_leather",
+    "mat_leme_pants",
+    "mat_leme_scarf",
+    "mat_leme_shirt",
+    "mat_leme_skin",
+    "mat_leme_vest"
+  ],
+  "height_m": 1.3095,
+  "min_z": -0.0007,
+  "objects": [
+    "Leme_Belt",
+    "Leme_Body",
+    "Leme_BootL",
+    "Leme_BootR",
+    "Leme_CuffL",
+    "Leme_CuffR",
+    "Leme_Face",
+    "Leme_Hair",
+    "Leme_HandL",
+    "Leme_HandR",
+    "Leme_Hat",
+    "Leme_HatBand",
+    "Leme_Head",
+    "Leme_Pants",
+    "Leme_Scarf",
+    "Leme_Shirt",
+    "Leme_Vest",
+    "Leme_VestDetails"
+  ],
+  "tris_por_objeto": {
+    "Leme_Body": 400,
+    "Leme_HandR": 720,
+    "Leme_HandL": 720,
+    "Leme_Shirt": 2496,
+    "Leme_Vest": 1528,
+    "Leme_Pants": 368,
+    "Leme_BootR": 112,
+    "Leme_BootL": 112,
+    "Leme_Head": 1312,
+    "Leme_Hair": 1480,
+    "Leme_Hat": 576,
+    "Leme_HatBand": 336,
+    "Leme_Belt": 348,
+    "Leme_VestDetails": 288,
+    "Leme_Scarf": 700,
+    "Leme_CuffR": 240,
+    "Leme_CuffL": 240,
+    "Leme_Face": 2100
+  },
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "hand_tip.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "hand_tip.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R",
+    "toe.R",
+    "toe_tip.R",
+    "heel.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "toe.L",
+    "toe_tip.L",
+    "heel.L"
+  ],
+  "bone_count": 28,
+  "animations": {
+    "idle": [
+      0,
+      72
+    ],
+    "idle_wheel": [
+      0,
+      72
+    ],
+    "react_horn": [
+      0,
+      27
+    ],
+    "steer_left": [
+      0,
+      30
+    ],
+    "steer_right": [
+      0,
+      30
+    ],
+    "walk": [
+      0,
+      30
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "blink"
+  ]
+}

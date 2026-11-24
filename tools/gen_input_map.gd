@@ -38,6 +38,7 @@ func _initialize() -> void:
 	_set_action("move_down", [_key(KEY_S), _key(KEY_DOWN), _axis(JOY_AXIS_LEFT_Y, 1.0)])
 	_set_action("interact", [_key(KEY_E), _button(JOY_BUTTON_A)])
 	_set_action("pause", [_key(KEY_ESCAPE), _button(JOY_BUTTON_START)])
+	_set_action("help", [_key(KEY_H), _button(JOY_BUTTON_Y)])
 	var err := ProjectSettings.save()
 	if err != OK:
 		push_error("Falha ao salvar project.godot: %d" % err)

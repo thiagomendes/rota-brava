@@ -146,7 +146,7 @@ func enter() -> void:
 		for m: StringName in [&"pilot", &"tracker"]:
 			var a: MemberActor = ctx.actors[m]
 			if a.riding_on == null:
-				a.ride(ctx.boat, Vector3(-0.45 if m == &"pilot" else 0.45, 0.6, 0.9))
+				a.ride(ctx.boat, BoatActor.CREW[m])
 		ctx.boat.place(Ep01Layout.ENSEADA_POS, 0.0)
 		_miss_cooldown = 0.0
 	refresh_world()
