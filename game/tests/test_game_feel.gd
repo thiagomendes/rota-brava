@@ -320,6 +320,10 @@ func _feedback_and_camera() -> void:
 	r.check(FeedbackFx.count(&"sparkle") > s0, "estrelinhas ao examinar")
 	r.check(not m.get_tree().get_nodes_in_group(FeedbackFx.GROUP).is_empty(), "efeitos existem na cena")
 	# Camera: antecipacao com movimento; sem antecipacao e sem tremor em reduced_motion.
+	await r.tree.create_timer(2.5).timeout
+	tracker.teleport(Vector3(-4.0, 0.05, 9.0))
+	m.camera_rig.follow(tracker, true)
+	await _physics(3)
 	_push(m, Vector3.RIGHT)
 	await r.tree.create_timer(0.8).timeout
 	r.check(m.camera_rig.lead.length() > 0.3, "camera antecipa na direcao do movimento (%.2f m)" % m.camera_rig.lead.length())
