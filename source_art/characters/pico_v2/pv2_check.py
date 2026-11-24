@@ -39,6 +39,9 @@ me.vertices.foreach_get("co", rest)
 rest = rest.reshape(-1, 3)
 boot_ids = {pv2_tex.PID[n] for n in ("boot", "sole", "boot_top")}
 is_boot = np.isin(pid, list(boot_ids))
+is_helmet = pid == pv2_tex.PID["helmet"]
+gloveR = (pid == pv2_tex.PID["glove"]) & (rest[:, 0] > 0)
+gloveL = (pid == pv2_tex.PID["glove"]) & (rest[:, 0] < 0)
 sideR = is_boot & (rest[:, 0] > 0)
 sideL = is_boot & (rest[:, 0] < 0)
 polys = [tuple(p.vertices) for p in me.polygons]
@@ -58,11 +61,21 @@ def mute_all():
     for ad in (rig.animation_data, face.data.shape_keys.animation_data):
         for tr in ad.nla_tracks:
             tr.mute = True
+    gk = gear.data.shape_keys
+    if gk is not None and gk.animation_data is not None:
+        for tr in gk.animation_data.nla_tracks:
+            tr.mute = True
+        gk.animation_data.action = None
 
 
 def set_clip(name):
     mute_all()
     rig.animation_data.action = bpy.data.actions[name]
+    gk = gear.data.shape_keys
+    if gk is not None and gk.animation_data is not None:
+        for tr in gk.animation_data.nla_tracks:
+            tr.mute = True
+        gk.animation_data.action = bpy.data.actions.get(name + "_gear")
 
 
 def deformed():
@@ -108,7 +121,7 @@ for pb in rig.pose.bones:
     pb.location = (0, 0, 0)
 sc.frame_set(0)
 report["vao_repouso_m"] = round(min_gap(deformed()), 4)
-names = sorted(a.name for a in bpy.data.actions if not a.name.endswith("_key"))
+names = sorted(a.name for a in bpy.data.actions if not a.name.endswith("_key") and not a.name.endswith("_gear"))
 speeds = {}
 info_p = os.path.join(HERE, "pico_v2.info.json")
 if os.path.exists(info_p):
@@ -120,18 +133,25 @@ for name in names:
     f0, f1 = int(act.frame_range[0]), int(act.frame_range[1])
     gaps = []
     balls = {"R": [], "L": []}
+    hand_over = {}
     toes = {"R": [], "L": []}
     for fr in range(f0, f1 + 1):
         sc.frame_set(fr)
         P = deformed()
         g = min_gap(P)
         gaps.append(g)
+        if name in ("idle", "team_pose", "celebrate"):
+            top = float(P[is_helmet, 2].max())
+            for sd, msk in (("R", gloveR), ("L", gloveL)):
+                hand_over[sd] = max(hand_over.get(sd, -9.0), float(P[msk, 2].max()) - top)
         for s in ("R", "L"):
             balls[s].append(bone_head("toe." + s))
             toes[s].append(bone_head("toe_tip." + s))
     gaps = np.array(gaps)
     i = int(np.argmin(gaps))
     rec = {"min_gap_m": round(float(gaps[i]), 4), "quadro": f0 + i, "quadros": f1 - f0 + 1, "media_m": round(float(gaps.mean()), 4)}
+    if hand_over:
+        rec["mao_acima_do_capacete_max_m"] = {k: round(v, 4) for k, v in hand_over.items()}
     if name in ("idle", "team_pose", "pull_rope", "look_up", "wave", "stop"):
         # pe plantado: maior deslocamento horizontal da bola do pe entre dois quadros seguidos com ela no chao (z < 5 mm);
         # trocar de lugar NO AR (pulinho da team_pose) nao conta como patinar

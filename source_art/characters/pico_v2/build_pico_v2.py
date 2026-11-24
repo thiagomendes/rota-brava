@@ -43,6 +43,8 @@ def finish_materials(groups, b):
           T.factor_material("mat_pico_v2_face_dark", "#2A160E", 0.25, coat=0.6, coat_rough=0.1),
           T.factor_material("mat_pico_v2_face_skin", T.C["skin"], 0.5, coat=0.3, coat_rough=0.35),
           T.factor_material("mat_pico_v2_face_mouth", "#A63A3F", 0.35, coat=0.4, coat_rough=0.2)]
+    for m in fm:
+        m.use_backface_culling = False    # dupla face no rosto (cascas do olho; mesma correcao do Rastro v2.1)
     for i, m in enumerate(fm):          # por indice: materials.clear() zera o indice de material das faces
         face.data.materials[i] = m
     for img in list(bpy.data.images):
@@ -58,7 +60,7 @@ def measure(b, groups, rig):
     hz = [v.co.z for v in head.data.vertices if v.co.z > b.F.chin - 0.01]
     head_top = b.F.hc.z + b.F.hr[2]
     head_h = head_top - min(hz)
-    acts = {a.name: [round(a.frame_range[0]), round(a.frame_range[1])] for a in bpy.data.actions if not a.name.endswith("_key")}
+    acts = {a.name: [round(a.frame_range[0]), round(a.frame_range[1])] for a in bpy.data.actions if not a.name.endswith(("_key", "_gear"))}
     return {"tris": tri_count(objs), "tris_por_objeto": {o.name: tri_count([o]) for o in objs},
             "materials": sorted({m.name for o in objs for m in o.data.materials if m}),
             "height_m": round(hi.z - lo.z, 4), "min_z": round(lo.z, 4), "head_h_m": round(head_h, 4),
@@ -68,6 +70,8 @@ def measure(b, groups, rig):
             "hip_x_m": b.F.hip_x,
             "objects": sorted(o.name for o in objs), "bones": [bb.name for bb in rig.data.bones], "bone_count": len(rig.data.bones),
             "animations": acts, "shape_keys": [k.name for k in groups["face"].data.shape_keys.key_blocks],
+            "gear_shape_keys": [k.name for k in groups["gear"].data.shape_keys.key_blocks] if groups["gear"].data.shape_keys else [],
+            "rope_gap": getattr(b, "rope_gap", None),
             "walk_speed_mps": round(pv2_anim.ha.walk_speed(b.F), 4), "run_speed_mps": round(pv2_anim.ha.run_speed(b.F), 4),
             "texturas": {img.name: list(img.size) for img in bpy.data.images if img.name.startswith("pico_v2_")}}
 
@@ -100,7 +104,8 @@ def build(glb=None, blend=None, textures=True):
     if textures:
         finish_materials(groups, b)
     print("MATERIAIS ok", round(time.time() - t0, 1))
-    pv2_anim.author(rig, groups["face"], b.F)
+    pv2_body.add_fist_keys(groups["gear"], b.F, b.v["hand"], pv2_tex.PID["glove"])
+    pv2_anim.author(rig, groups["face"], b.F, gear_ob=groups["gear"])
     bpy.context.view_layer.update()
     info = measure(b, groups, rig)
     print("CHAR_INFO", json.dumps(info))

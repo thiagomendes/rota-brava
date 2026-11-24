@@ -35,7 +35,7 @@ import hero_lib
 from rbart import new_object
 
 # ------------------------------------------------------------------ proporcao: o menor do trio (cabeca proporcionalmente maior)
-P2 = dict(head=0.392, leg=0.370, torso=0.262, belly=0.128, sh_x=0.126, limb=0.040, hand=1.28, boot=1.08, eye=1.12, layers=False,
+P2 = dict(head=0.392, leg=0.370, torso=0.262, belly=0.128, sh_x=0.126, limb=0.040, hand=1.36, boot=1.08, eye=1.12, layers=False,
           label="v2 heroi escalador")
 hero_lib.VARIANTS["P2"] = P2
 PAL = dict(pele="#F3C9A2", cabelo="#D8612A", iris="#2F7FC9", uniforme="#3DBE5A", creme="#FFD23F", calca="#3A4A5C",
@@ -45,13 +45,15 @@ hero_lib.CAST["pico_v2"] = dict(display="Pico", K=1.0, hat="none", hair="tufts",
 
 # Afastamento lateral das pernas (eixo do quadril/joelho/tornozelo): pes separados, chao visivel entre as botas parado
 HIP_X = 0.088
+# v2.1: alongamento dos bracos (m que o pulso desce no repouso) e mao um pouco maior
+ARM_DROP = 0.075
 # Bainha da jaqueta curta (acima do cinto) e passo dos gomos
 HEM_DZ = 0.054
 BAFFLE_T = 0.046      # passo dos gomos do tronco (m)
 BAFFLE_A = 0.042      # passo dos aneis das mangas (m)
 
-DECIMATE = {"suit": 0.26, "glove": 0.36, "boot": 0.38, "hair": 0.16, "sole": 0.7, "belt": 0.6, "rope": 0.70,
-            "lamp_band": 0.7, "chin_strap": 0.8, "knee_pad": 0.6, "carabiner_a": 0.7, "carabiner_b": 0.7}
+DECIMATE = {"suit": 0.23, "glove": 0.36, "boot": 0.38, "hair": 0.16, "sole": 0.7, "belt": 0.6, "rope": 0.62,
+            "lamp_band": 0.7, "chin_strap": 0.8, "knee_pad": 0.5, "carabiner_a": 0.7, "carabiner_b": 0.7}
 
 
 def decimate(ob, ratio):
@@ -157,6 +159,12 @@ class PV2(hero_lib.Builder):
         super().__init__("pico_v2", "P2")
         self.S = "Pico"
         self.F.hip_x = HIP_X
+        # v2.1: bracos mais longos (pulso ARM_DROP mais baixo): com o braco erguido a mao passa do topo do capacete
+        F = self.F
+        F.wrist_z -= ARM_DROP
+        F.wrist = V(F.wrist.x + 0.010, F.wrist.y, F.wrist_z + 0.02)
+        al = F.sh.z - F.wrist_z
+        F.elbow = V((self.v["sh_x"] + F.wrist.x) * 0.5 + 0.004, -0.012, F.sh.z - al * 0.48)
         self.hem_z = self.F.hz + HEM_DZ
         GROUP_OF_PART.clear()
 
@@ -193,7 +201,7 @@ class PV2(hero_lib.Builder):
         def phi_rim(a):
             return math.acos(max(-0.99, min(0.99, (rim_z(a) - self.hel_c.z) / self.hel_Ro[2])))
         self.phi_rim = phi_rim
-        na, nr = 40, 12
+        na, nr = 36, 11
         bm = bmesh.new()
         rows = []
         top = bm.verts.new(self.hel_c + V(0, 0, self.hel_Ro[2]))
@@ -352,7 +360,7 @@ class PV2(hero_lib.Builder):
         rng = np.random.default_rng(11)
         lb = bmesh.new()
 
-        def lock(a_deg, length, w0, out, down, flick, curl, dz0, root_in=0.020, seg=7, sides=6, flat=0.55):
+        def lock(a_deg, length, w0, out, down, flick, curl, dz0, root_in=0.020, seg=7, sides=6, flat=0.55, twist=0.0, lift=0.0):
             a = math.radians(a_deg)
             rad = V(math.sin(a), math.cos(a), 0.0)
             tang = V(math.cos(a), -math.sin(a), 0.0)
@@ -361,7 +369,8 @@ class PV2(hero_lib.Builder):
             pts = []
             for i in range(seg + 1):
                 t = i / seg
-                p = base + rad * (out * length * t) + V(0, 0, -down * length * t + flick * length * t ** 2.2) + tang * (curl * length * t ** 2)
+                p = base + rad * (out * length * t + lift * length * math.sin(math.pi * t) * 0.5) + \
+                    V(0, 0, -down * length * t + flick * length * t ** 2.2) + tang * (curl * length * t ** 2)
                 pts.append(p)
             rings = []
             for i, p in enumerate(pts):
@@ -370,6 +379,9 @@ class PV2(hero_lib.Builder):
                 nrm = (p - V(hc.x, hc.y, hc.z)).normalized()
                 nrm = (nrm - d * nrm.dot(d)).normalized()
                 bvec = d.cross(nrm)
+                if twist:
+                    ca, sa = math.cos(twist * t), math.sin(twist * t)
+                    nrm, bvec = nrm * ca + bvec * sa, bvec * ca - nrm * sa
                 w = w0 * (1.0 - t ** 1.5) * (0.85 + 0.15 * math.sin(math.pi * t))
                 if i == seg:
                     rings.append([lb.verts.new(p)])
@@ -386,12 +398,26 @@ class PV2(hero_lib.Builder):
             for q in range(sides):
                 lb.faces.new((rings[0][(q + 1) % sides], rings[0][q], cap))
             self.tail_axes.append((1, [(p, w0 * (1.0 - (i / seg) ** 1.5)) for i, p in enumerate(pts)]))
-        # leque de tras e dos lados: descem e viram a ponta para fora/cima
-        # cortina de mechas atras e dos lados (depois das orelhas): caem rente a cabeca e a ponta vira para fora
-        for i, a in enumerate((102, 122, 142, 161, 180, 199, 218, 238, 258)):
-            L = (0.112 if i % 2 == 0 else 0.096) * k
-            lock(a + rng.uniform(-3, 3), L, 0.042 * k, 0.30, 1.0, 0.30, 0.16 * (1 if a < 180 else -1), -0.004 * k, root_in=-0.012,
-                 flat=0.62)
+        # v2.1: cabelo solto e bagunçado atras, em DUAS camadas que se sobrepoem (nao uma fileira de pontas iguais).
+        # Camada de baixo: mechas compridas e largas que caem rente a nuca e abrem a ponta para os lados.
+        for i, a in enumerate((104, 126, 150, 172, 192, 214, 236, 256)):
+            L = rng.uniform(0.105, 0.135) * k
+            side = 1 if a < 180 else -1
+            lock(a + rng.uniform(-6, 6), L, rng.uniform(0.040, 0.048) * k, rng.uniform(0.10, 0.22), 1.0, rng.uniform(0.10, 0.35),
+                 side * rng.uniform(0.20, 0.55), -0.002 * k, root_in=-0.006, flat=0.58, twist=side * rng.uniform(0.2, 0.7), lift=0.25)
+        # Camada de cima: mechas mais curtas, saindo da borda do capacete por cima da camada de baixo, em direcoes variadas
+        # (umas viram para fora, outras para cima, uma cruza a vizinha)
+        for i, a in enumerate((96, 118, 140, 160, 182, 203, 224, 246, 266)):
+            L = rng.uniform(0.062, 0.090) * k
+            side = 1 if a < 180 else -1
+            curl = side * rng.uniform(-0.25, 0.65)
+            lock(a + rng.uniform(-7, 7), L, rng.uniform(0.032, 0.040) * k, rng.uniform(0.35, 0.60), rng.uniform(0.65, 0.95),
+                 rng.uniform(0.45, 1.05), curl, -0.006 * k, root_in=-0.020, sides=5, flat=0.55, twist=rng.uniform(-0.8, 0.8), lift=0.35)
+        # atras das orelhas: duas mechas por lado que espetam para tras/fora
+        for sx in (1, -1):
+            for a, L in ((84, 0.070), (92, 0.056)):
+                lock(sx * a + rng.uniform(-3, 3), L * k, 0.030 * k, 0.55, 0.80, 0.60, -0.45 * sx, -0.008 * k, root_in=-0.004, sides=5,
+                     flat=0.55, twist=0.4 * sx)
         # costeletas na frente das orelhas
         for sx in (1, -1):
             lock(sx * 66, 0.046 * k, 0.022 * k, 0.30, 1.0, 0.25, -0.15 * sx, -0.006 * k, root_in=0.004, flat=0.5)
@@ -824,7 +850,7 @@ class PV2(hero_lib.Builder):
         Y = V(0, 1, 0)
         nP = e1.cross(Y).normalized()
         C = (A + B) * 0.5
-        n_ = 40
+        n_ = 96                      # raios densos para medir o corpo; o tubo usa N_TUBE pontos (envelope conservador)
         rho = []
         dirs = []
         for i in range(n_):
@@ -838,14 +864,20 @@ class PV2(hero_lib.Builder):
             rho.append(0.7 - best if best is not None else 0.15)
             dirs.append(dv)
         rho = np.array(rho)
-        # fechamento morfologico (nao afunda nas concavidades) + media circular
-        dil = np.max(np.stack([np.roll(rho, s) for s in (-2, -1, 0, 1, 2)]), axis=0)
-        sm = np.mean(np.stack([np.roll(dil, s) for s in (-2, -1, 0, 1, 2)]), axis=0)
+        # v2.1: media circular curta e nunca abaixo do corpo (encosta sem atravessar); antes o fechamento morfologico largo
+        # deixava a corda afastada das costas
+        sm = np.mean(np.stack([np.roll(rho, s) for s in (-2, -1, 0, 1, 2)]), axis=0)
+        sm = np.maximum(sm, rho)
+        N_TUBE = 48
+        step = n_ // N_TUBE
+        sm = np.array([np.max(sm[(np.arange(-step, step + 1) + j * step) % n_]) for j in range(N_TUBE)])
+        dirs = [dirs[j * step] for j in range(N_TUBE)]
+        n_ = N_TUBE
         self.rope_axes = []
         bm = bmesh.new()
         rr = 0.0108
         # feixe de 5 voltas em volta de um eixo a 2,8 cm da roupa (rolo grosso, le a distancia e de costas)
-        strands = tuple((0.028 + 0.0165 * math.cos(2 * math.pi * q / 5 + 0.3), 0.0165 * math.sin(2 * math.pi * q / 5 + 0.3)) for q in range(5))
+        strands = tuple((0.0285 + 0.0165 * math.cos(2 * math.pi * q / 5 + 0.3), 0.0165 * math.sin(2 * math.pi * q / 5 + 0.3)) for q in range(5))
         for si, (radial, lat) in enumerate(strands):
             pts = []
             for i in range(n_):
@@ -854,6 +886,17 @@ class PV2(hero_lib.Builder):
                 pts.append(C + dirs[i] * (sm[i] + radial) + nP * l)
             loop_tube(bm, pts, rr, 6, nP)
             self.rope_axes.append(pts)
+        # folga entre a face interna do feixe e a roupa (medida no repouso): encosta sem atravessar
+        body = [bv for bv in bvhs]
+        gaps = []
+        for i in range(n_):
+            p_in = C + dirs[i] * (sm[i] + 0.0285 - 0.0165 - rr)     # face interna do feixe (eixo a 2,85 cm, raio 1,65 cm)
+            best = min((bv.find_nearest(p_in)[3] for bv in body if bv.find_nearest(p_in)[0] is not None), default=9.0)
+            gaps.append((i, best))
+        back = [g for i, g in gaps if math.sin(2 * math.pi * i / n_) < -0.3]
+        self.rope_gap = dict(costas_max_m=round(max(back), 4), costas_media_m=round(sum(back) / len(back), 4),
+                             geral_min_m=round(min(g for _, g in gaps), 4))
+        print("ROPE_GAP", self.rope_gap)
         ob = new_object(self.name("Rope"), bm, self.M["corda"])
         tag(ob, "rope", "gear")
         self.reg(ob, "torso")
@@ -1016,3 +1059,49 @@ def build():
     b = PV2()
     b.build_v2(True)
     return b
+
+
+def add_fist_keys(gear_ob, F, hand_k, glove_pid):
+    """Shape keys fist_R / fist_L na malha do equipamento (mesma tecnica do Rastro v2.1, rastro_v2/rv2_body.py): os 3 dedos
+    da luva dobram na base e no meio e o polegar fecha por cima. Sem ossos de dedo (o esqueleto segue com 28 ossos); os
+    clipes animam o peso (team_pose, celebrate)."""
+    me = gear_ob.data
+    n_v = len(me.vertices)
+    P = verts_np(gear_ob)
+    part = np.empty(n_v, dtype=np.float32)
+    me.attributes["rbpart"].data.foreach_get("value", part)
+    is_glove = np.rint(part * 100).astype(int) == glove_pid
+    if gear_ob.data.shape_keys is None:
+        gear_ob.shape_key_add(name="Basis", from_mix=False)
+    k = hand_k
+
+    def rot(Pts, center, axis, ang):
+        axis = axis / np.linalg.norm(axis)
+        v = Pts - center
+        c, s_ = np.cos(ang)[:, None], np.sin(ang)[:, None]
+        cr = np.cross(axis, v)
+        dot = (v @ axis)[:, None]
+        return center + v * c + cr * s_ + axis * dot * (1 - c)
+
+    for sx, s in ((1, "R"), (-1, "L")):
+        W, d, f, n = [np.array(x) for x in F.hand_frame(sx)]
+        sel = is_glove & (np.sign(P[:, 0]) == sx)
+        Q = P[sel].copy()
+        loc = Q - W
+        ad, af, an = loc @ d, loc @ f, loc @ n
+        # polegar do Pico: do lado +f e deslocado para a palma (+n), antes da ponta dos dedos
+        thumb = (af > 0.017 * k) & (an > 0.007 * k) & (ad < 0.064 * k)
+        ad_k, ad_m = 0.058 * k, 0.084 * k
+        u = np.cross(d, n)
+        w2 = np.where(thumb, 0.0, smooth(ad, ad_m - 0.006 * k, ad_m + 0.006 * k))
+        Q = rot(Q, W + d * ad_m + n * 0.006 * k, u, np.radians(95) * w2)
+        w1 = np.where(thumb, 0.0, smooth(ad, ad_k - 0.008 * k, ad_k + 0.006 * k))
+        Q = rot(Q, W + d * ad_k + n * 0.004 * k, u, np.radians(80) * w1)
+        ut = np.cross(f, n)
+        wt = np.where(thumb, smooth(ad, 0.010 * k, 0.030 * k), 0.0)
+        Q = rot(Q, W + d * 0.020 * k + f * 0.018 * k, ut, np.radians(60) * wt)
+        kb = gear_ob.shape_key_add(name="fist_" + s, from_mix=False)
+        co = P.copy()
+        co[sel] = Q
+        kb.data.foreach_set("co", co.astype(np.float64).ravel())
+        kb.slider_min, kb.slider_max = 0.0, 1.0

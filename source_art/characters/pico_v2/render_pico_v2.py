@@ -31,6 +31,20 @@ sc = bpy.context.scene
 rig = next(o for o in sc.objects if o.type == "ARMATURE")
 meshes = [o for o in sc.objects if o.type == "MESH"]
 face = next(o for o in meshes if o.name.endswith("_Face"))
+gear = next(o for o in meshes if o.name.endswith("_Gear"))
+GK = gear.data.shape_keys
+
+
+def gear_clip(name):
+    """Punho (shape keys fist_R/fist_L das luvas) acompanha o clipe."""
+    if GK is None or GK.animation_data is None:
+        return
+    for tr in GK.animation_data.nla_tracks:
+        tr.mute = True
+    GK.animation_data.action = bpy.data.actions.get(name + "_gear") if name else None
+    if name is None:
+        for kb in GK.key_blocks:
+            kb.value = 0.0
 
 
 def rest_pose():
@@ -43,6 +57,7 @@ def rest_pose():
         pb.location = (0, 0, 0)
     for kb in face.data.shape_keys.key_blocks:
         kb.value = 0.0
+    gear_clip(None)
     sc.frame_set(0)
 
 
@@ -52,6 +67,7 @@ def set_clip(name, frame):
             tr.mute = True
     rig.animation_data.action = bpy.data.actions[name]
     face.data.shape_keys.animation_data.action = bpy.data.actions[name + "_key"]
+    gear_clip(name)
     sc.frame_set(frame)
 
 
@@ -67,10 +83,17 @@ if "close" in ONLY:
     RR.cycles(sc, int(900 * S), int(1100 * S), int(128 * S))
     RR.place(cam, (0.0, 0.0, 0.55), 2.5, -6.0, 30)
     RR.render(sc, os.path.join(OUT, "pico_v2_heroi_baixo.png"))
+    # costas em close (cabelo e corda): de tras e de tres-quartos de tras
+    RR.cycles(sc, int(900 * S), int(900 * S), int(128 * S))
+    for lab, az in (("costas_close", 180), ("costas_tres_quartos_close", 145)):
+        RR.place(cam, (0.0, 0.0, 0.74), 1.55, 8.0, az)
+        RR.render(sc, os.path.join(OUT, "pico_v2_%s.png" % lab))
+    RR.compose([[os.path.join(OUT, "pico_v2_costas_close.png"), os.path.join(OUT, "pico_v2_costas_tres_quartos_close.png")]],
+               os.path.join(OUT, "pico_v2_costas.png"))
 if "poses" in ONLY:
     poses = [("idle", 0, -30), ("idle", 30, -30), ("idle", 66, -30), ("team_pose", 30, -30), ("jump", 14, -30), ("pull_rope", 12, -30),
              ("celebrate", 18, -30), ("wave", 22, -30)]
-    front = [("idle", 0), ("walk", 9), ("walk", 23), ("run", 4), ("run", 13), ("team_pose", 30)]
+    front = [("idle", 0), ("idle", 68), ("walk", 9), ("walk", 23), ("run", 4), ("run", 13), ("team_pose", 30)]
     paths, fpaths = [], []
     RR.cycles(sc, int(420 * S), int(600 * S), int(48 * S))
     for name, fr, az in poses:
