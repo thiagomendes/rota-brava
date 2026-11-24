@@ -143,6 +143,7 @@ python tools/measure_video_audio.py captures/ep01-playthrough.avi
 - **Câmera:** herói 12,4–16,2% da altura da tela em 16:9, 20:9 e 4:3 (teste); sem oclusão (teste pegou a cabana na pegada).
 - **Áudio (medido, não ouvido):** mixagem de referência −16,2 LUFS / −1,05 dBTP; voz ≥ 9,6 LU acima do fundo; licenças verificadas (Piper `jeff` base CC0; FreePats, Kenney, OpenGameArt CC0).
 - **UI:** HUD v2 e tela-título com heróis 3D vistos em 16:9; retratos renderizados no HUD.
+- **Duração em modo humano (medida, 2026-11-24, nuvem, headless):** `godot --headless ... --ep01-start=arrival -- --ep01-demo-human` concluiu o episódio em **236,5 s (3,94 min)**, com 5/10 emblemas; por etapa: chegada 14,2 s, cais 60,8, rio 91,2, ilha 27,6, atracação 15,3, volta 13,4, conclusão 14,0. **Abaixo da meta de 8 min.** A atracação pelo norte foi concluída pelo bot (15,3 s). Ressalva: headless usa driver de áudio nulo; as falas contam pela duração do arquivo. Encher com tempo morto está fora da barra; a duração depende do redesenho do mundo e das missões (D8).
 - **Pendentes:** ver `docs/STATE.md` §2 (pedras duplicadas na ilha, piloto/filhote no mundo, entrada norte na atracação, moradores, grama, contador de emblemas, opções no jogo, duração humana, capturas, desempenho final, vídeo, revisão, Portão 2).
 
 ## Revisão
