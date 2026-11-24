@@ -30,6 +30,8 @@
 
 **Feito em 2026-11-24 (nuvem):** tarefa 1 (ilha sem pedras duplicadas; piloto e filhote com modelos finais via `StoryFigure`; filhote pisa na buzina na fala final), tarefa 2 (atracação pelo norte, rumo alvo π, partida pelo noroeste) e tarefa 3 (17 moradores animados no cais, `gameplay`, branch `feature/rb-r1-moradores`). Tarefa 5 (contador de emblemas no HUD) e tarefa 6 (opções valem no jogo; Opções na pausa; bug do ducking que perdia o volume escolhido corrigido). Tarefa 7 medida: modo humano 3,94 min (meta 8 min, NÃO atingida; ver evidências no ticket). Suíte: 2687 PASS. **Direção reaberta (D7–D10 no ticket):** heróis v2 em traje de herói em estudo (`art3d`, esforço alto, branch `feature/rb-r1-herois-v2`), vitrine para Thiago antes de entrar no jogo; depois mundo; depois som (talvez Google AI Studio). **Render na nuvem funciona:** `xvfb-run` + Vulkan llvmpipe com `--write-movie` (caminho ABSOLUTO no `--write-movie`).
 
+**Rastro v2 (2026-11-24, art3d, branch `feature/rb-r1-rastro-v2`, sem push):** proposta de herói no padrão D11/D13 lado a lado (só na vitrine `game/lookdev/`). Fontes em `source_art/characters/rastro_v2/`, GLB em `game/assets/models/characters/rastro_v2.glb`; evidências no ticket. Aguarda aprovação de Thiago num visualizador 3D; depois Pico e Leme na mesma pegada.
+
 **A fazer para fechar o RB-R1 (nesta ordem):**
 4. Grama menos saturada (verde-limão) — materiais `mat_env_*` em `source_art/environment` ou atmosfera.
 5. Contador de emblemas no HUD (ligar `collectible_found`).

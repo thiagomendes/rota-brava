@@ -4,6 +4,8 @@ extends Node3D
 ##   --lookdev=before  visual atual do jogo (Atmosphere + Stylize + contorno); rodar com --rendering-method mobile
 ##   --lookdev=after   luz/ambiente novos (abaixo) + materiais novos (LookdevMaterials), renderizador Forward+
 ##   --lookdev-cam=low | close | high   camera baixa da referencia (padrao), close do heroi, camera alta antiga
+##   --lookdev-rastro=v2 | v1   no modo after, o Rastro da vitrine e a proposta v2 (padrao, materiais PBR do proprio GLB)
+##                              ou o Rastro do jogo com os materiais de lookdev. O jogo NAO muda: so esta vitrine.
 ## Imprime "LOOKDEV PERF ..." com chamadas de desenho e primitivas no quadro 15.
 ## Uso (nuvem): xvfb-run -a -s "-screen 0 1600x900x24" bash tools/godot.sh --path game --rendering-driver vulkan \
 ##   res://lookdev/lookdev_dock.tscn --write-movie /ABS/f.png --fixed-fps 10 --quit-after 20 -- --lookdev=after
@@ -11,6 +13,8 @@ extends Node3D
 const SLICE := "res://episodes/ep01/world/harbor_slice.tscn"
 const BOAT := "res://actors/environment/boat_v2.tscn"
 const SKY_SHADER := "res://art/sky.gdshader"
+## Proposta Rastro v2 (RB-R1 D13): substitui o Rastro so nesta vitrine.
+const RASTRO_V2 := "res://lookdev/rastro_v2_model.tscn"
 ## Heroi principal no cais, de frente para a camera em 3/4.
 const HERO_POS := Vector3(-2.0, 0.0, 1.0)
 const HEROES := [
@@ -29,6 +33,7 @@ const HIGH_OFFSET := Vector3(0.0, 4.6, 6.2)
 
 var mode := "after"
 var cam_name := "low"
+var rastro_variant := "v2"
 var cam: Camera3D
 var heroes: Array[CharacterVisual] = []
 var frame := 0
@@ -37,6 +42,7 @@ var frame := 0
 func _ready() -> void:
 	mode = _arg("--lookdev", "after")
 	cam_name = _arg("--lookdev-cam", "low")
+	rastro_variant = _arg("--lookdev-rastro", "v2")
 	var after := mode != "before"
 	if after:
 		_build_light()
@@ -61,13 +67,18 @@ func _ready() -> void:
 		Stylize.apply(boat)
 	_place_camera()
 	for h: Array in HEROES:
-		var inst := (load(String(h[0])) as PackedScene).instantiate() as Node3D
+		var path := String(h[0])
+		var pbr := after and rastro_variant == "v2" and path.ends_with("rastro_model.tscn")
+		if pbr:
+			path = RASTRO_V2
+		var inst := (load(path) as PackedScene).instantiate() as Node3D
 		add_child(inst)
 		inst.position = HERO_POS + (h[1] as Vector3)
 		inst.rotation_degrees.y = float(h[2])
 		var vis := inst.get_node("Model") as CharacterVisual
 		if after:
-			LookdevMaterials.apply(vis, true)
+			if not pbr:
+				LookdevMaterials.apply(vis, true)
 			_contact_shadow(inst)
 		else:
 			Stylize.apply(vis)
