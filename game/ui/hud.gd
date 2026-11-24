@@ -42,6 +42,8 @@ const SAFE_MIN := 48.0
 
 ## Ganchos do jogo: devolve a duracao (s) da fala ao iniciar a legenda (0.0 se nao ha audio) e interrompe a fala.
 var voice_hook: Callable = Callable()
+## Gancho de dados: (key: String) -> Array[StringName] com os emotes da fala quando quem chama nao os informa.
+var emotes_hook: Callable = Callable()
 var voice_stop_hook: Callable = Callable()
 var ui_theme: Theme
 var last_device: StringName = &"keyboard"
@@ -692,7 +694,10 @@ func speaker_for(key: String) -> StringName:
 
 ## Fala com legenda. `emotes`: pictogramas de res://ui/brand/icons (ex.: [&"question", &"paw"]) ao lado do nome.
 func say(key: String, params: Dictionary = {}, is_hint: bool = false, emotes: Array[StringName] = []) -> void:
-	_queue.append({"key": key, "params": params, "hint": is_hint, "emotes": emotes})
+	var use_emotes := emotes
+	if use_emotes.is_empty() and emotes_hook.is_valid():
+		use_emotes = emotes_hook.call(key)
+	_queue.append({"key": key, "params": params, "hint": is_hint, "emotes": use_emotes})
 	if not _speaking:
 		_pump()
 

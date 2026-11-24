@@ -397,6 +397,20 @@ func _setup_audio() -> void:
 		if not hud.is_speaking():
 			audio.duck_music(false))
 	hud.handoff_confirmed.connect(func() -> void: audio.play_sfx("sfx_ui_confirm"))
+	hud.emotes_hook = func(key: String) -> Array[StringName]: return Ep01Content.line_emotes(key)
+	hud.ui_sound.connect(_on_ui_sound)
+
+
+## Sons da UI do HUD v2. Nomes do HUD -> efeitos do catalogo (os que faltarem sao ignorados pelo AudioDirector).
+const UI_SOUNDS := {
+	&"focus": "sfx_ui_move", &"confirm": "sfx_ui_confirm", &"pop": "sfx_ui_move",
+	&"handoff": "sfx_ui_confirm", &"star": "sfx_clue_found", &"emote": "sfx_ui_move",
+}
+
+
+func _on_ui_sound(sound: StringName) -> void:
+	if audio != null and UI_SOUNDS.has(sound):
+		audio.play_sfx(String(UI_SOUNDS[sound]), Vector3.ZERO, -6.0)
 
 
 func _on_footstep(speed: float, pos: Vector3) -> void:

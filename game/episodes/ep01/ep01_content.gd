@@ -34,6 +34,33 @@ static func lines(state: StringName, key: String) -> Array[String]:
 	return out
 
 
+## Emotes da fala (ep01_dialogue.json, RB-R1): pictogramas que acompanham o balbucio na legenda.
+static func line_emotes(key: String) -> Array[StringName]:
+	var out: Array[StringName] = []
+	for e: Variant in dialogue().get("lines", {}).get(key, {}).get("emotes", []):
+		out.append(StringName(e))
+	return out
+
+
+## Chave de radio (Farol 7) que repete a instrucao desta fala para quem ainda nao le, ou "".
+static func radio_key(key: String) -> String:
+	var v: Variant = dialogue().get("lines", {}).get(key, {}).get("radio_key", null)
+	return "" if v == null else String(v)
+
+
+static var _dialogue: Dictionary = {}
+
+
+static func dialogue() -> Dictionary:
+	if _dialogue.is_empty():
+		var f := FileAccess.open("res://episodes/ep01/ep01_dialogue.json", FileAccess.READ)
+		if f != null:
+			var parsed: Variant = JSON.parse_string(f.get_as_text())
+			if parsed is Dictionary:
+				_dialogue = parsed
+	return _dialogue
+
+
 static func hints(state: StringName) -> Array:
 	return data().get("hints", {}).get(String(state), [])
 
