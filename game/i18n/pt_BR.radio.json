@@ -12,7 +12,7 @@
   "ep01.radio.dock.hint_boot": "Rastro, olhe a bota grande na lama, perto da água.",
   "ep01.radio.dock.hint_examine": "Rastro, depois de olhar as duas marcas, escolha a margem.",
   "ep01.radio.river.start": "Leme, segure firme o leme e olhe a água na frente.",
-  "ep01.radio.river.leaves": "Leme, siga as folhas: a água corre para a esquerda.",
+  "ep01.radio.river.leaves": "Leme, veja para onde as folhas vão: a água corre para lá.",
   "ep01.radio.river.slow": "Leme, vá devagar agora: tem pedra perto do barco.",
   "ep01.radio.river.cove": "Leme, siga agora para a enseada, devagar.",
   "ep01.radio.river.hint_buoy": "Leme, olhe a boia vermelha na frente do barco.",
@@ -22,6 +22,6 @@
   "ep01.radio.island.hint_line": "Pico, chegue na última pedra e prenda a linha.",
   "ep01.radio.docking.hint_line": "Leme, olhe a linha esticada entre a ilha e o barco.",
   "ep01.radio.docking.hint_approach": "Leme, aponte o barco para a linha e vá devagar.",
-  "ep01.radio.return.hint_button": "Leme, olhe o botão de partida, perto do volante.",
-  "ep01.radio.return.hint_press": "Leme, aperte o botão de partida e leve a equipe para casa."
+  "ep01.radio.return.hint_button": "Leme, chegue perto do barco e aperte Partir.",
+  "ep01.radio.return.hint_press": "Leme, aperte Partir e leve a equipe para casa."
 }
