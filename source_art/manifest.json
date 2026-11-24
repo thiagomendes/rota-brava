@@ -1195,9 +1195,9 @@
         "source_art/scripts/rbart.py"
       ],
       "saida_glb": "game/assets/models/characters/rastro_v2.glb",
-      "glb_sha256": "0779e56dff865f729281377857d6bc649eaf470b6b8c09777feef3248104f560",
-      "glb_bytes": 6111460,
-      "triangulos": 24441,
+      "glb_sha256": "5c86dbf1ffcbdf6c29ffa7b5c397cf4025ff933b4beea945c255f0d546de895f",
+      "glb_bytes": 6408464,
+      "triangulos": 24229,
       "materiais": [
         "mat_rastro_v2_face_dark",
         "mat_rastro_v2_face_eye",
@@ -1253,17 +1253,29 @@
       "quantidade_ossos": 28,
       "animacoes_duracao_s": {
         "celebrate": 1.2,
+        "celebrate_gear": 1.2,
         "crouch": 1.0,
+        "crouch_gear": 1.0,
         "idle": 4.4,
+        "idle_gear": 4.4,
         "inspect_touch": 3.0,
+        "inspect_touch_gear": 3.0,
         "look_to_leme": 2.4,
+        "look_to_leme_gear": 2.4,
         "point": 1.2,
+        "point_gear": 1.2,
         "react_surprise": 0.9,
+        "react_surprise_gear": 0.9,
         "run": 0.6,
+        "run_gear": 0.6,
         "stop": 0.5,
+        "stop_gear": 0.5,
         "team_pose": 1.5,
+        "team_pose_gear": 1.5,
         "walk": 1.0,
-        "wave": 1.6
+        "walk_gear": 1.0,
+        "wave": 1.6,
+        "wave_gear": 1.6
       },
       "shape_keys": [
         "Basis",
@@ -1332,8 +1344,8 @@
           2048
         ]
       },
-      "altura_m": 1.0856,
-      "razao_cabeca_altura": 0.3683,
+      "altura_m": 1.0835,
+      "razao_cabeca_altura": 0.369,
       "velocidade_walk_mps": 0.5491,
       "velocidade_run_mps": 1.1667
     }

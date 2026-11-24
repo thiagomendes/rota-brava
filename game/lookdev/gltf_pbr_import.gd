@@ -3,9 +3,16 @@ extends EditorScenePostImport
 ## Pos-importacao dos GLB PBR dos herois v2 (RB-R1 D11/D13, PROPOSTA PROVISORIA; hoje so o rastro_v2.glb usa).
 ## A Godot 4.7 importa base color, normal, ORM (oclusao/rugosidade/metalico) e alpha do glTF, mas:
 ##  1) texturas EMBUTIDAS no GLB chegam sem mipmap (cintilam a distancia) -> aqui geramos os mipmaps;
-##  2) ignora KHR_materials_clearcoat -> aqui lemos o verniz do proprio GLB e ligamos clearcoat no StandardMaterial3D.
+##  2) ignora KHR_materials_clearcoat -> aqui lemos o verniz do proprio GLB e ligamos clearcoat no StandardMaterial3D;
+##  3) nos materiais com verniz (vinil), calibra especular e rugosidade para o brilho ficar perto do visto no Blender.
 ## Assim o heroi abre igual na Godot e num visualizador web (que ja le essas duas coisas do glTF).
 ## Ligado pelo .import do GLB: import_script/path="res://lookdev/gltf_pbr_import.gd" e gltf/embedded_image_handling=3.
+
+
+## Materiais com verniz (vinil: pele, plastico, luvas, botas, cabelo): especular padrao da Godot e 0,5 (F0 = 0,04).
+const VINYL_SPECULAR := 0.7
+## Fator sobre a rugosidade do glTF nos materiais com verniz (a textura ORM continua mandando no detalhe).
+const VINYL_ROUGHNESS_SCALE := 0.82
 
 
 func _post_import(scene: Node) -> Object:
@@ -40,6 +47,11 @@ static func finish_material(m: StandardMaterial3D, coats: Dictionary) -> void:
 		m.clearcoat_enabled = float(c[0]) > 0.0
 		m.clearcoat = float(c[0])
 		m.clearcoat_roughness = float(c[1])
+		if m.clearcoat_enabled and m.transparency == BaseMaterial3D.TRANSPARENCY_DISABLED:
+			# Calibracao do vinil na Godot (H1): com a mesma cena, o verniz da Godot rende bem menos brilho que o Coat do
+			# Blender; um pouco mais de especular e de lisura devolve o brilho largo e baixo visto no Blender.
+			m.metallic_specular = VINYL_SPECULAR
+			m.roughness = m.roughness * VINYL_ROUGHNESS_SCALE
 
 
 static func with_mipmaps(t: Texture2D) -> Texture2D:

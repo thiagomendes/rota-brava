@@ -45,43 +45,67 @@ def pose_idle_v2(R, F, t, T):
         tr = Vector((0.03, F.v["belly"] + 0.20, F.sh.z - 0.02 - 0.03 * tap))
         reach(R, "R", restr.lerp(tr, scan * 0.85), Vector((0.1, 0.2, -1.0)).lerp(Vector((-0.6, 0.5, -0.5)), scan), pole=(1.0, -0.4, -0.6))
     stand_feet(R)
-    return ha.face(atenta=0.7 * scan, alegre=0.25 * (1 - scan), blink=blink_curve(t, 1.0) + blink_curve(t, 3.6))
+    # sem "alegre" parcial: no hero_face a palpebra parcial afunda o branco do olho (parecia mancha escura sob o olho)
+    return ha.face(atenta=0.7 * scan, blink=blink_curve(t, 1.0) + blink_curve(t, 3.6))
+
 
 
 def pose_team_v2(R, F, t, T):
-    """Pose de equipe (1,5 s): pequeno impulso, salta para a base aberta, punho direito ao alto e a frente, mao esquerda na
-    cintura, peito aberto, queixo erguido e sorriso; segura e assenta."""
-    pre = smooth(t, 0.0, 0.14) * (1 - smooth(t, 0.14, 0.26))
-    air = math.sin(math.pi * min(max((t - 0.20) / 0.22, 0.0), 1.0))
-    a = smooth(t, 0.12, 0.42) * (1 - smooth(t, 1.22, 1.5))
-    land = math.sin(math.pi * min(max((t - 0.40) / 0.22, 0.0), 1.0))
-    R.hips_off = Vector((0.0, 0.0, -0.040 * pre + 0.050 * air - 0.030 * land - 0.018 * a))
-    R.rel("hips", eul(z=-8.0 * a, y=-3.0 * a))
-    torso(R, lean=lerp(3.0, -9.0, a) + 10 * pre, yaw=12.0 * a, roll=-5.0 * a, head_pitch=10.0 * a, head_roll=9.0 * a, head_yaw=-14.0 * a)
+    """Pose de equipe (1,5 s), v2.1: impulso curto, pulinho para a pose e contrapposto: peso na perna esquerda (o quadril
+    desloca e cai do lado direito), perna direita solta com o calcanhar erguido, ombro direito sobe com o punho FECHADO ao
+    alto (shape key fist_R), mao esquerda na cintura, cabeca inclinada para o punho, queixo erguido e sorriso; segura e assenta."""
+    pre = smooth(t, 0.0, 0.12) * (1 - smooth(t, 0.12, 0.24))
+    air = math.sin(math.pi * min(max((t - 0.18) / 0.22, 0.0), 1.0))
+    a = smooth(t, 0.14, 0.46) * (1 - smooth(t, 1.24, 1.5))
+    land = math.sin(math.pi * min(max((t - 0.38) / 0.24, 0.0), 1.0))
+    sway = math.sin(2 * math.pi * (t - 0.5) / 1.4) * smooth(t, 0.5, 0.7) * (1 - smooth(t, 1.1, 1.3))
+    R.hips_off = Vector((-0.024 * a, 0.0, -0.040 * pre + 0.050 * air - 0.028 * land - 0.016 * a + 0.004 * sway))
+    R.rel("hips", eul(z=-10.0 * a, y=6.0 * a))
+    torso(R, lean=lerp(3.0, -8.0, a) + 10 * pre, yaw=12.0 * a, roll=-11.0 * a, head_pitch=9.0 * a + 2.0 * sway,
+          head_roll=12.0 * a, head_yaw=-10.0 * a)
+    R.rel("shoulder.R", eul(y=-10.0 * a))
+    R.rel("shoulder.L", eul(y=-4.0 * a))
     ha.arms_down(R, F, bend=14, out=6)
     R.evaluate()
     rr, rl = R.tip("hand.R"), R.tip("hand.L")
-    up = Vector((F.sh.x + 0.21, 0.13, F.sh.z + 0.33))
-    reach(R, "R", rr.lerp(up, a), Vector((0.1, 0.2, -1.0)).lerp(Vector((0.30, 0.20, 1.0)), a), pole=(1.0, -0.4, -0.5))
-    hip = Vector((-F.v["belly"] - 0.045, 0.010, F.hz + 0.06))
+    up = Vector((F.sh.x + 0.17, 0.10, F.sh.z + 0.36))
+    reach(R, "R", rr.lerp(up, a), Vector((0.1, 0.2, -1.0)).lerp(Vector((0.18, 0.12, 1.0)), a), pole=(1.0, -0.2, -0.7), roll=-20.0 * a)
+    hip = Vector((-F.v["belly"] - 0.040, 0.005, F.hz + 0.065))
     reach(R, "L", rl.lerp(hip, a), Vector((-0.1, 0.2, -1.0)).lerp(Vector((0.45, 0.05, -0.9)), a), pole=(-1.0, -0.9, 0.3))
-    for s, sx, dx, dy in (("R", 1, 0.045, 0.035), ("L", -1, -0.050, -0.030)):
-        put_foot(R, s, R.rest_head["heel." + s].y + dy * a, 0.0, "heel", lift=0.03 * air, dx=dx * a,
-                 pole=(sx * 0.25, 1.0, 0.0))
-    return ha.face(alegre=smooth(t, 0.1, 0.35) * (1 - smooth(t, 1.3, 1.5)), atenta=0.4 * pre)
+    # perna de apoio (esquerda) firme; perna direita solta: um pouco a frente e para fora, calcanhar erguido
+    put_foot(R, "L", R.rest_head["heel.L"].y - 0.012 * a, 0.0, "heel", lift=0.03 * air, dx=-0.020 * a, pole=(-0.25, 1.0, 0.0))
+    phi = -16.0 * a if air < 0.05 else 0.0
+    put_foot(R, "R", R.rest_head["heel.R"].y + 0.045 * a, phi, "ball" if phi < -0.5 else "heel", lift=0.03 * air, dx=0.040 * a,
+             pole=(0.35, 1.0, 0.0))
+    f = ha.face(alegre=smooth(t, 0.1, 0.35) * (1 - smooth(t, 1.3, 1.5)), atenta=0.4 * pre)
+    f["fist_R"] = smooth(t, 0.20, 0.42) * (1 - smooth(t, 1.22, 1.45))
+    return f
+
+
+def pose_celebrate_v2(R, F, t, T):
+    """celebrate do Rastro atual, agora com os dois punhos fechados no alto do salto."""
+    f = ha.pose_celebrate(R, F, t, T)
+    fist = smooth(t, 0.12, 0.32) * (1 - smooth(t, 0.95, 1.2))
+    f["fist_R"] = f["fist_L"] = fist
+    return f
 
 
 CLIPS = dict(ha.CLIPS)
 CLIPS["team_pose"] = (1.5, False, pose_team_v2)
+CLIPS["celebrate"] = (1.2, False, pose_celebrate_v2)
 IDLE = (4.4, pose_idle_v2)
 CLIP_SET = ["idle", "walk", "run", "stop", "crouch", "inspect_touch", "look_to_leme", "react_surprise", "point", "wave", "celebrate", "team_pose"]
+GEAR_KEYS = ("fist_R", "fist_L")
 
 
-def author(rig, face_ob, F, names=CLIP_SET):
-    """Grava cada clipe como Action + faixa NLA (corpo) e Action de shape keys (rosto), como no hero_anim.author."""
+def author(rig, face_ob, F, names=CLIP_SET, gear_ob=None):
+    """Grava cada clipe como Action + faixa NLA (corpo), Action de shape keys do rosto e, se houver, das luvas (punho)."""
     R = cl.Rigger(rig)
     sk = face_ob.data.shape_keys
     sk.animation_data_create()
+    gk = gear_ob.data.shape_keys if gear_ob is not None and gear_ob.data.shape_keys else None
+    if gk is not None:
+        gk.animation_data_create()
     rig.animation_data_create()
     prev = {}
     report = {}
@@ -95,6 +119,11 @@ def author(rig, face_ob, F, names=CLIP_SET):
         keyact.use_fake_user = True
         rig.animation_data.action = act
         sk.animation_data.action = keyact
+        gearact = None
+        if gk is not None:
+            gearact = bpy.data.actions.new(name + "_gear")
+            gearact.use_fake_user = True
+            gk.animation_data.action = gearact
         n = int(round(dur * FPS))
         prev.clear()
         best = 9.0
@@ -110,10 +139,18 @@ def author(rig, face_ob, F, names=CLIP_SET):
                 kb = sk.key_blocks[kn]
                 kb.value = max(0.0, min(1.0, fc.get(kn, 0.0)))
                 kb.keyframe_insert("value", frame=i)
+            if gk is not None:
+                for kn in GEAR_KEYS:
+                    kb = gk.key_blocks[kn]
+                    kb.value = max(0.0, min(1.0, fc.get(kn, 0.0)))
+                    kb.keyframe_insert("value", frame=i)
         if name == "inspect_touch":
             report["inspect_tip_err_m"] = round(best, 4)
         act["loop"] = loop
-        for ad, a_ in ((rig.animation_data, act), (sk.animation_data, keyact)):
+        pairs = [(rig.animation_data, act), (sk.animation_data, keyact)]
+        if gk is not None:
+            pairs.append((gk.animation_data, gearact))
+        for ad, a_ in pairs:
             ad.action = None
             tr = ad.nla_tracks.new()
             tr.name = name

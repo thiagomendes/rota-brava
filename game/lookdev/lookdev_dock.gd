@@ -6,6 +6,7 @@ extends Node3D
 ##   --lookdev-cam=low | close | high   camera baixa da referencia (padrao), close do heroi, camera alta antiga
 ##   --lookdev-rastro=v2 | v1   no modo after, cada heroi com proposta v2 (lookdev/<id>_v2_model.tscn) a mostra (padrao, PBR do proprio GLB); v1 volta os antigos
 ##                              ou o Rastro do jogo com os materiais de lookdev. O jogo NAO muda: so esta vitrine.
+##   --lookdev-anim=<clipe> --lookdev-t=<s>   clipe e instante do heroi principal (provas); --lookdev-ssao=off (diagnostico)
 ## Imprime "LOOKDEV PERF ..." com chamadas de desenho e primitivas no quadro 15.
 ## Uso (nuvem): xvfb-run -a -s "-screen 0 1600x900x24" bash tools/godot.sh --path game --rendering-driver vulkan \
 ##   res://lookdev/lookdev_dock.tscn --write-movie /ABS/f.png --fixed-fps 10 --quit-after 20 -- --lookdev=after
@@ -85,11 +86,18 @@ func _ready() -> void:
 		else:
 			Stylize.apply(vis)
 			Stylize.add_outline(vis, 0.008)
-		vis.play(&"idle")
+		# Heroi principal (o primeiro): clipe e instante escolhiveis para provas (--lookdev-anim, --lookdev-t).
+		var main := heroes.is_empty()
+		var clip := StringName(_arg("--lookdev-anim", "idle")) if main else &"idle"
+		if not vis.play(clip):
+			vis.play(&"idle")
 		# Fase do idle diferente por heroi (nao ficam sincronizados).
 		var player := vis.find_child("AnimationPlayer", true, false) as AnimationPlayer
 		if player != null:
-			player.seek(float(h[3]) * player.current_animation_length, true)
+			var t := float(h[3]) * player.current_animation_length
+			if main and _arg("--lookdev-t", "") != "":
+				t = float(_arg("--lookdev-t", "0"))
+			player.seek(t, true)
 		heroes.append(vis)
 	if not LookdevMaterials.unmatched.is_empty():
 		print("LOOKDEV materiais sem regra (usaram o padrao): ", LookdevMaterials.unmatched)
@@ -125,7 +133,7 @@ func _build_light() -> void:
 	env.tonemap_mode = Environment.TONE_MAPPER_AGX
 	env.tonemap_exposure = 0.95
 	# Oclusao de cantos e contato.
-	env.ssao_enabled = true
+	env.ssao_enabled = _arg("--lookdev-ssao", "on") != "off"   # "off" so para diagnostico
 	env.ssao_radius = 0.9
 	env.ssao_intensity = 1.9
 	env.ssao_power = 1.6

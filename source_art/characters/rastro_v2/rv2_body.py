@@ -49,6 +49,9 @@ def decimate(ob, ratio):
     hero_lib.bake(ob)
 
 
+HIP_X = 0.087          # meia distancia entre as pernas (era 0,065: as botas se tocavam)
+BOOT_K = 0.90          # botas um pouco mais estreitas (continuam grandes e redondas)
+
 # Grupos de material final (cada grupo vira UM objeto, UMA atlas de textura)
 GROUP_OF_PART = {}
 
@@ -127,6 +130,8 @@ class RV2(hero_lib.Builder):
         super().__init__("rastro_v2", "V2")
         self.S = "Rastro"
         GROUP_OF_PART.clear()
+        # v2.1: base das pernas mais aberta (as botas nao se encostam; aparece chao entre os pes de frente)
+        self.F.hip_x = HIP_X
 
     # ------------------------------------------------------------ cabeca (reuso + marcacao)
     def hair_v2(self):
@@ -219,8 +224,8 @@ class RV2(hero_lib.Builder):
             w0 = add(el.lerp(W, 0.86), L * 0.84, f0)
             hx = sx * F.hip_x
             kz = F.knee_z
-            h0 = add((hx, -0.002, hz - 0.060), 0.074, crotch)
-            t1 = add((hx, 0.002, hz - (hz - kz) * 0.45), 0.068, h0)
+            h0 = add((hx, -0.002, hz - 0.060), 0.066, crotch)
+            t1 = add((hx, 0.002, hz - (hz - kz) * 0.45), 0.063, h0)
             k0 = add((hx, 0.006, kz + 0.022), 0.058, t1)
             k1 = add((hx, 0.004, kz - 0.020), 0.056, k0)
             c0 = add((hx, -0.004, kz - 0.070), 0.058, k1)
@@ -367,15 +372,17 @@ class RV2(hero_lib.Builder):
             w1 = add(W + d * 0.004 * k, 0.027 * k, w0)
             palm = add(W + d * 0.036 * k, 0.031 * k, w1)
             # polegar: sai da lateral da palma, aponta para a frente e para dentro
-            t0 = add(W + d * 0.020 * k + f * 0.024 * k + n * 0.010 * k, 0.0150 * k, w1)
-            t1 = add(W + d * 0.040 * k + f * 0.044 * k + n * 0.018 * k, 0.0138 * k, t0)
-            add(W + d * 0.058 * k + f * 0.052 * k + n * 0.024 * k, 0.0128 * k, t1)
+            # v2.1: polegar mais para a frente e menos para dentro (aparece de frente e de lado)
+            t0 = add(W + d * 0.018 * k + f * 0.026 * k + n * 0.006 * k, 0.0152 * k, w1)
+            t1 = add(W + d * 0.036 * k + f * 0.048 * k + n * 0.009 * k, 0.0140 * k, t0)
+            add(W + d * 0.054 * k + f * 0.060 * k + n * 0.012 * k, 0.0130 * k, t1)
             tips = []
             for off, ln, spread in ((0.0175, 0.046, 0.30), (-0.0005, 0.052, 0.0), (-0.0185, 0.044, -0.34)):
                 base = add(W + d * 0.058 * k + f * off * k, 0.0148 * k, palm)
                 fd = (d + f * spread * 0.35).normalized()
-                mid = add(W + d * 0.058 * k + f * off * k + fd * ln * 0.55 * k + n * 0.006 * k, 0.0140 * k, base)
-                tips.append(add(W + d * 0.058 * k + f * off * k + fd * ln * k + n * 0.016 * k, 0.0128 * k, mid))
+                # v2.1: dedos relaxados, so levemente curvos (sem "garra")
+                mid = add(W + d * 0.058 * k + f * off * k + fd * ln * 0.55 * k + n * 0.003 * k, 0.0140 * k, base)
+                tips.append(add(W + d * 0.058 * k + f * off * k + fd * ln * k + n * 0.009 * k, 0.0128 * k, mid))
             ob = cl.skin_obj(self.name("Glove" + sd), nn, ee, self.M["creme"], levels=2, branch=0.6)
             # achata a palma no eixo da normal da mao (mao, nao bola), alarga um pouco no eixo dos dedos
             P = verts_np(ob)
@@ -412,13 +419,14 @@ class RV2(hero_lib.Builder):
         bk = v["boot"]
         for sx, sd in ((1, "R"), (-1, "L")):
             x = sx * F.hip_x
-            nn = [((x, -0.006, F.ankle_z + 0.090 * bk), 0.056 * bk), ((x, -0.010, F.ankle_z + 0.010), 0.064 * bk),
-                  ((x, F.ball_y * 0.70, 0.052 * bk), 0.066 * bk), ((x + sx * 0.004, F.toe_y - 0.046 * bk, 0.052 * bk), 0.062 * bk)]
+            bw = bk * BOOT_K
+            nn = [((x, -0.006, F.ankle_z + 0.090 * bk), 0.056 * bw), ((x, -0.010, F.ankle_z + 0.010), 0.064 * bw),
+                  ((x, F.ball_y * 0.70, 0.052 * bk), 0.066 * bw), ((x + sx * 0.006, F.toe_y - 0.046 * bk, 0.052 * bk), 0.062 * bw)]
             boot = cl.skin_obj(self.name("Boot" + sd), nn, [(0, 1), (1, 2), (2, 3)], self.M["botas"], levels=3, floor=0.026 * bk)
             P = verts_np(boot)
             # bico mais largo e redondo, calcanhar arredondado
             yrel = (P[:, 1] - F.heel_y) / (F.toe_y - F.heel_y)
-            P[:, 0] = x + (P[:, 0] - x) * (1.0 + 0.10 * smooth(yrel, 0.45, 0.95))
+            P[:, 0] = x + (P[:, 0] - x) * (1.0 + 0.06 * smooth(yrel, 0.45, 0.95))
             P[:, 2] = np.where(P[:, 2] > 0.03, P[:, 2] + 0.006 * bump(yrel, 0.85, 0.15) * (P[:, 2] > 0.06), P[:, 2])
             set_verts(boot, P)
             # boca da bota aberta (o traje entra nela) e aro no corte
@@ -447,7 +455,7 @@ class RV2(hero_lib.Builder):
                 a = 2 * math.pi * i / n_
                 d = np.array([math.cos(a), math.sin(a)])
                 proj = (low[:, :2] - cxy) @ d
-                prof.append(cxy + d * (proj.max() + 0.005))
+                prof.append(cxy + d * (proj.max() + 0.003))
             rows = []
             for zz, grow in ((0.0, -0.004), (0.005, 0.0), (0.020, 0.0), (0.026, -0.003)):
                 row = []
@@ -599,7 +607,7 @@ class RV2(hero_lib.Builder):
         tag(scr, "screen", "screen")
         self.reg(scr, "single", "forearm.L")
         # --- lupa no coldre do quadril direito (aro dourado grande, cabo azul)
-        lx = b * 0.98 + 0.012
+        lx = max(b * 0.98, F.hip_x + 0.072) + 0.012
         cz = bz - 0.090
         bm = bmesh.new()
         cl.torus_z(bm, 0.036, 0.0070, 0.0, major=26, minor=6)
@@ -635,19 +643,19 @@ class RV2(hero_lib.Builder):
         cl.rounded_box(bm, (sx_ - 0.016, 0.010, tz), (0.034, 0.088, 0.096), 0.012)
         pouch = new_object(self.name("Pouch"), bm, self.M["couro"])
         tag(pouch, "pouch", "gear")
-        self.reg(pouch, "xfer:Suit")
+        self.reg(pouch, "single", "thigh.L")
         bm = bmesh.new()
         cl.rounded_box(bm, (sx_ - 0.016, 0.010, tz + 0.058), (0.026, 0.072, 0.040), 0.005)
         nb = new_object(self.name("Notebook"), bm, self.M["uniforme"])
         tag(nb, "notebook", "gear")
-        self.reg(nb, "xfer:Suit")
+        self.reg(nb, "single", "thigh.L")
         bm = bmesh.new()
         prism_star = hero_lib.star4(0.012, 0.004)
         hero_lib.prism(bm, prism_star, 0.003, (0, 0, 0))
         cl.transform_bm(bm, Matrix.Translation((sx_ - 0.034, 0.010, tz + 0.004)) @ cl.Matrix.Rotation(math.radians(-90), 4, "Z"))
         nst = new_object(self.name("PouchStar"), bm, self.M["ouro"])
         tag(nst, "pouch_star", "gear")
-        self.reg(nst, "xfer:Suit")
+        self.reg(nst, "single", "thigh.L")
         # tiras da bolsa em volta da coxa
         bm = bmesh.new()
         for dz in (0.030, -0.034):
@@ -658,7 +666,7 @@ class RV2(hero_lib.Builder):
             cl.tube(bm, pts, 0.0055, 5, False)
         straps = new_object(self.name("PouchStraps"), bm, self.M["couro"])
         tag(straps, "pouch_strap", "gear")
-        self.reg(straps, "xfer:Suit")
+        self.reg(straps, "single", "thigh.L")
 
     # ------------------------------------------------------------ oculos-visor erguido na testa (sem cobrir os olhos)
     def visor(self):
@@ -884,3 +892,49 @@ def build():
     b = RV2()
     b.build_v2(True)
     return b
+
+
+def add_fist_keys(gear_ob, F, hand_k, glove_pid):
+    """Shape keys fist_R / fist_L na malha do equipamento: os 3 dedos da luva dobram nos nos (base e meio) e o polegar
+    fecha por cima. Sem ossos de dedo (o esqueleto segue com 28 ossos); os clipes animam o peso (team_pose, celebrate)."""
+    me = gear_ob.data
+    n_v = len(me.vertices)
+    P = verts_np(gear_ob)
+    part = np.empty(n_v, dtype=np.float32)
+    me.attributes["rbpart"].data.foreach_get("value", part)
+    is_glove = np.rint(part * 100).astype(int) == glove_pid
+    if gear_ob.data.shape_keys is None:
+        gear_ob.shape_key_add(name="Basis", from_mix=False)
+    k = hand_k
+
+    def rot(Pts, center, axis, ang):
+        axis = axis / np.linalg.norm(axis)
+        v = Pts - center
+        c, s_ = np.cos(ang)[:, None], np.sin(ang)[:, None]
+        cr = np.cross(axis, v)
+        dot = (v @ axis)[:, None]
+        return center + v * c + cr * s_ + axis * dot * (1 - c)
+
+    for sx, s in ((1, "R"), (-1, "L")):
+        W, d, f, n = [np.array(x) for x in F.hand_frame(sx)]
+        sel = is_glove & (np.sign(P[:, 0]) == sx)
+        Q = P[sel].copy()
+        loc = Q - W
+        ad, af = loc @ d, loc @ f
+        thumb = (af > 0.034 * k) | ((af > 0.020 * k) & (ad < 0.050 * k))
+        ad_k, ad_m = 0.058 * k, 0.085 * k
+        u = np.cross(d, n)
+        # junta do meio primeiro (no referencial de repouso), depois o no da base
+        w2 = np.where(thumb, 0.0, smooth(ad, ad_m - 0.006 * k, ad_m + 0.006 * k))
+        Q = rot(Q, W + d * ad_m + n * 0.006 * k, u, np.radians(95) * w2)
+        w1 = np.where(thumb, 0.0, smooth(ad, ad_k - 0.008 * k, ad_k + 0.006 * k))
+        Q = rot(Q, W + d * ad_k + n * 0.004 * k, u, np.radians(80) * w1)
+        # polegar fecha por cima dos dedos
+        ut = np.cross(f, n)
+        wt = np.where(thumb, smooth(ad, 0.010 * k, 0.030 * k), 0.0)
+        Q = rot(Q, W + d * 0.020 * k + f * 0.018 * k, ut, np.radians(60) * wt)
+        kb = gear_ob.shape_key_add(name="fist_" + s, from_mix=False)
+        co = P.copy()
+        co[sel] = Q
+        kb.data.foreach_set("co", co.astype(np.float64).ravel())
+        kb.slider_min, kb.slider_max = 0.0, 1.0

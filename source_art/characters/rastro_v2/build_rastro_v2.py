@@ -51,6 +51,10 @@ def finish_materials(groups, b):
           T.factor_material("mat_rastro_v2_face_dark", "#22150F", 0.25, coat=0.6, coat_rough=0.1),
           T.factor_material("mat_rastro_v2_face_skin", T.C["skin"], 0.5, coat=0.3, coat_rough=0.35),
           T.factor_material("mat_rastro_v2_face_mouth", "#8E2E3A", 0.35, coat=0.4, coat_rough=0.2)]
+    for m in fm:
+        # dupla face: as cascas do rosto (hero_face) tem enrolamento para dentro; com corte de face traseira a Godot sumia
+        # com o branco do olho e mostrava a pele por tras (a "mancha escura sob o olho" da v2)
+        m.use_backface_culling = False
     for i, m in enumerate(fm):          # por indice: materials.clear() zera o indice de material das faces
         face.data.materials[i] = m
     for img in list(bpy.data.images):
@@ -73,6 +77,7 @@ def measure(b, groups, rig):
             "head_ratio": round(head_h / (hi.z - lo.z), 4), "eye_h_ratio": round(b.eye_info["R"]["ez"] * 2 / head_h, 4),
             "objects": sorted(o.name for o in objs), "bones": [bb.name for bb in rig.data.bones], "bone_count": len(rig.data.bones),
             "animations": acts, "shape_keys": [k.name for k in groups["face"].data.shape_keys.key_blocks],
+            "gear_shape_keys": [k.name for k in groups["gear"].data.shape_keys.key_blocks] if groups["gear"].data.shape_keys else [],
             "walk_speed_mps": round(rv2_anim.ha.walk_speed(b.F), 4), "run_speed_mps": round(rv2_anim.ha.run_speed(b.F), 4),
             "texturas": {img.name: list(img.size) for img in bpy.data.images if img.name.startswith("rastro_v2_")}}
     return info
@@ -106,7 +111,8 @@ def build(glb=None, blend=None, renders=None, textures=True):
     if textures:
         finish_materials(groups, b)
     print("MATERIAIS ok", round(time.time() - t0, 1))
-    rep = rv2_anim.author(rig, groups["face"], b.F)
+    rv2_body.add_fist_keys(groups["gear"], b.F, b.v["hand"], rv2_tex.PID["glove"])
+    rep = rv2_anim.author(rig, groups["face"], b.F, gear_ob=groups["gear"])
     bpy.context.view_layer.update()
     info = measure(b, groups, rig)
     info.update(rep)

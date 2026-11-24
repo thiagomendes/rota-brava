@@ -1,10 +1,10 @@
 {
-  "tris": 24441,
+  "tris": 24229,
   "tris_por_objeto": {
     "Rastro_Skin": 2068,
     "Rastro_Hair": 3428,
-    "Rastro_Suit": 6436,
-    "Rastro_Gear": 9577,
+    "Rastro_Suit": 6484,
+    "Rastro_Gear": 9317,
     "Rastro_Screen": 60,
     "Rastro_Glass": 504,
     "Rastro_Face": 2368
@@ -22,10 +22,10 @@
     "mat_rastro_v2_skin",
     "mat_rastro_v2_suit"
   ],
-  "height_m": 1.0856,
+  "height_m": 1.0835,
   "min_z": -0.0002,
   "head_h_m": 0.3998,
-  "head_ratio": 0.3683,
+  "head_ratio": 0.369,
   "eye_h_ratio": 0.2981,
   "objects": [
     "Rastro_Face",
@@ -72,7 +72,15 @@
       0,
       36
     ],
+    "celebrate_gear": [
+      0,
+      36
+    ],
     "crouch": [
+      0,
+      30
+    ],
+    "crouch_gear": [
       0,
       30
     ],
@@ -80,7 +88,15 @@
       0,
       132
     ],
+    "idle_gear": [
+      0,
+      132
+    ],
     "inspect_touch": [
+      0,
+      90
+    ],
+    "inspect_touch_gear": [
       0,
       90
     ],
@@ -88,7 +104,15 @@
       0,
       72
     ],
+    "look_to_leme_gear": [
+      0,
+      72
+    ],
     "point": [
+      0,
+      36
+    ],
+    "point_gear": [
       0,
       36
     ],
@@ -96,7 +120,15 @@
       0,
       27
     ],
+    "react_surprise_gear": [
+      0,
+      27
+    ],
     "run": [
+      0,
+      18
+    ],
+    "run_gear": [
       0,
       18
     ],
@@ -104,7 +136,15 @@
       0,
       15
     ],
+    "stop_gear": [
+      0,
+      15
+    ],
     "team_pose": [
+      0,
+      45
+    ],
+    "team_pose_gear": [
       0,
       45
     ],
@@ -112,7 +152,15 @@
       0,
       30
     ],
+    "walk_gear": [
+      0,
+      30
+    ],
     "wave": [
+      0,
+      48
+    ],
+    "wave_gear": [
       0,
       48
     ]
@@ -133,6 +181,11 @@
     "look_left",
     "look_right",
     "look_up"
+  ],
+  "gear_shape_keys": [
+    "Basis",
+    "fist_R",
+    "fist_L"
   ],
   "walk_speed_mps": 0.5491,
   "run_speed_mps": 1.1667,
