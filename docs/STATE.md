@@ -8,6 +8,7 @@
 **Remoto:** `https://github.com/thiagomendes/rota-brava` (todas as branches enviadas).
 **Branch de integração ativa:** `feature/rb-r1-reorientacao` (commit no topo = estado mais recente). **`main`:** RB-01 a RB-04 (RB-04 só base técnica).
 **Última suíte medida na integração:** `RESULTADO: OK (2650 PASS, 0 FALHA(S))` (Windows, Godot 4.7.2).
+**Nuvem (2026-11-24):** `tools/setup-linux.sh` e `tools/test.sh` verificados no Linux: 2650 PASS em 1 min 42 s no `5f877ec`. Ambiente pessoal `rota-brava` libera `download.blender.org` (o Default bloqueava o Blender).
 
 ## 1. Onde estamos
 - **Ticket ativo:** `RB-R1 · Reorientação de qualidade (premium)`. Origem: Thiago reprovou arte/som/UI do RB-04 (“personagens nada infantis, gráfico ruim, som primitivo, mapa sem tamanho/densidade”).
@@ -78,7 +79,7 @@ bash tools/build-windows.sh          # exporta build/windows/RotaBrava.exe a par
 - Placar de qualidade: `docs/agent-scorecard.md`.
 
 ## 6. Regras que não mudam
-SDD (ticket antes do código, evidências no ticket); merge local pelo lead; push só quando Thiago pedir, nunca force; geometria 100% do zero; áudio de terceiros só CC0/PD com procedência por arquivo; sem modelo de imagem; balbucio + rádio Piper; nunca afirmar que viu/ouviu/mediu sem ter feito; Thiago ouve e aprova o som.
+SDD (ticket antes do código, evidências no ticket); merge pelo lead depois da revisão; push da branch em uso pelo lead a cada etapa (autorizado por Thiago em 2026-11-24), nunca force; geometria 100% do zero; áudio de terceiros só CC0/PD com procedência por arquivo; sem modelo de imagem; balbucio + rádio Piper; nunca afirmar que viu/ouviu/mediu sem ter feito; Thiago ouve e aprova o som.
 
 ## 7. Histórico curto
 RB-01 fundação → RB-02 missão em blocos → RB-03 referências → RB-04 primeiro minuto (base técnica; arte reprovada) → **RB-R1 reorientação premium (ativo, ~85%)** → (pausa de análise) → RB-05 episódio final → RB-06 portabilidade → RB-07 candidato.

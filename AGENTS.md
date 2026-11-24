@@ -5,7 +5,8 @@ Contrato de produto: `SPEC.md`. Processo: seções 10 a 13. Perfis em `.opencode
 
 ## Regras
 - SDD: ticket em `specs/features/RB-XX.md` antes do código; evidências no mesmo arquivo.
-- Uma feature branch local por tarefa (`feature/rb-XX-...`), merge local em `main`. Nunca `git push`.
+- Uma feature branch por tarefa (`feature/rb-XX-...`), merge em `main` só depois da revisão.
+- Push: o `rota-lead` envia a branch em uso para `origin` a cada etapa concluída, porque a sessão na nuvem é efêmera e o que não está no GitHub se perde. Nunca force push (reescreve o histórico de quem já baixou). Subagentes não fazem push nem merge: integrar é do `rota-lead`.
 - Godot fixada em `tools/toolchain.json`. Instalar com `tools/setup-toolchain.ps1`; rodar com `tools/godot.ps1`.
 - Ficam fora do Git: `.tools/`, `build/`, `captures/`, `logs/`, `game/.godot/`.
 - GDScript tipado. Entrada só por intenções da Input Map. Textos fora das regras (catálogo i18n).
