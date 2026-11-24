@@ -686,6 +686,9 @@ func speaker_name_for(key: String) -> String:
 
 
 func speaker_for(key: String) -> StringName:
+	# Falas de radio de Farol 7 (RB-R1): ep01.radio.<local>.<id>
+	if key.begins_with("ep01.radio."):
+		return &"radio"
 	var parts := key.split(".")
 	if parts.size() >= 3 and Loc.has_key("member.%s.name" % parts[2]):
 		return StringName(parts[2])
