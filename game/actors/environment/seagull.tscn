@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/seagull.glb" id="1_uouep"]
+
+[node name="Seagull" type="Node3D" unique_id=747681531]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=617220279 instance=ExtResource("1_uouep")]

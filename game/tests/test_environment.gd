@@ -23,6 +23,185 @@ func run(runner) -> void:
 	_test_cabin_view()
 	_test_paw()
 	_test_glb_folder(ids)
+	_test_harbor()
+
+
+# ------------------------------------------------------------------ RB-R1: trecho do porto/vila Farol 7
+const HARBOR := "res://episodes/ep01/world/harbor_slice.tscn"
+const HARBOR_CAM_OFFSET := Vector3(0, 4.6, 6.2)   # camera do cais pedida no RB-R1 (fov 55, olhar +1 m)
+## Densidade minima na camera do cais (16:9, ate 60 m): 40 pecas. Justificativa: o quadro cobre ~40 m de fachada
+## no cais norte + o deck; a style-bible (sec. 8) pede "nenhum plano vazio" com densidade nas bordas e no fundo,
+## o que da ~1 peca por metro de borda visivel. O cais do RB-04 sozinho ficava em ~20 nessa mesma camera.
+const HARBOR_MIN_VISIBLE := 40
+const HARBOR_MIN_LIGHTHOUSE_H := 12.0
+
+
+static func harbor_lighthouse_height(root: Node3D) -> float:
+	for c in root.find_children("lighthouse_*", "Node3D", true, false):
+		var n := c as Node3D
+		var box := n.transform * TA.mesh_aabb(n)
+		return box.size.y * 1.0
+	return 0.0
+
+
+static func harbor_dock_top(root: Node3D) -> float:
+	var dock := root.get_node_or_null("Dock") as Node3D
+	if dock == null:
+		return 999.0
+	var top := -999.0
+	for c in dock.find_children("Deck*", "Node3D", true, false):
+		var n := c as Node3D
+		var t := Transform3D.IDENTITY
+		var p: Node = n
+		while p != null and p != root:
+			t = (p as Node3D).transform * t
+			p = p.get_parent()
+		top = maxf(top, (t * TA.mesh_aabb(n)).end.y)
+	return top
+
+
+static func harbor_mm_top(root: Node3D, id: String) -> float:
+	var mm := root.find_child("MM_" + id, true, false) as EnvMultiMesh
+	if mm == null or mm.source_mesh == null or mm.xforms.is_empty():
+		return 999.0
+	var top := -999.0
+	for xf in mm.xforms:
+		if absf((xf as Transform3D).origin.y) < 0.001:
+			top = maxf(top, (xf as Transform3D).origin.y + _walk_top(mm.source_mesh))
+	return top
+
+
+## Topo da superficie caminhavel (material mat_env_cobble/mat_env_grass) da malha mesclada; o meio-fio do cais
+## (capeamento de 18 cm na borda da agua) nao conta como piso.
+static func _walk_top(m: Mesh) -> float:
+	var top := -999.0
+	for s in m.get_surface_count():
+		var mat := m.surface_get_material(s)
+		if mat == null or not (mat.resource_name in ["mat_env_cobble", "mat_env_grass"]):
+			continue
+		for v in (m.surface_get_arrays(s)[Mesh.ARRAY_VERTEX] as PackedVector3Array):
+			top = maxf(top, v.y)
+	return top
+
+
+static func harbor_visible_count(root: Node3D) -> int:
+	var tgt := Ep01Layout.BENCH_INTERACT_POS
+	var eye := tgt + HARBOR_CAM_OFFSET
+	var basis := Basis.looking_at(tgt + Vector3(0, 1, 0) - eye, Vector3.UP)
+	var tv := tan(deg_to_rad(27.5))
+	var th := tv * 16.0 / 9.0
+	var pts: Array = []
+	var village := root.get_node_or_null("Village")
+	if village != null:
+		for c in village.get_children():
+			pts.append((c as Node3D).position)
+	var dock := root.get_node_or_null("Dock")
+	if dock != null:
+		for g in dock.get_children():
+			for c in g.get_children():
+				if c is Node3D:
+					pts.append((dock as Node3D).transform * ((g as Node3D).transform * (c as Node3D).position))
+	for mm in root.find_children("MM_*", "Node3D", true, false):
+		for xf in (mm as EnvMultiMesh).xforms:
+			pts.append((xf as Transform3D).origin)
+	var n := 0
+	for p in pts:
+		var l: Vector3 = basis.inverse() * ((p as Vector3) + Vector3(0, 0.3, 0) - eye)
+		var depth := -l.z
+		if depth > 0.5 and depth < 60.0 and absf(l.y / depth) <= tv and absf(l.x / depth) <= th:
+			n += 1
+	return n
+
+
+func _test_harbor() -> void:
+	var ps := load(HARBOR) as PackedScene
+	r.check(ps != null, "harbor: harbor_slice.tscn carrega")
+	if ps == null:
+		return
+	var root := ps.instantiate() as Node3D
+	r.tree.root.add_child(root)
+	r.check(root.get_meta("provisional", false) == true, "harbor: trecho marcado como provisorio")
+	var top := harbor_dock_top(root)
+	r.check(absf(top) <= 0.01, "harbor: topo do deck do cais em y = 0 +-1 cm (%.4f)" % top)
+	var qtop := harbor_mm_top(root, "quay_block")
+	r.check(absf(qtop) <= 0.01, "harbor: topo do cais de pedra (praca do mercado) em y = 0 +-1 cm (%.4f)" % qtop)
+	var ptop := harbor_mm_top(root, "plaza_tile")
+	r.check(absf(ptop) <= 0.01, "harbor: topo da praca em y = 0 +-1 cm (%.4f)" % ptop)
+	var lh := harbor_lighthouse_height(root)
+	r.check(lh > HARBOR_MIN_LIGHTHOUSE_H, "harbor: farol existe e mede > 12 m (%.2f m)" % lh)
+	# casas instanciadas: varias instancias compartilham a mesma malha do GLB
+	var houses := 0
+	var wall_meshes := {}
+	for c in root.find_children("house_*", "Node3D", true, false):
+		houses += 1
+		for mi in (c as Node).find_children("*_Wall", "MeshInstance3D", true, false):
+			var m := (mi as MeshInstance3D).mesh
+			wall_meshes[m.get_instance_id()] = int(wall_meshes.get(m.get_instance_id(), 0)) + 1
+	var shared := 0
+	for k in wall_meshes:
+		if int(wall_meshes[k]) >= 2:
+			shared += 1
+	r.check(houses >= 8 and houses <= 24, "harbor: 8+ casas instanciadas (%d)" % houses)
+	r.check(wall_meshes.size() <= 4 and shared >= 3, "harbor: casas repetidas reutilizam a mesma malha (%d malhas para %d casas)" % [wall_meshes.size(), houses])
+	var mm_total := 0
+	for mm in root.find_children("MM_*", "MultiMeshInstance3D", true, false):
+		mm_total += (mm as EnvMultiMesh).xforms.size()
+		r.check((mm as MultiMeshInstance3D).multimesh != null and (mm as MultiMeshInstance3D).multimesh.instance_count == (mm as EnvMultiMesh).xforms.size(), "harbor: %s montado em MultiMesh (%d)" % [mm.name, (mm as EnvMultiMesh).xforms.size()])
+	r.check(mm_total >= 60, "harbor: chao e flores por MultiMesh (%d instancias)" % mm_total)
+	# colisao simples, fora dos GLB
+	var in_model := 0
+	var shapes := 0
+	for cs in root.find_children("*", "CollisionShape3D", true, false):
+		shapes += 1
+		var p: Node = cs.get_parent()
+		while p != null and p != root:
+			if p.name == "Model":
+				in_model += 1
+				break
+			p = p.get_parent()
+		var sh := (cs as CollisionShape3D).shape
+		if not (sh is BoxShape3D or sh is CylinderShape3D):
+			in_model += 1
+	r.check(shapes > 50 and in_model == 0, "harbor: %d colisoes simples (caixa/cilindro) fora dos GLB" % shapes)
+	r.check(root.get_node_or_null("Limits") != null, "harbor: limites de agua presentes")
+	# materiais mat_env_* (inclui sobreposicoes por instancia)
+	var bad: Array = []
+	for mi in root.find_children("*", "MeshInstance3D", true, false):
+		var m3 := mi as MeshInstance3D
+		for s in m3.mesh.get_surface_count():
+			var mat: Material = m3.get_surface_override_material(s)
+			if mat == null:
+				mat = m3.mesh.surface_get_material(s)
+			if mat != null and not mat.resource_name.begins_with("mat_env_") and not bad.has(mat.resource_name):
+				bad.append(mat.resource_name)
+	r.check(bad.is_empty(), "harbor: todos os materiais sao mat_env_* %s" % [bad])
+	# densidade na camera do cais
+	var vis := harbor_visible_count(root)
+	r.check(vis >= HARBOR_MIN_VISIBLE, "harbor: %d pecas na area visivel da camera do cais (minimo %d)" % [vis, HARBOR_MIN_VISIBLE])
+	# so malha do projeto
+	var ext: Array = []
+	for mi in root.find_children("*", "MeshInstance3D", true, false):
+		var rp := (mi as MeshInstance3D).mesh.resource_path
+		if not (rp.begins_with("res://assets/models/environment/") or rp.begins_with("res://episodes/ep01/world/meshes/")):
+			ext.append(rp)
+	for mm in root.find_children("MM_*", "MultiMeshInstance3D", true, false):
+		var rp2 := (mm as EnvMultiMesh).source_mesh.resource_path
+		if not rp2.begins_with("res://episodes/ep01/world/meshes/"):
+			ext.append(rp2)
+	r.check(ext.is_empty(), "harbor: nenhuma malha externa ao projeto %s" % [ext.slice(0, 3)])
+	# mutacoes: devem reprovar e, restauradas, voltar a passar
+	var dock := root.get_node("Dock") as Node3D
+	dock.position.y += 0.2
+	var mut1 := absf(harbor_dock_top(root)) <= 0.01
+	dock.position.y -= 0.2
+	r.check(not mut1 and absf(harbor_dock_top(root)) <= 0.01, "harbor: mutacao (topo do cais +20 cm) reprova e restaura")
+	var lhn := root.find_children("lighthouse_*", "Node3D", true, false)[0] as Node3D
+	var old := lhn.scale
+	lhn.scale = Vector3(1, 0.5, 1)
+	var mut2 := harbor_lighthouse_height(root) > HARBOR_MIN_LIGHTHOUSE_H
+	lhn.scale = old
+	r.check(not mut2 and harbor_lighthouse_height(root) > HARBOR_MIN_LIGHTHOUSE_H, "harbor: mutacao (farol a 50%) reprova e restaura")
+	root.queue_free()
 
 
 func _load_scene(id: String) -> Node3D:

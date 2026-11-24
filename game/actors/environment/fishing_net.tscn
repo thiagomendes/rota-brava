@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/fishing_net.glb" id="1_vutrs"]
 
-[node name="Fishing_Net" type="Node3D" unique_id=802923436]
+[node name="Fishing_Net" type="Node3D" unique_id=681319683]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=574233386 instance=ExtResource("1_vutrs")]
+[node name="Model" parent="." unique_id=454450413 instance=ExtResource("1_vutrs")]

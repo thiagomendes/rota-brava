@@ -6,14 +6,14 @@
 height = 1.0
 radius = 0.16
 
-[node name="Dock_Post" type="Node3D" unique_id=621661064]
+[node name="Dock_Post" type="Node3D" unique_id=1457378094]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=1166542885 instance=ExtResource("1_04dy6")]
+[node name="Model" parent="." unique_id=1717372424 instance=ExtResource("1_04dy6")]
 
-[node name="Body" type="StaticBody3D" parent="." unique_id=788666619]
+[node name="Body" type="StaticBody3D" parent="." unique_id=770599383]
 collision_mask = 0
 
-[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=210119803]
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1309591464]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 shape = SubResource("CylinderShape3D_ehd4a")

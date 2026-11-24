@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/bunting.glb" id="1_jv8fi"]
+
+[node name="Bunting" type="Node3D" unique_id=1232030061]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=2021827567 instance=ExtResource("1_jv8fi")]

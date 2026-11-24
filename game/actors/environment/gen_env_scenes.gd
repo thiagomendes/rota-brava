@@ -47,6 +47,34 @@ const SPEC := {
 	"rock_b": ["Rock_B", AABB_BOX],
 	"rock_c": ["Rock_C", AABB_BOX],
 	"boat_v2": ["BoatV2", {"box": [Vector3(2.2, 0.8, 5.0), Vector3(0, 0.1, -0.5)]}],
+	# RB-R1 kit da vila Farol 7 (style-bible)
+	"house_a": ["House_A", {"box": [Vector3(4.4, 6.0, 5.2), Vector3(0, 3.0, 0)]}],
+	"house_b": ["House_B", {"box": [Vector3(5.2, 6.0, 5.2), Vector3(0, 3.0, 0)]}],
+	"house_c": ["House_C", {"box": [Vector3(5.4, 8.7, 5.8), Vector3(0, 4.35, 0)]}],
+	"house_d": ["House_D", {"box": [Vector3(4.2, 3.2, 4.6), Vector3(0, 1.6, 0)]}],
+	"market_stall_red": ["Market_Stall_Red", {"box": [Vector3(2.7, 1.0, 0.7), Vector3(0, 0.5, 0.55)]}],
+	"market_stall_blue": ["Market_Stall_Blue", {"box": [Vector3(2.7, 1.0, 0.7), Vector3(0, 0.5, 0.55)]}],
+	"street_lamp": ["Street_Lamp", {"cyl": [0.15, 3.0, Vector3(0, 1.5, 0)]}],
+	"park_bench": ["Park_Bench", AABB_BOX],
+	"flower_bed": ["Flower_Bed", AABB_CYL],
+	"flower_clump": ["Flower_Clump", NONE],
+	"fence_2m": ["Fence_2m", {"box": [Vector3(2.0, 1.0, 0.12), Vector3(0, 0.5, 0)]}],
+	"stone_stairs": ["Stone_Stairs", NONE],
+	"low_wall": ["Low_Wall", AABB_BOX],
+	"quay_block": ["Quay_Block", {"box": [Vector3(8, 1.6, 6), Vector3(0, -0.8, 0)]}],
+	"plaza_tile": ["Plaza_Tile", {"box": [Vector3(8, 0.7, 8), Vector3(0, -0.35, 0)]}],
+	"lawn_block": ["Lawn_Block", {"box": [Vector3(8, 1.6, 6), Vector3(0, -0.8, 0)]}],
+	"terrace_wall": ["Terrace_Wall", {"box": [Vector3(8, 2.7, 0.9), Vector3(0, -1.3, -0.1)]}],
+	"lighthouse": ["Lighthouse", {"cyl": [3.2, 19.8, Vector3(0, 9.9, 0)]}],
+	"hills_near": ["Hills_Near", NONE],
+	"hills_far": ["Hills_Far", NONE],
+	"cloud": ["Cloud", NONE],
+	"seagull": ["Seagull", NONE],
+	"tree_round": ["Tree_Round", {"cyl": [0.3, 2.5, Vector3(0, 1.25, 0)]}],
+	"tree_round_dark": ["Tree_Round_Dark", {"cyl": [0.3, 2.2, Vector3(0, 1.1, 0)]}],
+	"tree_tall": ["Tree_Tall", {"cyl": [0.3, 2.0, Vector3(0, 1.0, 0)]}],
+	"rowboat": ["Rowboat", NONE],
+	"bunting": ["Bunting", NONE],
 }
 
 var _fail := false
@@ -128,6 +156,14 @@ func _make_piece(id: String) -> void:
 		l.omni_range = 7.0
 		l.position = Vector3(0.34, 1.7, 0)
 		root.add_child(l)
+	if id == "lighthouse":
+		var lb := OmniLight3D.new()
+		lb.name = "BeaconLight"
+		lb.light_color = Color("ffd88a")
+		lb.light_energy = 2.0
+		lb.omni_range = 14.0
+		lb.position = Vector3(0, 16.4, 0)
+		root.add_child(lb)
 	if id == "boat_v2":
 		var l2 := OmniLight3D.new()
 		l2.name = "BowLight"

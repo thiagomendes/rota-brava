@@ -1,0 +1,887 @@
+{
+  "house_a": {
+    "glb": "game/assets/models/environment/house_a.glb",
+    "tris": 5624,
+    "materials": [
+      "mat_env_door",
+      "mat_env_glass",
+      "mat_env_masonry",
+      "mat_env_roof_terracotta",
+      "mat_env_shutter",
+      "mat_env_stone",
+      "mat_env_tint",
+      "mat_env_trim",
+      "mat_env_wall_peach"
+    ],
+    "vertices": 3000,
+    "bbox_min": [
+      -2.407,
+      0.0,
+      -2.768
+    ],
+    "bbox_max": [
+      2.407,
+      9.09,
+      3.05
+    ],
+    "size": [
+      4.813,
+      9.09,
+      5.818
+    ],
+    "objects": [
+      "House_A_Chimney",
+      "House_A_Door",
+      "House_A_DoorFrame",
+      "House_A_Flowers",
+      "House_A_Glass",
+      "House_A_Plinth",
+      "House_A_Roof",
+      "House_A_RoofTiles",
+      "House_A_Shutters",
+      "House_A_Trim",
+      "House_A_Wall",
+      "House_A_WindowTrim"
+    ],
+    "empties": []
+  },
+  "house_b": {
+    "glb": "game/assets/models/environment/house_b.glb",
+    "tris": 9396,
+    "materials": [
+      "mat_env_awning_cream",
+      "mat_env_awning_red",
+      "mat_env_door",
+      "mat_env_glass",
+      "mat_env_iron",
+      "mat_env_masonry",
+      "mat_env_roof_blue",
+      "mat_env_shutter",
+      "mat_env_stone",
+      "mat_env_tint",
+      "mat_env_trim",
+      "mat_env_wall_mint"
+    ],
+    "vertices": 5016,
+    "bbox_min": [
+      -2.783,
+      0.0,
+      -2.783
+    ],
+    "bbox_max": [
+      2.783,
+      8.79,
+      3.812
+    ],
+    "size": [
+      5.566,
+      8.79,
+      6.595
+    ],
+    "objects": [
+      "House_B_AwningRod",
+      "House_B_Awning_A",
+      "House_B_Awning_B",
+      "House_B_Chimney",
+      "House_B_Door",
+      "House_B_DoorFrame",
+      "House_B_Flowers",
+      "House_B_Glass",
+      "House_B_Plinth",
+      "House_B_Roof",
+      "House_B_RoofTiles",
+      "House_B_Shutters",
+      "House_B_Trim",
+      "House_B_Wall",
+      "House_B_WindowTrim"
+    ],
+    "empties": []
+  },
+  "house_c": {
+    "glb": "game/assets/models/environment/house_c.glb",
+    "tris": 9960,
+    "materials": [
+      "mat_env_door",
+      "mat_env_glass",
+      "mat_env_masonry",
+      "mat_env_roof_terracotta",
+      "mat_env_shutter",
+      "mat_env_stone",
+      "mat_env_tint",
+      "mat_env_trim",
+      "mat_env_wall_sky"
+    ],
+    "vertices": 5342,
+    "bbox_min": [
+      -2.889,
+      0.0,
+      -3.057
+    ],
+    "bbox_max": [
+      2.889,
+      12.092,
+      3.708
+    ],
+    "size": [
+      5.778,
+      12.092,
+      6.766
+    ],
+    "objects": [
+      "House_C_Balcony",
+      "House_C_Chimney",
+      "House_C_Door",
+      "House_C_DoorFrame",
+      "House_C_Flowers",
+      "House_C_Glass",
+      "House_C_Plinth",
+      "House_C_Roof",
+      "House_C_RoofTiles",
+      "House_C_Shutters",
+      "House_C_Trim",
+      "House_C_Wall",
+      "House_C_WindowTrim"
+    ],
+    "empties": []
+  },
+  "house_d": {
+    "glb": "game/assets/models/environment/house_d.glb",
+    "tris": 3624,
+    "materials": [
+      "mat_env_door",
+      "mat_env_glass",
+      "mat_env_masonry",
+      "mat_env_roof_blue",
+      "mat_env_shutter",
+      "mat_env_stone",
+      "mat_env_tint",
+      "mat_env_trim",
+      "mat_env_wall_lemon"
+    ],
+    "vertices": 1924,
+    "bbox_min": [
+      -2.31,
+      0.0,
+      -2.478
+    ],
+    "bbox_max": [
+      2.31,
+      6.088,
+      2.75
+    ],
+    "size": [
+      4.62,
+      6.088,
+      5.228
+    ],
+    "objects": [
+      "House_D_Chimney",
+      "House_D_Door",
+      "House_D_DoorFrame",
+      "House_D_Flowers",
+      "House_D_Glass",
+      "House_D_Plinth",
+      "House_D_Roof",
+      "House_D_RoofTiles",
+      "House_D_Shutters",
+      "House_D_Trim",
+      "House_D_Wall",
+      "House_D_WindowTrim"
+    ],
+    "empties": []
+  },
+  "market_stall_red": {
+    "glb": "game/assets/models/environment/market_stall_red.glb",
+    "tris": 5324,
+    "materials": [
+      "mat_env_awning_cream",
+      "mat_env_awning_red",
+      "mat_env_iron",
+      "mat_env_tint",
+      "mat_env_wood_deck",
+      "mat_env_wood_light"
+    ],
+    "vertices": 2800,
+    "bbox_min": [
+      -1.526,
+      0.0,
+      -0.763
+    ],
+    "bbox_max": [
+      1.526,
+      2.469,
+      1.211
+    ],
+    "size": [
+      3.052,
+      2.469,
+      1.975
+    ],
+    "objects": [
+      "Market_Stall_Red_AwningRod",
+      "Market_Stall_Red_Awning_A",
+      "Market_Stall_Red_Awning_B",
+      "Market_Stall_Red_Crates",
+      "Market_Stall_Red_Frame",
+      "Market_Stall_Red_Fruit"
+    ],
+    "empties": []
+  },
+  "market_stall_blue": {
+    "glb": "game/assets/models/environment/market_stall_blue.glb",
+    "tris": 5324,
+    "materials": [
+      "mat_env_awning_blue",
+      "mat_env_awning_cream",
+      "mat_env_iron",
+      "mat_env_tint",
+      "mat_env_wood_deck",
+      "mat_env_wood_light"
+    ],
+    "vertices": 2800,
+    "bbox_min": [
+      -1.526,
+      0.0,
+      -0.763
+    ],
+    "bbox_max": [
+      1.526,
+      2.469,
+      1.211
+    ],
+    "size": [
+      3.052,
+      2.469,
+      1.975
+    ],
+    "objects": [
+      "Market_Stall_Blue_AwningRod",
+      "Market_Stall_Blue_Awning_A",
+      "Market_Stall_Blue_Awning_B",
+      "Market_Stall_Blue_Crates",
+      "Market_Stall_Blue_Frame",
+      "Market_Stall_Blue_Fruit"
+    ],
+    "empties": []
+  },
+  "street_lamp": {
+    "glb": "game/assets/models/environment/street_lamp.glb",
+    "tris": 288,
+    "materials": [
+      "mat_env_iron",
+      "mat_env_lamp_light"
+    ],
+    "vertices": 152,
+    "bbox_min": [
+      -0.22,
+      0.0,
+      -0.247
+    ],
+    "bbox_max": [
+      0.68,
+      3.55,
+      0.247
+    ],
+    "size": [
+      0.9,
+      3.55,
+      0.495
+    ],
+    "objects": [
+      "Street_Lamp_Light",
+      "Street_Lamp_Post"
+    ],
+    "empties": [
+      "Lamp_Light"
+    ]
+  },
+  "park_bench": {
+    "glb": "game/assets/models/environment/park_bench.glb",
+    "tris": 708,
+    "materials": [
+      "mat_env_iron",
+      "mat_env_wood_light"
+    ],
+    "vertices": 376,
+    "bbox_min": [
+      -0.85,
+      -0.007,
+      -0.37
+    ],
+    "bbox_max": [
+      0.85,
+      0.955,
+      0.234
+    ],
+    "size": [
+      1.7,
+      0.962,
+      0.604
+    ],
+    "objects": [
+      "Park_Bench_Legs",
+      "Park_Bench_Slats"
+    ],
+    "empties": []
+  },
+  "flower_bed": {
+    "glb": "game/assets/models/environment/flower_bed.glb",
+    "tris": 1708,
+    "materials": [
+      "mat_env_grass",
+      "mat_env_stone",
+      "mat_env_tint"
+    ],
+    "vertices": 902,
+    "bbox_min": [
+      -1.05,
+      0.0,
+      -1.05
+    ],
+    "bbox_max": [
+      1.05,
+      0.738,
+      1.05
+    ],
+    "size": [
+      2.1,
+      0.738,
+      2.1
+    ],
+    "objects": [
+      "Flower_Bed_Flowers",
+      "Flower_Bed_Planter",
+      "Flower_Bed_Soil"
+    ],
+    "empties": []
+  },
+  "flower_clump": {
+    "glb": "game/assets/models/environment/flower_clump.glb",
+    "tris": 332,
+    "materials": [
+      "mat_env_tint"
+    ],
+    "vertices": 182,
+    "bbox_min": [
+      -0.289,
+      -0.091,
+      -0.334
+    ],
+    "bbox_max": [
+      0.289,
+      0.365,
+      0.32
+    ],
+    "size": [
+      0.579,
+      0.456,
+      0.654
+    ],
+    "objects": [
+      "Flower_Clump_Clump"
+    ],
+    "empties": []
+  },
+  "fence_2m": {
+    "glb": "game/assets/models/environment/fence_2m.glb",
+    "tris": 1404,
+    "materials": [
+      "mat_env_trim"
+    ],
+    "vertices": 734,
+    "bbox_min": [
+      -1.0,
+      0.0,
+      -0.07
+    ],
+    "bbox_max": [
+      1.0,
+      1.055,
+      0.026
+    ],
+    "size": [
+      2.0,
+      1.055,
+      0.096
+    ],
+    "objects": [
+      "Fence_2m_Pickets"
+    ],
+    "empties": []
+  },
+  "stone_stairs": {
+    "glb": "game/assets/models/environment/stone_stairs.glb",
+    "tris": 1944,
+    "materials": [
+      "mat_env_masonry",
+      "mat_env_stone"
+    ],
+    "vertices": 1008,
+    "bbox_min": [
+      -1.31,
+      0.0,
+      -1.41
+    ],
+    "bbox_max": [
+      1.31,
+      2.0,
+      1.41
+    ],
+    "size": [
+      2.62,
+      2.0,
+      2.82
+    ],
+    "objects": [
+      "Stone_Stairs_Cheeks",
+      "Stone_Stairs_Steps"
+    ],
+    "empties": []
+  },
+  "low_wall": {
+    "glb": "game/assets/models/environment/low_wall.glb",
+    "tris": 1188,
+    "materials": [
+      "mat_env_masonry",
+      "mat_env_stone"
+    ],
+    "vertices": 616,
+    "bbox_min": [
+      -2.0,
+      0.0,
+      -0.275
+    ],
+    "bbox_max": [
+      2.0,
+      0.74,
+      0.275
+    ],
+    "size": [
+      4.0,
+      0.74,
+      0.55
+    ],
+    "objects": [
+      "Low_Wall_Body",
+      "Low_Wall_Cap"
+    ],
+    "empties": []
+  },
+  "quay_block": {
+    "glb": "game/assets/models/environment/quay_block.glb",
+    "tris": 2246,
+    "materials": [
+      "mat_env_cobble",
+      "mat_env_masonry",
+      "mat_env_stone"
+    ],
+    "vertices": 1756,
+    "bbox_min": [
+      -4.0,
+      -1.65,
+      -3.06
+    ],
+    "bbox_max": [
+      4.0,
+      0.18,
+      3.0
+    ],
+    "size": [
+      8.0,
+      1.83,
+      6.06
+    ],
+    "objects": [
+      "Quay_Block_Body",
+      "Quay_Block_Coping",
+      "Quay_Block_Top"
+    ],
+    "empties": []
+  },
+  "plaza_tile": {
+    "glb": "game/assets/models/environment/plaza_tile.glb",
+    "tris": 314,
+    "materials": [
+      "mat_env_cobble",
+      "mat_env_masonry"
+    ],
+    "vertices": 612,
+    "bbox_min": [
+      -4.0,
+      -0.75,
+      -4.0
+    ],
+    "bbox_max": [
+      4.0,
+      0.0,
+      4.0
+    ],
+    "size": [
+      8.0,
+      0.75,
+      8.0
+    ],
+    "objects": [
+      "Plaza_Tile_Body",
+      "Plaza_Tile_Top"
+    ],
+    "empties": []
+  },
+  "lawn_block": {
+    "glb": "game/assets/models/environment/lawn_block.glb",
+    "tris": 396,
+    "materials": [
+      "mat_env_earth",
+      "mat_env_grass"
+    ],
+    "vertices": 229,
+    "bbox_min": [
+      -4.0,
+      -1.62,
+      -3.0
+    ],
+    "bbox_max": [
+      4.0,
+      0.059,
+      3.0
+    ],
+    "size": [
+      8.0,
+      1.679,
+      6.0
+    ],
+    "objects": [
+      "Lawn_Block_Body",
+      "Lawn_Block_Top"
+    ],
+    "empties": []
+  },
+  "terrace_wall": {
+    "glb": "game/assets/models/environment/terrace_wall.glb",
+    "tris": 4764,
+    "materials": [
+      "mat_env_masonry",
+      "mat_env_stone"
+    ],
+    "vertices": 2472,
+    "bbox_min": [
+      -4.0,
+      -2.6,
+      -0.6
+    ],
+    "bbox_max": [
+      4.0,
+      0.11,
+      0.31
+    ],
+    "size": [
+      8.0,
+      2.71,
+      0.91
+    ],
+    "objects": [
+      "Terrace_Wall_Core",
+      "Terrace_Wall_Stones"
+    ],
+    "empties": []
+  },
+  "lighthouse": {
+    "glb": "game/assets/models/environment/lighthouse.glb",
+    "tris": 3554,
+    "materials": [
+      "mat_env_lh_dark",
+      "mat_env_lh_glass",
+      "mat_env_lh_red",
+      "mat_env_lh_white",
+      "mat_env_masonry",
+      "mat_env_trim"
+    ],
+    "vertices": 1873,
+    "bbox_min": [
+      -3.285,
+      0.0,
+      -3.138
+    ],
+    "bbox_max": [
+      3.285,
+      19.8,
+      3.25
+    ],
+    "size": [
+      6.571,
+      19.8,
+      6.388
+    ],
+    "objects": [
+      "Lighthouse_Bands_Red",
+      "Lighthouse_Bands_White",
+      "Lighthouse_Base",
+      "Lighthouse_Dome",
+      "Lighthouse_DoorFrame",
+      "Lighthouse_Gallery",
+      "Lighthouse_Lantern",
+      "Lighthouse_Mullions",
+      "Lighthouse_Openings"
+    ],
+    "empties": [
+      "Beacon"
+    ]
+  },
+  "hills_near": {
+    "glb": "game/assets/models/environment/hills_near.glb",
+    "tris": 576,
+    "materials": [
+      "mat_env_hill"
+    ],
+    "vertices": 333,
+    "bbox_min": [
+      -60.0,
+      -0.5,
+      -15.0
+    ],
+    "bbox_max": [
+      60.0,
+      15.43,
+      15.0
+    ],
+    "size": [
+      120.0,
+      15.93,
+      30.0
+    ],
+    "objects": [
+      "Hills_Near_Mass"
+    ],
+    "empties": []
+  },
+  "hills_far": {
+    "glb": "game/assets/models/environment/hills_far.glb",
+    "tris": 576,
+    "materials": [
+      "mat_env_hill"
+    ],
+    "vertices": 343,
+    "bbox_min": [
+      -130.0,
+      -0.5,
+      -15.0
+    ],
+    "bbox_max": [
+      130.0,
+      28.955,
+      15.0
+    ],
+    "size": [
+      260.0,
+      29.455,
+      30.0
+    ],
+    "objects": [
+      "Hills_Far_Mass"
+    ],
+    "empties": []
+  },
+  "cloud": {
+    "glb": "game/assets/models/environment/cloud.glb",
+    "tris": 1372,
+    "materials": [
+      "mat_env_cloud"
+    ],
+    "vertices": 700,
+    "bbox_min": [
+      -4.277,
+      -1.367,
+      -1.98
+    ],
+    "bbox_max": [
+      4.575,
+      2.275,
+      1.98
+    ],
+    "size": [
+      8.852,
+      3.643,
+      3.96
+    ],
+    "objects": [
+      "Cloud_Puff"
+    ],
+    "empties": []
+  },
+  "seagull": {
+    "glb": "game/assets/models/environment/seagull.glb",
+    "tris": 264,
+    "materials": [
+      "mat_env_beak",
+      "mat_env_gull",
+      "mat_env_gull_gray"
+    ],
+    "vertices": 142,
+    "bbox_min": [
+      -0.626,
+      -0.09,
+      -0.361
+    ],
+    "bbox_max": [
+      0.626,
+      0.154,
+      0.22
+    ],
+    "size": [
+      1.252,
+      0.244,
+      0.581
+    ],
+    "objects": [
+      "Seagull_Beak",
+      "Seagull_Body",
+      "Seagull_Wings"
+    ],
+    "empties": []
+  },
+  "tree_round": {
+    "glb": "game/assets/models/environment/tree_round.glb",
+    "tris": 1004,
+    "materials": [
+      "mat_env_foliage_a",
+      "mat_env_trunk"
+    ],
+    "vertices": 512,
+    "bbox_min": [
+      -1.543,
+      -0.007,
+      -1.632
+    ],
+    "bbox_max": [
+      1.765,
+      4.232,
+      1.465
+    ],
+    "size": [
+      3.308,
+      4.239,
+      3.097
+    ],
+    "objects": [
+      "Tree_Round_Canopy",
+      "Tree_Round_Trunk"
+    ],
+    "empties": []
+  },
+  "tree_round_dark": {
+    "glb": "game/assets/models/environment/tree_round_dark.glb",
+    "tris": 1228,
+    "materials": [
+      "mat_env_foliage_b",
+      "mat_env_trunk"
+    ],
+    "vertices": 626,
+    "bbox_min": [
+      -1.537,
+      -0.009,
+      -1.509
+    ],
+    "bbox_max": [
+      1.413,
+      3.523,
+      1.462
+    ],
+    "size": [
+      2.95,
+      3.532,
+      2.971
+    ],
+    "objects": [
+      "Tree_Round_Dark_Canopy",
+      "Tree_Round_Dark_Trunk"
+    ],
+    "empties": []
+  },
+  "tree_tall": {
+    "glb": "game/assets/models/environment/tree_tall.glb",
+    "tris": 224,
+    "materials": [
+      "mat_env_foliage_b",
+      "mat_env_trunk"
+    ],
+    "vertices": 116,
+    "bbox_min": [
+      -0.975,
+      0.0,
+      -0.951
+    ],
+    "bbox_max": [
+      0.975,
+      6.2,
+      0.951
+    ],
+    "size": [
+      1.951,
+      6.2,
+      1.902
+    ],
+    "objects": [
+      "Tree_Tall_Canopy",
+      "Tree_Tall_Trunk"
+    ],
+    "empties": []
+  },
+  "rowboat": {
+    "glb": "game/assets/models/environment/rowboat.glb",
+    "tris": 280,
+    "materials": [
+      "mat_env_tint",
+      "mat_env_wood_light"
+    ],
+    "vertices": 146,
+    "bbox_min": [
+      -0.62,
+      -0.25,
+      -1.612
+    ],
+    "bbox_max": [
+      0.62,
+      0.32,
+      1.612
+    ],
+    "size": [
+      1.24,
+      0.57,
+      3.224
+    ],
+    "objects": [
+      "Rowboat_Hull",
+      "Rowboat_Seats"
+    ],
+    "empties": []
+  },
+  "bunting": {
+    "glb": "game/assets/models/environment/bunting.glb",
+    "tris": 244,
+    "materials": [
+      "mat_env_tint",
+      "mat_env_trim"
+    ],
+    "vertices": 152,
+    "bbox_min": [
+      -4.005,
+      -1.177,
+      -0.015
+    ],
+    "bbox_max": [
+      4.005,
+      0.014,
+      0.035
+    ],
+    "size": [
+      8.011,
+      1.191,
+      0.05
+    ],
+    "objects": [
+      "Bunting_Cord",
+      "Bunting_Flags"
+    ],
+    "empties": []
+  }
+}
