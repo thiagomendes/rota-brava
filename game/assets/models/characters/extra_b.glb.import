@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://du48tqw1bat66"
-path="res://.godot/imported/rastro.glb-1c952fd6b7e8652748dbd82665e2a391.scn"
+uid="uid://oorijhhblu5"
+path="res://.godot/imported/extra_b.glb-5ba26c47bf62fc59a2da6bcdaa0ff1b5.scn"
 
 [deps]
 
-source_file="res://assets/models/rastro.glb"
-dest_files=["res://.godot/imported/rastro.glb-1c952fd6b7e8652748dbd82665e2a391.scn"]
+source_file="res://assets/models/characters/extra_b.glb"
+dest_files=["res://.godot/imported/extra_b.glb-5ba26c47bf62fc59a2da6bcdaa0ff1b5.scn"]
 
 [params]
 

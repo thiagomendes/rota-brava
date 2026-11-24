@@ -13,14 +13,11 @@ $bver = $tc.blender.version
 function Invoke-Blender([string]$script, [string[]]$extra) {
     $a = @('--background', '--factory-startup', '--python', $script, '--') + $extra
     Write-Host ("COMANDO: ./tools/blender.ps1 " + ($a -join ' '))
-    & "$PSScriptRoot/blender.ps1" @a | Where-Object { $_ -match '^(RASTRO_INFO|BOAT_INFO|Error|Traceback)' } | ForEach-Object { Write-Host $_ }
+    & "$PSScriptRoot/blender.ps1" @a | Where-Object { $_ -match '^(CHAR_INFO|BOAT_INFO|Error|Traceback)' } | ForEach-Object { Write-Host $_ }
     if ($LASTEXITCODE -ne 0) { throw "Blender falhou em $script" }
 }
 
 $assets = @(
-    @{ id = 'rastro'; name = 'Rastro'; script = 'source_art/scripts/build_rastro.py'; blend = 'source_art/characters/rastro/rastro.blend';
-       glb = 'game/assets/models/rastro.glb'; extra = @('source_art/scripts/rbart.py', 'source_art/scripts/rbchars.py', 'source_art/params/rastro.json');
-       note = 'Corpo-base provisorio da rastreadora (candidata A: chapeu de aba larga, caderno lateral, postura curvada). Sem rig/animacao (RB-04). 3 expressoes como shape keys em Rastro_Face. Recomendacao da candidata A: a aba larga e o torso curvado leem melhor em 48 px e se distinguem de Pico (arco/corda) e Leme (bracos abertos) - gosto e decisao de Thiago.' },
     @{ id = 'boat'; name = 'Barco'; script = 'source_art/scripts/build_boat.py'; blend = 'source_art/vehicles/boat/boat.blend';
        glb = 'game/assets/models/boat.glb'; extra = @('source_art/scripts/rbart.py');
        note = 'Barco amarelo provisorio. Pivo = centro de giro: eixo longitudinal, 40% do comprimento a partir da popa. Proa em -Z na Godot. Empties DeckPoint e BenchMark.' }
@@ -46,17 +43,63 @@ foreach ($a in $assets) {
         nota = $a.note
     }
 }
-$manifest = [ordered]@{ projeto = 'Rota Brava'; ticket = 'RB-03-art'; ativos = $entries }
+
+# ---- personagens organicos (RB-04-chars): malha SKIN+SUBSURF, rig, pesos, shape keys e animacoes -> um GLB por personagem
+$chars = @(
+    @{ id = 'rastro';  name = 'Rastro';  role = 'tracker'; note = 'Rastreadora: chapeu de aba larga caida, cabelo, colete laranja sobre camisa, cinto com caderno por cordao, bolsa, luvas sem dedos, botas. Rig 28 ossos, 6 clipes.' },
+    @{ id = 'leme';    name = 'Leme';    role = 'pilot';   note = 'Piloto: gorro de marinheiro, lenco, colete claro com bolsos, maos grandes. Clipes de volante (idle_wheel, steer_left/right, react_horn) + idle/walk.' },
+    @{ id = 'extra_a'; name = 'Figurante A'; role = 'extra'; note = 'Figurante do cais com chapeu de palha. Malha simples, rig completo, clipes idle e walk.' },
+    @{ id = 'extra_b'; name = 'Figurante B'; role = 'extra'; note = 'Figurante do cais com lenco na cabeca e tunica. Malha simples, rig completo, clipes idle e walk.' },
+    @{ id = 'extra_c'; name = 'Figurante C'; role = 'extra'; note = 'Figurante do cais com boina. Malha simples, rig completo, clipes idle e walk.' }
+)
+$charSrc = @('source_art/scripts/char_build.py', 'source_art/scripts/char_lib.py', 'source_art/scripts/char_face.py', 'source_art/scripts/char_anim.py', 'source_art/scripts/rbart.py')
+foreach ($c in $chars) {
+    $blend = "source_art/characters/rb04/$($c.id)/$($c.id).blend"
+    $glb = "game/assets/models/characters/$($c.id).glb"
+    Invoke-Blender 'source_art/scripts/char_build.py' @('--id', $c.id, '--blend', $blend, '--glb', $glb)
+    $info = Get-Content ([IO.Path]::ChangeExtension($blend, '.info.json')) -Raw | ConvertFrom-Json
+    $anims = [ordered]@{}
+    foreach ($p in $info.animations.PSObject.Properties | Sort-Object Name) { $anims[$p.Name] = [math]::Round(($p.Value[1] - $p.Value[0]) / 30.0, 3) }
+    $entries += [ordered]@{
+        id = $c.id; nome = $c.name; papel = $c.role; agente = 'art3d'
+        processo = [ordered]@{ script = 'source_art/scripts/char_build.py'; ferramenta = "Blender $bver (tools/blender.ps1, headless)"; exportador = 'glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA'; tecnicas = 'modificador SKIN + SUBSURF, bmesh, pesos por distancia ao osso, cinematica FK/IK em Python' }
+        origem = $charSrc + @($blend)
+        saida_glb = $glb
+        glb_sha256 = (Get-FileHash $glb -Algorithm SHA256).Hash.ToLower()
+        triangulos = $info.tris
+        materiais = $info.materials
+        objetos = $info.objects
+        ossos = $info.bones
+        quantidade_ossos = $info.bone_count
+        animacoes_duracao_s = $anims
+        shape_keys = $info.shape_keys
+        altura_m = $info.height_m
+        status = 'provisorio'
+        aprovacao = 'pendente (Thiago)'
+        originalidade = 'geometria procedural propria (primitivas bmesh, SKIN, SUBSURF); rig e animacoes autorais por script; nenhum modelo, malha, rig, mocap, textura ou personagem-base de terceiros'
+        data = (Get-Date -Format 'yyyy-MM-dd')
+        nota = $c.note
+    }
+}
+$manifest = [ordered]@{ projeto = 'Rota Brava'; ticket = 'RB-03-art + RB-04-chars'; ativos = $entries }
 $manifest | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $root 'source_art/manifest.json') -Encoding utf8
 Write-Host 'manifest: source_art/manifest.json atualizado'
 
 if ($Images) {
     $out = 'captures/rb-03/art'
     Invoke-Blender 'source_art/scripts/cast_silhouettes.py' @('--out', $out)
-    Invoke-Blender 'source_art/scripts/render_views.py' @('--asset', 'rastro', '--out', $out)
+    foreach ($c in $chars) {
+        Invoke-Blender 'source_art/scripts/char_render.py' @('--id', $c.id, '--mode', 'views', '--out', 'captures/rb-04/chars')
+        Invoke-Blender 'source_art/scripts/char_render.py' @('--id', $c.id, '--mode', 'expr', '--out', 'captures/rb-04/chars')
+        Invoke-Blender 'source_art/scripts/char_render.py' @('--id', $c.id, '--mode', 'mesh', '--rest', '--out', 'captures/rb-04/chars')
+        Invoke-Blender 'source_art/scripts/char_render.py' @('--id', $c.id, '--mode', 'extremes', '--out', 'captures/rb-04/chars')
+    }
     Invoke-Blender 'source_art/scripts/render_views.py' @('--asset', 'boat', '--out', $out)
 }
 Write-Host 'OK export-assets'
+
+
+
 
 
 

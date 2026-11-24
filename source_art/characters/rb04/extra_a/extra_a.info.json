@@ -1,0 +1,78 @@
+{
+  "tris": 11448,
+  "materials": [
+    "mat_extra_a_eye",
+    "mat_extra_a_hair",
+    "mat_extra_a_hat",
+    "mat_extra_a_iris",
+    "mat_extra_a_leather",
+    "mat_extra_a_pants",
+    "mat_extra_a_shirt",
+    "mat_extra_a_skin"
+  ],
+  "height_m": 1.2633,
+  "min_z": 0.0018,
+  "objects": [
+    "ExtraA_Body",
+    "ExtraA_BootL",
+    "ExtraA_BootR",
+    "ExtraA_Face",
+    "ExtraA_Hair",
+    "ExtraA_HandL",
+    "ExtraA_HandR",
+    "ExtraA_Hat",
+    "ExtraA_HatBand",
+    "ExtraA_Head",
+    "ExtraA_Pants",
+    "ExtraA_Shirt"
+  ],
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "hand_tip.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "hand_tip.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R",
+    "toe.R",
+    "toe_tip.R",
+    "heel.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "toe.L",
+    "toe_tip.L",
+    "heel.L"
+  ],
+  "bone_count": 28,
+  "animations": {
+    "idle": [
+      0,
+      72
+    ],
+    "walk": [
+      0,
+      30
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "blink"
+  ]
+}
