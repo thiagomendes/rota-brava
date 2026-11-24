@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://fx4rsq21w7up"
-path="res://.godot/imported/extra_c.glb-f418b47d46de78693b40ac7f8a260142.scn"
+uid="uid://c2ak0rpwsv52o"
+path="res://.godot/imported/villager_c.glb-e7a7c3e00c687072a9675dc28e11f202.scn"
 
 [deps]
 
-source_file="res://assets/models/characters/extra_c.glb"
-dest_files=["res://.godot/imported/extra_c.glb-f418b47d46de78693b40ac7f8a260142.scn"]
+source_file="res://assets/models/characters/villager_c.glb"
+dest_files=["res://.godot/imported/villager_c.glb-e7a7c3e00c687072a9675dc28e11f202.scn"]
 
 [params]
 

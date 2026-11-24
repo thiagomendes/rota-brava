@@ -169,11 +169,37 @@ def stage_face(var):
     hr.compose([paths[0:6], paths[6:12]], os.path.join(OUT, "rastro_rosto_%s.png" % var))
 
 
+def stage_lineup(ids, name, spacing=0.75, center_z=0.85, dist=7.5):
+    reset_scene()
+    sc = hr.eevee_scene(1400, 800)
+    n = len(ids)
+    roots = []
+    for i, cid in enumerate(ids):
+        if cid == "pup":
+            import pup_build
+            b = pup_build.build_pup(with_rig=False)
+        else:
+            b = hero_lib.build_hero(cid, "A", with_rig=False)
+        set_face(b, "alegre", 0.0)
+        hr.toonify(b.objs)
+        root = parent_all(b.objs, None, "Raiz_" + cid)
+        root.location.x = (i - (n - 1) / 2) * spacing
+        roots.append(root)
+    hr.camera(sc, (0, 0, center_z), dist, 4.0, 0.0, 70.0)
+    hr.render(sc, os.path.join(TMP, name + "_f.png"))
+    for r in roots:
+        r.rotation_euler = (0, 0, math.pi)
+    hr.render(sc, os.path.join(TMP, name + "_c.png"))
+    hr.compose([[os.path.join(TMP, name + "_f.png")], [os.path.join(TMP, name + "_c.png")]], os.path.join(OUT, name + ".png"))
+
+
 stage = arg_value("--stage", "abc")
-if stage == "face":
+if stage == "lineup":
+    stage_lineup(arg_value("--ids").split(","), arg_value("--name"), float(arg_value("--spacing", "0.75")),
+                 float(arg_value("--cz", "0.85")), float(arg_value("--dist", "7.5")))
+elif stage == "face":
     stage_face(arg_value("--variant", "C"))
-    raise SystemExit
-if stage == "abc":
+elif stage == "abc":
     stage_abc()
 else:
     stage_trio(arg_value("--variant", "C"))

@@ -31,7 +31,7 @@ func _ready() -> void:
 	_clip = _arg("--clip=", "idle")
 	_old = _flag("--old")
 	_build_world()
-	var ids := ["rastro_model", "leme_model", "pico_model", "extra_a", "extra_b", "extra_c"]
+	var ids := ["rastro_model", "leme_model", "pico_model", "villager_a", "villager_b", "villager_c", "captain_model", "pup_model"]
 	var count := ids.size() + (1 if _old else 0)
 	var x0 := -SPACING * (count - 1) * 0.5
 	var slot := 0

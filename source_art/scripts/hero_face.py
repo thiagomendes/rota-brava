@@ -20,12 +20,12 @@ import char_lib as cl
 
 N_MOUTH = 16   # pontos do contorno fechado da boca (8 em cima, 8 embaixo)
 
-BASE = dict(mouth="neutra", brow=(0.006, 0.004, 0.010), lid=0.0, bottom=False, eye=1.0, iris=1.0, gaze=(0.0, 0.0))
+BASE = dict(happy=False, mouth="neutra", brow=(0.006, 0.004, 0.010), lid=0.0, bottom=False, eye=1.0, iris=1.0, gaze=(0.0, 0.0))
 STATES = {
     "neutra": {},
     "atenta": dict(mouth="atenta", brow=(0.004, -0.006, 0.004), lid=0.10),
     "surpresa": dict(mouth="surpresa", brow=(0.020, 0.004, 0.012), eye=1.10, iris=0.85),
-    "alegre": dict(mouth="alegre", brow=(0.010, 0.004, 0.012), lid=0.40, bottom=True),
+    "alegre": dict(mouth="alegre", brow=(0.012, 0.004, 0.012), lid=1.0, happy=True),
     "triste": dict(mouth="triste", brow=(0.004, 0.016, -0.002), lid=0.22),
     "brava_leve": dict(mouth="brava", brow=(-0.002, -0.014, -0.002), lid=0.26),
     "blink": dict(lid=1.0),
@@ -248,7 +248,9 @@ def build_face(rig, name, mats, head_ob, hc, k=1.0, eye_x=0.068, eye_z=None, eye
                 for i in range(9):
                     t = (i - 4) / 4.0
                     x = c.x + t * ex * 1.04
-                    if st["bottom"] and h > 0:
+                    if st["happy"]:
+                        zt = c.z - 0.15 * ez + 0.50 * ez * (1 - t * t)
+                    elif st["bottom"] and h > 0:
                         zt = c.z + ez * math.sqrt(max(1 - t * t, 0.0)) * 0.98
                         zt = zt - (zt - c.z) * 0.15 * h
                     else:
@@ -295,15 +297,22 @@ def build_face(rig, name, mats, head_ob, hc, k=1.0, eye_x=0.068, eye_z=None, eye
                         cc = Vector((c.x - ex * 0.34 * fe + g.x * 0.5, 0, c.z - ez * 0.34 * fe + g.z * 0.5))
                         x, z = cc.x + u.x * 0.0050 * es, cc.z + u.z * 0.0050 * es
                         q = Vector((x, conform(x, z, 0.0034 * k, u.y, 0.0004 * k), z))
-                    else:  # lid
-                        h = st["lid"]
-                        if h < 0.005:
-                            x, z = c.x + u.x * ex * 0.5, c.z + u.z * 0.0001
-                            q = Vector((x, surf(x, z) - 0.03 * k, z))
+                    else:  # palpebra: sempre escondida; o fechamento e feito recortando o olho (sem casca translucida)
+                        x, z = c.x + u.x * ex * 0.5, c.z + u.z * 0.0001
+                        q = Vector((x, surf(x, z) - 0.03 * k, z))
+                    h = st["lid"]
+                    if kind != "lid" and h > 0.005:
+                        tt = max(-1.0, min(1.0, (q.x - c.x) / (ex * 1.04)))
+                        if st["bottom"]:
+                            zl = c.z - ez + 2.0 * ez * h * (1.0 - 0.35 * tt * tt)
+                            cov = q.z < zl
                         else:
-                            czz, rz = lid_profile(I, h, st["bottom"])
-                            x, z = c.x + u.x * ex * 1.10, czz + u.z * rz
-                            q = Vector((x, conform(x, z, 0.0042 * k, u.y, 0.001 * k), z))
+                            zt0 = c.z + ez * math.sqrt(max(1 - tt * tt, 0.0)) * 0.98
+                            zb = c.z - ez * 0.20 + 0.010 * k * tt * tt
+                            zl = zt0 + (zb - zt0) * h
+                            cov = q.z > zl or h >= 0.999
+                        if cov:
+                            q = Vector((q.x, surf(q.x, zl) - 0.03 * k, zl))
                     pos.append(q)
             for j, q in enumerate(pos):
                 out[p["start"] + j] = q

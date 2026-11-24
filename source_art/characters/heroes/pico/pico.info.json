@@ -1,0 +1,185 @@
+{
+  "tris": 19752,
+  "materials": [
+    "mat_pico_boca",
+    "mat_pico_botas",
+    "mat_pico_cabelo",
+    "mat_pico_calca",
+    "mat_pico_chapeu",
+    "mat_pico_corda",
+    "mat_pico_couro",
+    "mat_pico_creme",
+    "mat_pico_emblema",
+    "mat_pico_escuro",
+    "mat_pico_iris",
+    "mat_pico_luz",
+    "mat_pico_metal",
+    "mat_pico_olhos",
+    "mat_pico_ouro",
+    "mat_pico_pele",
+    "mat_pico_rubor",
+    "mat_pico_uniforme"
+  ],
+  "height_m": 1.0738,
+  "min_z": 0.0,
+  "head_h_m": 0.4011,
+  "head_ratio": 0.3735,
+  "eye_h_ratio": 0.3056,
+  "objects": [
+    "Pico_Belt",
+    "Pico_Blush",
+    "Pico_BootL",
+    "Pico_BootR",
+    "Pico_Buckle",
+    "Pico_Carabiners",
+    "Pico_Collar",
+    "Pico_CuffL",
+    "Pico_CuffR",
+    "Pico_Emblem",
+    "Pico_EmblemBand",
+    "Pico_EmblemStar",
+    "Pico_Face",
+    "Pico_Hair",
+    "Pico_HandL",
+    "Pico_HandR",
+    "Pico_Hat",
+    "Pico_HatBand",
+    "Pico_Head",
+    "Pico_Jacket",
+    "Pico_Lamp",
+    "Pico_LampLight",
+    "Pico_Neck",
+    "Pico_Nose",
+    "Pico_Pants",
+    "Pico_RopeCoil",
+    "Pico_SoleL",
+    "Pico_SoleR"
+  ],
+  "tris_por_objeto": {
+    "Pico_Head": 1552,
+    "Pico_Nose": 196,
+    "Pico_Blush": 160,
+    "Pico_Hair": 2748,
+    "Pico_Hat": 480,
+    "Pico_HatBand": 532,
+    "Pico_Lamp": 120,
+    "Pico_LampLight": 140,
+    "Pico_Neck": 80,
+    "Pico_HandR": 1600,
+    "Pico_HandL": 1600,
+    "Pico_Jacket": 1952,
+    "Pico_Pants": 960,
+    "Pico_BootR": 448,
+    "Pico_SoleR": 236,
+    "Pico_BootL": 448,
+    "Pico_SoleL": 236,
+    "Pico_Collar": 652,
+    "Pico_CuffR": 240,
+    "Pico_CuffL": 240,
+    "Pico_Belt": 280,
+    "Pico_Buckle": 172,
+    "Pico_Emblem": 140,
+    "Pico_EmblemStar": 28,
+    "Pico_EmblemBand": 68,
+    "Pico_RopeCoil": 1596,
+    "Pico_Carabiners": 480,
+    "Pico_Face": 2368
+  },
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "hand_tip.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "hand_tip.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R",
+    "toe.R",
+    "toe_tip.R",
+    "heel.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "toe.L",
+    "toe_tip.L",
+    "heel.L"
+  ],
+  "bone_count": 28,
+  "animations": {
+    "celebrate": [
+      0,
+      36
+    ],
+    "idle": [
+      0,
+      108
+    ],
+    "jump": [
+      0,
+      30
+    ],
+    "look_up": [
+      0,
+      60
+    ],
+    "pull_rope": [
+      0,
+      48
+    ],
+    "react_surprise": [
+      0,
+      27
+    ],
+    "run": [
+      0,
+      18
+    ],
+    "stop": [
+      0,
+      15
+    ],
+    "team_pose": [
+      0,
+      45
+    ],
+    "walk": [
+      0,
+      30
+    ],
+    "wave": [
+      0,
+      48
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "triste",
+    "brava_leve",
+    "blink",
+    "mouth_A",
+    "mouth_E",
+    "mouth_O",
+    "mouth_M",
+    "look_left",
+    "look_right",
+    "look_up"
+  ],
+  "walk_speed_mps": 0.4281,
+  "run_speed_mps": 0.9095,
+  "variant": "A"
+}

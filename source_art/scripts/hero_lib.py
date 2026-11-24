@@ -24,6 +24,9 @@ VARIANTS = {
     #       cabeca(m)  perna(quadril z) tronco  barriga  ombro_x  membro   mao   bota  olho
     "A": dict(head=0.420, leg=0.320, torso=0.255, belly=0.150, sh_x=0.118, limb=0.044, hand=1.18, boot=1.16, eye=1.10, layers=False, label="brinquedo brilhante"),
     "B": dict(head=0.380, leg=0.345, torso=0.290, belly=0.124, sh_x=0.132, limb=0.036, hand=1.00, boot=1.00, eye=0.96, layers=True, label="aventura"),
+    # adultos da vila e o piloto resgatado: mesma familia de formas, proporcao adulta estilizada (cabeca ~22% da altura)
+    "AD": dict(head=0.460, leg=0.660, torso=0.500, belly=0.210, sh_x=0.190, limb=0.056, hand=1.55, boot=1.35, eye=0.90, layers=False, label="adulto"),
+    "EL": dict(head=0.460, leg=0.600, torso=0.480, belly=0.230, sh_x=0.185, limb=0.056, hand=1.50, boot=1.30, eye=0.85, layers=False, label="idoso"),
     "C": dict(head=0.395, leg=0.350, torso=0.272, belly=0.138, sh_x=0.124, limb=0.040, hand=1.10, boot=1.08, eye=1.04, layers=False, label="meio-termo"),
 }
 
@@ -32,21 +35,40 @@ CAST = {
                    pal=dict(pele="#C98B60", cabelo="#3A2419", iris="#8A5426", uniforme="#FF8A1F", creme="#FFF1D6",
                             calca="#2E4A70", botas="#7A4529", chapeu="#F6C877", couro="#94592F", emblema="#123A5E",
                             ouro="#FFC83D", olhos="#FFFFFF", escuro="#2A1A14", boca="#9C3341", rubor="#F08A7A", vidro="#BFEFFF")),
-    "pico": dict(display="Pico", K=0.955, hat="helmet", hair="tufts", gear=("rope", "carabiners"), gloves=True,
+    "pico": dict(display="Pico", K=0.955, hat="helmet", hair="tufts", gear=("rope_back", "carabiners"), gloves=True,
                  pal=dict(pele="#F3C9A2", cabelo="#D8612A", iris="#2F7FC9", uniforme="#3DBE5A", creme="#FFD23F",
                           calca="#35506B", botas="#5B3A26", chapeu="#3DBE5A", couro="#2B7F46", emblema="#123A5E",
                           ouro="#FFC83D", olhos="#FFFFFF", escuro="#3A1E12", boca="#A63A3F", rubor="#F49A8A", metal="#D6DEE6",
                           corda="#FFD23F", luz="#FFF6B0")),
-    "leme": dict(display="Leme", K=1.04, hat="cap", hair="curls", gear=("lifevest", "compass"), gloves=False,
+    "leme": dict(display="Leme", K=1.04, head_k=0.96, hat="cap", hair="curls", gear=("lifevest", "compass"), gloves=False,
                  pal=dict(pele="#7A4A2E", cabelo="#18110E", iris="#5A3418", uniforme="#2F8CFF", creme="#F7FBFF",
                           calca="#22416B", botas="#3E2A20", chapeu="#F7FBFF", couro="#123A5E", emblema="#123A5E",
-                          ouro="#FFC83D", olhos="#FFFFFF", escuro="#120B08", boca="#8E2F38", rubor="#C9705E", refletivo="#E3ECF2",
+                          ouro="#FFC83D", olhos="#FFFFFF", escuro="#120B08", boca="#8E2F38", rubor="#C9705E", refletivo="#9FB3C2",
                           colete="#F7FBFF")),
+    "captain": dict(display="Captain", K=1.0, variant="AD", hat="captain", hair="short", beard=True, team=False, gear=("buttons",), gloves=False,
+                    pal=dict(pele="#E9B48E", cabelo="#9AA0AA", iris="#3A6E8A", uniforme="#2B4C7E", creme="#F7FBFF", calca="#263A5A",
+                             botas="#3A2A22", chapeu="#F7FBFF", couro="#1C2B47", emblema="#123A5E", ouro="#FFC83D", olhos="#FFFFFF",
+                             escuro="#2A2228", boca="#A0404A", rubor="#F0907E")),
+    "villager_a": dict(display="VillagerA", K=0.94, variant="AD", hat="none", hair="bun", team=False, gear=(), gloves=False,
+                       pal=dict(pele="#D9A27A", cabelo="#5A3A28", iris="#5A7A3A", uniforme="#BDEBD3", creme="#FFF0A8", calca="#7FA7C9",
+                                botas="#8A5A3A", chapeu="#FFC6D3", couro="#B07A52", emblema="#123A5E", ouro="#FFC83D", olhos="#FFFFFF",
+                                escuro="#2A1A14", boca="#A0404A", rubor="#F0907E")),
+    "villager_b": dict(display="VillagerB", K=1.0, variant="EL", hat="none", hair="short", beard=True, team=False, gear=(), gloves=False,
+                       pal=dict(pele="#F0C9A8", cabelo="#E4E4E8", iris="#4A6A8A", uniforme="#FFC9A3", creme="#FFF1D6", calca="#8C7A6B",
+                                botas="#5A4636", chapeu="#BFE3FF", couro="#7A5A44", emblema="#123A5E", ouro="#FFC83D", olhos="#FFFFFF",
+                                escuro="#2A2228", boca="#A0404A", rubor="#F0907E")),
+    "villager_c": dict(display="VillagerC", K=0.90, variant="A", hat="none", hair="curls", team=False, gear=(), gloves=False,
+                       pal=dict(pele="#8D5A3B", cabelo="#24160F", iris="#4A2E18", uniforme="#FFC6D3", creme="#BFE3FF", calca="#3A7BD5",
+                                botas="#D8693F", chapeu="#FFF0A8", couro="#9A6A44", emblema="#123A5E", ouro="#FFC83D", olhos="#FFFFFF",
+                                escuro="#1A0F0A", boca="#8E2F38", rubor="#C9705E")),
 }
 
 
 def V(*a):
     return Vector(a)
+
+
+EMISSION = {"olhos": 0.55, "iris": 0.35, "escuro": 0.0, "boca": 0.10, "luz": 1.5, "vidro": 0.5}
 
 
 class Frame:
@@ -295,13 +317,24 @@ class Builder:
     def __init__(self, cid, variant):
         self.cid = cid
         self.cfg = CAST[cid]
-        self.v = VARIANTS[variant]
+        base = VARIANTS[self.cfg.get("variant", variant)]
+        K = self.cfg["K"]
+        self.v = dict(base)
+        for key in ("head", "leg", "torso", "belly", "sh_x", "limb", "hand", "boot"):
+            self.v[key] = base[key] * K
+        self.v["head"] *= self.cfg.get("head_k", 1.0)
         self.F = Frame(self.v)
+        self.lk = self.v["limb"] / 0.040        # espessura relativa dos membros (adultos mais grossos)
         self.S = self.cfg["display"]
         self.M = {}
         rough = dict(olhos=0.15, iris=0.25, vidro=0.05, metal=0.3)
         for role, col in self.cfg["pal"].items():
-            self.M[role] = mat("mat_%s_%s" % (cid, role), col, rough.get(role, 0.75))
+            m = mat("mat_%s_%s" % (cid, role), col, rough.get(role, 0.75))
+            # brilho proprio leve: o sombreador toon do jogo (game/art/stylized.gdshader) escurece os personagens
+            bsdf = m.node_tree.nodes["Principled BSDF"]
+            bsdf.inputs["Emission Color"].default_value = m.diffuse_color
+            bsdf.inputs["Emission Strength"].default_value = EMISSION.get(role, 0.20)
+            self.M[role] = m
         self.parts = []     # (ob, modo, osso)  modo: dist | single | xfer:<parte>
 
     def reg(self, ob, mode="dist", bone=None):
@@ -360,7 +393,8 @@ class Builder:
             x = bx * k
             z = hc.z + bz * k
             E.append(("ELLIPSOID", (x, hc.y + hr[1] * 0.68, z), 1.0, (bs * k, 0.040 * k, 0.034 * k), False))
-        E.append(("ELLIPSOID", (hc.x, hc.y + hr[1] * 0.25, hc.z - 0.20 * k), 1.0, (hr[0] * 1.3, hr[1] * 0.75, 0.13 * k), True))  # rosto livre
+        if not self.cfg.get("beard"):
+            E.append(("ELLIPSOID", (hc.x, hc.y + hr[1] * 0.25, hc.z - 0.20 * k), 1.0, (hr[0] * 1.3, hr[1] * 0.75, 0.13 * k), True))  # rosto livre
         if kind == "pigtails":
             for sx in (1, -1):
                 E.append(("BALL", (sx * (hr[0] + 0.045 * k), hc.y - 0.045 * k, hc.z - 0.030 * k), 0.058 * k, None, False))
@@ -371,18 +405,28 @@ class Builder:
             for sx in (1, -1):
                 E.append(("BALL", (sx * hr[0] * 0.95, hc.y - 0.02 * k, hc.z - 0.02 * k), 0.050 * k, None, False))
             E.append(("ELLIPSOID", (0, hc.y - hr[1] * 0.6, hc.z - 0.05 * k), 1.0, (hr[0] * 0.8, 0.06 * k, 0.10 * k), False))
+        elif kind == "bun":
+            E.append(("BALL", (0, hc.y - hr[1] * 0.55, hc.z + hr[2] * 0.75), 0.075 * k, None, False))
+            E.append(("ELLIPSOID", (0, hc.y - hr[1] * 0.5, hc.z - 0.02 * k), 1.0, (hr[0] * 0.85, 0.08 * k, 0.14 * k), False))
+        elif kind == "short":
+            pass
         elif kind == "curls":
             for i in range(9):
                 a = -math.pi * 0.85 + i * math.pi * 1.7 / 8
                 E.append(("BALL", (math.sin(a) * hr[0] * 0.92, hc.y + math.cos(a) * hr[1] * 0.75 - 0.03 * k, hc.z + 0.10 * k), 0.058 * k, None, False))
             for sx in (1, -1):
                 E.append(("BALL", (sx * hr[0] * 0.92, hc.y - 0.03 * k, hc.z + 0.0), 0.055 * k, None, False))
-        ob = metaball_obj(self.name("Hair"), E, self.M["cabelo"], res=0.020 * k, thresh=0.6)
+        if self.cfg.get("beard"):
+            # bigode e barba arredondados (adultos)
+            E.append(("ELLIPSOID", (0, hc.y + hr[1] * 0.84, hc.z - 0.088 * k), 1.0, (0.058 * k, 0.022 * k, 0.016 * k), False))
+            E.append(("ELLIPSOID", (0, hc.y + hr[1] * 0.50, hc.z - 0.205 * k), 1.0, (0.120 * k, 0.090 * k, 0.058 * k), False))
+        ob = metaball_obj(self.name("Hair"), E, self.M["cabelo"], res=(0.026 if kind == "curls" else 0.020) * k, thresh=0.6)
         # remove o que invade o rosto (mantem franja acima das sobrancelhas)
         bm = bmesh.new()
         bm.from_mesh(ob.data)
         brow_top = hc.z + 0.062 * k
-        kill = [v for v in bm.verts if (v.co.y > hc.y + hr[1] * 0.35 and v.co.z < brow_top and abs(v.co.x) < hr[0] * 0.80)
+        kill = [v for v in bm.verts if (v.co.y > hc.y + hr[1] * 0.35 and v.co.z < brow_top and abs(v.co.x) < hr[0] * 0.80
+                                        and not (self.cfg.get("beard") and v.co.z < hc.z - 0.085 * k))
                 or (self.cfg["hat"] != "none" and v.co.y > hc.y + hr[1] * 0.45 and abs(v.co.x) < hr[0] * 0.70)]
         bmesh.ops.delete(bm, geom=kill, context="VERTS")
         bm.to_mesh(ob.data)
@@ -404,6 +448,10 @@ class Builder:
         M = self.M
         out = []
         top = hc.z + hr[2]
+        if kind == "none":
+            return out
+        if kind == "captain":
+            kind = "cap"
         if kind == "wide":
             R = hr[0] * 1.02
             prof = [(0.0, 0.150), (0.07, 0.147), (0.118, 0.130), (0.146, 0.092), (0.153, 0.040), (0.154, 0.010), (0.19, 0.006),
@@ -515,7 +563,7 @@ class Builder:
         F, v, M = self.F, self.v, self.M
         hz, nz, b, L = F.hz, F.nz, v["belly"], v["limb"]
         # pescoco (pele)
-        nodes = [((0, 0.004, nz - 0.03), 0.040), ((0, 0.006, F.chin + 0.04), 0.036)]
+        nodes = [((0, 0.004, nz - 0.03), 0.040 * self.lk), ((0, 0.006, F.chin + 0.04), 0.036 * self.lk)]
         neck = cl.skin_obj(self.name("Neck"), nodes, [(0, 1)], M["pele"], levels=1)
         self.reg(neck, "dist")
         # maos com 4 dedos (polegar + 3), grandes e redondas
@@ -568,8 +616,9 @@ class Builder:
         edges = []
         for sx in (1, -1):
             i0 = len(nodes)
-            nodes += [((sx * F.hip_x, 0, hz - 0.05), 0.072), ((sx * F.hip_x, 0.006, F.knee_z), 0.058),
-                      ((sx * F.hip_x, 0.0, F.ankle_z + 0.06), 0.052)]
+            lk = self.lk ** 0.8
+            nodes += [((sx * F.hip_x, 0, hz - 0.05), 0.072 * lk), ((sx * F.hip_x, 0.006, F.knee_z), 0.058 * lk),
+                      ((sx * F.hip_x, 0.0, F.ankle_z + 0.06), 0.052 * lk)]
             edges += [(0, i0), (i0, i0 + 1), (i0 + 1, i0 + 2)]
         self.reg(cl.skin_obj(self.name("Pants"), nodes, edges, M["calca"], levels=2, scale=(1, 0.92, 1)), "dist")
         # botas grandes com sola clara
@@ -661,9 +710,11 @@ class Builder:
         cl.transform_bm(bm, Matrix.Translation((0, by - 0.006, bz)) @ cl.Matrix.Rotation(math.radians(-90), 4, "X"))
         prism(bm, star4(0.018, 0.006), 0.004, (0, by + 0.003, bz))
         self.reg(new_object(self.name("Buckle"), bm, M["ouro"]), "single", "hips")
+        if not self.cfg.get("team", True):
+            return
         # emblema: escudo-gota azul-marinho + rosa dos ventos amarela + faixa curva branca (peito ESQUERDO = -X)
         ex, ez = -0.060, nz - 0.100
-        ey = (cl.snap_y(jk, ex, ez) or 0.1) + (0.040 if "lifevest" in self.cfg["gear"] else 0.0)
+        ey = (cl.snap_y(jk, ex, ez) or 0.1) + (0.033 if "lifevest" in self.cfg["gear"] else 0.0)
         nrm_t = V(-0.35, 1.0, 0.1).normalized()
         q = nrm_t.to_track_quat("Y", "Z").to_matrix().to_4x4()
         T = Matrix.Translation((ex, ey - 0.002, ez)) @ q
@@ -744,6 +795,40 @@ class Builder:
             bm = bmesh.new()
             cl.ellipsoid(bm, (lx - 0.006, 0.040, hz - 0.095), (0.004, 0.027, 0.027), 12, 6)
             self.reg(new_object(self.name("LupaGlass"), bm, M["vidro"]), "single", "hips")
+        if "rope_back" in g:
+            # rolo de corda NAS COSTAS (tres voltas grossas) preso por uma alca que desce do ombro DIREITO ao quadril esquerdo,
+            # passando a direita do emblema (peito esquerdo) sem tapa-lo
+            from mathutils.bvhtree import BVHTree
+            bvh = BVHTree.FromObject(jk, bpy.context.evaluated_depsgraph_get())
+            back_hit = bvh.ray_cast(V(0, -1.0, (hz + nz) * 0.5), V(0, 1, 0))[0]
+            by = (back_hit.y if back_hit else -b) - 0.040
+            bm = bmesh.new()
+            for i in range(3):
+                tb = bmesh.new()
+                cl.torus_z(tb, (0.080 + 0.010 * (i % 2)) * self.lk, 0.022, 0.0, major=28, minor=8)
+                cl.transform_bm(tb, Matrix.Translation((0.006 * (i - 1), by - 0.026 * i, (hz + nz) * 0.5 + 0.02 - 0.008 * i)) @ cl.Matrix.Rotation(math.radians(90 + 6 * (i - 1)), 4, "X"))
+                join_bm(bm, tb)
+            pts, back = [], []
+            for i in range(9):
+                u = i / 8
+                x = 0.085 * (1 - u) + (-b * 0.92) * u
+                z = (nz - 0.012) * (1 - u) + (hz + 0.02) * u
+                yy = cl.snap_y(jk, x, z)
+                pts.append((x, (yy if yy is not None else 0.09) + 0.010, z))
+                hit = bvh.ray_cast(V(x, -1.0, z), V(0, 1, 0))[0]
+                back.append((x, (hit.y if hit else -0.09) - 0.010, z))
+            cl.tube(bm, pts, 0.013, 6, True)
+            cl.tube(bm, back, 0.013, 6, True)
+            cl.tube(bm, [pts[0], (0.09, 0.0, nz + 0.012), back[0]], 0.013, 6, True)
+            self.reg(new_object(self.name("RopeCoil"), bm, M["corda"]), "torso")
+        if "buttons" in g:
+            bm = bmesh.new()
+            for z in (nz - 0.08, nz - 0.18, nz - 0.28, nz - 0.38):
+                for sx in (1, -1):
+                    x = sx * 0.05
+                    y = (cl.snap_y(jk, x, z) or 0.15) + 0.004
+                    cl.ellipsoid(bm, (x, y, z), (0.014, 0.006, 0.014), 10, 6)
+            self.reg(new_object(self.name("Buttons"), bm, M["ouro"]), "torso")
         if "rope" in g:
             bm = bmesh.new()
             # rolo de corda a tiracolo: tres voltas grossas em torno do tronco (ombro direito -> quadril esquerdo)
@@ -785,7 +870,7 @@ class Builder:
             bmv = bmesh.new()
             bmv.from_mesh(jk.data)
             cx = b * 0.97
-            for co, no, keep in (((0, 0, hz - 0.04), (0, 0, 1), True), ((0, 0, nz - 0.035), (0, 0, 1), False),
+            for co, no, keep in (((0, 0, hz - 0.04), (0, 0, 1), True), ((0, 0, nz - 0.055), (0, 0, 1), False),
                                  ((cx, 0, 0), (1, 0, 0), False), ((-cx, 0, 0), (1, 0, 0), True)):
                 bisect_keep(bmv, co, no, keep_above=keep)
             bmv.normal_update()
@@ -793,20 +878,45 @@ class Builder:
             kill = [f for f in bmv.faces if f.normal.dot(Vector((f.calc_center_median().x, f.calc_center_median().y, 0.0))) < 0]
             bmesh.ops.delete(bmv, geom=kill, context="FACES")
             for vtx in bmv.verts:
-                vtx.co += vtx.normal * 0.022
+                vtx.co += vtx.normal * 0.030
             vest = new_object(self.name("LifeVest"), bmv, M["colete"], recalc=False)
             s_ = vest.modifiers.new("sol", "SOLIDIFY")
             s_.thickness = 0.018
             s_.offset = -1
             bake(vest)
             self.reg(vest, "torso")
+            from mathutils.bvhtree import BVHTree
+            vbvh = BVHTree.FromObject(vest, bpy.context.evaluated_depsgraph_get())
             bm = bmesh.new()
-            for z in (hz + 0.04, hz + 0.11):
-                rx, ry = self.jacket_radius(z)
-                tb = bmesh.new()
-                cl.torus_z(tb, rx + 0.031, 0.010, z, sy=(ry + 0.031) / (rx + 0.031), major=36, minor=6)
-                join_bm(bm, tb)
+            for z in (hz + 0.035, hz + 0.115):
+                for side in (1, -1):        # faixa na frente e nas costas, colada a superficie do colete
+                    pts = []
+                    for i in range(13):
+                        x = (-0.86 + 1.72 * i / 12) * b
+                        hit = vbvh.ray_cast(V(x, side * 1.0, z), V(0, -side, 0))[0]
+                        if hit is not None:
+                            pts.append((x, hit.y + side * 0.004, z))
+                    if len(pts) > 3:
+                        cl.tube(bm, pts, 0.011, 6, True)
             self.reg(new_object(self.name("Reflective"), bm, M["refletivo"]), "torso")
+            # bolsos frontais, gola de espuma e fecho central (volume de colete salva-vidas)
+            bm = bmesh.new()
+            for sx in (1, -1):
+                x, z = sx * 0.072, hz + 0.075
+                y = (cl.snap_y(vest, x, z) or 0.14)
+                cl.rounded_box(bm, (x, y + 0.004, z), (0.070, 0.026, 0.060), 0.010)
+            tb = bmesh.new()
+            cl.torus_z(tb, 0.078 * self.lk, 0.024, nz - 0.020, sy=0.92, major=20, minor=6)
+            join_bm(bm, tb)
+            self.reg(new_object(self.name("VestPockets"), bm, M["colete"]), "torso")
+            bm = bmesh.new()
+            for sx in (1, -1):
+                x, z = sx * 0.072, hz + 0.105
+                y = (cl.snap_y(vest, x, z) or 0.14)
+                cl.rounded_box(bm, (x, y + 0.016, z), (0.060, 0.008, 0.012), 0.003)
+            pts = [(0.0, (cl.snap_y(vest, 0.0, zz) or 0.14) + 0.004, zz) for zz in (nz - 0.05, hz + 0.15, hz + 0.03)]
+            cl.tube(bm, pts, 0.008, 6, True)
+            self.reg(new_object(self.name("VestStraps"), bm, M["couro"]), "torso")
         if "compass" in g:
             el = V(-F.elbow.x, F.elbow.y, F.elbow.z)
             W = V(-F.wrist.x, F.wrist.y, F.wrist.z)
@@ -832,7 +942,7 @@ class Builder:
 
     # ---- montagem
     def build(self, with_rig=True):
-        K = self.cfg["K"]
+        K = 1.0   # o K do personagem ja foi aplicado as proporcoes (Frame)
         self.head()
         self.hair()
         self.hat()

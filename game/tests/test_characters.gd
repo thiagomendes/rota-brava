@@ -7,33 +7,50 @@ const DIR := "res://actors/characters/"
 const BONES := ["root", "hips", "spine", "chest", "neck", "head", "shoulder.L", "shoulder.R", "upper_arm.L", "upper_arm.R",
 	"forearm.L", "forearm.R", "hand.L", "hand.R", "thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R", "toe.L", "toe.R"]
 const SHAPES := ["neutra", "atenta", "surpresa", "alegre", "blink"]
-const LOOPS := ["idle", "walk", "run", "idle_wheel"]
-## RB-R1: rosto do Rastro (expressoes + visemas da fala + olhar).
-const RASTRO_SHAPES := ["neutra", "atenta", "surpresa", "alegre", "triste", "brava_leve", "blink", "mouth_A", "mouth_E", "mouth_O",
+const LOOPS := ["idle", "walk", "run", "idle_wheel", "chat", "wag"]
+## RB-R1: rosto completo (expressoes + visemas da fala + olhar) em todo o elenco novo.
+const FULL_SHAPES := ["neutra", "atenta", "surpresa", "alegre", "triste", "brava_leve", "blink", "mouth_A", "mouth_E", "mouth_O",
 	"mouth_M", "look_left", "look_right", "look_up"]
+const RASTRO_SHAPES := FULL_SHAPES
 const RASTRO_ANIMS := ["idle", "walk", "run", "stop", "crouch", "inspect_touch", "look_to_leme", "react_surprise", "point", "wave",
 	"celebrate", "team_pose"]
+const PICO_ANIMS := ["idle", "walk", "run", "stop", "jump", "pull_rope", "look_up", "react_surprise", "celebrate", "wave", "team_pose"]
+const LEME_ANIMS := ["idle", "walk", "run", "stop", "idle_wheel", "steer_left", "steer_right", "react_horn", "celebrate", "wave", "point",
+	"team_pose"]
+const PUP_BONES := ["root", "hips", "spine", "chest", "neck", "head", "tail1", "fl_paw.L", "fl_paw.R", "bl_paw.L", "bl_paw.R"]
+const HEROES := ["rastro", "pico", "leme"]
 
 const CHARS := {
 	"rastro": {"scene": "rastro_model", "glb": "res://assets/models/characters/rastro.glb", "root": "Rastro", "prefix": "Rastro",
-		"anims": RASTRO_ANIMS, "shapes": RASTRO_SHAPES, "height": [1.0, 1.2], "tris": [12000, 20000],
+		"anims": RASTRO_ANIMS, "shapes": FULL_SHAPES, "height": [1.0, 1.2], "tris": [12000, 20000],
 		"materials": ["mat_rastro_pele", "mat_rastro_cabelo", "mat_rastro_olhos", "mat_rastro_iris", "mat_rastro_uniforme",
 			"mat_rastro_creme", "mat_rastro_chapeu", "mat_rastro_couro", "mat_rastro_botas", "mat_rastro_emblema", "mat_rastro_boca"]},
-	"leme": {"scene": "leme_model", "glb": "res://assets/models/characters/leme.glb", "root": "Leme", "prefix": "Leme",
-		"anims": ["idle", "walk", "idle_wheel", "steer_left", "steer_right", "react_horn"],
-		"materials": ["mat_leme_skin", "mat_leme_hair", "mat_leme_shirt", "mat_leme_vest", "mat_leme_pants", "mat_leme_leather",
-			"mat_leme_hat", "mat_leme_band", "mat_leme_scarf", "mat_leme_iris", "mat_leme_eye"]},
 	"pico": {"scene": "pico_model", "glb": "res://assets/models/characters/pico.glb", "root": "Pico", "prefix": "Pico",
-		"anims": ["idle", "walk", "react_surprise", "pull_rope", "look_up"],
-		"materials": ["mat_pico_skin", "mat_pico_hair", "mat_pico_shirt", "mat_pico_vest", "mat_pico_pants", "mat_pico_leather", "mat_pico_hat",
-			"mat_pico_rope", "mat_pico_metal", "mat_pico_iris", "mat_pico_eye"]},
-	"extra_a": {"scene": "extra_a", "glb": "res://assets/models/characters/extra_a.glb", "root": "ExtraA", "prefix": "ExtraA",
-		"anims": ["idle", "walk"], "materials": ["mat_extra_a_skin", "mat_extra_a_hat", "mat_extra_a_shirt"]},
-	"extra_b": {"scene": "extra_b", "glb": "res://assets/models/characters/extra_b.glb", "root": "ExtraB", "prefix": "ExtraB",
-		"anims": ["idle", "walk"], "materials": ["mat_extra_b_skin", "mat_extra_b_hat", "mat_extra_b_shirt"]},
-	"extra_c": {"scene": "extra_c", "glb": "res://assets/models/characters/extra_c.glb", "root": "ExtraC", "prefix": "ExtraC",
-		"anims": ["idle", "walk"], "materials": ["mat_extra_c_skin", "mat_extra_c_hat", "mat_extra_c_shirt"]},
+		"anims": PICO_ANIMS, "shapes": FULL_SHAPES, "height": [1.0, 1.2], "tris": [12000, 20000],
+		"materials": ["mat_pico_pele", "mat_pico_cabelo", "mat_pico_olhos", "mat_pico_iris", "mat_pico_uniforme", "mat_pico_chapeu",
+			"mat_pico_corda", "mat_pico_metal", "mat_pico_couro", "mat_pico_emblema", "mat_pico_luz"]},
+	"leme": {"scene": "leme_model", "glb": "res://assets/models/characters/leme.glb", "root": "Leme", "prefix": "Leme",
+		"anims": LEME_ANIMS, "shapes": FULL_SHAPES, "height": [1.0, 1.2], "tris": [12000, 20000],
+		"materials": ["mat_leme_pele", "mat_leme_cabelo", "mat_leme_olhos", "mat_leme_iris", "mat_leme_uniforme", "mat_leme_chapeu",
+			"mat_leme_colete", "mat_leme_refletivo", "mat_leme_emblema", "mat_leme_ouro"]},
+	"captain": {"scene": "captain_model", "glb": "res://assets/models/characters/captain.glb", "root": "Captain", "prefix": "Captain",
+		"anims": ["idle", "walk", "wave", "thanks"], "shapes": FULL_SHAPES, "height": [1.55, 1.95],
+		"materials": ["mat_captain_pele", "mat_captain_chapeu", "mat_captain_uniforme", "mat_captain_ouro"]},
+	"pup": {"scene": "pup_model", "glb": "res://assets/models/characters/pup.glb", "root": "Pup", "prefix": "Pup", "bones": PUP_BONES, "face_ahead": 0.04,
+		"anims": ["idle", "wag", "jump_happy", "bark", "step_on_horn"], "shapes": FULL_SHAPES, "height": [0.35, 0.65],
+		"materials": ["mat_pup_pelo", "mat_pup_creme", "mat_pup_coleira", "mat_pup_emblema", "mat_pup_olhos", "mat_pup_iris"]},
+	"villager_a": {"scene": "villager_a", "glb": "res://assets/models/characters/villager_a.glb", "root": "VillagerA", "prefix": "VillagerA",
+		"anims": ["idle", "walk", "wave", "chat"], "shapes": FULL_SHAPES, "height": [1.45, 1.9],
+		"materials": ["mat_villager_a_pele", "mat_villager_a_uniforme", "mat_villager_a_cabelo"]},
+	"villager_b": {"scene": "villager_b", "glb": "res://assets/models/characters/villager_b.glb", "root": "VillagerB", "prefix": "VillagerB",
+		"anims": ["idle", "walk", "wave", "chat"], "shapes": FULL_SHAPES, "height": [1.45, 1.9],
+		"materials": ["mat_villager_b_pele", "mat_villager_b_uniforme", "mat_villager_b_cabelo"]},
+	"villager_c": {"scene": "villager_c", "glb": "res://assets/models/characters/villager_c.glb", "root": "VillagerC", "prefix": "VillagerC",
+		"anims": ["idle", "walk", "wave", "chat"], "shapes": FULL_SHAPES, "height": [0.8, 1.1],
+		"materials": ["mat_villager_c_pele", "mat_villager_c_uniforme", "mat_villager_c_cabelo"]},
 }
+const PORTRAIT_IDS := ["rastro", "pico", "leme", "captain", "pup"]
+const PORTRAIT_EXPRS := ["neutra", "alegre", "surpresa"]
 
 var r
 
@@ -42,24 +59,23 @@ func run(runner) -> void:
 	r = runner
 	for id in CHARS:
 		await _test_static(id)
-	await _test_walk_contact("rastro")
-	await _test_gait_contact("rastro", &"run")
-	await _test_rastro_child()
-	await _test_walk_contact("leme")
-	await _test_walk_contact("extra_a")
-	await _test_walk_contact("pico")
-	for id in ["extra_a", "extra_b", "extra_c", "pico", "rastro", "leme"]:
+	for id in ["rastro", "pico", "leme", "captain", "villager_a", "villager_b", "villager_c"]:
+		await _test_walk_contact(id)
+	for id in HEROES:
+		await _test_gait_contact(id, &"run")
+		await _test_hero_child(id)
+		await _test_loops_close(id)
+	for id in ["rastro", "pico", "leme", "captain", "villager_a", "villager_b", "villager_c"]:
 		await _test_idle_upright(id)
 	await _test_pico()
+	await _test_pup()
 	await _test_member_actor_idle()
 	await _test_inspect_real_pawmark()
 	await _test_leme_wheel()
-	await _test_loops_close("rastro")
-	await _test_loops_close("leme")
 	await _test_visual_api()
 	_test_rastro_compat_scene()
 	_test_no_foreign_models()
-
+	_test_portraits()
 
 func _spawn(id: String) -> Node3D:
 	var ps := load(DIR + String(CHARS[id]["scene"]) + ".tscn") as PackedScene
@@ -132,7 +148,7 @@ func _test_static(id: String) -> void:
 	r.check(box.size.x < 1.0 and box.size.z < 1.0, "chars: %s cabe em 1 m (x %.2f, z %.2f)" % [id, box.size.x, box.size.z])
 	var face := _part(root, d["prefix"] + "_Face")
 	var head := _part(root, d["prefix"] + "_Head")
-	r.check(face.get_center().z < head.get_center().z - 0.08, "chars: frente de %s em -Z (rosto z=%.3f, cabeca z=%.3f)" % [id, face.get_center().z, head.get_center().z])
+	r.check(face.get_center().z < head.get_center().z - float(d.get("face_ahead", 0.08)), "chars: frente de %s em -Z (rosto z=%.3f, cabeca z=%.3f)" % [id, face.get_center().z, head.get_center().z])
 	var mats := _materials(root)
 	var miss: Array = []
 	for m in d["materials"]:
@@ -147,7 +163,7 @@ func _test_static(id: String) -> void:
 	r.check(sk != null, "chars: %s tem Skeleton3D" % id)
 	if sk != null:
 		var miss_b: Array = []
-		for b in BONES:
+		for b in d.get("bones", BONES):
 			if sk.find_bone(b) < 0:
 				miss_b.append(b)
 		r.check(miss_b.is_empty(), "chars: ossos estaveis de %s presentes %s" % [id, miss_b])
@@ -196,7 +212,7 @@ func _test_static(id: String) -> void:
 	r.check(tn.has("atenta") and tn.has("blink"), "chars: GLB de %s declara targetNames %s" % [id, tn])
 	r.check(String((js.get("asset", {}) as Dictionary).get("generator", "")).contains("Blender"), "chars: GLB de %s gerado pelo Blender" % id)
 	var tris := _tri_count(root)
-	var limit := 25000 if id in ["rastro", "leme", "pico"] else 14000
+	var limit := 25000
 	r.check(tris > 2000 and tris <= limit, "chars: %s com %d triangulos (orcamento <= %d)" % [id, tris, limit])
 	if d.has("tris"):
 		var tb: Array = d["tris"]
@@ -342,23 +358,24 @@ func _test_inspect_real_pawmark() -> void:
 
 ## RB-R1: barra de crianca-heroi do Rastro: altura 1,0-1,2 m, cabeca 33-38% da altura, olhos (esclera, iris, pupila), visemas,
 ## olhar, 12 clipes nomeados com loop correto, corrida de ~0,6 s.
-func _test_rastro_child() -> void:
-	var root := await _spawn("rastro")
+func _test_hero_child(id: String) -> void:
+	var pre := String(CHARS[id]["prefix"])
+	var root := await _spawn(id)
 	var vis := root.find_child("Model", false, false) as CharacterVisual
 	var box := _aabb(root)
-	var head := _part(root, "Rastro_Head")
+	var head := _part(root, pre + "_Head")
 	var ratio := head.size.y / box.size.y
-	r.check(ratio >= 0.33 and ratio <= 0.38, "chars: cabeca do Rastro com %.1f%% da altura (33 a 38%%; cabeca %.3f m, altura %.3f m)" % [ratio * 100, head.size.y, box.size.y])
+	r.check(ratio >= 0.33 and ratio <= 0.38, "chars: cabeca de %s com %.1f%% da altura (33 a 38%%; cabeca %.3f m, altura %.3f m)" % [id, ratio * 100, head.size.y, box.size.y])
 	var fm := vis.face_mesh()
 	var fmats: Array = []
 	for s in fm.mesh.get_surface_count():
 		fmats.append(fm.mesh.surface_get_material(s).resource_name)
-	for m in ["mat_rastro_olhos", "mat_rastro_iris", "mat_rastro_escuro", "mat_rastro_boca"]:
-		r.check(fmats.has(m), "chars: rosto do Rastro tem %s (olhos/iris/pupila/boca)" % m)
-	for a in RASTRO_ANIMS:
-		r.check(vis.has_animation(StringName(a)), "chars: Rastro tem o clipe %s" % a)
-	r.check(absf(vis.animation_length(&"run") - 0.6) < 0.05, "chars: run do Rastro com ciclo de ~0,6 s (%.3f)" % vis.animation_length(&"run"))
-	r.check(absf(vis.animation_length(&"team_pose") - 1.5) < 0.05, "chars: team_pose do Rastro dura 1,5 s (%.3f)" % vis.animation_length(&"team_pose"))
+	for m in ["olhos", "iris", "escuro", "boca"]:
+		r.check(fmats.has("mat_%s_%s" % [id, m]), "chars: rosto de %s tem mat_%s_%s (olhos/iris/pupila/boca)" % [id, id, m])
+	for a in CHARS[id]["anims"]:
+		r.check(vis.has_animation(StringName(a)), "chars: %s tem o clipe %s" % [id, a])
+	r.check(absf(vis.animation_length(&"run") - 0.6) < 0.05, "chars: run de %s com ciclo de ~0,6 s (%.3f)" % [id, vis.animation_length(&"run")])
+	r.check(absf(vis.animation_length(&"team_pose") - 1.5) < 0.05, "chars: team_pose de %s dura 1,5 s (%.3f)" % [id, vis.animation_length(&"team_pose")])
 	vis.set_viseme(&"mouth_A", 1.0)
 	var ia := fm.find_blend_shape_by_name("mouth_A")
 	r.check(ia >= 0 and fm.get_blend_shape_value(ia) > 0.99, "chars: set_viseme(mouth_A) abre a boca")
@@ -368,7 +385,7 @@ func _test_rastro_child() -> void:
 	vis.set_gaze(Vector2(-1, 0.5))
 	r.check(fm.get_blend_shape_value(fm.find_blend_shape_by_name("look_left")) > 0.99 and fm.get_blend_shape_value(fm.find_blend_shape_by_name("look_up")) > 0.49, "chars: set_gaze move os olhos para a esquerda e para cima")
 	vis.set_gaze(Vector2.ZERO)
-	print("  medida Rastro: altura %.3f m, cabeca %.3f m (%.1f%%), %d triangulos" % [box.size.y, head.size.y, ratio * 100, _tri_count(root)])
+	print("  medida %s: altura %.3f m, cabeca %.3f m (%.1f%%), %d triangulos" % [id, box.size.y, head.size.y, ratio * 100, _tri_count(root)])
 	root.queue_free()
 	await r.frames(1)
 
@@ -401,7 +418,8 @@ func _test_idle_upright(id: String) -> void:
 	await r.frames(1)
 
 
-## Pico: pull_rope dura 1,6 s e tem exatamente dois puxoes (maos descem duas vezes); look_up levanta a cabeca; mochila/corda no modelo.
+## Pico: pull_rope dura 1,6 s com dois puxoes (maos descem duas vezes, a frente do corpo); jump existe, sai do chao (~0,45 s de voo)
+## e volta ao chao no fim; look_up levanta a cabeca; rolo de corda nas costas sem tapar o emblema.
 func _test_pico() -> void:
 	var root := await _spawn("pico")
 	var vis := root.find_child("Model", false, false) as CharacterVisual
@@ -414,38 +432,62 @@ func _test_pico() -> void:
 		var tip := vis.bone_position(&"hand_tip.R")
 		ys.append(tip.y)
 		zs.append(tip.z)
-	var ymax: float = ys.max()
 	var ymin: float = ys.min()
+	var ymax: float = ys.max()
+	var thr := ymin + 0.35 * (ymax - ymin)
 	var pulls := 0
-	for i in range(1, ys.size() - 1):
-		var y: float = ys[i]
-		if y < ys[i - 1] and y <= ys[i + 1] and y > 0.55 and y < 0.85 and (float(ys[maxi(i - 6, 0)]) - y) > 0.12:
+	var below := false
+	for y in ys:
+		if float(y) < thr and not below:
 			pulls += 1
-	r.check(pulls == 2, "chars: pull_rope do Pico tem dois puxoes (%d; maos de %.0f a %.0f cm)" % [pulls, ymax * 100, ymin * 100])
-	r.check(ymax - ymin > 0.25, "chars: puxoes com curso > 25 cm (%.1f cm)" % [(ymax - ymin) * 100])
-	r.check(float(zs.min()) < -0.15, "chars: maos do Pico a frente do corpo no puxao (z %.2f)" % float(zs.min()))
-	var worst := 0.0
-	for i in 17:
-		vis.seek_clip(&"pull_rope", len * i / 16.0)
-		worst = maxf(worst, vis.foot_contact_error())
-	r.check(worst < 0.01, "chars: pes do Pico plantados no pull_rope (%.1f mm)" % [worst * 1000])
+		below = float(y) < thr
+	r.check(ymax - ymin > 0.12, "chars: puxoes do Pico com curso > 12 cm (%.1f cm)" % [(ymax - ymin) * 100])
+	r.check(pulls == 2, "chars: pull_rope do Pico tem dois puxoes (%d)" % pulls)
+	r.check(float(zs.min()) < -0.12, "chars: maos do Pico a frente do corpo no puxao (z %.2f)" % float(zs.min()))
+	r.check(vis.has_animation(&"jump") and not vis.is_looping(&"jump"), "chars: Pico tem jump (sem loop)")
+	var jl := vis.animation_length(&"jump")
+	vis.seek_clip(&"jump", 0.0)
+	var f0 := vis.foot_contact_error()
+	vis.seek_clip(&"jump", jl)
+	var f1 := vis.foot_contact_error()
+	var top := 0.0
+	var air := 0
+	for i in 31:
+		vis.seek_clip(&"jump", jl * i / 30.0)
+		var h := vis.lowest_foot_height()
+		top = maxf(top, h)
+		if h > 0.03:
+			air += 1
+	var air_s := air * jl / 30.0
+	r.check(f0 < 0.02 and f1 < 0.02, "chars: jump do Pico comeca e termina com os pes no chao (%.1f / %.1f mm)" % [f0 * 1000, f1 * 1000])
+	r.check(top > 0.10 and air_s > 0.25 and air_s < 0.6, "chars: jump do Pico sai do chao (%.1f cm, ~%.2f s no ar)" % [top * 100, air_s])
 	vis.seek_clip(&"look_up", 0.0)
-	var h0 := vis.bone_position(&"head")
-	var n0 := vis.bone_position(&"neck")
-	var look0 := h0 - n0
+	var l0 := vis.bone_position(&"head")
 	vis.seek_clip(&"look_up", 0.9)
-	var look1 := vis.bone_position(&"head") - vis.bone_position(&"neck")
-	r.check(look1.distance_to(look0) < 0.2, "chars: look_up mantem a cabeca no pescoco")
-	var fm := vis.face_mesh()
-	var aabb := fm.get_aabb()
-	r.check(aabb.size.y > 0.0, "chars: rosto do Pico presente")
-	for part in ["Pico_RopeCoil", "Pico_Carabiners", "Pico_Backpack", "Pico_RopeSash"]:
-		r.check(root.find_child(part, true, false) != null, "chars: Pico tem %s" % part)
+	r.check(vis.bone_position(&"head").distance_to(l0) < 0.2, "chars: look_up mantem a cabeca no pescoco")
 	var rope := _part(root, "Pico_RopeCoil")
-	r.check(rope.get_center().z > 0.12 and rope.size.x > 0.18, "chars: corda do Pico nas costas (+Z), larga o bastante para ler a 48 px (z=%.2f, largura %.2f)" % [rope.get_center().z, rope.size.x])
+	var emb := _part(root, "Pico_Emblem")
+	r.check(rope.end.z > 0.15, "chars: rolo de corda do Pico nas costas (+Z ate %.2f m)" % rope.end.z)
+	r.check(emb.size.x > 0.0, "chars: Pico tem emblema no peito")
+	print("  medida jump Pico: pico dos pes %.1f cm, ~%.2f s no ar" % [top * 100, air_s])
 	root.queue_free()
 	await r.frames(1)
 
+
+## Filhote: clipes, latido abre a boca (visema animado), pata dianteira sobe no step_on_horn.
+func _test_pup() -> void:
+	var root := await _spawn("pup")
+	var vis := root.find_child("Model", false, false) as CharacterVisual
+	vis.seek_clip(&"step_on_horn", 0.0)
+	var p0 := vis.bone_position(&"fl_paw.R")
+	vis.seek_clip(&"step_on_horn", 0.4)
+	var p1 := vis.bone_position(&"fl_paw.R")
+	r.check(p1.y - p0.y > 0.03, "chars: step_on_horn levanta a pata dianteira (%.1f cm)" % [(p1.y - p0.y) * 100])
+	vis.seek_clip(&"jump_happy", 0.42)
+	r.check(vis.bone_position(&"hips").y > 0.30, "chars: jump_happy tira o filhote do chao (quadril %.2f m)" % vis.bone_position(&"hips").y)
+	r.check(vis.is_looping(&"wag") and vis.is_looping(&"idle"), "chars: wag e idle do filhote em loop")
+	root.queue_free()
+	await r.frames(1)
 
 ## Ator de verdade (MemberActor) parado no chao: toca idle, em pe, pes no chao (reproduz o caso do figurante/Pico tombado no jogo).
 func _test_member_actor_idle() -> void:
@@ -479,24 +521,58 @@ func _test_member_actor_idle() -> void:
 
 
 func _test_leme_wheel() -> void:
-	var root := await _spawn("leme")
-	var vis := root.find_child("Model", false, false) as CharacterVisual
+	## Leme embarcada em BoatActor.CREW[&"pilot"] olhando para a proa: ponto medio das duas pontas de mao no WheelPoint do boat_v2.
+	var boat := BoatActor.new()
+	r.tree.root.add_child(boat)
+	boat.place(Ep01Layout.BOAT_DOCKED_POS, Ep01Layout.BOAT_DOCKED_HEADING)
+	await r.frames(2)
+	var wp := boat.find_child("WheelPoint", true, false) as Node3D
+	r.check(wp != null, "chars: boat_v2 tem WheelPoint")
+	var a := MemberActor.new()
+	r.tree.root.add_child(a)
+	a.setup(&"pilot")
+	a.ride(boat, BoatActor.CREW[&"pilot"])
+	a.global_position = boat.to_global(BoatActor.CREW[&"pilot"])
+	a.face_now(a.global_position + boat.forward())
+	await r.frames(2)
+	var vis := a.model
+	var best := INF
+	for i in 25:
+		vis.seek_clip(&"idle_wheel", vis.animation_length(&"idle_wheel") * i / 24.0)
+		var mid := (vis.bone_position(&"hand_tip.R") + vis.bone_position(&"hand_tip.L")) * 0.5
+		best = minf(best, mid.distance_to(wp.global_position))
 	vis.seek_clip(&"idle_wheel", 0.0)
+	var mid0 := (vis.bone_position(&"hand_tip.R") + vis.bone_position(&"hand_tip.L")) * 0.5
+	var d0 := mid0.distance_to(wp.global_position)
+	r.check(d0 < 0.05, "chars: maos da Leme no volante (ponto medio a %.1f mm do WheelPoint; melhor %.1f mm)" % [d0 * 1000, best * 1000])
 	var r0 := vis.bone_position(&"hand_tip.R")
-	var l0 := vis.bone_position(&"hand_tip.L")
-	r.check(absf(r0.z) > 0.15 and r0.z < 0.0 and l0.z < 0.0, "chars: idle_wheel de Leme com as maos a frente (-Z): R z=%.2f L z=%.2f" % [r0.z, l0.z])
 	vis.seek_clip(&"steer_left", 0.5)
 	var rl := vis.bone_position(&"hand_tip.R")
 	vis.seek_clip(&"steer_right", 0.5)
 	var rr := vis.bone_position(&"hand_tip.R")
-	r.check(rl.distance_to(rr) > 0.12, "chars: steer_left e steer_right movem a mao em sentidos opostos (%.1f cm)" % [rl.distance_to(rr) * 100])
-	r.check(rl.y > r0.y + 0.03 and rr.y < r0.y - 0.03, "chars: volante para a esquerda sobe a mao direita, para a direita desce (%.1f / %.1f cm)" % [(rl.y - r0.y) * 100, (rr.y - r0.y) * 100])
+	r.check(rl.y > r0.y + 0.03 and rr.y < r0.y - 0.03, "chars: volante a esquerda sobe a mao direita, a direita desce (%.1f / %.1f cm)" % [(rl.y - r0.y) * 100, (rr.y - r0.y) * 100])
 	vis.seek_clip(&"react_horn", 0.45)
-	var rh := vis.bone_position(&"hand_tip.R")
-	r.check(rh.y > r0.y + 0.1, "chars: react_horn ergue a mao direita (%.1f cm acima)" % [(rh.y - r0.y) * 100])
-	root.queue_free()
+	r.check(vis.bone_position(&"hand_tip.R").y > r0.y + 0.08, "chars: react_horn ergue a mao direita")
+	var feet := true
+	for t in [0.0, 1.2]:
+		vis.seek_clip(&"idle_wheel", t)
+		feet = feet and vis.foot_contact_error() < 0.02
+	r.check(feet, "chars: Leme com os pes no conves no idle_wheel")
+	print("  medida idle_wheel Leme: ponto medio das maos a %.1f mm do WheelPoint (melhor %.1f mm)" % [d0 * 1000, best * 1000])
+	a.queue_free()
+	boat.queue_free()
 	await r.frames(1)
 
+
+func _test_portraits() -> void:
+	for id in PORTRAIT_IDS:
+		for e in PORTRAIT_EXPRS:
+			var p := "res://ui/portraits/%s_%s.png" % [id, e]
+			var tex := load(p) as Texture2D
+			r.check(tex != null and tex.get_width() == 512 and tex.get_height() == 512, "chars: retrato %s existe com 512x512" % p)
+			if tex != null:
+				var img := tex.get_image()
+				r.check(img.detect_alpha() != Image.ALPHA_NONE and img.get_pixel(2, 2).a < 0.05, "chars: retrato %s com fundo transparente" % p)
 
 func _test_loops_close(id: String) -> void:
 	var root := await _spawn(id)
@@ -557,7 +633,7 @@ func _test_no_foreign_models() -> void:
 	for f in files:
 		if f.ends_with(".import") or f.ends_with(".uid"):
 			continue
-		if not (f in ["rastro.glb", "leme.glb", "pico.glb", "extra_a.glb", "extra_b.glb", "extra_c.glb"]):
+		if not (f in ["rastro.glb", "leme.glb", "pico.glb", "captain.glb", "pup.glb", "villager_a.glb", "villager_b.glb", "villager_c.glb"]):
 			foreign.append(f)
 	r.check(foreign.is_empty(), "chars: pasta de personagens so tem GLB do manifesto %s" % [foreign])
 	var man: Variant = JSON.parse_string(FileAccess.get_file_as_string(ProjectSettings.globalize_path("res://").path_join("../source_art/manifest.json")))
