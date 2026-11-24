@@ -1,0 +1,19 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/boulder.glb" id="1_dnkqm"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_skmfw"]
+height = 2.227658
+radius = 1.5801234
+
+[node name="Boulder" type="Node3D" unique_id=1689133247]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=38943617 instance=ExtResource("1_dnkqm")]
+
+[node name="Body" type="StaticBody3D" parent="." unique_id=876982708]
+collision_mask = 0
+
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1525922645]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09788203, 0.5179629, 0.01898563)
+shape = SubResource("CylinderShape3D_skmfw")

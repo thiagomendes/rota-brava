@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/dock_cleat.glb" id="1_wr77e"]
 
-[node name="Dock_Cleat" type="Node3D" unique_id=777631276]
+[node name="Dock_Cleat" type="Node3D" unique_id=302783347]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=1681132873 instance=ExtResource("1_wr77e")]
+[node name="Model" parent="." unique_id=1891027708 instance=ExtResource("1_wr77e")]

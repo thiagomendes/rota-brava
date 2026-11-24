@@ -1,0 +1,524 @@
+{
+  "river_bank_north": {
+    "glb": "game/assets/models/environment/river_bank_north.glb",
+    "tris": 9496,
+    "materials": [
+      "mat_env_ground"
+    ],
+    "vertices": 4930,
+    "bbox_min": [
+      25.509,
+      -4.0,
+      -82.889
+    ],
+    "bbox_max": [
+      194.491,
+      5.542,
+      -10.0
+    ],
+    "size": [
+      168.982,
+      9.542,
+      72.889
+    ],
+    "objects": [
+      "River_Bank_North_Ground"
+    ],
+    "empties": []
+  },
+  "river_bank_south": {
+    "glb": "game/assets/models/environment/river_bank_south.glb",
+    "tris": 11716,
+    "materials": [
+      "mat_env_ground"
+    ],
+    "vertices": 6073,
+    "bbox_min": [
+      3.008,
+      -4.0,
+      -1.0
+    ],
+    "bbox_max": [
+      189.488,
+      5.721,
+      92.0
+    ],
+    "size": [
+      186.481,
+      9.721,
+      93.0
+    ],
+    "objects": [
+      "River_Bank_South_Ground"
+    ],
+    "empties": []
+  },
+  "island_ground": {
+    "glb": "game/assets/models/environment/island_ground.glb",
+    "tris": 4560,
+    "materials": [
+      "mat_env_ground"
+    ],
+    "vertices": 2390,
+    "bbox_min": [
+      183.279,
+      -3.997,
+      -22.25
+    ],
+    "bbox_max": [
+      217.967,
+      0.451,
+      25.0
+    ],
+    "size": [
+      34.689,
+      4.448,
+      47.25
+    ],
+    "objects": [
+      "Island_Ground_Ground"
+    ],
+    "empties": []
+  },
+  "sandbar": {
+    "glb": "game/assets/models/environment/sandbar.glb",
+    "tris": 872,
+    "materials": [
+      "mat_env_ground"
+    ],
+    "vertices": 487,
+    "bbox_min": [
+      106.08,
+      -4.0,
+      -0.118
+    ],
+    "bbox_max": [
+      131.92,
+      -0.282,
+      12.118
+    ],
+    "size": [
+      25.84,
+      3.718,
+      12.235
+    ],
+    "objects": [
+      "Sandbar_Ground"
+    ],
+    "empties": []
+  },
+  "headland": {
+    "glb": "game/assets/models/environment/headland.glb",
+    "tris": 4636,
+    "materials": [
+      "mat_env_ground",
+      "mat_env_rock"
+    ],
+    "vertices": 2432,
+    "bbox_min": [
+      20.5,
+      -1.2,
+      -35.5
+    ],
+    "bbox_max": [
+      42.0,
+      2.404,
+      -14.5
+    ],
+    "size": [
+      21.5,
+      3.604,
+      21.0
+    ],
+    "objects": [
+      "Headland_Ground",
+      "Headland_Rocks"
+    ],
+    "empties": []
+  },
+  "far_water": {
+    "glb": "game/assets/models/environment/far_water.glb",
+    "tris": 8,
+    "materials": [
+      "mat_env_far_water"
+    ],
+    "vertices": 16,
+    "bbox_min": [
+      -1045.0,
+      -0.4,
+      -1100.0
+    ],
+    "bbox_max": [
+      1155.0,
+      -0.4,
+      1100.0
+    ],
+    "size": [
+      2200.0,
+      0.0,
+      2200.0
+    ],
+    "objects": [
+      "Far_Water_Plane"
+    ],
+    "empties": []
+  },
+  "arch_bridge": {
+    "glb": "game/assets/models/environment/arch_bridge.glb",
+    "tris": 11200,
+    "materials": [
+      "mat_env_masonry",
+      "mat_env_trim",
+      "mat_env_wood_dark",
+      "mat_env_wood_deck"
+    ],
+    "vertices": 5980,
+    "bbox_min": [
+      -1.816,
+      -1.8,
+      -19.6
+    ],
+    "bbox_max": [
+      1.816,
+      4.925,
+      19.6
+    ],
+    "size": [
+      3.633,
+      6.725,
+      39.2
+    ],
+    "objects": [
+      "Arch_Bridge_Abutments",
+      "Arch_Bridge_Deck",
+      "Arch_Bridge_Rails",
+      "Arch_Bridge_Stringers"
+    ],
+    "empties": [
+      "Underside_Center"
+    ]
+  },
+  "fence_rustic": {
+    "glb": "game/assets/models/environment/fence_rustic.glb",
+    "tris": 340,
+    "materials": [
+      "mat_env_wood_deck",
+      "mat_env_wood_light"
+    ],
+    "vertices": 186,
+    "bbox_min": [
+      -1.021,
+      0.0,
+      -0.075
+    ],
+    "bbox_max": [
+      1.021,
+      0.951,
+      0.115
+    ],
+    "size": [
+      2.043,
+      0.951,
+      0.19
+    ],
+    "objects": [
+      "Fence_Rustic_Rails",
+      "Fence_Rustic_Stakes"
+    ],
+    "empties": []
+  },
+  "palm_tree": {
+    "glb": "game/assets/models/environment/palm_tree.glb",
+    "tris": 1096,
+    "materials": [
+      "mat_env_foliage_a",
+      "mat_env_palm",
+      "mat_env_trunk"
+    ],
+    "vertices": 572,
+    "bbox_min": [
+      -1.94,
+      -0.006,
+      -2.165
+    ],
+    "bbox_max": [
+      2.629,
+      5.73,
+      2.405
+    ],
+    "size": [
+      4.569,
+      5.735,
+      4.569
+    ],
+    "objects": [
+      "Palm_Tree_Coconuts",
+      "Palm_Tree_Fronds",
+      "Palm_Tree_Trunk"
+    ],
+    "empties": []
+  },
+  "tent": {
+    "glb": "game/assets/models/environment/tent.glb",
+    "tris": 212,
+    "materials": [
+      "mat_env_tent",
+      "mat_env_tent_dark",
+      "mat_env_wood_dark"
+    ],
+    "vertices": 128,
+    "bbox_min": [
+      -1.607,
+      0.0,
+      -2.011
+    ],
+    "bbox_max": [
+      1.607,
+      1.7,
+      2.011
+    ],
+    "size": [
+      3.215,
+      1.7,
+      4.022
+    ],
+    "objects": [
+      "Tent_Canvas",
+      "Tent_Flaps",
+      "Tent_Poles"
+    ],
+    "empties": []
+  },
+  "campfire": {
+    "glb": "game/assets/models/environment/campfire.glb",
+    "tris": 1012,
+    "materials": [
+      "mat_env_ash",
+      "mat_env_rock",
+      "mat_env_trunk"
+    ],
+    "vertices": 532,
+    "bbox_min": [
+      -0.679,
+      -0.03,
+      -0.692
+    ],
+    "bbox_max": [
+      0.712,
+      0.365,
+      0.692
+    ],
+    "size": [
+      1.39,
+      0.395,
+      1.383
+    ],
+    "objects": [
+      "Campfire_Ash",
+      "Campfire_Logs",
+      "Campfire_Stones"
+    ],
+    "empties": []
+  },
+  "flag_pole": {
+    "glb": "game/assets/models/environment/flag_pole.glb",
+    "tris": 108,
+    "materials": [
+      "mat_env_flag",
+      "mat_env_flag_navy",
+      "mat_env_wood_dark"
+    ],
+    "vertices": 62,
+    "bbox_min": [
+      -0.076,
+      0.0,
+      -0.08
+    ],
+    "bbox_max": [
+      1.151,
+      3.126,
+      0.08
+    ],
+    "size": [
+      1.228,
+      3.126,
+      0.16
+    ],
+    "objects": [
+      "Flag_Pole_Flag",
+      "Flag_Pole_Pole",
+      "Flag_Pole_Stripe"
+    ],
+    "empties": []
+  },
+  "step_rock_safe": {
+    "glb": "game/assets/models/environment/step_rock_safe.glb",
+    "tris": 288,
+    "materials": [
+      "mat_env_flag",
+      "mat_env_rock_safe"
+    ],
+    "vertices": 156,
+    "bbox_min": [
+      -0.99,
+      -1.8,
+      -1.031
+    ],
+    "bbox_max": [
+      1.038,
+      0.01,
+      0.966
+    ],
+    "size": [
+      2.029,
+      1.81,
+      1.996
+    ],
+    "objects": [
+      "Step_Rock_Safe_Body",
+      "Step_Rock_Safe_Marks"
+    ],
+    "empties": []
+  },
+  "step_rock_decoy": {
+    "glb": "game/assets/models/environment/step_rock_decoy.glb",
+    "tris": 224,
+    "materials": [
+      "mat_env_rock_wet"
+    ],
+    "vertices": 114,
+    "bbox_min": [
+      -0.586,
+      -1.273,
+      -0.513
+    ],
+    "bbox_max": [
+      0.579,
+      0.136,
+      0.49
+    ],
+    "size": [
+      1.165,
+      1.409,
+      1.003
+    ],
+    "objects": [
+      "Step_Rock_Decoy_Body"
+    ],
+    "empties": []
+  },
+  "boulder": {
+    "glb": "game/assets/models/environment/boulder.glb",
+    "tris": 528,
+    "materials": [
+      "mat_env_rock"
+    ],
+    "vertices": 268,
+    "bbox_min": [
+      -1.482,
+      -0.596,
+      -1.31
+    ],
+    "bbox_max": [
+      1.678,
+      1.632,
+      1.348
+    ],
+    "size": [
+      3.16,
+      2.228,
+      2.659
+    ],
+    "objects": [
+      "Boulder_Body"
+    ],
+    "empties": []
+  },
+  "shell": {
+    "glb": "game/assets/models/environment/shell.glb",
+    "tris": 40,
+    "materials": [
+      "mat_env_tint"
+    ],
+    "vertices": 22,
+    "bbox_min": [
+      -0.09,
+      0.0,
+      -0.107
+    ],
+    "bbox_max": [
+      0.09,
+      0.035,
+      0.107
+    ],
+    "size": [
+      0.18,
+      0.035,
+      0.214
+    ],
+    "objects": [
+      "Shell_Body"
+    ],
+    "empties": []
+  },
+  "pier_small": {
+    "glb": "game/assets/models/environment/pier_small.glb",
+    "tris": 1072,
+    "materials": [
+      "mat_env_wood_dark",
+      "mat_env_wood_deck"
+    ],
+    "vertices": 592,
+    "bbox_min": [
+      -1.25,
+      -1.6,
+      -6.0
+    ],
+    "bbox_max": [
+      1.239,
+      0.25,
+      -0.0
+    ],
+    "size": [
+      2.489,
+      1.85,
+      6.0
+    ],
+    "objects": [
+      "Pier_Small_Deck",
+      "Pier_Small_Piles"
+    ],
+    "empties": []
+  },
+  "gull_standing": {
+    "glb": "game/assets/models/environment/gull_standing.glb",
+    "tris": 352,
+    "materials": [
+      "mat_env_beak",
+      "mat_env_gull",
+      "mat_env_gull_gray"
+    ],
+    "vertices": 190,
+    "bbox_min": [
+      -0.118,
+      0.0,
+      -0.311
+    ],
+    "bbox_max": [
+      0.118,
+      0.415,
+      0.24
+    ],
+    "size": [
+      0.236,
+      0.415,
+      0.551
+    ],
+    "objects": [
+      "Gull_Standing_Beak",
+      "Gull_Standing_Body",
+      "Gull_Standing_Wings"
+    ],
+    "empties": []
+  }
+}

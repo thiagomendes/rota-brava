@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/flower_clump.glb" id="1_cx2jn"]
 
-[node name="Flower_Clump" type="Node3D" unique_id=2123148451]
+[node name="Flower_Clump" type="Node3D" unique_id=1706399709]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=841769618 instance=ExtResource("1_cx2jn")]
+[node name="Model" parent="." unique_id=419998466 instance=ExtResource("1_cx2jn")]

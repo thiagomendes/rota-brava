@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/arch_bridge.glb" id="1_qge2c"]
+
+[node name="Arch_Bridge" type="Node3D" unique_id=574489625]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=1093705080 instance=ExtResource("1_qge2c")]

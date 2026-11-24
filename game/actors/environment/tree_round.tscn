@@ -6,14 +6,14 @@
 height = 2.5
 radius = 0.3
 
-[node name="Tree_Round" type="Node3D" unique_id=1748863513]
+[node name="Tree_Round" type="Node3D" unique_id=1470897147]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=401039944 instance=ExtResource("1_cbc74")]
+[node name="Model" parent="." unique_id=2026559809 instance=ExtResource("1_cbc74")]
 
-[node name="Body" type="StaticBody3D" parent="." unique_id=1123380629]
+[node name="Body" type="StaticBody3D" parent="." unique_id=1171806888]
 collision_mask = 0
 
-[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=78762102]
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1237668365]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
 shape = SubResource("CylinderShape3D_7xjtd")

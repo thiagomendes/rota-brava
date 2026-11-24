@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/campfire.glb" id="1_22tfx"]
+
+[node name="Campfire" type="Node3D" unique_id=1648718112]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=1504852966 instance=ExtResource("1_22tfx")]

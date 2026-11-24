@@ -30,7 +30,9 @@ $sets = @(
     @{ id = 'boat_v2'; script = 'source_art/environment/build_boat_v2.py'; blend = 'source_art/environment/boat_v2.blend';
        note = 'Barco v2 (evolucao do RB-03): cabine na popa, banco com PawMark, volante, motor, bandeirola, lampiao, corda. Pivo a 40% da popa.' },
     @{ id = 'village_kit'; script = 'source_art/environment/build_village.py'; blend = 'source_art/environment/village_kit.blend';
-       note = 'RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas.' }
+       note = 'RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas.' },
+    @{ id = 'world_kit'; script = 'source_art/environment/build_world.py'; blend = 'source_art/environment/world_kit.blend';
+       note = 'RB-R1 mundo do Ep01: margens do rio, ilha, banco de areia, promontorio do farol, agua distante, ponte em arco, cerca rustica, palmeira, barraca, fogueira, bandeira, rochas da travessia (seguras/iscas), rochedo, concha, pier pequeno, gaivota pousada.' }
 )
 $harborComp = 'B'   # composicao recomendada (RB-R1, ver game/episodes/ep01/world/LAYOUT_PROPOSTO.md)
 $common = @('source_art/environment/envlib.py', 'source_art/scripts/rbart.py')
@@ -62,6 +64,7 @@ foreach ($s in $sets) {
 }
 # layout do trecho do porto (fonte unica em Python) -> JSON lido por game/episodes/ep01/world/gen_harbor_slice.gd
 Invoke-Blender @('--factory-startup') 'source_art/environment/village_layout.py' @('--json', $harborComp, 'game/episodes/ep01/world/harbor_layout.json')
+Invoke-Blender @('--factory-startup') 'source_art/environment/world_layout.py' @('--out', 'game/episodes/ep01/world')
 $manifest = [ordered]@{ projeto = 'Rota Brava'; ticket = 'RB-04-env + RB-R1-mundo'; agente = 'art3d'; ativos = $entries }
 $manifest | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $root 'source_art/manifest_environment.json') -Encoding utf8
 $tot = 0; foreach ($e in $entries) { $tot += [int]$e.triangulos }
@@ -89,6 +92,14 @@ if ($Scenes) {
             ($txt -replace 'import_script/path=""', 'import_script/path="res://assets/models/environment/vertex_color_postimport.gd"') | Set-Content $f.FullName -NoNewline
             $changed = $true
         }
+        # terrenos: sem LOD automatico (a simplificacao some com a lingua de terra do pouso e as bordas do caminho)
+        if ($f.Name -match '^(river_bank_|island_ground|sandbar|headland|bank_path|ground_tile_|far_water)') {
+            $txt = Get-Content $f.FullName -Raw
+            if ($txt -match 'meshes/generate_lods=true') {
+                ($txt -replace 'meshes/generate_lods=true', 'meshes/generate_lods=false') | Set-Content $f.FullName -NoNewline
+                $changed = $true
+            }
+        }
     }
     if ($changed) { & "$PSScriptRoot/godot.ps1" --headless --path game --import | Out-Null }
     Write-Host 'COMANDO: ./tools/godot.ps1 --headless --path game --script res://actors/environment/gen_env_scenes.gd'
@@ -97,5 +108,8 @@ if ($Scenes) {
     Write-Host 'COMANDO: ./tools/godot.ps1 --headless --path game --script res://episodes/ep01/world/gen_harbor_slice.gd'
     & "$PSScriptRoot/godot.ps1" --headless --path game --script res://episodes/ep01/world/gen_harbor_slice.gd | Select-Object -Last 3 | ForEach-Object { Write-Host $_ }
     if ($LASTEXITCODE -ne 0) { throw 'gen_harbor_slice falhou' }
+    Write-Host 'COMANDO: ./tools/godot.ps1 --headless --path game --script res://episodes/ep01/world/gen_world_scenes.gd'
+    & "$PSScriptRoot/godot.ps1" --headless --path game --script res://episodes/ep01/world/gen_world_scenes.gd | Select-Object -Last 4 | ForEach-Object { Write-Host $_ }
+    if ($LASTEXITCODE -ne 0) { throw 'gen_world_scenes falhou' }
 }
 Write-Host 'OK export-environment'

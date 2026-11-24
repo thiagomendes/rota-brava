@@ -6,14 +6,14 @@
 height = 0.82846653
 radius = 0.37265506
 
-[node name="Barrel" type="Node3D" unique_id=1344755042]
+[node name="Barrel" type="Node3D" unique_id=1688878368]
 metadata/provisional = true
 
 [node name="Model" parent="." unique_id=1614240061 instance=ExtResource("1_m7sx2")]
 
-[node name="Body" type="StaticBody3D" parent="." unique_id=1749930106]
+[node name="Body" type="StaticBody3D" parent="." unique_id=454948022]
 collision_mask = 0
 
-[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=2034578547]
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1398683385]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.41423327, 0)
 shape = SubResource("CylinderShape3D_ecm4a")

@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/environment/cork_buoy.glb" id="1_65y7b"]
 
-[node name="Cork_Buoy" type="Node3D" unique_id=480301618]
+[node name="Cork_Buoy" type="Node3D" unique_id=1251864982]
 metadata/provisional = true
 
 [node name="Model" parent="." unique_id=872515123 instance=ExtResource("1_65y7b")]

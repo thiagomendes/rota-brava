@@ -5,14 +5,14 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_pomph"]
 size = Vector3(2.7, 1, 0.7)
 
-[node name="Market_Stall_Blue" type="Node3D" unique_id=2060570664]
+[node name="Market_Stall_Blue" type="Node3D" unique_id=873482304]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=874217931 instance=ExtResource("1_hp37y")]
+[node name="Model" parent="." unique_id=635829528 instance=ExtResource("1_hp37y")]
 
-[node name="Body" type="StaticBody3D" parent="." unique_id=1187917497]
+[node name="Body" type="StaticBody3D" parent="." unique_id=601041228]
 collision_mask = 0
 
-[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1474556690]
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=153835187]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.55)
 shape = SubResource("BoxShape3D_pomph")

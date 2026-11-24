@@ -5,14 +5,14 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_j4pmx"]
 size = Vector3(4, 0.74, 0.55)
 
-[node name="Low_Wall" type="Node3D" unique_id=253200932]
+[node name="Low_Wall" type="Node3D" unique_id=467847383]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=768808591 instance=ExtResource("1_kjkfi")]
+[node name="Model" parent="." unique_id=1767052158 instance=ExtResource("1_kjkfi")]
 
-[node name="Body" type="StaticBody3D" parent="." unique_id=497744383]
+[node name="Body" type="StaticBody3D" parent="." unique_id=943377312]
 collision_mask = 0
 
-[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=580149244]
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1503661486]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.37, 0)
 shape = SubResource("BoxShape3D_j4pmx")

@@ -65,3 +65,36 @@ e LOD das casas da segunda fileira.
 2. Decidir as novas constantes da seção 2 (rio de 152 m, +90 m na etapa da ilha) em `ep01_layout.gd`.
 3. Ajustar `art/atmosphere.gd` (fora da minha área): o céu e a névoa do jogo ficaram mais claros/lavados que a bible (`SKY_TOP #4FA6E8`, horizonte `#FDE9C9`; névoa 0,0035 apaga os morros no plano aberto).
 4. Câmera: o `CameraRig` atual usa offset (0; 7,5; 9,5); os estudos usaram (0; 4,6; 6,2) como pedido.
+
+## 5. RB-R1 etapa 2 — mundo inteiro (cenas prontas para o lead)
+Coordenadas do MUNDO: as três cenas se instanciam **na origem** (sem deslocamento), irmãs do porto.
+| Cena | Nó raiz | Conteúdo | Pisos (colisão) |
+|---|---|---|---|
+| `res://episodes/ep01/world/river_world.tscn` | `RiverWorld` | margens norte/sul (barrancos arredondados, praia, mata), ponte em arco em x 62 (vão livre medido 3,49 m em \|z\| ≤ 10), banco de areia (x 112..126) com conchas e 2 gaivotas, enseada (166, 21) com palmeiras, rochedos e barquinho, cabana de pescador + pier de pesca em x ~100 (margem norte), pouso de Pico na margem oeste do braço (x 175,5..182, z 1,5..18, topo y 0) | `Floors/PicoLanding` (caixa, topo y 0) |
+| `res://episodes/ep01/world/island_world.tscn` | `IslandWorld` | ilha x 190..212 (acampamento em y 0); travessia: `SafeRock0..2` claras de topo plano nos apoios (183,5; 0,3; 6,5), (186; 0,5; 5), (188,5; 0,3; 4,2) + `DecoyRock0..3` escuras/molhadas (topo ≤ −0,16); `CampTent`, `CampFire` (apagada), `CampCrate`, `CampFlag`; atracadouro `IslandPier` (z −2, topo y 0) | `Floors/IslandFloor` (caixa 15×22, topo y 0), cilindros em palmeiras/árvores/rochedos e nas rochas seguras |
+| `res://episodes/ep01/world/horizon.tscn` | `Horizon` | moldura de mar distante em volta do `WaterSurface` (sem sobrepor: a água do jogo faz espuma por profundidade), 16 morros distantes + 11 próximos no perímetro, 22 nuvens | — |
+
+Porto (`harbor_slice.tscn`, já integrado): margem sul refeita (caminho de terra `BankPath` com bordas irregulares e lama em volta da pegada, grama com morrinhos e cor por vértice, 170 tufos + 26 flores em MultiMesh, cerca rústica, barco virado com gaivota, caixotes, banco, juncos e pedras na beira), promontório arredondado (`Headland`) sob o farol, árvore alta em gota, faixas do farol sem costura.
+
+Atenção (lead/gameplay): `LANDING_POS` (180,5; 0; 10) e a âncora A (182; 1,2; 4) ficam na língua de terra; o barco entra no braço pelo norte (z < 1,5). A cabana do RB-04 em (−7; 0; 13,5) pode tapar a câmera quando Rastro está na pegada (não mudei a posição).
+
+### Custo medido por trecho (Godot 4.7.2, Movie Maker 1280×720, `preview_world.tscn` = porto + rio + ilha + horizonte juntos)
+| Vista | draw calls | primitivas |
+|---|---|---|
+| cais (câmera de jogo) | 925 | 974 510 |
+| margem sul (câmera de jogo) | 1 029 | 1 032 026 |
+| farol / promontório | 358 | 1 197 272 |
+| rio — ponte | 339 | 1 726 714 |
+| rio — banco de areia | 238 | 1 353 488 |
+| enseada | 161 | 544 998 |
+| ilha — travessia | 136 | 365 886 |
+| ilha — acampamento | 118 | 385 182 |
+| aéreo (tudo) | 922 | 1 911 582 |
+Tempo de quadro não medido aqui. As primitivas incluem os passes de sombra.
+
+### Reduções propostas para celular (não implementadas)
+1. Árvores: variante de baixa contagem (copa ~250 tri em vez de ~1 000) na mata/margens e `visibility_range_end` ~80 m nos MultiMesh; a mata domina as primitivas (vista da ponte 1,7 M).
+2. Sombras: só o porto projeta sombra; mata, arbustos, juncos e rochas sem sombra; 1 cascata.
+3. Porto: mesclar por material as partes de cada peça (casas 12 → 8 superfícies) e passar postes, caixotes, bandeirolas e tufos para MultiMesh (estimo ~925 → ~450 draw calls na câmera do cais).
+4. Carregar por trecho: `river_world`/`island_world` só a partir do estágio do rio; liberar o porto ao chegar à ilha.
+5. Terrenos: grade de 1,5 m → 3 m longe das margens.

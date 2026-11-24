@@ -157,7 +157,7 @@ def sweep(bm, pts, r, seg=8, caps=True, closed=False):
         bm.faces.new(rings[-1])
 
 
-def lathe(bm, profile, seg=16, c=(0, 0, 0), sx=1.0, sz=1.0):
+def lathe(bm, profile, seg=16, c=(0, 0, 0), sx=1.0, sz=1.0, caps=True):
     """Revolucao em torno do eixo y: profile = [(raio, y), ...] de baixo para cima (raio 0 fecha a ponta)."""
     rings = []
     for r, y in profile:
@@ -177,7 +177,7 @@ def lathe(bm, profile, seg=16, c=(0, 0, 0), sx=1.0, sz=1.0):
         else:
             for k in range(seg):
                 bm.faces.new((a[k], a[(k + 1) % seg], b[(k + 1) % seg], b[k]))
-    for ring in (rings[0], rings[-1]):
+    for ring in ((rings[0], rings[-1]) if caps else ()):
         if len(ring) > 2:
             bm.faces.new(ring)
 

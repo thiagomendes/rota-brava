@@ -131,8 +131,6 @@ func _extra_ground() -> Array:
 	for z in [-12, -4, 4]:
 		L.append({"id": "plaza_tile", "pos": [-21, 0, z], "ry": 0, "s": [0.25, 1, 1]})
 	L.append({"id": "lawn_block", "pos": [-12, 0, 7], "ry": 0, "s": [0.5, 1, 1.34]})
-	for x in [29, 35]:
-		L.append({"id": "lawn_block", "pos": [x, 2.4, -24], "ry": 0, "s": [1, 2.5, 1.3]})
 	# tufos de flores ao longo das fachadas e da praca (MultiMesh)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 707

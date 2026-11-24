@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/sandbar.glb" id="1_k8d8i"]
+
+[node name="Sandbar" type="Node3D" unique_id=1025925586]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=1169357479 instance=ExtResource("1_k8d8i")]

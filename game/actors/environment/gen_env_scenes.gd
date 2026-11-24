@@ -75,6 +75,26 @@ const SPEC := {
 	"tree_tall": ["Tree_Tall", {"cyl": [0.3, 2.0, Vector3(0, 1.0, 0)]}],
 	"rowboat": ["Rowboat", NONE],
 	"bunting": ["Bunting", NONE],
+	# RB-R1 mundo do Ep01 (rio, ilha, horizonte, margem sul)
+	"fence_rustic": ["Fence_Rustic", {"box": [Vector3(2.0, 0.9, 0.16), Vector3(0, 0.45, 0)]}],
+	"palm_tree": ["Palm_Tree", {"cyl": [0.25, 3.0, Vector3(0, 1.5, 0)]}],
+	"tent": ["Tent", {"box": [Vector3(2.2, 1.6, 2.4), Vector3(0, 0.8, 0)]}],
+	"campfire": ["Campfire", NONE],
+	"flag_pole": ["Flag_Pole", {"cyl": [0.06, 3.0, Vector3(0, 1.5, 0)]}],
+	"step_rock_safe": ["Step_Rock_Safe", {"cyl": [0.75, 1.8, Vector3(0, -0.9, 0)]}],
+	"step_rock_decoy": ["Step_Rock_Decoy", NONE],
+	"boulder": ["Boulder", AABB_CYL],
+	"shell": ["Shell", NONE],
+	"pier_small": ["Pier_Small", {"box": [Vector3(2.4, 0.3, 6.0), Vector3(0, -0.15, -3.0)]}],
+	"gull_standing": ["Gull_Standing", NONE],
+	"arch_bridge": ["Arch_Bridge", NONE],
+	"headland": ["Headland", NONE],
+	"far_water": ["Far_Water", NONE],
+	"river_bank_north": ["River_Bank_North", NONE],
+	"river_bank_south": ["River_Bank_South", NONE],
+	"island_ground": ["Island_Ground", NONE],
+	"sandbar": ["Sandbar", NONE],
+	"bank_path": ["Bank_Path", NONE],
 }
 
 var _fail := false
@@ -236,7 +256,9 @@ func _assemble() -> void:
 	var ground := _group(root, "Ground")
 	_inst(ground, "ground_tile_a", Vector3(-6, 0, 9.5), 0.0, 1.0, 0.0, "Tile0")
 	_inst(ground, "ground_tile_path", Vector3(0, 0, 9.5), 0.0, 1.0, 0.0, "Tile1")
-	_inst(ground, "ground_tile_b", Vector3(6, 0, 9.5), 180.0, 1.0, 0.0, "Tile2")
+	_inst(ground, "ground_tile_b", Vector3(6, 0, 9.5), 0.0, 1.0, 0.0, "Tile2")
+	var gd := _group(root, "GroundDetail")
+	_inst(gd, "bank_path", Vector3.ZERO, 0.0, 1.0, 0.0, "BankPath")
 	# adercos
 	var props := _group(root, "Props")
 	_inst(props, "crate_l", Vector3(6.4, 0, 1.7), 14.0, 1.0, 0.0, "CrateL")
@@ -257,33 +279,109 @@ func _assemble() -> void:
 	_inst(props, "oar", Vector3(-5.6, 0, 11.75), 10.0, 1.0, 11.0, "OarA")
 	_inst(props, "oar", Vector3(-5.9, 0, 11.75), -4.0, 1.0, 8.0, "OarB")
 	_inst(props, "boot_print", Vector3(-6.0, 0.003, 10.0), 15.0, 1.4, 0.0, "BootPrint")
-	# vegetacao e rochas
+	# vegetacao, rochas e vida da margem sul (RB-R1): caminho livre entre RASTRO_START e BANK_PRINT_POS
 	var nat := _group(root, "Nature")
-	_inst(nat, "tree_a", Vector3(-9.4, 0, 13.6), 30.0, 0.85, 0.0, "TreeA1")
-	_inst(nat, "tree_b", Vector3(9.5, 0, 7.6), 0.0, 1.0, 0.0, "TreeB1")
-	_inst(nat, "tree_c", Vector3(9.6, 0, 15.2), 200.0, 0.9, 0.0, "TreeC1")
-	_inst(nat, "tree_a", Vector3(9.2, 0, 12.6), 140.0, 0.95, 0.0, "TreeA2")
-	_inst(nat, "tree_c", Vector3(-9.5, 0, 9.5), 80.0, 0.85, 0.0, "TreeC2")
-	_inst(nat, "bush_round", Vector3(-9.0, 0, 15.0), 0.0, 1.2, 0.0, "BushR1")
-	_inst(nat, "bush_flower", Vector3(-3.6, 0, 13.0), 20.0, 1.0, 0.0, "BushF1")
-	_inst(nat, "bush_round", Vector3(3.8, 0, 13.6), 100.0, 1.0, 0.0, "BushR2")
-	_inst(nat, "bush_flower", Vector3(8.8, 0, 14.6), 60.0, 1.1, 0.0, "BushF2")
-	_inst(nat, "bush_flower", Vector3(-9.2, 0, 4.4), 0.0, 0.9, 0.0, "BushF3")
-	_inst(nat, "rock_a", Vector3(9.0, 0, 4.3), 20.0, 1.0, 0.0, "RockA1")
-	_inst(nat, "rock_b", Vector3(8.2, 0, 4.9), 70.0, 1.0, 0.0, "RockB1")
-	_inst(nat, "rock_c", Vector3(-9.0, 0, 11.0), 140.0, 1.0, 0.0, "RockC1")
-	_inst(nat, "rock_b", Vector3(0.3, 0, 7.4), 10.0, 1.0, 0.0, "RockB2")
-	_inst(nat, "reeds", Vector3(9.4, 0, 3.4), 0.0, 1.0, 0.0, "ReedsA")
-	_inst(nat, "reeds", Vector3(-9.5, 0, 3.5), 90.0, 1.2, 0.0, "ReedsB")
+	_inst(nat, "tree_round", Vector3(-9.0, 0, 14.4), 30.0, 0.85, 0.0, "TreeA1")
+	_inst(nat, "tree_round_dark", Vector3(9.3, 0, 7.9), 0.0, 1.0, 0.0, "TreeB1")
+	_inst(nat, "tree_round", Vector3(9.4, 0, 15.0), 200.0, 0.9, 0.0, "TreeC1")
+	_inst(nat, "tree_tall", Vector3(9.0, 0, 12.0), 140.0, 0.8, 0.0, "TreeA2")
+	_inst(nat, "tree_round_dark", Vector3(-9.3, 0, 11.8), 80.0, 0.8, 0.0, "TreeC2")
+	_inst(nat, "bush_round", Vector3(-9.2, 0, 15.2), 0.0, 1.2, 0.0, "BushR1")
+	_inst(nat, "bush_flower", Vector3(-3.2, 0, 13.2), 20.0, 1.0, 0.0, "BushF1")
+	_inst(nat, "bush_round", Vector3(3.6, 0, 14.6), 100.0, 1.0, 0.0, "BushR2")
+	_inst(nat, "bush_flower", Vector3(8.6, 0, 14.4), 60.0, 1.1, 0.0, "BushF2")
+	_inst(nat, "bush_flower", Vector3(-9.3, 0, 5.2), 0.0, 0.9, 0.0, "BushF3")
+	_inst(nat, "flower_bed", Vector3(3.4, 0, 6.2), 0.0, 0.7, 0.0, "FlowerBedA")
+	_inst(nat, "flower_bed", Vector3(-1.2, 0, 11.6), 0.0, 0.75, 0.0, "FlowerBedB")
+	_inst(nat, "rock_a", Vector3(9.4, 0, 4.6), 20.0, 1.0, 0.0, "RockA1")
+	_inst(nat, "rock_b", Vector3(8.6, 0, 3.5), 70.0, 0.9, 0.0, "RockB1")
+	_inst(nat, "rock_c", Vector3(-9.4, 0, 3.6), 140.0, 0.8, 0.0, "RockC1")
+	_inst(nat, "rock_b", Vector3(9.6, 0, 9.8), 10.0, 0.8, 0.0, "RockB2")
+	_inst(nat, "reeds", Vector3(9.7, 0, 3.4), 0.0, 1.0, 0.0, "ReedsA")
+	_inst(nat, "reeds", Vector3(-9.6, 0, 4.4), 90.0, 1.2, 0.0, "ReedsB")
+	_inst(nat, "reeds", Vector3(9.8, 0, 6.6), 40.0, 1.1, 0.0, "ReedsC")
+	_inst(nat, "reeds", Vector3(8.4, 0, 3.2), 200.0, 0.9, 0.0, "ReedsD")
+	# cerca baixa de madeira na borda sul, barco virado, caixotes e banco
+	for i in 10:
+		_inst(props, "fence_rustic", Vector3(-9.0 + 2.0 * i, 0, 15.75), 0.0 if i % 2 == 0 else 180.0, 1.0, 0.0, "Fence%d" % i)
+	_inst(props, "rowboat", Vector3(5.4, 0.3, 11.4), 20.0, 1.0, 180.0, "BoatUpturned")
+	_inst(props, "crate_s", Vector3(-4.6, 0, 14.4), 12.0, 1.0, 0.0, "CrateS2")
+	_inst(props, "crate_peach", Vector3(8.0, 0, 13.4), -20.0, 1.0, 0.0, "CratePeach2")
+	_inst(props, "barrel", Vector3(7.3, 0, 14.6), 0.0, 1.0, 0.0, "BarrelC")
+	_inst(props, "park_bench", Vector3(3.6, 0, 9.0), -40.0, 1.0, 0.0, "Bench")
+	_inst(props, "gull_standing", Vector3(5.6, 0.62, 11.5), 60.0, 1.2, 0.0, "GullOnBoat")
+	# tufos de grama e flores em MultiMesh (fora do caminho de terra)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 4040
-	for i in 36:
-		var p := Vector3(rng.randf_range(-9.4, 9.4), 0.0, rng.randf_range(3.5, 15.6))
-		if absf(p.x + 0.3) < 1.3 or (p.x < -5.2 and p.x > -8.9 and p.z > 11.8):
+	var tufts: Array[Transform3D] = []
+	var flowers: Array[Transform3D] = []
+	var tries := 0
+	while (tufts.size() < 170 or flowers.size() < 26) and tries < 6000:
+		tries += 1
+		var p := Vector3(rng.randf_range(-9.6, 9.6), 0.0, rng.randf_range(3.4, 15.4))
+		var d := _bank_path_dist(p)
+		if d < 1.3 or (p.x < -4.6 and p.x > -9.4 and p.z > 11.4) or (p.x > 4.2 and p.x < 6.8 and absf(p.z - 11.4) < 1.8):
 			continue
-		_inst(nat, "grass_tuft", p, rng.randf_range(0, 360), rng.randf_range(0.8, 1.5), 0.0, "Tuft%d" % i)
+		var b := Basis(Vector3.UP, rng.randf_range(0, TAU)).scaled(Vector3.ONE * rng.randf_range(0.6, 0.9))
+		if d < 2.2 and flowers.size() < 26:
+			flowers.append(Transform3D(b, p))
+		elif tufts.size() < 170:
+			tufts.append(Transform3D(b.scaled(Vector3.ONE * 1.9), p))
+	_mm(nat, "grass_tuft", tufts, "MM_GrassTufts")
+	_mm(nat, "flower_clump", flowers, "MM_Flowers")
 	_own(root, root)
 	_save(root, OUT + "dock_assembled.tscn")
+
+
+## Caminho de terra da margem sul (mesmo traçado de source_art/environment/build_nature.py PATH).
+const BANK_PATH := [Vector2(0.4, 3.1), Vector2(0.0, 4.2), Vector2(-1.4, 6.0), Vector2(-3.4, 7.8), Vector2(-5.2, 9.4),
+	Vector2(-6.4, 10.1), Vector2(-8.0, 9.6), Vector2(-9.2, 8.6), Vector2(-10.6, 7.9)]
+
+
+static func _bank_path_dist(p: Vector3) -> float:
+	var q := Vector2(p.x, p.z)
+	var best := 1e9
+	for i in BANK_PATH.size() - 1:
+		var a: Vector2 = BANK_PATH[i]
+		var b: Vector2 = BANK_PATH[i + 1]
+		var t := clampf((q - a).dot(b - a) / (b - a).length_squared(), 0.0, 1.0)
+		best = minf(best, q.distance_to(a + (b - a) * t))
+	return best
+
+
+## Malha unica (varias superficies) do GLB, salva em res://episodes/ep01/world/meshes/<id>_merged.res.
+static func merged_mesh(id: String) -> ArrayMesh:
+	var path := "res://episodes/ep01/world/meshes/" + id + "_merged.res"
+	var root := (load(GLB + id + ".glb") as PackedScene).instantiate() as Node3D
+	var am := ArrayMesh.new()
+	for mi in root.find_children("*", "MeshInstance3D", true, false):
+		var m := mi as MeshInstance3D
+		var xf := Transform3D.IDENTITY
+		var cur: Node = m
+		while cur != null and cur != root:
+			xf = (cur as Node3D).transform * xf
+			cur = cur.get_parent()
+		for s in m.mesh.get_surface_count():
+			var st := SurfaceTool.new()
+			st.append_from(m.mesh, s, xf)
+			var before := am.get_surface_count()
+			st.commit(am)
+			if am.get_surface_count() > before:
+				am.surface_set_material(before, m.mesh.surface_get_material(s))
+	root.free()
+	am.resource_name = id + "_merged"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://episodes/ep01/world/meshes/"))
+	ResourceSaver.save(am, path)
+	return load(path) as ArrayMesh
+
+
+func _mm(parent: Node, id: String, xfs: Array[Transform3D], nm: String) -> void:
+	var mmi := EnvMultiMesh.new()
+	mmi.name = nm
+	mmi.source_mesh = merged_mesh(id)
+	mmi.xforms = xfs
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(mmi)
 
 
 func _run() -> void:
