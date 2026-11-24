@@ -1,1 +1,10 @@
-{ "ep01.radio.team.found_boat": "Farol 7, aqui é Rota Brava. Achamos o barco." }
+{
+  "ep01.radio.team.found_boat": "Farol 7, aqui é Rota Brava. Achamos o barco.",
+  "audio.caption.horn_boat": "[buzina de barco ao longe]",
+  "audio.caption.hull_bump": "[casco encosta no cais]",
+  "audio.caption.crate_slide": "[caixa desliza no convés]",
+  "audio.caption.rope_creak": "[corda range]",
+  "audio.caption.rope_tug": "[puxão de corda]",
+  "audio.caption.clue_found": "[pista encontrada]",
+  "audio.caption.notebook": "[rabisco de lápis]"
+}

@@ -88,8 +88,10 @@ def process(line, voice_cfg):
     if line.get("radio"):
         x = radio(x, sr)
     fade(x, sr)
+    # RB-04: nivel consistente entre falas (RMS alvo -19 dBFS), limitado ao pico de -3 dBFS.
     pk = max(abs(v) for v in x)
-    g = 10 ** (TARGET_DB / 20) / pk
+    rms = math.sqrt(sum(v * v for v in x) / len(x))
+    g = min(10 ** (TARGET_DB / 20) / pk, 10 ** (-19.0 / 20) / rms)
     x = [v * g for v in x]
     out = os.path.join(ROOT, "game", "audio", "voice", line["file"] + ".wav")
     write_wav(out, sr, [x])
