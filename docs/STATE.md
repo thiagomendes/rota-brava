@@ -28,10 +28,9 @@
 - Jogabilidade (merge `ea8e4a8`): mapa em tamanho final, correr com rampa, pulo do Pico (automático na borda + mira assistida; erro volta ao último apoio), pose de equipe 1,2 s na troca (`team_pose_started/finished`), retorno visual (`game/actors/feedback/`), 10 emblemas (`Ep01Main.collectible_found(count,total)`), câmera com herói em 12,4–16,2% da tela nas 3 proporções e sem oclusão. Bot completa o episódio no mapa novo (238 s de jogo no modo rápido).
 - Claude Code: `.claude/agents/` (Opus 5.5; lead medium, subagentes low), `.claude/settings.json`, `CLAUDE.md`, skills; toolchain Linux `tools/*.sh`.
 
+**Feito em 2026-11-24 (nuvem):** tarefa 1 (ilha sem pedras duplicadas; piloto e filhote com modelos finais via `StoryFigure`; filhote pisa na buzina na fala final), tarefa 2 (atracação pelo norte, rumo alvo π, partida pelo noroeste) e tarefa 3 (17 moradores animados no cais, `gameplay`, branch `feature/rb-r1-moradores`). Suíte: 2673 PASS. **Render na nuvem funciona:** `xvfb-run` + Vulkan llvmpipe com `--write-movie` (caminho ABSOLUTO no `--write-movie`).
+
 **A fazer para fechar o RB-R1 (nesta ordem):**
-1. **Ilha: pedras duplicadas** (cubos do estágio antigo sobre as rochas de `island_world`) e **piloto/filhote ainda em blocos** — esconder os blocos do `island_stage.gd` quando `island_world` existir; instanciar `captain_model.tscn` e `pup_model.tscn` no acampamento (`PILOT_CAPTAIN_POS`) e o filhote pisando na buzina no final (`step_on_horn`).
-2. Atracação: barco entra no braço do rio pelo **norte** (z < 1,5), não pelo sul (z 13); conferir com `river_world` (língua de terra x 175,5–182, z 1,5–18).
-3. Moradores animados na vila (12–20, rotinas simples) usando `villager_a/b/c.tscn`.
 4. Grama menos saturada (verde-limão) — materiais `mat_env_*` em `source_art/environment` ou atmosfera.
 5. Contador de emblemas no HUD (ligar `collectible_found`).
 6. Opções ligadas ao jogo (volumes por bus, tamanho de legenda, movimento reduzido, assistência de pilotagem).
