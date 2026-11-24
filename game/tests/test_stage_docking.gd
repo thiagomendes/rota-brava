@@ -116,7 +116,7 @@ func run(runner) -> void:
 	await r.tree.create_timer(1.2).timeout
 	r.check(main.hud.handoff_open, "a entrada em return_trip abre a confirmacao")
 	main.hud.handoff_confirmed.emit()
-	await r.frames(2)
+	await r.tree.create_timer(Ep01Main.TEAM_POSE_SECONDS + 0.2).timeout
 	r.check(main.controlled_node == boat, "Leme controla o barco em return_trip")
 	r.check(main.hud.is_speaking(), "control_started fala a linha de enter")
 	st.update_docking()

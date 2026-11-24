@@ -54,7 +54,7 @@ func run(runner) -> void:
 	r.check(d.last_safe_foothold == 0, "progresso nao muda com apoio fora de ordem")
 
 	# Queda no inicio -> LANDING_POS
-	pico.teleport(Vector3(95.5, 0.0, 1.0))
+	pico.teleport(Vector3(185.5, 0.0, 1.0))
 	res = st.fall_into_water()
 	r.check(res["respawn_foothold"] == 0 and d.last_safe_foothold == 0, "queda no inicio nao avanca; respawn 0")
 	r.check(_hz(pico.global_position, Ep01Layout.LANDING_POS) < 0.1, "Pico volta a LANDING_POS")
@@ -62,13 +62,13 @@ func run(runner) -> void:
 	# Na ordem; queda no apoio 2
 	r.check(st.step_on_foothold(1)["accepted"] and d.last_safe_foothold == 1, "apoio 1 aceito")
 	r.check(st.step_on_foothold(2)["accepted"] and d.last_safe_foothold == 2, "apoio 2 aceito")
-	pico.teleport(Vector3(96.0, -2.0, 1.0))
+	pico.teleport(Vector3(186.0, -2.0, 1.0))
 	res = st.fall_into_water()
 	r.check(res["respawn_foothold"] == 2 and d.last_safe_foothold == 2, "queda apos apoio 2 usa respawn_foothold 2 sem avancar")
 	r.check(_hz(pico.global_position, Ep01Layout.ROCK_FOOTHOLDS[1]) < 0.1, "Pico volta ao apoio 2")
 	# Deteccao por posicao (isca e queda via process_stage)
 	st.process_stage(2.0)
-	pico.teleport(Vector3(97.4, 0.0, 7.0))
+	pico.teleport(IslandStage.DECOYS[2])
 	st.process_stage(0.1)
 	r.check(d.last_safe_foothold == 2 and _hz(pico.global_position, Ep01Layout.ROCK_FOOTHOLDS[1]) < 0.1,
 		"pisar na isca devolve ao apoio 2 sem progresso")
@@ -90,7 +90,7 @@ func run(runner) -> void:
 	r.check(sag_mid < Ep01Layout.ANCHOR_A.y - 0.1, "a corda tem curva (meio abaixo das pontas)")
 	await r.tree.create_timer(4.5).timeout
 	r.check(st.rope_sag() <= 0.11, "depois dos puxoes a corda fica esticada")
-	r.check(pico.global_position.distance_to(Ep01Layout.ANCHOR_B) < 4.5, "Pico seguro na ilha perto de ANCHOR_B")
+	r.check(pico.global_position.distance_to(Ep01Layout.ANCHOR_B) < 4.5, "Pico seguro na ilha perto de ANCHOR_B %s" % pico.global_position)
 	var blocks := 0
 	for c in st.get_children():
 		if c is MeshInstance3D or c is StaticBody3D:

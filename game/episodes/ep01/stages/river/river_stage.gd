@@ -10,11 +10,14 @@ const LEAF_GAIN := 1.6                    # ganho visual: a folha anda mais que 
 const COVE_LOOK_SECONDS := 2.0
 const LOOK_BACK_SECONDS := 1.8
 const KEY_HINT_BUOY := "ep01.river.pilot.hint_gesture_buoy"
+const WORLD_SCENE := "res://episodes/ep01/world/river_world.tscn"
+const HORIZON_SCENE := "res://episodes/ep01/world/horizon.tscn"
 
 const RIDE_PILOT := BoatActor.CREW[&"pilot"]
 const RIDE_TRACKER := BoatActor.CREW[&"tracker"]
 const RIDE_CLIMBER := BoatActor.CREW[&"climber"]
 
+var world_mounted: bool = false
 var tracker := RiverBuoyTracker.new(Ep01Layout.BUOY_POS, BUOY_TRACK_RADIUS)
 var buoy_node: Node3D
 var captain_figure: Node3D
@@ -44,11 +47,26 @@ func setup(main: Ep01Main) -> void:
 	_scenery.name = "RiverScenery"
 	_scenery.set_meta(Blocks.PROVISIONAL, true)
 	add_child(_scenery)
-	_build_banks()
+	if not _mount_world():
+		_build_banks()
+		_build_cove()
+		_build_sandbar()
 	_build_buoy()
-	_build_cove()
 	_build_leaves()
 	_build_captain_signal()
+
+
+## Cena de mundo do rio (art3d). Se existir, substitui os blocos provisorios de margem, enseada e banco de areia.
+func _mount_world() -> bool:
+	var mounted := false
+	for path: String in [WORLD_SCENE, HORIZON_SCENE]:
+		if ResourceLoader.exists(path):
+			var inst := (load(path) as PackedScene).instantiate()
+			add_child(inst)
+			if path == WORLD_SCENE:
+				mounted = true
+	world_mounted = mounted
+	return mounted
 
 
 # ---------- cenografia ----------
@@ -58,24 +76,35 @@ func _build_banks() -> void:
 	var earth := Color("8a6a43")
 	var z_n := -(Ep01Layout.RIVER_Z_HALF + 2.0)
 	var z_s := Ep01Layout.RIVER_Z_HALF + 2.0
-	# Margem norte (x 10..95) e sul (x 10..76; a baia ocupa o resto).
-	Blocks.box(_scenery, "BankNorth", Vector3(85, 1.0, 4), Vector3(52.5, -0.1, z_n), green)
-	Blocks.box(_scenery, "BankNorthEdge", Vector3(85, 0.6, 0.6), Vector3(52.5, -0.2, z_n + 2.3), earth)
-	Blocks.box(_scenery, "BankSouth", Vector3(66, 1.0, 4), Vector3(43, -0.1, z_s), green)
-	Blocks.box(_scenery, "BankSouthEdge", Vector3(66, 0.6, 0.6), Vector3(43, -0.2, z_s - 2.3), earth)
-	for i in 34:
-		var x := 12.0 + float(i) * 2.4 + _rng.randf_range(-0.6, 0.6)
+	var x0 := Ep01Layout.RIVER_X_MIN - 20.0
+	var x1 := Ep01Layout.RIVER_X_MAX + 8.0
+	var cove_w := Ep01Layout.ENSEADA_POS.x - Ep01Layout.ENSEADA_RADIUS - 1.0
+	# Margem norte inteira; margem sul ate a enseada (a baia recorta o resto).
+	Blocks.box(_scenery, "BankNorth", Vector3(x1 - x0, 1.0, 4), Vector3((x0 + x1) * 0.5, -0.1, z_n), green)
+	Blocks.box(_scenery, "BankNorthEdge", Vector3(x1 - x0, 0.6, 0.6), Vector3((x0 + x1) * 0.5, -0.2, z_n + 2.3), earth)
+	Blocks.box(_scenery, "BankSouth", Vector3(cove_w - x0, 1.0, 4), Vector3((x0 + cove_w) * 0.5, -0.1, z_s), green)
+	Blocks.box(_scenery, "BankSouthEdge", Vector3(cove_w - x0, 0.6, 0.6), Vector3((x0 + cove_w) * 0.5, -0.2, z_s - 2.3), earth)
+	var n := int((x1 - x0) / 2.4)
+	for i in n:
+		var x := x0 + 2.0 + float(i) * 2.4 + _rng.randf_range(-0.6, 0.6)
 		var depth := _rng.randf_range(0.5, 4.5)
 		if _rng.randf() < 0.65:
 			_tree("TreeN%d" % i, Vector3(x, 0.4, z_n - 1.0 - depth))
 		else:
 			_rock("RockN%d" % i, Vector3(x, 0.4, z_n + 1.0 - depth * 0.3))
-		if x < 74.0:
+		if x < cove_w - 2.0:
 			if _rng.randf() < 0.65:
 				_tree("TreeS%d" % i, Vector3(x, 0.4, z_s + 1.0 + depth))
 			else:
 				_rock("RockS%d" % i, Vector3(x, 0.4, z_s - 1.0 + depth * 0.3))
 
+
+func _build_sandbar() -> void:
+	var s := Ep01Layout.SANDBAR_RECT
+	var c := s.get_center()
+	Blocks.box(_scenery, "Sandbar", Vector3(s.size.x, 0.5, s.size.y), Vector3(c.x, Ep01Layout.WATER_Y - 0.05, c.y), Color("e8d49a"))
+	for i in 3:
+		_rock("SandbarRock%d" % i, Vector3(s.position.x + 2.0 + 5.0 * i, Ep01Layout.WATER_Y + 0.1, c.y + _rng.randf_range(-1.5, 1.5)))
 
 func _tree(node_name: String, pos: Vector3) -> void:
 	var h := _rng.randf_range(1.8, 3.0)
@@ -104,13 +133,13 @@ func _build_buoy() -> void:
 
 func _build_cove() -> void:
 	var sand := Color("e3cf9a")
-	Blocks.box(_scenery, "CoveSandSouth", Vector3(16, 0.8, 3), Vector3(84, -0.45, 19.5), sand)
-	Blocks.box(_scenery, "CoveSandEast", Vector3(3, 0.8, 19), Vector3(90.5, -0.45, 11.5), sand)
-	Blocks.box(_scenery, "RiverEndBank", Vector3(4, 0.8, 17), Vector3(90, -0.45, -5.5), sand)
-	Blocks.box(_scenery, "CoveBankWest", Vector3(2, 0.8, 4), Vector3(75, -0.45, 16), sand)
-	_rock("CoveRock1", Vector3(80.0, 0.4, 20.5))
-	_rock("CoveRock2", Vector3(87.0, 0.4, 20.0))
-
+	var e := Ep01Layout.ENSEADA_POS
+	var r := Ep01Layout.ENSEADA_RADIUS
+	Blocks.box(_scenery, "CoveSandSouth", Vector3(r * 2.0 + 4.0, 0.8, 3), Vector3(e.x, -0.45, e.z + r + 0.5), sand)
+	Blocks.box(_scenery, "CoveSandEast", Vector3(3, 0.8, r * 2.0 + 10.0), Vector3(e.x + r + 1.5, -0.45, e.z - 3.0), sand)
+	Blocks.box(_scenery, "CoveBankWest", Vector3(2, 0.8, r * 2.0), Vector3(e.x - r - 1.0, -0.45, e.z), sand)
+	_rock("CoveRock1", Vector3(e.x - 4.0, 0.4, e.z + r + 0.5))
+	_rock("CoveRock2", Vector3(e.x + 3.0, 0.4, e.z + r))
 
 func _build_leaves() -> void:
 	for i in LEAF_COUNT:
@@ -174,7 +203,7 @@ func focus_node(member: StringName) -> Node3D:
 
 
 func camera_view() -> Dictionary:
-	return {"offset": Vector3(-3.0, 13.0, 14.0), "yaw": 0.0}
+	return {"offset": Vector3(-4.0, 4.2, 3.0), "yaw": 0.0}
 
 
 func refresh_world() -> void:

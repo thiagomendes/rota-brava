@@ -3,8 +3,16 @@ extends Node3D
 ## Cena principal do Episodio 01: monta o mundo, os atores, a camera e o HUD, e liga o EpisodeDirector aos estagios.
 ## O diretor decide o progresso; os estagios apresentam e enviam eventos por `submit` (SPEC secao 7).
 
+## Emblema opcional coletado (o HUD mostra; nunca bloqueia progresso).
+signal collectible_found(count: int, total: int)
+## Pose de equipe na troca de integrante: comeca ao confirmar o cartao; ao terminar, o controle passa ao heroi.
+signal team_pose_started(member: StringName)
+signal team_pose_finished(member: StringName)
+
 const MENU_SCENE := "res://ui/main_menu.tscn"
 const IDLE_HINT_SECONDS := 25.0
+const TEAM_POSE_SECONDS := 1.2
+const TEAM_POSE_ANIMS: Array[StringName] = [&"team_pose", &"celebrate", &"wave"]
 
 ## Execucao nova: registro de conclusao sobrevive a recarga da cena (a persistencia em disco e do RB-05).
 static var carry_completed: Array[StringName] = []
@@ -35,6 +43,10 @@ var world: Node3D
 var idle_seconds: float = 0.0
 var hint_index: int = 0
 var simulating: bool = false
+var collectibles: Ep01Collectibles
+## Em pose de equipe (controle ainda nao devolvido) e o clipe usado na ultima pose ("" = sem clipe).
+var posing: bool = false
+var last_pose_anim: StringName = &""
 
 var _current_target: Ep01Interactable
 var _pending: Array = []
@@ -65,6 +77,10 @@ func _ready() -> void:
 	camera_rig = CameraRig.new()
 	add_child(camera_rig)
 	_load_stages()
+	collectibles = Ep01Collectibles.new()
+	world.add_child(collectibles)
+	collectibles.setup(self)
+	collectibles.found.connect(func(count: int, total: int) -> void: collectible_found.emit(count, total))
 	hud = Hud.new()
 	hud.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(hud)
@@ -85,9 +101,12 @@ func _ready() -> void:
 		start_at(StringName(start))
 	if _has_flag("--perf-probe"):
 		add_child(PerfProbe.new())
-	if _has_flag("--ep01-demo"):
+	if _has_flag("--ep01-demo") or _has_flag("--ep01-demo-human"):
 		var bot := Ep01DemoBot.new()
 		bot.main = self
+		bot.human = _has_flag("--ep01-demo-human")
+		if bot.human:
+			bot.timeout_seconds = 1800.0
 		bot.finished.connect(func(ok: bool) -> void: get_tree().quit(0 if ok else 1))
 		add_child(bot)
 
@@ -146,6 +165,21 @@ func _on_event_accepted(event: StringName, payload: Dictionary) -> void:
 	print("[RB] event %s %s" % [event, payload])
 	help_level = 0
 	_event_sound(event)
+	_event_feedback(event)
+
+
+## Retorno visual dos eventos aceitos (game/actors/feedback). Tremor so onde ha impacto; reduced_motion desliga.
+func _event_feedback(event: StringName) -> void:
+	match event:
+		&"buoy_rounded":
+			FeedbackFx.ring(world, Ep01Layout.BUOY_POS + Vector3(0, Ep01Layout.WATER_Y + 0.2, 0))
+		&"cove_reached":
+			FeedbackFx.ring(world, boat.global_position + Vector3(0, 0.2, 0), Color("7af0a0"))
+		&"boat_docked":
+			FeedbackFx.splash(world, boat.global_position + Vector3(0, Ep01Layout.WATER_Y, 0))
+			camera_rig.shake(0.1, 0.3)
+		&"departure_confirmed":
+			FeedbackFx.splash(world, boat.global_position + Vector3(0, Ep01Layout.WATER_Y, 0))
 
 
 func _on_state_changed(old: StringName, new: StringName) -> void:
@@ -221,7 +255,31 @@ func _handoff(prev: StringName, next: StringName) -> void:
 	hud.open_handoff(text, next)
 	print("[RB] handoff_open %s" % next)
 	await hud.handoff_confirmed
+	await _team_pose(next)
 	_give_control(next)
+
+
+## O proximo heroi faz a pose de equipe (team_pose; senao celebrate/wave) com a camera de frente por ~1,2 s.
+## O controle so volta depois; a pressao que confirmou o cartao nao vira uma segunda confirmacao/interacao.
+func _team_pose(member: StringName) -> void:
+	var a := actors.get(member) as MemberActor
+	if a == null:
+		return
+	posing = true
+	last_pose_anim = &""
+	team_pose_started.emit(member)
+	print("[RB] team_pose %s" % member)
+	if a.model != null:
+		for anim: StringName in TEAM_POSE_ANIMS:
+			if a.model.has_animation(anim):
+				last_pose_anim = anim
+				a.play_action(anim)
+				break
+	camera_rig.frame_front(a, a.facing())
+	FeedbackFx.sparkle(world, a.global_position + Vector3(0, 1.0, 0))
+	await get_tree().create_timer(TEAM_POSE_SECONDS).timeout
+	posing = false
+	team_pose_finished.emit(member)
 
 
 func _give_control(member: StringName) -> void:
@@ -246,7 +304,7 @@ func set_controlled(node: Node3D) -> void:
 func _apply_view() -> void:
 	if current_stage:
 		var v := current_stage.camera_view()
-		camera_rig.set_view(v.get("offset", camera_rig.offset), v.get("yaw", 0.0))
+		camera_rig.set_view(v.get("offset", camera_rig.offset), v.get("yaw", 0.0), v.get("look", CameraRig.LOOK_Y))
 
 
 # ---------- inicio ----------
@@ -333,6 +391,8 @@ func _update_prompt() -> void:
 		_hide_prompt()
 	else:
 		hud.show_prompt(Loc.t(target.label_key, target.label_params), target.icon)
+		if target.action_id != &"jump":
+			FeedbackFx.pulse(world, target.global_position)
 
 
 func _hide_prompt() -> void:
@@ -347,6 +407,8 @@ func try_interact() -> bool:
 	if target == null:
 		return false
 	idle_seconds = 0.0
+	if target.action_id != &"jump":
+		FeedbackFx.sparkle(world, target.global_position + Vector3(0, 0.3, 0))
 	target.trigger(controlled_node)
 	return true
 

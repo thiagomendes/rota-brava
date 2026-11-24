@@ -12,8 +12,8 @@ const STUCK_WINDOW := 3.0
 ## Corrente fraca do braco (m/s); some conforme a assistencia cresce. Ajustavel.
 const ARM_CURRENT := Vector3(-0.3, 0.0, -0.2)
 ## Limites do braco (clearance): margem oeste, ilha/pier a leste, norte, entrada sul.
-const BOUND_WEST := 92.0
-const BOUND_EAST := 100.0
+const BOUND_WEST := 92.0 + Ep01Layout.STAGE3_SHIFT
+const BOUND_EAST := 100.0 + Ep01Layout.STAGE3_SHIFT
 const BOUND_NORTH := -9.0
 const BOUND_SOUTH := 16.0
 
@@ -80,6 +80,8 @@ func _build_pier() -> void:
 	pier.set_meta(Blocks.PROVISIONAL, true)
 	add_child(pier)
 	pier.position = Ep01Layout.PIER_POS
+	# Com a cena de mundo da ilha, o atracadouro vem dela; o bloco provisorio fica escondido.
+	pier.visible = not ResourceLoader.exists(IslandStage.WORLD_SCENE)
 	Blocks.box(pier, "PierDeck", Vector3(3.4, 0.3, 8.0), Vector3(0, 0.0, 0), Color("a77a4b"))
 	for i in 4:
 		Blocks.box(pier, "PierPlank%d" % i, Vector3(3.4, 0.04, 0.12), Vector3(0, 0.17, -3.0 + 2.0 * i), Color("7e5a35"))
@@ -150,10 +152,10 @@ func _build_beacons() -> void:
 	beacons.set_meta(Blocks.PROVISIONAL, true)
 	add_child(beacons)
 	for z in [11.0, 7.0, 3.0]:
-		Blocks.cylinder(beacons, "BeaconL", 0.22, 1.2, Vector3(94.0, Ep01Layout.WATER_Y + 0.5, z), Color("e04a3a"), 0.3)
-		Blocks.sphere(beacons, "BeaconLTop", 0.28, Vector3(94.0, Ep01Layout.WATER_Y + 1.2, z), Color("ff7a6a"), 0.8)
-		Blocks.cylinder(beacons, "BeaconR", 0.22, 1.2, Vector3(99.0, Ep01Layout.WATER_Y + 0.5, z), Color("3aa86a"), 0.3)
-		Blocks.sphere(beacons, "BeaconRTop", 0.28, Vector3(99.0, Ep01Layout.WATER_Y + 1.2, z), Color("7af0a0"), 0.8)
+		Blocks.cylinder(beacons, "BeaconL", 0.22, 1.2, Vector3(BOUND_WEST + 2.0, Ep01Layout.WATER_Y + 0.5, z), Color("e04a3a"), 0.3)
+		Blocks.sphere(beacons, "BeaconLTop", 0.28, Vector3(BOUND_WEST + 2.0, Ep01Layout.WATER_Y + 1.2, z), Color("ff7a6a"), 0.8)
+		Blocks.cylinder(beacons, "BeaconR", 0.22, 1.2, Vector3(BOUND_EAST - 1.0, Ep01Layout.WATER_Y + 0.5, z), Color("3aa86a"), 0.3)
+		Blocks.sphere(beacons, "BeaconRTop", 0.28, Vector3(BOUND_EAST - 1.0, Ep01Layout.WATER_Y + 1.2, z), Color("7af0a0"), 0.8)
 	beacons.visible = false
 
 
@@ -229,7 +231,7 @@ func enter() -> void:
 	var pilot: MemberActor = ctx.actors[&"pilot"]
 	var tracker: MemberActor = ctx.actors[&"tracker"]
 	var climber: MemberActor = ctx.actors[&"climber"]
-	if climber.global_position.x < 85.0:
+	if climber.global_position.x < 85.0 + Ep01Layout.STAGE3_SHIFT:
 		climber.teleport(Ep01Layout.LANDING_POS)
 	if st == &"return_trip":
 		_dock_boat_at_target()
@@ -300,7 +302,7 @@ func focus_node(member: StringName) -> Node3D:
 
 func camera_view() -> Dictionary:
 	# Alta e a oeste/sul do barco: linha (z=4), barco (alvo) e pier (a leste) ficam juntos e livres.
-	return {"offset": Vector3(-7.0, 12.0, 13.0), "yaw": 0.0}
+	return {"offset": Vector3(-2.4, 4.2, 4.6), "yaw": 0.0}
 
 
 func gesture_hint(_key: String) -> void:

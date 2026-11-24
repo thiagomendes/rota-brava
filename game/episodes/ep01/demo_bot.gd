@@ -12,6 +12,28 @@ var show_wrong_choice: bool = true
 var elapsed: float = 0.0
 var done: bool = false
 var log_steps: bool = true
+## Modo humano (--ep01-demo-human): velocidade de crianca, pausas de leitura proporcionais a legenda, olha em volta
+## ao comecar cada etapa, pega a rota opcional atras do banco de areia e alguns emblemas. Serve para medir duracao.
+var human: bool = false
+const HUMAN_STICK := 0.85
+const HUMAN_THROTTLE := 0.8
+const READ_SECONDS_PER_CHAR := 0.055
+const READ_MIN := 1.2
+const LOOK_AROUND := 2.5
+## Desvios de exploracao a pe por estado (modo humano): emblemas alcancaveis antes da tarefa principal.
+const HUMAN_DETOURS := {
+	&"dock_investigation": [Vector3(-7.0, 0, 2.2), Vector3(-8.0, 0, 7.5)],
+	&"island_crossing": [Vector3(180.6, 0, 15.0)],
+}
+
+var _read_wait: float = 0.0
+var _last_key: String = ""
+var _line_hooked: bool = false
+var _was_speaking: bool = false
+var _look_wait: float = 0.0
+var _detour: int = 0
+var _state_time: Dictionary = {}
+var _state_started: float = 0.0
 
 var _idle: float = 0.0
 var _handoff_wait: float = 0.0
@@ -44,10 +66,13 @@ func _physics_process(delta: float) -> void:
 		return
 	if hud.pause_open:
 		return
+	if human and _human_pause(delta):
+		_release_all()
+		return
 	if hud.handoff_open:
 		_release_all()
 		_handoff_wait += delta
-		if _handoff_wait > 0.8:
+		if _handoff_wait > (2.5 if human else 0.8):
 			_handoff_wait = 0.0
 			_tap(&"interact")
 		return
@@ -58,18 +83,26 @@ func _physics_process(delta: float) -> void:
 		return
 	var state := main.director.state
 	if state != _wp_state:
+		if _wp_state != &"":
+			_state_time[_wp_state] = elapsed - _state_started
+		_state_started = elapsed
 		_wp_state = state
 		_wp_index = 0
+		_detour = 0
 		_tries.clear()
 		_step("estado %s" % state)
+		if human:
+			_look_wait = LOOK_AROUND
 	if main.controlled_node == null:
 		_release_all()
+		return
+	if human and _human_detour():
 		return
 	match state:
 		&"dock_investigation":
 			_seek_interactable(delta)
 		&"river_search":
-			_drive_boat_waypoints(_river_waypoints(), 2.8, 0.6)
+			_drive_boat_waypoints(_river_waypoints(), 2.8, HUMAN_THROTTLE if human else 0.6)
 		&"island_crossing":
 			_island(delta)
 		&"docking":
@@ -90,6 +123,13 @@ func _finish(success: bool, reason: String = "") -> void:
 		return
 	done = true
 	_release_all()
+	if _wp_state != &"":
+		_state_time[_wp_state] = elapsed - _state_started
+	var parts: Array[String] = []
+	for k: StringName in _state_time:
+		parts.append("%s=%.1f" % [k, float(_state_time[k])])
+	print("[RB] bot duracao total=%.1fs (%.2f min) human=%s emblemas=%d/%d por_etapa: %s" % [
+		elapsed, elapsed / 60.0, human, Ep01Collectibles.count(), Ep01Collectibles.total(), ", ".join(parts)])
 	print("[RB] bot fim success=%s %s" % [success, reason])
 	finished.emit(success)
 
@@ -123,7 +163,51 @@ func _release_all() -> void:
 
 
 ## Direcao desejada em coordenadas do mundo -> intencoes de movimento (considera o giro da camera).
+## Modo humano: le a legenda (pausa proporcional ao texto depois de cada fala) e olha em volta ao comecar a etapa.
+func _human_pause(delta: float) -> bool:
+	if not _line_hooked:
+		_line_hooked = true
+		main.hud.line_started.connect(func(key: String) -> void: _last_key = key)
+	var speaking := main.hud.is_speaking()
+	if speaking:
+		_was_speaking = true
+		return false
+	if _was_speaking:
+		_was_speaking = false
+		var text := _last_line_text()
+		_read_wait = maxf(READ_MIN, float(text.length()) * READ_SECONDS_PER_CHAR)
+	if _read_wait > 0.0:
+		_read_wait -= delta
+		return true
+	if _look_wait > 0.0 and main.controlled_node != null:
+		_look_wait -= delta
+		return true
+	return false
+
+
+func _last_line_text() -> String:
+	if _last_key.is_empty():
+		return "x".repeat(60)
+	return Loc.t(_last_key)
+
+
+## Desvio para pegar emblemas a pe antes da tarefa (modo humano). Devolve true enquanto esta desviando.
+func _human_detour() -> bool:
+	var list: Array = HUMAN_DETOURS.get(main.director.state, [])
+	if _detour >= list.size() or not (main.controlled_node is MemberActor):
+		return false
+	if main.hud.is_speaking():
+		_release_all()
+		return true
+	if _walk_to(list[_detour] as Vector3, 0.4):
+		_detour += 1
+		_step("emblema (desvio)")
+	return true
+
+
 func _walk_dir(dir_world: Vector3) -> void:
+	if human:
+		dir_world *= HUMAN_STICK
 	var local := Basis(Vector3.UP, -main.camera_rig.yaw) * dir_world
 	_hold(&"move_right", maxf(local.x, 0.0))
 	_hold(&"move_left", maxf(-local.x, 0.0))
@@ -163,7 +247,7 @@ func _usable_targets() -> Array[Ep01Interactable]:
 	var out: Array[Ep01Interactable] = []
 	for n in get_tree().get_nodes_in_group(Ep01Interactable.GROUP):
 		var it := n as Ep01Interactable
-		if it != null and it.can_use(main.director.active_member):
+		if it != null and it.action_id != &"jump" and it.can_use(main.director.active_member):
 			out.append(it)
 	return out
 
@@ -218,11 +302,19 @@ func _island(delta: float) -> void:
 
 func _river_waypoints() -> Array[Vector3]:
 	var b := Ep01Layout.BUOY_POS
-	var pts: Array[Vector3] = [Vector3(-6, 0, -9), Vector3(10, 0, -8), Vector3(26, 0, -7)]
+	var pts: Array[Vector3] = [Vector3(-6, 0, -9), Vector3(10, 0, -8), Vector3(26, 0, -7), Vector3(50, 0, -6), Vector3(70, 0, -6)]
+	if human:
+		pts.insert(4, Vector3(60, 0, -12.0))      # emblema rente a margem norte
 	for deg in [180, 225, 270, 315, 360, 405, 450, 495, 540]:
 		var a := deg_to_rad(float(deg))
 		pts.append(b + Vector3(cos(a), 0, sin(a)) * 6.0)
-	pts.append_array([Vector3(58, 0, 4), Vector3(76, 0, 9), Ep01Layout.ENSEADA_POS])
+	if human:
+		# Rota opcional: atras do banco de areia (corrente mais suave), com o emblema escondido; depois o fundo da enseada.
+		pts.append_array([Vector3(104, 0, 6), Vector3(110, 0, 11.3), Vector3(128, 0, 11.3), Vector3(145, 0, 8),
+			Vector3(160, 0, 14), Vector3(170, 0, 25)])
+	else:
+		pts.append_array([Vector3(110, 0, -2), Vector3(135, 0, -1), Vector3(152, 0, 6), Vector3(160, 0, 13)])
+	pts.append(Ep01Layout.ENSEADA_POS)
 	return pts
 
 

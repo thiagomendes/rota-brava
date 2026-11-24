@@ -181,7 +181,7 @@ func control_started(_member: StringName) -> void:
 
 
 func camera_view() -> Dictionary:
-	return {"offset": Vector3(0.0, 4.6, 6.2), "yaw": 0.0}
+	return {"offset": Vector3(1.8, 3.6, 4.6), "yaw": 0.0}
 
 
 func gesture_hint(key: String) -> void:
