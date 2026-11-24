@@ -20,5 +20,21 @@
     "sha256": "e258e90a1ebc14798ad65b3426bc5f11f5e0e013541c61cc7c3ee9bbf4ca0ce6",
     "folder": "blender-4.5.16-windows-x64",
     "exe": "blender.exe"
+  },
+  "audio": {
+    "_doc": "RB-R1: ferramentas de producao de audio (fora do Git, em .tools/). Instalar com tools/setup-audio-tools.ps1. Nada disto vai para o jogo distribuido.",
+    "python_packages": {"numpy": "2.5.5", "scipy": "1.18.1", "soundfile": "0.14.0", "mido": "1.3.3", "piper-tts": "1.8.0"},
+    "python_licenses": {"numpy": "BSD-3-Clause", "scipy": "BSD-3-Clause", "soundfile": "BSD-3-Clause (libsndfile LGPL-2.1)", "mido": "MIT", "piper-tts": "GPL-3.0-or-later (motor OHF-Voice/piper1-gpl; ferramenta de producao, nao distribuida; saida de audio nao e obra derivada do codigo)", "onnxruntime": "MIT"},
+    "fluidsynth": {"version": "2.6.3", "license": "LGPL-2.1-or-later", "url": "https://github.com/FluidSynth/fluidsynth/releases/download/v2.6.3/fluidsynth-v2.6.3-win10-x64-cpp11.zip", "sha256": "5522023a247de0e7d27c7678733d5abe7a591ef3b5fa400a520b8b50e0ae3791"},
+    "piper_voice": {
+      "name": "pt_BR-jeff-medium",
+      "model_card": "https://huggingface.co/rhasspy/piper-voices/blob/main/pt/pt_BR/jeff/medium/MODEL_CARD",
+      "license": "Repositorio rhasspy/piper-voices: MIT; dataset (OHF-Voice/voice-datasets): CC0; base de fine-tuning rdh (nl_BE): CC0",
+      "files": [
+        {"name": "pt_BR-jeff-medium.onnx", "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/jeff/medium/pt_BR-jeff-medium.onnx", "sha256": "82ddcdb01a0342f078bd89ce2815eda27185818d15e15f06fb9a72ac3bce94e1"},
+        {"name": "pt_BR-jeff-medium.onnx.json", "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/jeff/medium/pt_BR-jeff-medium.onnx.json", "sha256": "8dc6e33760a02bc217ae83f8a8ede973c08b0e46c240f48f7f9fb9f0dbe45e0b"},
+        {"name": "MODEL_CARD", "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/jeff/medium/MODEL_CARD", "sha256": "a81ea309434fe2fa23ed89c8ae270bc8aa40908b14e182fae54c021cc368f7a8"}
+      ]
+    }
   }
 }

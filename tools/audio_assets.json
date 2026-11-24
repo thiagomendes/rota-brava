@@ -1,0 +1,293 @@
+{
+  "_doc": "Downloads de audio de terceiros (RB-R1 D3). SO CC0/dominio publico. Baixados por tools/setup-audio-tools.ps1 para .tools/audio/cache (fora do Git), conferidos por SHA-256. 'kenney' = link assinado obtido da pagina (hash confere o conteudo).",
+  "assets": [
+    {
+      "id": "fp_xylophone",
+      "kind": "soundfont",
+      "url": "https://freepats.zenvoid.org/ChromaticPercussion/Xylophone1/Xylophone-MediumMallets-SF2-20200706.tar.xz",
+      "page": "https://freepats.zenvoid.org/ChromaticPercussion/xylophone.html",
+      "author": "FreePats (samples VCSL, Versilian Studios)",
+      "license": "CC0-1.0",
+      "sha256": "b142f2a25f0610f13d1d657c60ae3f28be58cf026d216826125c6fb9d1af631b"
+    },
+    {
+      "id": "fp_kalimba",
+      "kind": "soundfont",
+      "url": "https://freepats.zenvoid.org/Ethnic/Kalimba/Kalimba-SF2-20190723.tar.xz",
+      "page": "https://freepats.zenvoid.org/Ethnic/kalimba.html",
+      "author": "FreePats",
+      "license": "CC0-1.0",
+      "sha256": "c391c9c9ed4e91f33843383d6ffefe785d99acfa9594d9fc1945afba4b582476"
+    },
+    {
+      "id": "fp_ukulele",
+      "kind": "soundfont",
+      "url": "https://github.com/freepats/ukulele1/releases/download/2026-08-11/Ukulele-SF2-20260811.7z",
+      "page": "https://freepats.zenvoid.org/GuitarFamily/ukulele.html",
+      "author": "FreePats",
+      "license": "CC0-1.0",
+      "sha256": "38eeee4b5a040c9c172a68dad2e37a657d8ae2d878f6a1f19ee2ab5f6dbd8461"
+    },
+    {
+      "id": "fp_guitar",
+      "kind": "soundfont",
+      "url": "https://freepats.zenvoid.org/Guitar/SpanishClassicalGuitar/SpanishClassicalGuitar-SF2-20190618.7z",
+      "page": "https://freepats.zenvoid.org/Guitar/acoustic-guitar.html",
+      "author": "FreePats",
+      "license": "CC0-1.0",
+      "sha256": "8c192f1fc640a553199a4a43a17ae12354a6a05e3d6aad79bd43b5d29314ff51"
+    },
+    {
+      "id": "fp_harp",
+      "kind": "soundfont",
+      "url": "https://freepats.zenvoid.org/OrchestralStrings/ConcertHarp/ConcertHarp-small-SF2-20200702.tar.xz",
+      "page": "https://freepats.zenvoid.org/OrchestralStrings/harp.html",
+      "author": "FreePats (samples VCSL, Versilian Studios)",
+      "license": "CC0-1.0",
+      "sha256": "04d149bd7446e24ce30874de34077aa81a21a1b8d228e5fa81611fc883b18f71"
+    },
+    {
+      "id": "fp_worldperc",
+      "kind": "soundfont",
+      "url": "https://github.com/freepats/world-percussion/releases/download/2020-09-05/WorldPercussion-SF2-20200905.7z",
+      "page": "https://freepats.zenvoid.org/Percussion/world-and-rare-percussion.html",
+      "author": "FreePats (samples VCSL)",
+      "license": "CC0-1.0",
+      "sha256": "5d72c35572259804091657e094fb094c4ee45ffd4bc37f1708878ef6cfeeb129"
+    },
+    {
+      "id": "fp_brass",
+      "kind": "soundfont",
+      "url": "https://github.com/freepats/synth-brass-2/releases/download/2024-06-10/SynthBrass2-SF2-20240610.7z",
+      "page": "https://freepats.zenvoid.org/Synthesizer/synth-brass.html",
+      "author": "FreePats",
+      "license": "CC0-1.0",
+      "sha256": "d094cd3067efd057fdbba0cc9ca831496fa9331580544ae943cb1dca9da476b1"
+    },
+    {
+      "id": "kenney_impact",
+      "kind": "foley",
+      "kenney": "assets/impact-sounds",
+      "page": "https://kenney.nl/assets/impact-sounds",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0-1.0",
+      "sha256": "029d734af1582474edf3a694d1b0cebc97c1c152f2f39fa34d4c2bafc5de77f8"
+    },
+    {
+      "id": "kenney_rpg",
+      "kind": "foley",
+      "kenney": "assets/rpg-audio",
+      "page": "https://kenney.nl/assets/rpg-audio",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0-1.0",
+      "sha256": "6dbeaf8544da958d8f2adcb4a4a4b76c1ade34a05f8ab9edccd327da7375f38b"
+    },
+    {
+      "id": "kenney_interface",
+      "kind": "foley",
+      "kenney": "assets/interface-sounds",
+      "page": "https://kenney.nl/assets/interface-sounds",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0-1.0",
+      "sha256": "f2193d072726d6758a5f7871b2dcc54dcce0d5c35c6f0a62f92549b327c81232"
+    },
+    {
+      "id": "oga_waves_a1",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/wave_01_cc0-11505__transitking__wavesound.flac",
+      "page": "https://opengameart.org/content/water-waves",
+      "author": "transitking (Freesound 11505), editado por qubodup",
+      "license": "CC0-1.0",
+      "sha256": "0bd84b2061a82c234470bd4e16efc6ab24851928d3f93e1757bfea048b2d7a33"
+    },
+    {
+      "id": "oga_waves_a2",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/wave_02_cc0-11505__transitking__wavesound.flac",
+      "page": "https://opengameart.org/content/water-waves",
+      "author": "transitking (Freesound 11505), editado por qubodup",
+      "license": "CC0-1.0",
+      "sha256": "afa112a66c4cafe06ef76d5e2d4d00a701d4520c58eef63b862afa771991d77a"
+    },
+    {
+      "id": "oga_waves_a3",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/wave_03_cc0-11505__transitking__wavesound.flac",
+      "page": "https://opengameart.org/content/water-waves",
+      "author": "transitking (Freesound 11505), editado por qubodup",
+      "license": "CC0-1.0",
+      "sha256": "1657a0002367e6e97eb34fc9f4d841f4a910981450c634bdc6c09ae1978049c1"
+    },
+    {
+      "id": "oga_waves_a4",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/wave_04_cc0-11505__transitking__wavesound.flac",
+      "page": "https://opengameart.org/content/water-waves",
+      "author": "transitking (Freesound 11505), editado por qubodup",
+      "license": "CC0-1.0",
+      "sha256": "6c5b59562bf9b00e77f7bd8d6550912b6326e190ce97e9b8c1a1faa887bb4fac"
+    },
+    {
+      "id": "oga_beach_1",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/wave_01_cc0-18363__jasinski__alkaibeach.flac",
+      "page": "https://opengameart.org/content/beach-ocean-waves",
+      "author": "jasinski (Freesound 18363), editado por qubodup",
+      "license": "CC0-1.0",
+      "sha256": "fcfca178eca2eac536e8c2a4ed5cf8096e44c921acd587047b3d9f1d7845435c"
+    },
+    {
+      "id": "oga_beach_2",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/wave_02_cc0-18363__jasinski__alkaibeach.flac",
+      "page": "https://opengameart.org/content/beach-ocean-waves",
+      "author": "jasinski (Freesound 18363), editado por qubodup",
+      "license": "CC0-1.0",
+      "sha256": "53b5c28c0edc36f049e77e65f2cf8a86135103328c44c1507c416e6469d18096"
+    },
+    {
+      "id": "oga_beach_3",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/wave_03_cc0-18363__jasinski__alkaibeach.flac",
+      "page": "https://opengameart.org/content/beach-ocean-waves",
+      "author": "jasinski (Freesound 18363), editado por qubodup",
+      "license": "CC0-1.0",
+      "sha256": "fc795f95f352b354867d69a587daecb8815334e28e3b56a7798c5f3005349054"
+    },
+    {
+      "id": "oga_beach_4",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/wave_04_cc0-18363__jasinski__alkaibeach.flac",
+      "page": "https://opengameart.org/content/beach-ocean-waves",
+      "author": "jasinski (Freesound 18363), editado por qubodup",
+      "license": "CC0-1.0",
+      "sha256": "3c490e736365fdd617ce8405470d8878fc6146d9a8dba448d622addb01cfff3b"
+    },
+    {
+      "id": "oga_gull_1",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/Seagull%20Ambient%201.wav",
+      "page": "https://opengameart.org/content/solo-seagull-sound-effects",
+      "author": "rango-mango",
+      "license": "CC0-1.0",
+      "sha256": "3e891a8cf944797b2f16e0c19b1167e7eea7a20c8c7693487dcfdcfa0eb5621c"
+    },
+    {
+      "id": "oga_gull_2",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/Seagull%20Ambient%202.wav",
+      "page": "https://opengameart.org/content/solo-seagull-sound-effects",
+      "author": "rango-mango",
+      "license": "CC0-1.0",
+      "sha256": "477246beafe31569b5937483b34b97043f4331a0639358fdcb3a55347d3d7a3a"
+    },
+    {
+      "id": "oga_gull_3",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/Seagull%20Ambient%203.wav",
+      "page": "https://opengameart.org/content/solo-seagull-sound-effects",
+      "author": "rango-mango",
+      "license": "CC0-1.0",
+      "sha256": "f9e5e283197945d3df148082a9c2110154bc5a1c7ff2b58c951134c182c61788"
+    },
+    {
+      "id": "oga_gull_4",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/Seagull%20Ambient%204.wav",
+      "page": "https://opengameart.org/content/solo-seagull-sound-effects",
+      "author": "rango-mango",
+      "license": "CC0-1.0",
+      "sha256": "14b6fcd3f05376a75bb4a01f1cf60ba10499e43e4d62eec59290409a92b93613"
+    },
+    {
+      "id": "oga_gull_5",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/Seagull%20Ambient%205.wav",
+      "page": "https://opengameart.org/content/solo-seagull-sound-effects",
+      "author": "rango-mango",
+      "license": "CC0-1.0",
+      "sha256": "3c8fed4e1f9c43f8a91a4db776fa34e3f7d7c51ea190a18243aeade4b0908cac"
+    },
+    {
+      "id": "oga_wind_1",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/wind1.wav",
+      "page": "https://opengameart.org/content/wind1",
+      "author": "lukerustltd",
+      "license": "CC0-1.0",
+      "sha256": "a2856f794fbf77e05f8241dc4adeade7f62fa21c3c9dc49f7725b6c6218060c3"
+    },
+    {
+      "id": "oga_wind_2",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/wind2.wav",
+      "page": "https://opengameart.org/content/wind1",
+      "author": "lukerustltd",
+      "license": "CC0-1.0",
+      "sha256": "76a05480733ee021bdf7c255b44695b57fd0dedca09dccadccd2aaf67d32f127"
+    },
+    {
+      "id": "oga_wind_3",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/wind3.wav",
+      "page": "https://opengameart.org/content/wind1",
+      "author": "lukerustltd",
+      "license": "CC0-1.0",
+      "sha256": "8def85e8546fb4850f017ede32b938593aeca5dfd3a9361cbabd80d455ff954d"
+    },
+    {
+      "id": "oga_crowd",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/crowd_shouting_0.ogg",
+      "page": "https://opengameart.org/content/crowd-shoutingspeaking-ambience",
+      "author": "starninjas",
+      "license": "CC0-1.0",
+      "sha256": "a2c23a64c127c77717cbe4abb21f138bac9d9aa6cb3cc89d62bab5d0d96dd7ca"
+    },
+    {
+      "id": "oga_birds",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/birds-isaiah658_0.ogg",
+      "page": "https://opengameart.org/content/ambient-bird-sounds",
+      "author": "isaiah658",
+      "license": "CC0-1.0",
+      "sha256": "359e4e3f9da9d75aac64cede511c7e3ef8b461f9d9f8c230f8f80e44c4b3e35f"
+    },
+    {
+      "id": "oga_steps_fantozzi",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/Fantozzi-footsteps.7z",
+      "page": "https://opengameart.org/content/fantozzis-footsteps-grasssand-stone",
+      "author": "Fantozzi (Freesound pack 10338), recortado por qubodup",
+      "license": "CC0-1.0",
+      "sha256": "415d360e0911c1c1c5355ee94023b772e6f4044f59b9b580610e7dbffd1840fd"
+    },
+    {
+      "id": "oga_bell_1",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/bell_ding1.wav",
+      "page": "https://opengameart.org/content/bell-dingschimes",
+      "author": "pwl",
+      "license": "CC0-1.0",
+      "sha256": "8ce40f49cd211125303df59db0da4fe911e8b2f34d3847011b15137c6b5850de"
+    },
+    {
+      "id": "oga_bell_3",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/bell_ding3.wav",
+      "page": "https://opengameart.org/content/bell-dingschimes",
+      "author": "pwl",
+      "license": "CC0-1.0",
+      "sha256": "99b9cdb7b9536c97c6738f1e0762cc40a3e7ef81bc774b0b6e0322aa70c96434"
+    },
+    {
+      "id": "oga_tree_creak",
+      "kind": "foley",
+      "url": "https://opengameart.org/sites/default/files/tree_creak.flac",
+      "page": "https://opengameart.org/content/tree-creaking",
+      "author": "Department64, limpo por antumdeluge",
+      "license": "CC0-1.0",
+      "sha256": "9bab7c7f68850136c43fb91216c7c1760ac2bda22b2a31659905c559a464d422"
+    }
+  ]
+}

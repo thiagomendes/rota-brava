@@ -68,7 +68,7 @@ def true_peak_estimate(samples, channels, top=400):
     best = 0.0
     for k in idx:
         ch = k % channels
-        pts = [samples[k + (t - 1) * channels] if 0 <= k + (t - 1) * channels < len(samples) else 0 for t in range(-1, 3)]
+        pts = [samples[k + t * channels] if 0 <= k + t * channels < len(samples) else 0 for t in range(-1, 3)]  # p0=k-1, p1=k, p2=k+1, p3=k+2 (RB-R1: antes p1 era k-1)
         p0, p1, p2, p3 = pts
         for s in (0.25, 0.5, 0.75):
             v = 0.5 * ((2 * p1) + (-p0 + p2) * s + (2 * p0 - 5 * p1 + 4 * p2 - p3) * s * s + (-p0 + 3 * p1 - 3 * p2 + p3) * s ** 3)
@@ -86,7 +86,7 @@ def main():
     dur = frames / rate
     peak = max(abs(s) for s in samples) / 32768.0 if samples else 0.0
     rms = math.sqrt(sum(s * s for s in samples) / max(len(samples), 1)) / 32768.0
-    tp = true_peak_estimate(samples, ch)
+    tp = max(true_peak_estimate(samples, ch), peak)  # pico verdadeiro nunca e menor que o de amostra
     per_sec = []
     win = rate * ch
     for s in range(int(dur)):

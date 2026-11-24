@@ -7,6 +7,7 @@ class_name AudioDirector extends Node
 signal voice_finished(id: String)
 signal voice_cancelled(id: String)
 signal music_finished(music_name: String)
+signal line_started(id: String, info: Dictionary)
 
 const CATALOG_PATH := "res://audio/sfx_catalog.json"
 const BUS_VOICE := &"Voz"
@@ -15,6 +16,30 @@ const BUS_SFX := &"Efeitos"
 const BUS_AMBIENCE := &"Ambiente"
 const AMBIENCE_NAMES: Array[String] = ["amb_dock_water", "amb_wind_light", "amb_dock_creaks", "amb_gulls_far"]
 const STEP_NAMES: Array[String] = ["sfx_step_wood_01", "sfx_step_wood_02", "sfx_step_wood_03", "sfx_step_wood_04", "sfx_step_wood_05", "sfx_step_wood_06"]
+const SURFACES: Array[StringName] = [&"wood", &"stone", &"sand", &"grass"]
+## Zonas de ambiente (RB-R1): camadas em loop por lugar do mapa.
+const AMBIENCE_ZONES: Dictionary = {
+	&"dock": ["amb_dock_water", "amb_wind_light", "amb_dock_creaks", "amb_gulls_far"],
+	&"village": ["amb_beach_waves", "amb_village_market", "amb_gulls_far", "amb_wind_light"],
+	&"river": ["amb_river", "amb_birds", "amb_wind_light"],
+	&"island": ["amb_beach_waves", "amb_birds", "amb_gulls_far", "amb_wind_light"],
+}
+## Nomes curtos de musica (secoes) -> entradas do catalogo. Vinhetas tocam por cima do loop e devolvem a secao.
+const MUSIC_ALIASES: Dictionary = {
+	&"explore": "theme_explore", &"explore_low": "theme_explore_low", &"crossing": "theme_crossing",
+	&"return": "theme_return", &"discovery": "theme_discovery", &"victory": "theme_victory", &"team_call": "theme_team_call",
+}
+const UI_SOUNDS: Dictionary = {
+	&"move": "sfx_ui_move", &"confirm": "sfx_ui_confirm", &"back": "sfx_ui_back", &"open": "sfx_ui_open",
+	&"swap": "sfx_ui_swap", &"hero_swap": "sfx_ui_swap", &"clue": "sfx_clue_found", &"clue_found": "sfx_clue_found",
+	&"star": "sfx_ui_star",
+}
+const STING_DIP_DB := -10.0
+## Nomes de `ui_sound` emitidos pela UI v2 -> nomes de play_ui.
+const UI_V2_SOUNDS: Dictionary = {
+	&"focus": &"move", &"confirm": &"confirm", &"pop": &"open", &"handoff": &"swap", &"star": &"star",
+	&"emote": &"move", &"back": &"back", &"tick": &"move", &"select": &"confirm",
+}
 const POOL_START := 8
 const POOL_MAX := 24
 const ENGINE_PITCH_MIN := 0.8
@@ -32,6 +57,10 @@ var last_step_name: String = ""
 var step_history: Array[String] = []
 var rng := RandomNumberGenerator.new()
 var ducked: bool = false
+var ambience_zone: StringName = &"dock"
+var current_sting: String = ""
+var current_line: Dictionary = {}
+var last_step_by_surface: Dictionary = {}
 
 var _entries: Dictionary = {}
 var _streams: Dictionary = {}
@@ -47,6 +76,10 @@ var _amb_tween: Tween
 var _duck_tween: Tween
 var _music_base_db: float = 0.0
 var _music_bus_base_db: float = NAN
+var _sting_player: AudioStreamPlayer
+var _visemes_cache: Dictionary = {}
+var _line_started_ms: int = 0
+var _line_duck: bool = false
 
 
 func _ready() -> void:
@@ -55,6 +88,9 @@ func _ready() -> void:
 	for i in 2:
 		_voice_players.append(_make_player(BUS_VOICE))
 		_music_players.append(_make_player(BUS_MUSIC))
+	voice_finished.connect(_on_line_end)
+	voice_cancelled.connect(_on_line_end)
+	_sting_player = _make_player(BUS_MUSIC)
 	for i in POOL_START:
 		_pool2d.append(_make_player(BUS_SFX))
 		_pool3d.append(_make_player3d())
@@ -120,6 +156,12 @@ func _stream(sound_name: String) -> AudioStream:
 
 
 static func _looped(s: AudioStream) -> AudioStream:
+	var ogg := s as AudioStreamOggVorbis
+	if ogg != null:
+		var o := ogg.duplicate() as AudioStreamOggVorbis
+		o.loop = true
+		o.loop_offset = 0.0
+		return o
 	var w := s as AudioStreamWAV
 	if w == null:
 		return s
@@ -184,17 +226,30 @@ func play_sfx(sound_name: String, position: Vector3 = Vector3.ZERO, volume_db: f
 	return p
 
 
-## Passo: escolhe uma das 6 variacoes sem repetir a anterior; volume e pitch variam levemente com a velocidade
-## (m/s; ~0..4). Devolve o nome tocado ("" se speed <= 0 ou a superficie nao existe).
+## Nomes das variacoes de passo de uma superficie (wood, stone, sand, grass); desconhecida cai em madeira.
+func step_names(surface: StringName) -> Array[String]:
+	var s := surface if SURFACES.has(surface) else &"wood"
+	var names: Array[String] = []
+	for i in 6:
+		var n := "sfx_step_%s_%02d" % [s, i + 1]
+		if has_sound(n):
+			names.append(n)
+	return names if not names.is_empty() else STEP_NAMES
+
+
+## Passo: escolhe uma das 6 variacoes da superficie sem repetir a anterior; volume e pitch variam levemente com a
+## velocidade (m/s; ~0..4). Devolve o nome tocado ("" se speed <= 0).
 func play_footstep(speed: float, surface: StringName = &"wood", position: Vector3 = Vector3.ZERO) -> String:
 	if speed <= 0.0:
 		return ""
-	var names := STEP_NAMES  # so madeira existe hoje; outras superficies caem em madeira
+	var names := step_names(surface)
+	var prev: String = last_step_by_surface.get(surface, last_step_name)
 	var pick := names[rng.randi_range(0, names.size() - 1)]
 	if names.size() > 1:
-		while pick == last_step_name:
+		while pick == prev:
 			pick = names[rng.randi_range(0, names.size() - 1)]
 	last_step_name = pick
+	last_step_by_surface[surface] = pick
 	step_history.append(pick)
 	if step_history.size() > 200:
 		step_history.pop_front()
@@ -245,7 +300,8 @@ func _cancel_voice() -> void:
 	current_voice_id = ""
 	_voice_token += 1  # invalida o fim da fala antiga
 	voice_cancelled.emit(old_id)
-	if is_inside_tree() and old.playing:
+	# sem checar old.playing: logo apos play() a Godot pode ainda reportar playing=false e a fala tocaria inteira
+	if is_inside_tree():
 		var tw := create_tween()
 		tw.tween_property(old, "volume_db", SILENT_DB, VOICE_CANCEL_FADE)
 		tw.tween_callback(old.stop)
@@ -262,10 +318,134 @@ func is_voice_playing() -> bool:
 	return current_voice_id != ""
 
 
-## Ambiente: 4 camadas em loop (agua, vento, rangidos, gaivotas), cada uma com nivel proprio (gain_db do catalogo),
-## entram com fade de 2 s a partir de pontos aleatorios para nao alinhar as emendas.
+## Fala com dados para a boca e a legenda (RB-R1). Devolve sempre um Dictionary:
+##   id, duration (s; 0.0 se a fala/arquivo nao existe -> o chamador mantem a legenda e libera a sequencia),
+##   type ("babble" | "radio" | ""), character, intent, emotes (Array), subtitle (chave de Loc),
+##   frame_s (s por quadro de visema) e visemes (Array[float] 0..1, abertura da boca).
+## Abaixa a musica (duck_music) enquanto a fala toca; volta ao terminar ou ser cancelada.
+func play_line(id: String) -> Dictionary:
+	var e := VoiceCatalog.lookup(id, Loc.language)
+	var info := {"id": id, "duration": 0.0, "type": str(e.get("type", "")), "character": str(e.get("character", "")),
+		"intent": str(e.get("intent", "")), "emotes": e.get("emotes", []), "subtitle": str(e.get("subtitle", id)),
+		"frame_s": 0.03, "visemes": []}
+	var dur := play_voice(id) if not e.is_empty() else 0.0
+	if dur <= 0.0:
+		current_line = {}
+		return info
+	var vis := _load_visemes(str(e.get("visemes", "")))
+	info["duration"] = dur
+	info["frame_s"] = float(vis.get("frame_s", 0.03))
+	info["visemes"] = vis.get("open", [])
+	current_line = info
+	_line_started_ms = Time.get_ticks_msec()
+	if not ducked:
+		duck_music(true)
+		_line_duck = true
+	line_started.emit(id, info)
+	return info
+
+
+func _load_visemes(path: String) -> Dictionary:
+	if path == "":
+		return {}
+	if _visemes_cache.has(path):
+		return _visemes_cache[path]
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path)) if FileAccess.file_exists(path) else null
+	var d: Dictionary = parsed if parsed is Dictionary else {}
+	_visemes_cache[path] = d
+	return d
+
+
+## Abertura da boca (0..1) da fala atual no instante t (s desde o inicio da fala). 0.0 sem fala ou fora dela.
+## Interpola linearmente entre quadros de ~30 ms.
+func viseme_at(t: float) -> float:
+	var v: Array = current_line.get("visemes", [])
+	if v.is_empty() or t < 0.0:
+		return 0.0
+	var f := t / float(current_line.get("frame_s", 0.03))
+	var i := int(floor(f))
+	if i >= v.size() - 1:
+		return float(v[v.size() - 1]) if i == v.size() - 1 else 0.0
+	return lerpf(float(v[i]), float(v[i + 1]), f - float(i))
+
+
+## Abertura da boca agora (usa a posicao de reproducao da fala atual; 0.0 se nenhuma fala toca).
+func current_viseme() -> float:
+	if current_voice_id == "" or current_line.is_empty() or str(current_line.get("id", "")) != current_voice_id:
+		return 0.0
+	var p := _voice_players[_voice_cur]
+	var t := p.get_playback_position() if p.playing else float(Time.get_ticks_msec() - _line_started_ms) / 1000.0
+	return viseme_at(t)
+
+
+func _on_line_end(_id: String) -> void:
+	current_line = {}
+	if _line_duck:
+		_line_duck = false
+		duck_music(false)
+
+
+## Som de interface (2D, bus Efeitos): move, confirm, back, open, swap/hero_swap, clue/clue_found, star.
+## Devolve o player ou null se o nome nao existe.
+func play_ui(ui_name: StringName) -> Node:
+	var n: String = UI_SOUNDS.get(ui_name, "")
+	if n == "":
+		push_warning("AudioDirector: som de UI desconhecido: " + String(ui_name))
+		return null
+	return play_sfx(n)
+
+
+## Som da UI v2 pelo nome do sinal `ui_sound` (focus, confirm, pop, handoff, star, emote, back, tick, select).
+## Aceita tambem os nomes de play_ui. Devolve o player ou null.
+func play_ui_named(ui_name: StringName) -> Node:
+	return play_ui(UI_V2_SOUNDS.get(ui_name, ui_name))
+
+
+## Arquivo (res://) de uma entrada do catalogo de sons; aceita nomes curtos de musica (explore, discovery...).
+## "" se nao existe. Estatico: serve a quem toca audio sem um AudioDirector (ex.: demo de referencia).
+static func catalog_file(sound_name: String) -> String:
+	var n := str(MUSIC_ALIASES.get(StringName(sound_name), sound_name))
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(CATALOG_PATH)) if FileAccess.file_exists(CATALOG_PATH) else null
+	if parsed is Dictionary:
+		for e in (parsed as Dictionary).get("entries", []):
+			if str((e as Dictionary).get("name", "")) == n:
+				return str(e["file"])
+	return ""
+
+
+## Troca as camadas de ambiente pela zona (dock, village, river, island) com crossfade de `fade` s.
+func set_ambience_zone(zone: StringName, fade: float = 2.0) -> void:
+	if not AMBIENCE_ZONES.has(zone):
+		push_warning("AudioDirector: zona de ambiente desconhecida: " + String(zone))
+		return
+	ambience_zone = zone
+	var wanted: Array = AMBIENCE_ZONES[zone]
+	for n in _amb_players:
+		if not wanted.has(n):
+			var p: AudioStreamPlayer = _amb_players[n]
+			if p.playing:
+				if is_inside_tree() and fade > 0.0:
+					var tw := create_tween()
+					tw.tween_property(p, "volume_db", SILENT_DB, fade)
+					tw.tween_callback(p.stop)
+				else:
+					p.stop()
+	start_ambience(fade)
+
+
+func ambience_layers_playing() -> Array[String]:
+	var out: Array[String] = []
+	for n in _amb_players:
+		var p: AudioStreamPlayer = _amb_players[n]
+		if p.playing and (AMBIENCE_ZONES[ambience_zone] as Array).has(n):
+			out.append(n)
+	return out
+
+
+## Ambiente: camadas em loop da zona atual (padrao dock: agua, vento, rangidos, gaivotas), cada uma com nivel proprio
+## (gain_db do catalogo); entram com fade a partir de pontos aleatorios para nao alinhar as emendas.
 func start_ambience(fade: float = 2.0) -> void:
-	for n in AMBIENCE_NAMES:
+	for n in AMBIENCE_ZONES[ambience_zone]:
 		var s := _stream(n)
 		if s == null:
 			continue
@@ -331,10 +511,16 @@ func set_engine_rpm(t: float) -> void:
 ## Musica: crossfade de `fade` s entre a faixa atual e `music_name` (theme_explore, theme_explore_low,
 ## theme_discovery). Faixas sem loop emitem music_finished ao terminar.
 func play_music(music_name: String, fade: float = 1.0) -> void:
+	music_name = resolve_music(music_name)
 	if music_name == current_music and _music_players.size() > 0 and _music_players[_music_cur].playing:
 		return
 	var s := _stream(music_name)
 	if s == null:
+		return
+	# Vinheta (sem loop) sobre um loop tocando: toca por cima, abaixa o loop e devolve a secao ao terminar.
+	if not bool(_entries[music_name].get("loop", true)) and current_music != "" and _music_players.size() > 0 \
+			and _music_players[_music_cur].playing and bool(_entries.get(current_music, {}).get("loop", false)):
+		_play_sting(music_name, s)
 		return
 	if _music_players.is_empty():
 		for i in 2:
@@ -358,6 +544,45 @@ func play_music(music_name: String, fade: float = 1.0) -> void:
 		old.stop()
 	if not bool(_entries[music_name].get("loop", true)):
 		_wait_music_end(p, music_name)
+
+
+## Nome do catalogo para um nome curto de secao (explore, explore_low, crossing, return, discovery, victory,
+## team_call) ou o proprio nome se ja for do catalogo.
+func resolve_music(music_name: String) -> String:
+	return str(MUSIC_ALIASES.get(StringName(music_name), music_name))
+
+
+func _play_sting(sting: String, s: AudioStream) -> void:
+	if _sting_player == null:
+		_sting_player = _make_player(BUS_MUSIC)
+	var loop_p := _music_players[_music_cur]
+	_sting_player.stop()
+	_sting_player.stream = s
+	_sting_player.volume_db = _gain(sting)
+	current_sting = sting
+	_sting_player.play()
+	if is_inside_tree():
+		create_tween().tween_property(loop_p, "volume_db", _music_base_db + STING_DIP_DB, 0.15)
+	else:
+		loop_p.volume_db = _music_base_db + STING_DIP_DB
+	_wait_sting_end(sting, loop_p)
+
+
+func _wait_sting_end(sting: String, loop_p: AudioStreamPlayer) -> void:
+	await _sting_player.finished
+	if current_sting != sting:
+		return
+	current_sting = ""
+	if loop_p.playing and loop_p == _music_players[_music_cur]:
+		if is_inside_tree():
+			create_tween().tween_property(loop_p, "volume_db", _music_base_db, 1.2)
+		else:
+			loop_p.volume_db = _music_base_db
+	music_finished.emit(sting)
+
+
+func is_sting_playing() -> bool:
+	return current_sting != "" and _sting_player != null and _sting_player.playing
 
 
 func _wait_music_end(p: AudioStreamPlayer, music_name: String) -> void:
@@ -421,6 +646,11 @@ func stop_all() -> void:
 	stop_music(0.0)
 	stop_ambience(0.0)
 	current_music = ""
+	current_sting = ""
+	current_line = {}
+	_line_duck = false
+	if _sting_player != null:
+		_sting_player.stop()
 	if ducked:
 		duck_music(false)
 
