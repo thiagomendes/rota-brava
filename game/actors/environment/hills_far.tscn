@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/hills_far.glb" id="1_tua7t"]
+
+[node name="Hills_Far" type="Node3D" unique_id=1625094221]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=684093032 instance=ExtResource("1_tua7t")]

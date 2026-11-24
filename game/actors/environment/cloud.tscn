@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/cloud.glb" id="1_km8e3"]
+
+[node name="Cloud" type="Node3D" unique_id=1483032354]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=1531732950 instance=ExtResource("1_km8e3")]

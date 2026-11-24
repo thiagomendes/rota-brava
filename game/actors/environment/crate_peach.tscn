@@ -5,14 +5,14 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_1ssgo"]
 size = Vector3(0.7409132, 0.5766113, 0.7499018)
 
-[node name="Crate_Peach" type="Node3D" unique_id=1322778194]
+[node name="Crate_Peach" type="Node3D" unique_id=1931882777]
 metadata/provisional = true
 
-[node name="Model" parent="." unique_id=714997325 instance=ExtResource("1_thsmd")]
+[node name="Model" parent="." unique_id=1670345623 instance=ExtResource("1_thsmd")]
 
-[node name="Body" type="StaticBody3D" parent="." unique_id=632138822]
+[node name="Body" type="StaticBody3D" parent="." unique_id=630343007]
 collision_mask = 0
 
-[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1098352362]
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1715443981]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0023030937, 0.28830564, -0.0038902164)
 shape = SubResource("BoxShape3D_1ssgo")

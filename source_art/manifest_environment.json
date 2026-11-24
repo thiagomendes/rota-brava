@@ -1,6 +1,6 @@
 {
   "projeto": "Rota Brava",
-  "ticket": "RB-04-env",
+  "ticket": "RB-04-env + RB-R1-mundo",
   "agente": "art3d",
   "ativos": [
     {
@@ -19,7 +19,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_deck_2m.glb",
-      "glb_sha256": "48318644aa1ffa26eac0f257af56f7f91d4230edd8c9a575e2b354f850f4ef6a",
+      "glb_sha256": "e13bb1c74e001fd3fdedc12494bf8f104ec744b6233373f31eb11ea77b355e32",
       "triangulos": 4360,
       "vertices": 2328,
       "materiais": [
@@ -63,7 +63,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_deck_4m.glb",
-      "glb_sha256": "a96cdb490e321015119965a1f4b6818196ace0c9fdf7dce6309caa4df62a7768",
+      "glb_sha256": "55b41e66ee0015720e59d4aa39ac04205092ca5f93d4dc04179bb4c24f83ea6f",
       "triangulos": 8384,
       "vertices": 4480,
       "materiais": [
@@ -107,7 +107,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_post.glb",
-      "glb_sha256": "ad42dcf1f2a3276189dfebc02f21ccd26a94ccf25f80da3304a33a7496bf052d",
+      "glb_sha256": "46884c9211629b6f91c5994124f0a528525d9e8334eb4e6f3678e9056f967d7d",
       "triangulos": 2556,
       "vertices": 1286,
       "materiais": [
@@ -150,7 +150,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_cleat.glb",
-      "glb_sha256": "7b39f18f8f8c881d6d12be4386e984be22257f13813cf9500f2860191a45d953",
+      "glb_sha256": "e11a9a1dcb8cabde5c1522dd5120490217e53d809dc7b0b02d6d1fd7afc76d12",
       "triangulos": 1356,
       "vertices": 684,
       "materiais": [
@@ -227,7 +227,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_ladder.glb",
-      "glb_sha256": "b9a919225c9dfdc8236d3c6be91dc7609d58ae2b2cf8bf59ffe4e01eed689fca",
+      "glb_sha256": "ef6f95464bbbaf5e93be19dfc8f9d66aca51948082cfcf9a13a96e7243eab491",
       "triangulos": 840,
       "vertices": 440,
       "materiais": [
@@ -266,7 +266,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_edge.glb",
-      "glb_sha256": "5131aa6930c60c9762b4e6981208de505581f2928dc5415bd29f5c114f593c46",
+      "glb_sha256": "afb06802e379b60339f6dfb21dbea33106ab10b80c6a62fe335d206c26d8e188",
       "triangulos": 412,
       "vertices": 216,
       "materiais": [
@@ -305,7 +305,7 @@
         "source_art/environment/dock_kit.blend"
       ],
       "saida_glb": "game/assets/models/environment/dock_pile.glb",
-      "glb_sha256": "f17ab7f54bf89471c79030f2aa133c4aae5a972ae60e5337ddb8e0c74df18ad9",
+      "glb_sha256": "5076e7c4c0b5967844fd85fc6a9f470aeb3de9802fe8347c192f78e35e21ff19",
       "triangulos": 2760,
       "vertices": 1382,
       "materiais": [
@@ -342,7 +342,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/crate_l.glb",
-      "glb_sha256": "e3e02c2bd5e1d0927c870518af964a3084be39dda633bb29f3ca08a5b8155915",
+      "glb_sha256": "2ceeab7fe4ea66b2399169ac73ac7b0ca89693aa3336bc020422911893b3d8ed",
       "triangulos": 1256,
       "vertices": 672,
       "materiais": [
@@ -385,7 +385,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/crate_s.glb",
-      "glb_sha256": "65e05c9df414de5c2899a04b69583ac01e51ba627e0c0d268a0c30eb2d92a752",
+      "glb_sha256": "62fa0ea6fcf7b64a7f229ce96a8ead6fd29312bcaa66a7a2101ebde64d863df5",
       "triangulos": 1080,
       "vertices": 576,
       "materiais": [
@@ -428,7 +428,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/crate_peach.glb",
-      "glb_sha256": "68fcd3d9dcf3ae019aab78c32eaca65ba51e84eab5ad57858d5d46094871e2ea",
+      "glb_sha256": "5d56e8eab0fb8c5f084fb77410480ff87fffbfc6ee3353a7b40e2ac6f59fa803",
       "triangulos": 5412,
       "vertices": 2814,
       "materiais": [
@@ -475,7 +475,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/barrel.glb",
-      "glb_sha256": "4b790ad04ada8a29866f4502f1560c960287acc5f605358e25c174de4437637c",
+      "glb_sha256": "de3563702eaaed0924dc939d638c43e60d7497abd438d22464f5aa7e1c223880",
       "triangulos": 3424,
       "vertices": 1722,
       "materiais": [
@@ -551,7 +551,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/lantern_post.glb",
-      "glb_sha256": "38bf5260c537936ac8659fee5498fed83e39853e27aa90c5f55c2923a7f3ac4a",
+      "glb_sha256": "400e462287b6298d9a762622f94444176ecfa006a764b8280d1a6ef26bec7627",
       "triangulos": 980,
       "vertices": 516,
       "materiais": [
@@ -596,7 +596,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/fishing_net.glb",
-      "glb_sha256": "0d8a7c5e330c09cc7e1e76b6f04522a0bdfcdbc0b3e540d7dfe0371a5bf6be06",
+      "glb_sha256": "c5b67fef2f9d3ac53a9f31373cf7c3c2e4fda9cd8aeea04983c592f2dbf66034",
       "triangulos": 2964,
       "vertices": 1262,
       "materiais": [
@@ -639,7 +639,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/sign_board.glb",
-      "glb_sha256": "0022ae2bd18e3bb3a187181f48cadedab3a05974b813fd2904cee2534e0541bb",
+      "glb_sha256": "dce074f42756143a81c9ff6a74a8fbb96c0999c8b9e2d38d22f58fe72f8622c3",
       "triangulos": 724,
       "vertices": 372,
       "materiais": [
@@ -721,7 +721,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/oar.glb",
-      "glb_sha256": "c33eae2e719ebd7f6e21825d395b1cec86742557cc54a77ec073fdf7a62eebaf",
+      "glb_sha256": "0e3782a98e12d0f8ecd313f6f3b3892ba12664f4b9c7cf8b715e8d35d1cb3229",
       "triangulos": 1208,
       "vertices": 610,
       "materiais": [
@@ -799,7 +799,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/boat_hut.glb",
-      "glb_sha256": "1a71e72183e61b1a749108c7ace898a68d95c4aa677a99be319e12b78b7c575f",
+      "glb_sha256": "3b7cee1909c6ab321ae7b9c5e23d912e154feaa21daaa0a3c8bf1e8c63be41b4",
       "triangulos": 5008,
       "vertices": 2628,
       "materiais": [
@@ -856,7 +856,7 @@
         "source_art/environment/props.blend"
       ],
       "saida_glb": "game/assets/models/environment/boot_print.glb",
-      "glb_sha256": "51e240d28f74f60ab8f8993367997e336f1fe2906039eb7850288b04787eb11e",
+      "glb_sha256": "224ecd904fc02bd08fe57c8118b7ac2d678dee5ba522954929c80c001cfe8587",
       "triangulos": 728,
       "vertices": 382,
       "materiais": [
@@ -894,7 +894,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/ground_tile_a.glb",
-      "glb_sha256": "93e66c8e510c55145a17592060c47e22a23a52d23a1bdb2516c677bd33feb186",
+      "glb_sha256": "e5cd3e8cb599d10441017dd3cfb25b3319c36934f0bf5ded13d23b36eae10552",
       "triangulos": 3664,
       "vertices": 1921,
       "materiais": [
@@ -933,7 +933,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/ground_tile_b.glb",
-      "glb_sha256": "da1622714ec2f19f4abe6da129446501a4959015e7b3d758d4dc3a5574dcbe17",
+      "glb_sha256": "e940b09600ca310ddf7544aae906aecf5952aaf5976e0b1d477a12cb2e8610b0",
       "triangulos": 3664,
       "vertices": 1921,
       "materiais": [
@@ -972,7 +972,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/ground_tile_path.glb",
-      "glb_sha256": "d49bee818c292d0a17e5d29d0eeec42bb4e30c3d22ff53e624aafbc8590e7ddf",
+      "glb_sha256": "275c4e6e7f1cd2c3a4b46b6f75379ee5c02ca7de7b7367d6011d18df07231a6b",
       "triangulos": 1936,
       "vertices": 1041,
       "materiais": [
@@ -1011,7 +1011,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/tree_a.glb",
-      "glb_sha256": "601fd9a7d65ce0b336a1295657a403b9d94dd40ea891e821a514f5e934c4bc5c",
+      "glb_sha256": "cfa997f6c3a3459750229e93fda2d8fc2d017fd11d26cb455848fa0e9817e4a4",
       "triangulos": 6424,
       "vertices": 3228,
       "materiais": [
@@ -1050,7 +1050,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/tree_b.glb",
-      "glb_sha256": "a6b1ee24b219ea052d00bb2b30eafbe9fdf07f30e5b5ef885c8b0b5cd307336f",
+      "glb_sha256": "8687929a20eda88edbca81803ce7265f998bc3af39746c8311657ba7e0bc4fe9",
       "triangulos": 6068,
       "vertices": 3048,
       "materiais": [
@@ -1089,7 +1089,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/tree_c.glb",
-      "glb_sha256": "e648d5da6f32c0c6c6470860dde6ea97f642c56437797c3585e4debd41689de7",
+      "glb_sha256": "b26d53e0b267b8f099caa45077f9423615dc3df18c75dec7ddbfabbbed4befdf",
       "triangulos": 5524,
       "vertices": 2776,
       "materiais": [
@@ -1128,7 +1128,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/bush_round.glb",
-      "glb_sha256": "8548d7f9bc4a33e3fd5e464a0521c00f380c50c99acbe5c1eb73ab70d9a2c496",
+      "glb_sha256": "87327b4de7f2ff607fcfca54914aaf4b601549831bf73966c4a7f349b37ca6d7",
       "triangulos": 4760,
       "vertices": 2390,
       "materiais": [
@@ -1165,7 +1165,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/bush_flower.glb",
-      "glb_sha256": "c68472ab7c32beb1e27fe341655b314c47c7bbcb85db653e6186b6b9810f6b52",
+      "glb_sha256": "6db0eaaf11988663a40cbb8881e8b5cd139ce294fd5d904ab9f23c5f86620343",
       "triangulos": 3752,
       "vertices": 1910,
       "materiais": [
@@ -1204,7 +1204,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/grass_tuft.glb",
-      "glb_sha256": "106e824f00906718739d1914777d45c5d8bec2aa6c3cb22fc3124a12d2c8608d",
+      "glb_sha256": "47f64a6f5d894fa2efc48d9bef6a7c0a6a0eb252c8d4cb29b0214cde0c5f0120",
       "triangulos": 240,
       "vertices": 144,
       "materiais": [
@@ -1241,7 +1241,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/reeds.glb",
-      "glb_sha256": "c15683736fa822c0e8be70bc138dddc26228ae757ed11e0fd0304be422f0a152",
+      "glb_sha256": "7cf0a1ee91eabc6fd087d9c8eebdacb765f892259c450846560b5aeddd41533b",
       "triangulos": 260,
       "vertices": 156,
       "materiais": [
@@ -1280,7 +1280,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/rock_a.glb",
-      "glb_sha256": "73eb37ebc0c6489c34aab036a621b5fde66a3d4919c9856cfc4fb2f9cf88ef60",
+      "glb_sha256": "243067ff7fdcd69c3900a3c13d5c181bdfb827ef6d088bbbb88484d629b05da0",
       "triangulos": 480,
       "vertices": 242,
       "materiais": [
@@ -1317,7 +1317,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/rock_b.glb",
-      "glb_sha256": "4a38f87cce734518d7cabd14a4c177426d071a8dc60d991ef190fa95b47eac8b",
+      "glb_sha256": "63d949f26f49495b176ce678d76a39dc4b4b941de6a2929e825e3b81d6467cc2",
       "triangulos": 480,
       "vertices": 242,
       "materiais": [
@@ -1354,7 +1354,7 @@
         "source_art/environment/nature.blend"
       ],
       "saida_glb": "game/assets/models/environment/rock_c.glb",
-      "glb_sha256": "35a7a288ae1d1812dfb104c13054e1b51a01b225d7f8f431f37a7323ddf91653",
+      "glb_sha256": "62a209cb29b7f441b55bb140acc411433cff78d47d5cdeece389e6c1f5705a04",
       "triangulos": 480,
       "vertices": 242,
       "materiais": [
@@ -1391,7 +1391,7 @@
         "source_art/environment/boat_v2.blend"
       ],
       "saida_glb": "game/assets/models/environment/boat_v2.glb",
-      "glb_sha256": "26af036639acd1f925a76c89626d7916918a87f63f84e0e37e4ef6c0bb8a1796",
+      "glb_sha256": "343149081cc58d436c80acf04d7bc1ef841de7c933028b7c3873c5fb29f2bfca",
       "triangulos": 13364,
       "vertices": 6852,
       "materiais": [
@@ -1462,6 +1462,1161 @@
       "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
       "data": "2026-11-23",
       "nota": "Barco v2 (evolucao do RB-03): cabine na popa, banco com PawMark, volante, motor, bandeirola, lampiao, corda. Pivo a 40% da popa."
+    },
+    {
+      "id": "house_a",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/house_a.glb",
+      "glb_sha256": "44b2a608382a5ea318694e87153303ef282bfaf028e26913d25e13fd755d328b",
+      "triangulos": 5624,
+      "vertices": 3000,
+      "materiais": [
+        "mat_env_door",
+        "mat_env_glass",
+        "mat_env_masonry",
+        "mat_env_roof_terracotta",
+        "mat_env_shutter",
+        "mat_env_stone",
+        "mat_env_tint",
+        "mat_env_trim",
+        "mat_env_wall_peach"
+      ],
+      "tamanho_m": [
+        4.813,
+        9.09,
+        5.818
+      ],
+      "objetos": [
+        "House_A_Chimney",
+        "House_A_Door",
+        "House_A_DoorFrame",
+        "House_A_Flowers",
+        "House_A_Glass",
+        "House_A_Plinth",
+        "House_A_Roof",
+        "House_A_RoofTiles",
+        "House_A_Shutters",
+        "House_A_Trim",
+        "House_A_Wall",
+        "House_A_WindowTrim"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "house_b",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/house_b.glb",
+      "glb_sha256": "70c594bf09d87d7464336cf2f9e15df6b576e0c17440df76239c3ba84e56ccd3",
+      "triangulos": 9396,
+      "vertices": 5016,
+      "materiais": [
+        "mat_env_awning_cream",
+        "mat_env_awning_red",
+        "mat_env_door",
+        "mat_env_glass",
+        "mat_env_iron",
+        "mat_env_masonry",
+        "mat_env_roof_blue",
+        "mat_env_shutter",
+        "mat_env_stone",
+        "mat_env_tint",
+        "mat_env_trim",
+        "mat_env_wall_mint"
+      ],
+      "tamanho_m": [
+        5.566,
+        8.79,
+        6.595
+      ],
+      "objetos": [
+        "House_B_AwningRod",
+        "House_B_Awning_A",
+        "House_B_Awning_B",
+        "House_B_Chimney",
+        "House_B_Door",
+        "House_B_DoorFrame",
+        "House_B_Flowers",
+        "House_B_Glass",
+        "House_B_Plinth",
+        "House_B_Roof",
+        "House_B_RoofTiles",
+        "House_B_Shutters",
+        "House_B_Trim",
+        "House_B_Wall",
+        "House_B_WindowTrim"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "house_c",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/house_c.glb",
+      "glb_sha256": "0d94c1cd53dda808330134512bf07f26cd8f633366c43beeeae12fc76382af63",
+      "triangulos": 9960,
+      "vertices": 5342,
+      "materiais": [
+        "mat_env_door",
+        "mat_env_glass",
+        "mat_env_masonry",
+        "mat_env_roof_terracotta",
+        "mat_env_shutter",
+        "mat_env_stone",
+        "mat_env_tint",
+        "mat_env_trim",
+        "mat_env_wall_sky"
+      ],
+      "tamanho_m": [
+        5.778,
+        12.092,
+        6.766
+      ],
+      "objetos": [
+        "House_C_Balcony",
+        "House_C_Chimney",
+        "House_C_Door",
+        "House_C_DoorFrame",
+        "House_C_Flowers",
+        "House_C_Glass",
+        "House_C_Plinth",
+        "House_C_Roof",
+        "House_C_RoofTiles",
+        "House_C_Shutters",
+        "House_C_Trim",
+        "House_C_Wall",
+        "House_C_WindowTrim"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "house_d",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/house_d.glb",
+      "glb_sha256": "65f37f2f265c53c29e1f115ed98570ea4b2541766d37e9ce5f23819384b9228f",
+      "triangulos": 3624,
+      "vertices": 1924,
+      "materiais": [
+        "mat_env_door",
+        "mat_env_glass",
+        "mat_env_masonry",
+        "mat_env_roof_blue",
+        "mat_env_shutter",
+        "mat_env_stone",
+        "mat_env_tint",
+        "mat_env_trim",
+        "mat_env_wall_lemon"
+      ],
+      "tamanho_m": [
+        4.62,
+        6.088,
+        5.228
+      ],
+      "objetos": [
+        "House_D_Chimney",
+        "House_D_Door",
+        "House_D_DoorFrame",
+        "House_D_Flowers",
+        "House_D_Glass",
+        "House_D_Plinth",
+        "House_D_Roof",
+        "House_D_RoofTiles",
+        "House_D_Shutters",
+        "House_D_Trim",
+        "House_D_Wall",
+        "House_D_WindowTrim"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "market_stall_red",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/market_stall_red.glb",
+      "glb_sha256": "5d12d267eab5fd8180cab896616b37d28fbb27dd3f91be0f1ac9ab8277ba2244",
+      "triangulos": 5324,
+      "vertices": 2800,
+      "materiais": [
+        "mat_env_awning_cream",
+        "mat_env_awning_red",
+        "mat_env_iron",
+        "mat_env_tint",
+        "mat_env_wood_deck",
+        "mat_env_wood_light"
+      ],
+      "tamanho_m": [
+        3.052,
+        2.469,
+        1.975
+      ],
+      "objetos": [
+        "Market_Stall_Red_AwningRod",
+        "Market_Stall_Red_Awning_A",
+        "Market_Stall_Red_Awning_B",
+        "Market_Stall_Red_Crates",
+        "Market_Stall_Red_Frame",
+        "Market_Stall_Red_Fruit"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "market_stall_blue",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/market_stall_blue.glb",
+      "glb_sha256": "1411e39efb907b5d18dbdd2b8d0d675238e2c4cbacc50620d958eeb1ce54bc37",
+      "triangulos": 5324,
+      "vertices": 2800,
+      "materiais": [
+        "mat_env_awning_blue",
+        "mat_env_awning_cream",
+        "mat_env_iron",
+        "mat_env_tint",
+        "mat_env_wood_deck",
+        "mat_env_wood_light"
+      ],
+      "tamanho_m": [
+        3.052,
+        2.469,
+        1.975
+      ],
+      "objetos": [
+        "Market_Stall_Blue_AwningRod",
+        "Market_Stall_Blue_Awning_A",
+        "Market_Stall_Blue_Awning_B",
+        "Market_Stall_Blue_Crates",
+        "Market_Stall_Blue_Frame",
+        "Market_Stall_Blue_Fruit"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "street_lamp",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/street_lamp.glb",
+      "glb_sha256": "fbaac84d7bd07a5232d8283c3123522d7bba2ad81fda33c628b4fcb7b0aa8d23",
+      "triangulos": 288,
+      "vertices": 152,
+      "materiais": [
+        "mat_env_iron",
+        "mat_env_lamp_light"
+      ],
+      "tamanho_m": [
+        0.9,
+        3.55,
+        0.495
+      ],
+      "objetos": [
+        "Street_Lamp_Light",
+        "Street_Lamp_Post"
+      ],
+      "empties": [
+        "Lamp_Light"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "park_bench",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/park_bench.glb",
+      "glb_sha256": "8a3ff27eaced0983054c15b4c1861c2b239ef61133f5bcec2e0a5b1017055b91",
+      "triangulos": 708,
+      "vertices": 376,
+      "materiais": [
+        "mat_env_iron",
+        "mat_env_wood_light"
+      ],
+      "tamanho_m": [
+        1.7,
+        0.962,
+        0.604
+      ],
+      "objetos": [
+        "Park_Bench_Legs",
+        "Park_Bench_Slats"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "flower_bed",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/flower_bed.glb",
+      "glb_sha256": "f2193b2513918c34eeaa06f9cf63977c3c6e9509ee2a7061c60a27ce688e80cd",
+      "triangulos": 1708,
+      "vertices": 902,
+      "materiais": [
+        "mat_env_grass",
+        "mat_env_stone",
+        "mat_env_tint"
+      ],
+      "tamanho_m": [
+        2.1,
+        0.738,
+        2.1
+      ],
+      "objetos": [
+        "Flower_Bed_Flowers",
+        "Flower_Bed_Planter",
+        "Flower_Bed_Soil"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "flower_clump",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/flower_clump.glb",
+      "glb_sha256": "811cd446801aaca2af81fd46c051f36f502ca8ca3bed6aa25b02048222c4101d",
+      "triangulos": 332,
+      "vertices": 182,
+      "materiais": [
+        "mat_env_tint"
+      ],
+      "tamanho_m": [
+        0.579,
+        0.456,
+        0.654
+      ],
+      "objetos": [
+        "Flower_Clump_Clump"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "fence_2m",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/fence_2m.glb",
+      "glb_sha256": "acb1d55808f858440575bff83b522a376db2a775586af6f7c50b743da63a5ff4",
+      "triangulos": 1404,
+      "vertices": 734,
+      "materiais": [
+        "mat_env_trim"
+      ],
+      "tamanho_m": [
+        2.0,
+        1.055,
+        0.096
+      ],
+      "objetos": [
+        "Fence_2m_Pickets"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "stone_stairs",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/stone_stairs.glb",
+      "glb_sha256": "38254a324273696036eebda40c9a121d6c28dc1eb2dd8357bb3dae470be44492",
+      "triangulos": 1944,
+      "vertices": 1008,
+      "materiais": [
+        "mat_env_masonry",
+        "mat_env_stone"
+      ],
+      "tamanho_m": [
+        2.62,
+        2.0,
+        2.82
+      ],
+      "objetos": [
+        "Stone_Stairs_Cheeks",
+        "Stone_Stairs_Steps"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "low_wall",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/low_wall.glb",
+      "glb_sha256": "17c0a6c79947a7675c9cf4489af993ac2579b12c854ae57d4e812a38ff08d991",
+      "triangulos": 1188,
+      "vertices": 616,
+      "materiais": [
+        "mat_env_masonry",
+        "mat_env_stone"
+      ],
+      "tamanho_m": [
+        4.0,
+        0.74,
+        0.55
+      ],
+      "objetos": [
+        "Low_Wall_Body",
+        "Low_Wall_Cap"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "quay_block",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/quay_block.glb",
+      "glb_sha256": "888589b7ae867abd28ff718968396edc99db8d09006a09fc3cde2048bb94ac36",
+      "triangulos": 2246,
+      "vertices": 1756,
+      "materiais": [
+        "mat_env_cobble",
+        "mat_env_masonry",
+        "mat_env_stone"
+      ],
+      "tamanho_m": [
+        8.0,
+        1.83,
+        6.06
+      ],
+      "objetos": [
+        "Quay_Block_Body",
+        "Quay_Block_Coping",
+        "Quay_Block_Top"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "plaza_tile",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/plaza_tile.glb",
+      "glb_sha256": "a6c29dd1eb52f3398d03598848990c0da6273f66f66c64d15cd7d3ae8df81644",
+      "triangulos": 314,
+      "vertices": 612,
+      "materiais": [
+        "mat_env_cobble",
+        "mat_env_masonry"
+      ],
+      "tamanho_m": [
+        8.0,
+        0.75,
+        8.0
+      ],
+      "objetos": [
+        "Plaza_Tile_Body",
+        "Plaza_Tile_Top"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "lawn_block",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/lawn_block.glb",
+      "glb_sha256": "7f708be93ef5f15f8c22233ab158e0b5a3f82a9297859fbaa476b29784d32461",
+      "triangulos": 396,
+      "vertices": 229,
+      "materiais": [
+        "mat_env_earth",
+        "mat_env_grass"
+      ],
+      "tamanho_m": [
+        8.0,
+        1.679,
+        6.0
+      ],
+      "objetos": [
+        "Lawn_Block_Body",
+        "Lawn_Block_Top"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "terrace_wall",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/terrace_wall.glb",
+      "glb_sha256": "db88e7b97c5b89142c6297e7e8158bf441b3b8ca747e4a2033e3659ba74a0732",
+      "triangulos": 4764,
+      "vertices": 2472,
+      "materiais": [
+        "mat_env_masonry",
+        "mat_env_stone"
+      ],
+      "tamanho_m": [
+        8.0,
+        2.71,
+        0.91
+      ],
+      "objetos": [
+        "Terrace_Wall_Core",
+        "Terrace_Wall_Stones"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "lighthouse",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/lighthouse.glb",
+      "glb_sha256": "5affc4730765b6f631b522540831abb2e6e691f75789f8f4c15b518a5594481e",
+      "triangulos": 3554,
+      "vertices": 1873,
+      "materiais": [
+        "mat_env_lh_dark",
+        "mat_env_lh_glass",
+        "mat_env_lh_red",
+        "mat_env_lh_white",
+        "mat_env_masonry",
+        "mat_env_trim"
+      ],
+      "tamanho_m": [
+        6.571,
+        19.8,
+        6.388
+      ],
+      "objetos": [
+        "Lighthouse_Bands_Red",
+        "Lighthouse_Bands_White",
+        "Lighthouse_Base",
+        "Lighthouse_Dome",
+        "Lighthouse_DoorFrame",
+        "Lighthouse_Gallery",
+        "Lighthouse_Lantern",
+        "Lighthouse_Mullions",
+        "Lighthouse_Openings"
+      ],
+      "empties": [
+        "Beacon"
+      ],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "hills_near",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/hills_near.glb",
+      "glb_sha256": "393228fb9372842759cfbb93f819beb7def2c616f8e119b986f37c2ee9d02659",
+      "triangulos": 576,
+      "vertices": 333,
+      "materiais": [
+        "mat_env_hill"
+      ],
+      "tamanho_m": [
+        120.0,
+        15.93,
+        30.0
+      ],
+      "objetos": [
+        "Hills_Near_Mass"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "hills_far",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/hills_far.glb",
+      "glb_sha256": "cce6d22b801aa1f958d09ba7b70e923f9bf5aaf8662867956de42534457b03c5",
+      "triangulos": 576,
+      "vertices": 343,
+      "materiais": [
+        "mat_env_hill"
+      ],
+      "tamanho_m": [
+        260.0,
+        29.455,
+        30.0
+      ],
+      "objetos": [
+        "Hills_Far_Mass"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "cloud",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/cloud.glb",
+      "glb_sha256": "a5489f32c8051adff358e6f1f7560e25d1d594ed4cc9893d3202735f17af14a9",
+      "triangulos": 1372,
+      "vertices": 700,
+      "materiais": [
+        "mat_env_cloud"
+      ],
+      "tamanho_m": [
+        8.852,
+        3.643,
+        3.96
+      ],
+      "objetos": [
+        "Cloud_Puff"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "seagull",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/seagull.glb",
+      "glb_sha256": "004fa352c384ea56e9fddf3de691c1f7cae0da5a5dd59bf19186597fafa812f2",
+      "triangulos": 264,
+      "vertices": 142,
+      "materiais": [
+        "mat_env_beak",
+        "mat_env_gull",
+        "mat_env_gull_gray"
+      ],
+      "tamanho_m": [
+        1.252,
+        0.244,
+        0.581
+      ],
+      "objetos": [
+        "Seagull_Beak",
+        "Seagull_Body",
+        "Seagull_Wings"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "tree_round",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/tree_round.glb",
+      "glb_sha256": "760b84f33ba29a850fbf74ddc024f8e440b77e01659848b05e732a521d55382b",
+      "triangulos": 1004,
+      "vertices": 512,
+      "materiais": [
+        "mat_env_foliage_a",
+        "mat_env_trunk"
+      ],
+      "tamanho_m": [
+        3.308,
+        4.239,
+        3.097
+      ],
+      "objetos": [
+        "Tree_Round_Canopy",
+        "Tree_Round_Trunk"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "tree_round_dark",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/tree_round_dark.glb",
+      "glb_sha256": "0bc72335971dccb8404c3cdf723f48a6183f4fd88bd90cf04bb4a84e228a13b8",
+      "triangulos": 1228,
+      "vertices": 626,
+      "materiais": [
+        "mat_env_foliage_b",
+        "mat_env_trunk"
+      ],
+      "tamanho_m": [
+        2.95,
+        3.532,
+        2.971
+      ],
+      "objetos": [
+        "Tree_Round_Dark_Canopy",
+        "Tree_Round_Dark_Trunk"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "tree_tall",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/tree_tall.glb",
+      "glb_sha256": "b7f410475b161b7390544c4755810a155723f0ddeb85b954a776c2c51e814c70",
+      "triangulos": 224,
+      "vertices": 116,
+      "materiais": [
+        "mat_env_foliage_b",
+        "mat_env_trunk"
+      ],
+      "tamanho_m": [
+        1.951,
+        6.2,
+        1.902
+      ],
+      "objetos": [
+        "Tree_Tall_Canopy",
+        "Tree_Tall_Trunk"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "rowboat",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/rowboat.glb",
+      "glb_sha256": "81dfae5730ceaf790b4227842d6584c72bbedd6be7f78e746018bcf6861cfcd5",
+      "triangulos": 280,
+      "vertices": 146,
+      "materiais": [
+        "mat_env_tint",
+        "mat_env_wood_light"
+      ],
+      "tamanho_m": [
+        1.24,
+        0.57,
+        3.224
+      ],
+      "objetos": [
+        "Rowboat_Hull",
+        "Rowboat_Seats"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
+    },
+    {
+      "id": "bunting",
+      "conjunto": "village_kit",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/environment/build_village.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, modificadores aplicados, cor por vertice"
+      },
+      "origem": [
+        "source_art/environment/build_village.py",
+        "source_art/environment/envlib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/environment/village_kit.blend"
+      ],
+      "saida_glb": "game/assets/models/environment/bunting.glb",
+      "glb_sha256": "2a2f457d0e4acb86cccac6ec5d4da9463eaca89e3981f59aa59bcdc2e94aff78",
+      "triangulos": 244,
+      "vertices": 152,
+      "materiais": [
+        "mat_env_tint",
+        "mat_env_trim"
+      ],
+      "tamanho_m": [
+        8.011,
+        1.191,
+        0.05
+      ],
+      "objetos": [
+        "Bunting_Cord",
+        "Bunting_Flags"
+      ],
+      "empties": [],
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (bmesh, Bevel, Subdivision); nenhum modelo, malha, textura ou kit de terceiros",
+      "data": "2026-11-23",
+      "nota": "RB-R1 kit da vila Farol 7 (style-bible): 4 casas parametricas, barracas, poste, banco, canteiro, tufo, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, FAROL, morros, nuvem, gaivota, arvores, barquinho, bandeirolas."
     }
   ]
 }

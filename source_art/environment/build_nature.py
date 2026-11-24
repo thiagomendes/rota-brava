@@ -33,8 +33,8 @@ def ground_tile(M, info, glb, name, seed, width=4.0, path=False):
     bm = bmesh.new()
     W = width
     NX, NZ = int(W * 4), 52
-    grass = hex_to_linear("#6F9A4F")
-    dirt = hex_to_linear("#9C7B56")
+    grass = hex_to_linear("#7CCB4A")
+    dirt = hex_to_linear("#E2C493")
 
     def edge_fade(x, z):
         d = min(W / 2 - abs(x), TD / 2 - abs(z))
@@ -57,7 +57,7 @@ def ground_tile(M, info, glb, name, seed, width=4.0, path=False):
             k = 1 - (1 - k) * f
             v[layer] = tuple(clamp((grass[i] * (1 - w) + dirt[i] * w) * k, 0, 1) for i in range(3)) + (1.0,)
     # saia: desce 0,35 m nas quatro bordas (cor de terra escura)
-    skirt = hex_to_linear("#6B5439")
+    skirt = hex_to_linear("#A07A55")
     for edge in ([vs[i][0] for i in range(NX + 1)], [vs[i][NZ] for i in range(NX, -1, -1)],
                  [vs[0][j] for j in range(NZ, -1, -1)], [vs[NX][j] for j in range(NZ + 1)]):
         low = []

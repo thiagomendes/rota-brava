@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/market_stall_blue.glb" id="1_hp37y"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pomph"]
+size = Vector3(2.7, 1, 0.7)
+
+[node name="Market_Stall_Blue" type="Node3D" unique_id=2060570664]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=874217931 instance=ExtResource("1_hp37y")]
+
+[node name="Body" type="StaticBody3D" parent="." unique_id=1187917497]
+collision_mask = 0
+
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1474556690]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.55)
+shape = SubResource("BoxShape3D_pomph")

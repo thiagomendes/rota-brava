@@ -1,0 +1,19 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/environment/tree_round_dark.glb" id="1_hahjd"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_7b7qq"]
+height = 2.2
+radius = 0.3
+
+[node name="Tree_Round_Dark" type="Node3D" unique_id=506033392]
+metadata/provisional = true
+
+[node name="Model" parent="." unique_id=1499095854 instance=ExtResource("1_hahjd")]
+
+[node name="Body" type="StaticBody3D" parent="." unique_id=1811270359]
+collision_mask = 0
+
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1626710588]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+shape = SubResource("CylinderShape3D_7b7qq")

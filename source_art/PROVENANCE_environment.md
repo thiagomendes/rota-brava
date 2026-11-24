@@ -34,3 +34,10 @@ Biblioteca comum: `envlib.py` (usa `source_art/scripts/rbart.py` do RB-03). Conf
 ## Reproduzir
 `./tools/export-environment.ps1 -Scenes` (Blender headless -> .blend + GLB + manifesto; reimporta e regenera as cenas).
 `-Images` gera renders de conferencia em `captures/rb-04/env` (fora do Git).
+
+## RB-R1-mundo (vila Farol 7) - PROVISORIO
+- Kit da vila: `source_art/environment/build_village.py` -> `village_kit.blend` + 27 GLB (casas A-D, barracas, poste, banco, canteiro, tufo de flores, cerca, escada, muro, cais de pedra, praca, gramado, arrimo, farol, morros, nuvem, gaivota, arvores, barquinho, bandeirolas). Geometria 100% procedural (bmesh, Bevel, Solidify); nada baixado.
+- Paleta nova (docs/style-bible.md sec. 5) aplicada tambem em `envlib.py` (madeira desbotada, folhagem, rochas, cabana) e no chao de `build_nature.py`: os GLB do cais/adercos/natureza do RB-04 foram regenerados com as cores novas (mesma geometria).
+- Layout: `source_art/environment/village_layout.py` (fonte unica) -> `game/episodes/ep01/world/harbor_layout.json` -> `gen_harbor_slice.gd` -> `harbor_slice.tscn`.
+- Estudos de direcao: `source_art/studies/world/study_village.py` (Eevee; importa os GLB do proprio projeto). Renders em `captures/rb-r1/mundo/` (fora do Git).
+- Personagem-escala dos estudos e da preview: cilindro/capsula de 1,10 m, NAO e o heroi.
