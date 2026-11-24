@@ -34,7 +34,7 @@ import hero_lib
 from rbart import new_object
 
 # ------------------------------------------------------------------ proporcao (mesma familia do Rastro v2; Leme e a mais velha)
-LV2 = dict(head=0.390, leg=0.392, torso=0.272, belly=0.130, sh_x=0.128, limb=0.040, hand=1.22, boot=1.06, eye=1.08, layers=False,
+LV2 = dict(head=0.390, leg=0.392, torso=0.272, belly=0.130, sh_x=0.128, limb=0.044, hand=1.22, boot=1.06, eye=1.08, layers=False,
            label="v2 heroina piloto")
 hero_lib.VARIANTS["LV2"] = LV2
 PAL = dict(pele="#8C5634", cabelo="#1E1410", iris="#5A3418", uniforme="#2F8CFF", creme="#F7FBFF", calca="#1F5FBF",
@@ -156,6 +156,10 @@ class LV2B(hero_lib.Builder):
         F.hip_x = 0.070 * k
         F.foot_x = 0.088 * k
         F.knee_x = F.hip_x + (F.foot_x - F.hip_x) * (F.hz - F.knee_z) / (F.hz - F.ankle_z)
+        # bracos (acabamento): mais grossos (limb) e um pouco mais curtos -- pulso sobe 1,6 cm, cotovelo recalculado
+        F.wrist = V(F.wrist.x - 0.004, F.wrist.y, F.wrist.z + 0.016)
+        al = F.sh.z - F.wrist.z
+        F.elbow = V((self.v["sh_x"] + F.wrist.x) * 0.5 + 0.004, -0.012, F.sh.z - al * 0.48)
 
     # ------------------------------------------------------------ cabeca
     def head_parts(self):
@@ -173,53 +177,84 @@ class LV2B(hero_lib.Builder):
         self.cap()
 
     def hair_lv2(self):
-        """Cachos com volume: calota sob o bone, cachos em anel na linha do cabelo (laterais ate a mandibula), puff grande
-        atras (rabo de cavalo cacheado saindo da abertura do bone) e cachinhos de franja sob a pala."""
+        """Cachos com volume (acabamento): massa de base lisa (metaball de resolucao baixa, sem Decimate: sem facetas) +
+        CACHOS INDIVIDUAIS em mola: cada um e um elipsoide alongado no proprio eixo, torcido e com tres sulcos em espiral,
+        de tamanho variado; as faces enterradas na massa sao removidas. Tres aneis (logo abaixo do bone, laterais ate a
+        mandibula, nuca), puff grande atras com cachos na superficie e um cachinho em cada tempora."""
         F, k = self.F, self.F.k
         hc, hr = F.hc, F.hr
-        E = [("ELLIPSOID", (hc.x, hc.y - 0.014 * k, hc.z + 0.022 * k), 1.0, (hr[0] * 1.03, hr[1] * 1.02, hr[2] * 0.98), False)]
         rng = np.random.RandomState(7)
-        curls = []
-
-        def curl(p, r):
-            E.append(("BALL", tuple(p), r, None, False))
-            curls.append((Vector(p), r))
-        # anel alto (logo abaixo da faixa do bone) e anel baixo (laterais e nuca), deixando a frente livre para o rosto
-        for ring, (zc, rad_k, a_lim, rr) in enumerate(((0.020, 1.00, 66, 0.040), (-0.045, 1.02, 74, 0.044), (-0.110, 0.92, 84, 0.040))):
-            n = 13 if ring < 2 else 11
-            for i in range(n):
-                a = math.radians(a_lim + (360 - 2 * a_lim) * (i + 0.5 * (ring % 2)) / n)
-                jit = rng.uniform(-0.010, 0.010, 3) * k
-                z = hc.z + zc * k
-                if ring == 2:
-                    z += 0.020 * k * math.cos(a)          # mais curto na nuca, desce nas laterais ate a mandibula
-                p = V(math.sin(a) * hr[0] * rad_k, hc.y - 0.010 * k + math.cos(a) * hr[1] * rad_k * 0.98, z) + V(*jit)
-                curl(p, rr * k * rng.uniform(0.85, 1.12))
-        # puff grande atras, um pouco acima do meio da cabeca, com cachos na superficie (silhueta irregular)
         pc = V(0.0, hc.y - hr[1] * 1.10, hc.z + 0.010 * k)
         self.puff = (pc, 0.090 * k)
-        E.append(("BALL", tuple(pc), 0.086 * k, None, False))
-        for i in range(16):
-            u = (i + 0.5) / 16
-            th = math.acos(1 - 2 * u)
-            ph = i * 2.399963
-            d = V(math.sin(th) * math.cos(ph), math.sin(th) * math.sin(ph), math.cos(th))
-            if d.y > 0.55:            # nao entra na cabeca
-                continue
-            curl(pc + d * 0.078 * k, 0.036 * k * rng.uniform(0.85, 1.15))
-        # cachinhos de franja logo abaixo da pala (acima das sobrancelhas)
-        for sxx in (-1, 1):           # cachinho na tempora (moldura do rosto, abaixo da faixa do bone)
-            curl(V(sxx * hr[0] * 0.86, hc.y + hr[1] * 0.42, hc.z + 0.030 * k), 0.030 * k)
-        # janela do rosto (elipsoide negativo): recorta lisa a linha do cabelo
+        base_c = V(hc.x, hc.y - 0.014 * k, hc.z + 0.022 * k)
+        base_r = (hr[0] * 1.00, hr[1] * 0.99, hr[2] * 0.96)
+        E = [("ELLIPSOID", tuple(base_c), 1.0, base_r, False),
+             ("BALL", tuple(pc), 0.074 * k, None, False)]
+        for sxx in (-1, 1):       # volume das laterais ate a mandibula (sob os cachos)
+            E.append(("ELLIPSOID", (sxx * hr[0] * 0.74, hc.y - 0.040 * k, hc.z - 0.065 * k), 1.0, (0.070 * k, 0.110 * k, 0.085 * k), False))
         E.append(("ELLIPSOID", (0, hc.y + hr[1] * 0.80, hc.z - 0.060 * k), 1.0, (hr[0] * 0.78, hr[1] * 0.55, 0.125 * k), True))
         E.append(("ELLIPSOID", (hc.x, hc.y + hr[1] * 0.25, hc.z - 0.215 * k), 1.0, (hr[0] * 1.3, hr[1] * 0.75, 0.10 * k), True))
-        ob = hero_lib.metaball_obj(self.name("Hair"), E, self.M["cabelo"], res=0.0125 * k, thresh=0.6)
+        ob = hero_lib.metaball_obj(self.name("Hair"), E, self.M["cabelo"], res=0.017 * k, thresh=0.6)
         bm = bmesh.new()
         bm.from_mesh(ob.data)
-        for _ in range(2):
+        for _ in range(4):
             bmesh.ops.smooth_vert(bm, verts=bm.verts[:], factor=0.5, use_axis_x=True, use_axis_y=True, use_axis_z=True)
         bm.to_mesh(ob.data)
         bm.free()
+        curls = []
+        # posicoes dos cachos (centro, raio, eixo para fora)
+        spots = []
+        for ring, (zc, rad_k, a_lim, rr, n) in enumerate(((0.024, 1.02, 70, 0.038, 9), (-0.045, 1.06, 74, 0.044, 10),
+                                                           (-0.110, 0.98, 86, 0.040, 9))):
+            for i in range(n):
+                a = math.radians(a_lim + (360 - 2 * a_lim) * (i + 0.5 * (ring % 2) + 0.5) / n)
+                z = hc.z + zc * k
+                if ring == 2:
+                    z += 0.020 * k * math.cos(a)
+                jit = rng.uniform(-0.008, 0.008, 3) * k
+                p = V(math.sin(a) * hr[0] * rad_k, hc.y - 0.012 * k + math.cos(a) * hr[1] * rad_k * 0.98, z) + V(*jit)
+                out = (p - V(hc.x, hc.y, hc.z + 0.02 * k)).normalized()
+                spots.append((p, rr * k * rng.uniform(0.82, 1.18), out))
+        for i in range(14):
+            u = (i + 0.5) / 14
+            th = math.acos(1 - 2 * u)
+            ph = i * 2.399963
+            d = V(math.sin(th) * math.cos(ph), math.sin(th) * math.sin(ph), math.cos(th))
+            if d.y > 0.45:
+                continue
+            spots.append((pc + d * 0.070 * k, 0.040 * k * rng.uniform(0.80, 1.20), d))
+        for sxx in (-1, 1):
+            p = V(sxx * hr[0] * 0.86, hc.y + hr[1] * 0.40, hc.z + 0.030 * k)
+            spots.append((p, 0.028 * k, V(sxx * 0.8, 0.5, -0.3).normalized()))
+        head_c, head_r = Vector(hc), Vector(hr)
+
+        def buried(q):
+            def inside_ell(c, r, sc):
+                v = q - c
+                return (v.x / (r[0] * sc)) ** 2 + (v.y / (r[1] * sc)) ** 2 + (v.z / (r[2] * sc)) ** 2 < 1.0
+            return inside_ell(base_c, base_r, 0.97) or inside_ell(head_c, head_r, 1.0) or (q - pc).length < 0.074 * k * 0.95
+        bmc = bmesh.new()
+        for p, r, ax in spots:
+            tw = rng.uniform(0, 2 * math.pi)
+            tb = bmesh.new()
+            bmesh.ops.create_uvsphere(tb, u_segments=12, v_segments=6, radius=1.0)
+            for vv in tb.verts:
+                x, y, z = vv.co
+                t = z                                   # -1..1 ao longo do eixo do cacho
+                phi = math.atan2(y, x) + 1.6 * t + tw   # torcao
+                rho = math.hypot(x, y) * (1.0 + 0.13 * math.sin(3 * phi + 5.0 * t))     # tres sulcos em espiral
+                vv.co = Vector((rho * math.cos(phi), rho * math.sin(phi), z * 1.22))
+            q = ax.to_track_quat("Z", "Y").to_matrix().to_4x4()
+            cl.transform_bm(tb, Matrix.Translation(p) @ q @ Matrix.Scale(r, 4))
+            kill = [f for f in tb.faces if all(buried(vv.co) for vv in f.verts)]
+            bmesh.ops.delete(tb, geom=kill, context="FACES")
+            bmesh.ops.delete(tb, geom=[vv for vv in tb.verts if not vv.link_faces], context="VERTS")
+            hero_lib.join_bm(bmc, tb)
+            curls.append((p, r, ax))
+        cob = new_object(self.name("HairCurls"), bmc, self.M["cabelo"])
+        tag(cob, "hair", "hair")
+        self.reg(cob, "single", "head")
+        self.curl_ob = cob
         self.curls = curls
         self.hair_ob = ob
         tag(ob, "hair", "hair")
@@ -252,13 +287,14 @@ class LV2B(hero_lib.Builder):
         rr = R * 0.99 + 0.62 * 0.068 * k * (0.35 + 0.65 * math.cos(a * 0.72))
         F.brim_r = m @ V(math.sin(a) * rr, math.cos(a) * rr, 0.004 * k - 0.012 * k)
         # copa (tecido branco): faixa reta ate 0,036, abre para 1,16 R no alto, topo levemente abaulado
-        prof = [(0.0, 0.112), (0.40, 0.111), (0.75, 0.106), (1.02, 0.096), (1.15, 0.084), (1.17, 0.074), (1.12, 0.062),
+        prof = [(0.0, 0.112), (0.20, 0.1118), (0.40, 0.111), (0.75, 0.106), (1.02, 0.096), (1.15, 0.084), (1.17, 0.074), (1.12, 0.062),
                 (1.03, 0.046), (1.00, 0.034), (0.985, 0.0), (0.0, 0.0)]
         bm = bmesh.new()
 
         def deform(r, z, a):
-            # copa um pouco mais alta e mais avancada na frente (bone de capitania)
-            fr = 0.5 + 0.5 * math.sin(a)
+            # copa um pouco mais alta e mais avancada na frente (bone de capitania). O efeito cresce com o raio: no polo
+            # (r = 0) todos os pontos do torno ficam iguais e se fundem (antes o polo virava uma estrela vincada).
+            fr = (0.5 + 0.5 * math.sin(a)) * min(r / (0.6 * R), 1.0) ** 1.5
             if z > 0.05:
                 z += 0.010 * fr * (z - 0.05) / 0.06
             return r, z
@@ -394,10 +430,10 @@ class LV2B(hero_lib.Builder):
             s0 = add(V(sx * F.sh.x * 0.62, 0.0, F.sh.z + 0.012), L * 1.30, upper)
             s1 = add(sh.lerp(el, 0.10), L * 1.20, s0)
             s2 = add(sh.lerp(el, 0.50), L * 1.02, s1)
-            e0 = add(sh.lerp(el, 0.90), L * 0.90, s2)
-            e1 = add(el.lerp(W, 0.12), L * 0.90, e0)
-            f0 = add(el.lerp(W, 0.38), L * 0.94, e1)
-            add(el.lerp(W, 0.92), L * 0.74, f0)
+            e0 = add(sh.lerp(el, 0.90), L * 0.92, s2)
+            e1 = add(el.lerp(W, 0.12), L * 0.92, e0)
+            f0 = add(el.lerp(W, 0.38), L * 0.97, e1)
+            add(el.lerp(W, 0.92), L * 0.78, f0)
             hx, kx, fx = sx * F.hip_x, sx * F.knee_x, sx * F.foot_x
             kz = F.knee_z
 
@@ -427,7 +463,7 @@ class LV2B(hero_lib.Builder):
         P = verts_np(ob)
         segs = [("torso", 0, np.array([0, 0, hz - 0.06]), np.array([0, 0, nz + 0.02]), v["belly"])]
         for kind, s, a, b in self.limb_segs:
-            r = {"upper_arm": 0.048, "forearm": 0.040, "thigh": 0.070, "shin": 0.050}[kind]
+            r = {"upper_arm": 0.052, "forearm": 0.044, "thigh": 0.070, "shin": 0.050}[kind]
             segs.append((kind, 1 if s == "R" else -1, np.array(a), np.array(b), r))
         D = []
         for kind, sx, a, b, r in segs:
@@ -500,7 +536,7 @@ class LV2B(hero_lib.Builder):
         F = self.F
         segs = [("torso", None, np.array([0, 0, F.hz - 0.06]), np.array([0, 0, F.nz + 0.04]), 0.13)]
         for kind, s, a, b in self.limb_segs:
-            segs.append((kind, s, np.array(a), np.array(b), {"upper_arm": 0.048, "forearm": 0.040, "thigh": 0.070, "shin": 0.050}[kind]))
+            segs.append((kind, s, np.array(a), np.array(b), {"upper_arm": 0.052, "forearm": 0.044, "thigh": 0.070, "shin": 0.050}[kind]))
         sc, us = [], []
         for kind, s, a, b, r in segs:
             u, rr, rn, dn, L = seg_frame(P, a, b)
@@ -590,37 +626,15 @@ class LV2B(hero_lib.Builder):
         bpy.data.objects.remove(ob)
         self.shirt_ob, self.shorts_ob, self.limbskin_ob, self.sock_ob = outs
         # barras: vivo azul na manga, barra dobrada da bermuda, punho canelado da meia
-        bvh = BVHTree.FromObject(self.limbskin_ob, bpy.context.evaluated_depsgraph_get())
         bm_sl, bm_hm, bm_sk = bmesh.new(), bmesh.new(), bmesh.new()
         for kind, s, a, b in self.limb_segs:
             sx = 1 if s == "R" else -1
             if kind == "upper_arm":
-                c = a.lerp(b, self.sleeve_u)
-                ax = (b - a).normalized()
-                r = self._radius_loop(self.limbskin_ob, c, ax)
-                tb = bmesh.new()
-                cl.torus_z(tb, r + 0.0045, 0.0055, 0.0, major=20, minor=5)
-                cl.transform_bm(tb, Matrix.Translation(c) @ ax.to_track_quat("Z", "Y").to_matrix().to_4x4())
-                hero_lib.join_bm(bm_sl, tb)
+                self._loop_ring(bm_sl, self.limbskin_ob, a.lerp(b, self.sleeve_u), (b - a).normalized(), 0.0045, 0.0055, 1.0)
             if kind == "thigh":
-                c = V(sx * self._leg_x(self.z_hem), 0.004, self.z_hem)
-                ax = V(0, 0, 1)
-                r = self._radius_loop(self.limbskin_ob, c, ax)
-                tb = bmesh.new()
-                cl.torus_z(tb, r + 0.0075, 0.0085, 0.0, major=20, minor=5)
-                for vv in tb.verts:
-                    vv.co.z *= 1.25
-                cl.transform_bm(tb, Matrix.Translation(c))
-                hero_lib.join_bm(bm_hm, tb)
+                self._loop_ring(bm_hm, self.limbskin_ob, V(sx * self._leg_x(self.z_hem), 0.004, self.z_hem), V(0, 0, 1), 0.0075, 0.0085, 1.25)
             if kind == "shin":
-                c = V(sx * self._leg_x(self.z_sock), 0.0, self.z_sock)
-                r = self._radius_loop(self.sock_ob, c, V(0, 0, 1))
-                tb = bmesh.new()
-                cl.torus_z(tb, r + 0.0018, 0.0042, 0.0, major=20, minor=5)
-                for vv in tb.verts:
-                    vv.co.z *= 1.6
-                cl.transform_bm(tb, Matrix.Translation(c))
-                hero_lib.join_bm(bm_sk, tb)
+                self._loop_ring(bm_sk, self.sock_ob, V(sx * self._leg_x(self.z_sock), 0.0, self.z_sock), V(0, 0, 1), 0.0018, 0.0042, 1.6)
         for bm_, nm, part, grp, mk in ((bm_sl, "SleeveBand", "sleeve_band", "suit", "uniforme"), (bm_hm, "ShortsHem", "shorts_hem", "suit", "calca"),
                                        (bm_sk, "SockTop", "sock_top", "suit", "creme")):
             o = new_object(self.name(nm), bm_, self.M[mk])
@@ -632,6 +646,46 @@ class LV2B(hero_lib.Builder):
         if z >= F.knee_z:
             return F.hip_x + (F.knee_x - F.hip_x) * (F.hz - z) / (F.hz - F.knee_z)
         return F.knee_x + (F.foot_x - F.knee_x) * (F.knee_z - z) / (F.knee_z - F.ankle_z)
+
+    @staticmethod
+    def _loop_ring(bm, ob, c, ax, off, minor, zs, nseg=22, sides=5, tol=0.0025, reach=0.09):
+        """Vivo/barra que SEGUE o laco de corte real de `ob` no plano (c, ax): raio por angulo (nao um circulo medio), mais
+        `off`; secao eliptica (minor, minor*zs ao longo do eixo). Cobre a emenda por igual na frente e atras (panturrilha)."""
+        P = verts_np(ob)
+        c_, a_ = np.array(c), np.array(ax.normalized())
+        d = (P - c_) @ a_
+        rv = P - c_ - np.outer(d, a_)
+        sel = (np.abs(d) < tol) & (np.linalg.norm(rv, axis=1) < reach)
+        L = P[sel] - np.outer(d[sel], a_)
+        cen = L.mean(axis=0)
+        e1 = np.cross(a_, [0.0, 1.0, 0.0] if abs(a_[1]) < 0.9 else [1.0, 0.0, 0.0])
+        e1 /= np.linalg.norm(e1)
+        e2 = np.cross(a_, e1)
+        q = L - cen
+        ang = np.arctan2(q @ e2, q @ e1)
+        rad = np.linalg.norm(q, axis=1)
+        o = np.argsort(ang)
+        ang, rad = ang[o], rad[o]
+        angs = np.concatenate([ang - 2 * np.pi, ang, ang + 2 * np.pi])
+        rads = np.concatenate([rad, rad, rad])
+        rows = []
+        for i in range(nseg):
+            t = -np.pi + 2 * np.pi * i / nseg
+            r = float(np.interp(t, angs, rads)) + off
+            rd = np.cos(t) * e1 + np.sin(t) * e2
+            ctr = cen + rd * r
+            row = []
+            for j in range(sides):
+                w = 2 * np.pi * j / sides
+                pnt = ctr + rd * (minor * np.cos(w)) + a_ * (minor * zs * np.sin(w))
+                row.append(bm.verts.new(tuple(pnt)))
+            rows.append(row)
+        for i in range(nseg):
+            i2 = (i + 1) % nseg
+            for j in range(sides):
+                j2 = (j + 1) % sides
+                bm.faces.new((rows[i][j], rows[i2][j], rows[i2][j2], rows[i][j2]))
+        return bm
 
     @staticmethod
     def _radius_loop(ob, c, ax, tol=0.0025, reach=0.09):
@@ -863,24 +917,43 @@ class LV2B(hero_lib.Builder):
         set_verts(col, P)
         tag(col, "collar_pillow", "suit")
         self.reg(col, "torso")
-        # apito no cordao, pendurado na ponta direita da gola
-        pw, nw = self.vest_point("R", 24.0, zS - 0.075, 0.010)
+        # apito esportivo no cordao, pendurado na ponta direita da gola: camara redonda (de frente le como circulo), bocal
+        # chato subindo pela tangente, janela do som escura e argola onde o cordao passa
+        pw, nw = self.vest_point("R", 25.0, zS - 0.082, 0.0)
+        yv = nw.normalized()
+        zv = (V(0, 0, 1) - yv * yv.z).normalized()
+        xv = yv.cross(zv).normalized()
+        Tw = Matrix.Translation(pw + yv * 0.0015) @ Matrix((xv, yv, zv)).transposed().to_4x4() @ Matrix.Rotation(math.radians(-18), 4, "Y")
         bm = bmesh.new()
-        p0 = path[0][1] + V(0.010, 0.012, -0.010)
-        cl.tube(bm, [p0, p0.lerp(pw, 0.5) + nw * 0.006 + V(0, 0, -0.006), pw + V(0, 0, 0.012)], 0.0018, 5, True)
-        cord = new_object(self.name("WhistleCord"), bm, M["creme"])
-        tag(cord, "whistle_cord", "gear")
-        self.reg(cord, "torso")
-        bm = bmesh.new()
-        cl.rounded_box(bm, (0, 0, 0), (0.016, 0.034, 0.014), 0.005)
+        # camara: torno em volta de Y (perfil arredondado), face redonda para fora do colete
+        cl.lathe(bm, [(0.0, 0.0115), (0.0080, 0.0115), (0.0102, 0.0100), (0.0110, 0.0060), (0.0108, 0.0012), (0.0, 0.0012)], 18)
+        cl.transform_bm(bm, Matrix.Rotation(math.radians(-90), 4, "X"))
         tb = bmesh.new()
-        cl.ellipsoid(tb, (0, -0.010, -0.004), (0.011, 0.011, 0.011), 12, 6)
+        cl.rounded_box(tb, (-0.0040, 0.0064, 0.0150), (0.0094, 0.0086, 0.0230), 0.0028)
         hero_lib.join_bm(bm, tb)
-        q = nw.to_track_quat("Z", "Y").to_matrix().to_4x4()
-        cl.transform_bm(bm, Matrix.Translation(pw) @ Matrix.Rotation(math.radians(-15), 4, "Z") @ Matrix.Rotation(math.radians(80), 4, "X"))
+        cl.transform_bm(bm, Tw)
         wh = new_object(self.name("Whistle"), bm, M["ouro"])
         tag(wh, "whistle", "gear")
         self.reg(wh, "torso")
+        bm = bmesh.new()
+        cl.rounded_box(bm, (-0.0040, 0.0108, 0.0072), (0.0066, 0.0016, 0.0050), 0.0008)
+        cl.transform_bm(bm, Tw)
+        sl = new_object(self.name("WhistleSlot"), bm, M["couro"])
+        tag(sl, "whistle_slot", "gear")
+        self.reg(sl, "torso")
+        bm = bmesh.new()
+        cl.torus_z(bm, 0.0042, 0.0012, 0.0, major=12, minor=4)
+        cl.transform_bm(bm, Tw @ Matrix.Translation((-0.0040, 0.0062, 0.0300)) @ Matrix.Rotation(math.radians(90), 4, "X"))
+        rg = new_object(self.name("WhistleRing"), bm, M["ouro"])
+        tag(rg, "whistle_ring", "gear")
+        self.reg(rg, "torso")
+        ring_top = Tw @ V(-0.0040, 0.0062, 0.0342)
+        bm = bmesh.new()
+        p0 = path[0][1] + V(0.010, 0.012, -0.010)
+        cl.tube(bm, [p0, p0.lerp(ring_top, 0.5) + yv * 0.006, ring_top], 0.0016, 5, True)
+        cord = new_object(self.name("WhistleCord"), bm, M["creme"])
+        tag(cord, "whistle_cord", "gear")
+        self.reg(cord, "torso")
         # EMBLEMA da equipe na placa esquerda do peito (lado esquerdo da personagem, -X)
         pe, ne = self.vest_point("L", -36.0, zS - 0.058, 0.0)
         ne_h = V(ne.x, ne.y, ne.z * 0.4).normalized()
@@ -994,16 +1067,16 @@ class LV2B(hero_lib.Builder):
             w0 = add(W - d * 0.034 * k, 0.020 * k)
             w1 = add(W + d * 0.002 * k, 0.021 * k, w0)
             palm = add(W + d * 0.034 * k, 0.027 * k, w1)
-            # polegar relaxado: ao lado da palma, para a frente e um pouco para baixo (sem fechar)
-            t0 = add(W + d * 0.016 * k + f * 0.022 * k + n * 0.006 * k, 0.0125 * k, w1)
-            t1 = add(W + d * 0.036 * k + f * 0.038 * k + n * 0.010 * k, 0.0112 * k, t0)
-            add(W + d * 0.054 * k + f * 0.044 * k + n * 0.012 * k, 0.0100 * k, t1)
-            # 3 dedos levemente abertos, quase retos (curva suave so na ponta: mao relaxada, nao garra)
+            # polegar relaxado e VISIVEL: sai da lateral da palma, para a frente, pouco para dentro (aparece de frente e de lado)
+            t0 = add(W + d * 0.014 * k + f * 0.026 * k + n * 0.003 * k, 0.0128 * k, w1)
+            t1 = add(W + d * 0.032 * k + f * 0.046 * k + n * 0.005 * k, 0.0116 * k, t0)
+            add(W + d * 0.048 * k + f * 0.056 * k + n * 0.008 * k, 0.0104 * k, t1)
+            # 3 dedos relaxados: levemente abertos e curvos (cada junta dobra um pouco para a palma; sem garra)
             for off, ln, spread in ((0.0160, 0.040, 0.22), (-0.0005, 0.045, 0.0), (-0.0165, 0.038, -0.24)):
                 base = add(W + d * 0.054 * k + f * off * k, 0.0122 * k, palm)
                 fd = (d + f * spread * 0.30).normalized()
-                mid = add(W + d * 0.054 * k + f * off * k + fd * ln * 0.52 * k + n * 0.002 * k, 0.0114 * k, base)
-                add(W + d * 0.054 * k + f * off * k + fd * ln * k + n * 0.0055 * k, 0.0100 * k, mid)
+                mid = add(W + d * 0.054 * k + f * off * k + fd * ln * 0.52 * k + n * 0.0045 * k, 0.0114 * k, base)
+                add(W + d * 0.054 * k + f * off * k + fd * ln * 0.94 * k + n * 0.0135 * k, 0.0100 * k, mid)
             ob = cl.skin_obj(self.name("Hand" + sd), nn, ee, self.M["pele"], levels=2, branch=0.6)
             P = verts_np(ob)
             Wn = np.array(W)
@@ -1267,6 +1340,62 @@ class LV2B(hero_lib.Builder):
         self.rig = rig
         self.objs = [o for o, _, _ in self.parts] + [self.face_ob]
         return rig, self.objs
+
+
+def add_hand_keys(skin_ob, F, hand_k, hand_pid):
+    """Shape keys nas maos de pele (grupo skin): fist_R/fist_L (3 dedos dobram nas juntas de base e do meio, polegar fecha
+    por cima) e thumb_up_R/thumb_up_L (mesmo punho, polegar esticado para o lado do indicador -- o "joinha"). Sem ossos de
+    dedo: o esqueleto segue com 28 ossos; os clipes animam o peso. Mesma tecnica do Rastro v2.1 (rv2_body.add_fist_keys)."""
+    me = skin_ob.data
+    n_v = len(me.vertices)
+    P = verts_np(skin_ob)
+    part = np.empty(n_v, dtype=np.float32)
+    me.attributes["rbpart"].data.foreach_get("value", part)
+    is_hand = np.rint(part * 100).astype(int) == hand_pid
+    if me.shape_keys is None:
+        skin_ob.shape_key_add(name="Basis", from_mix=False)
+    k = hand_k
+
+    def rot(Pts, center, axis, ang):
+        axis = axis / np.linalg.norm(axis)
+        v = Pts - center
+        c, s_ = np.cos(ang)[:, None], np.sin(ang)[:, None]
+        cr = np.cross(axis, v)
+        dot = (v @ axis)[:, None]
+        return center + v * c + cr * s_ + axis * dot * (1 - c)
+
+    out = {}
+    for sx, s in ((1, "R"), (-1, "L")):
+        W, d, f, n = [np.array(x) for x in F.hand_frame(sx)]
+        sel = is_hand & (np.sign(P[:, 0]) == sx) & (np.linalg.norm(P - W, axis=1) < 0.20)
+        Q0 = P[sel].copy()
+        loc = Q0 - W
+        ad, af = loc @ d, loc @ f
+        thumb = (af > 0.036 * k) | ((af > 0.021 * k) & (ad < 0.046 * k))
+        ad_k, ad_m = 0.054 * k, 0.078 * k
+        u = np.cross(d, n)
+        # dedos: junta do meio, depois junta da base (no referencial de repouso)
+        w2 = np.where(thumb, 0.0, smooth(ad, ad_m - 0.006 * k, ad_m + 0.006 * k))
+        Q = rot(Q0, W + d * ad_m + n * 0.010 * k, u, np.radians(100) * w2)
+        w1 = np.where(thumb, 0.0, smooth(ad, ad_k - 0.008 * k, ad_k + 0.006 * k))
+        Q = rot(Q, W + d * ad_k + n * 0.006 * k, u, np.radians(78) * w1)
+        fingers = Q.copy()
+        # punho: polegar fecha por cima dos dedos
+        ut = np.cross(f, n)
+        wt = np.where(thumb, smooth(ad, 0.006 * k, 0.026 * k), 0.0)
+        Qf = rot(fingers, W + d * 0.016 * k + f * 0.020 * k, ut, np.radians(62) * wt)
+        # joinha: polegar esticado, apontando para o lado do indicador (f) e um pouco para fora da palma
+        uj = np.cross(d, f)
+        Qj = rot(fingers, W + d * 0.014 * k + f * 0.022 * k, uj, np.radians(48) * wt)
+        Qj = rot(Qj, W + d * 0.014 * k + f * 0.022 * k, d, np.radians(-14 * sx) * wt)
+        for name, QQ in (("fist_" + s, Qf), ("thumb_up_" + s, Qj)):
+            kb = skin_ob.shape_key_add(name=name, from_mix=False)
+            co = P.copy()
+            co[sel] = QQ
+            kb.data.foreach_set("co", co.astype(np.float64).ravel())
+            kb.slider_min, kb.slider_max = 0.0, 1.0
+            out[name] = int(sel.sum())
+    return out
 
 
 def build(with_rig=True):

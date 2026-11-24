@@ -33,7 +33,7 @@ C = dict(white="#F7FBFF", blue="#2F8CFF", deep="#1F5FBF", navy="#1F3A5F", navy_l
 
 PARTS = ["none", "shirt", "shorts", "skin_limb", "sock", "sleeve_band", "shorts_hem", "sock_top", "vest", "vest_rim", "collar_pillow",
          "cap_crown", "shirt_collar", "skin_head", "skin_neck", "hand", "hair", "hair_tie", "cap_band", "cap_visor", "cap_cord",
-         "cap_badge", "cap_star", "vest_strap", "vest_buckle", "whistle", "whistle_cord", "emblem", "emblem_star", "emblem_band",
+         "cap_badge", "cap_star", "vest_strap", "vest_buckle", "whistle", "whistle_cord", "whistle_slot", "whistle_ring", "emblem", "emblem_star", "emblem_band",
          "belt", "buckle", "buckle_star", "boot", "sole", "boot_collar", "laces", "eyelets", "compass_strap", "compass",
          "compass_dial", "compass_needle", "compass_glass", "bracelet_a", "bracelet_b", "face"]
 PID = {n: i for i, n in enumerate(PARTS)}
@@ -42,7 +42,7 @@ PID = {n: i for i, n in enumerate(PARTS)}
 GEAR = {
     "hair_tie": ("blue", 0.40, 0.0), "cap_band": ("navy", 0.42, 0.0), "cap_visor": ("navy_dk", 0.20, 0.0), "cap_cord": ("gold", 0.30, 0.6),
     "cap_badge": ("navy_emb", 0.32, 0.0), "cap_star": ("gold", 0.28, 0.55), "vest_strap": ("navy", 0.50, 0.0),
-    "vest_buckle": ("white", 0.40, 0.0), "whistle": ("whistle", 0.30, 0.0), "whistle_cord": ("white", 0.55, 0.0),
+    "vest_buckle": ("white", 0.40, 0.0), "whistle": ("whistle", 0.30, 0.0), "whistle_cord": ("white", 0.55, 0.0), "whistle_slot": ("navy_dk", 0.6, 0.0), "whistle_ring": ("gold", 0.28, 0.6),
     "emblem": ("navy_emb", 0.34, 0.0), "emblem_star": ("gold", 0.28, 0.55), "emblem_band": ("white", 0.36, 0.0),
     "belt": ("navy", 0.44, 0.0), "buckle": ("gold", 0.30, 0.55), "buckle_star": ("navy_emb", 0.32, 0.0),
     "boot": ("navy", 0.40, 0.0), "sole": ("white", 0.58, 0.0), "boot_collar": ("blue", 0.46, 0.0), "laces": ("white", 0.60, 0.0),
