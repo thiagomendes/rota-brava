@@ -1336,6 +1336,176 @@
       "razao_cabeca_altura": 0.3683,
       "velocidade_walk_mps": 0.5491,
       "velocidade_run_mps": 1.1667
+    },
+    {
+      "id": "pico_v2",
+      "nome": "Pico v2 (proposta)",
+      "papel": "climber",
+      "agente": "art3d",
+      "status": "provisorio",
+      "proposta": "RB-R1 D11/D13: heroi escalador lado a lado; NAO substitui pico.glb no jogo (so na vitrine game/lookdev/)",
+      "processo": {
+        "script": "source_art/characters/pico_v2/build_pico_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless) + Cycles CPU para assar mapas",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, PBR metallic-roughness, KHR_materials_clearcoat, JPEG embutido",
+        "tecnicas": "corpo inteirico por SKIN+SUBSURF com gomos acolchoados, articulacoes e bolso deslocados em numpy; capacete parametrico + Solidify; metaballs e mechas por tubos achatados (cabelo); corda por laco em raycast no corpo; torno, toros, tubos e prismas (equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (ripstop, lona, pespontos, helice da corda, sardas); normal map assada por Bump; FK/IK em Python"
+      },
+      "origem": [
+        "source_art/characters/pico_v2/build_pico_v2.py",
+        "source_art/characters/pico_v2/pv2_body.py",
+        "source_art/characters/pico_v2/pv2_tex.py",
+        "source_art/characters/pico_v2/pv2_anim.py",
+        "source_art/characters/pico_v2/pv2_render.py",
+        "source_art/characters/pico_v2/render_pico_v2.py",
+        "source_art/characters/pico_v2/pv2_check.py",
+        "source_art/characters/pico_v2/PROVENANCE.md",
+        "source_art/characters/pico_v2/pico_v2.blend",
+        "source_art/scripts/hero_lib.py",
+        "source_art/scripts/hero_face.py",
+        "source_art/scripts/hero_anim.py",
+        "source_art/scripts/char_lib.py",
+        "source_art/scripts/char_anim.py",
+        "source_art/scripts/rbart.py"
+      ],
+      "saida_glb": "game/assets/models/characters/pico_v2.glb",
+      "glb_sha256": "75d299ab70851e7f69f27c9d86ac7b3a9aad792d468e088d8d70e4185c973302",
+      "glb_bytes": 6589776,
+      "triangulos": 24864,
+      "materiais": [
+        "mat_pico_v2_face_dark",
+        "mat_pico_v2_face_eye",
+        "mat_pico_v2_face_iris",
+        "mat_pico_v2_face_mouth",
+        "mat_pico_v2_face_skin",
+        "mat_pico_v2_gear",
+        "mat_pico_v2_hair",
+        "mat_pico_v2_lamp",
+        "mat_pico_v2_skin",
+        "mat_pico_v2_suit"
+      ],
+      "objetos": [
+        "Pico_Face",
+        "Pico_Gear",
+        "Pico_Hair",
+        "Pico_Screen",
+        "Pico_Skin",
+        "Pico_Suit"
+      ],
+      "ossos": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "neck",
+        "head",
+        "shoulder.R",
+        "upper_arm.R",
+        "forearm.R",
+        "hand.R",
+        "hand_tip.R",
+        "shoulder.L",
+        "upper_arm.L",
+        "forearm.L",
+        "hand.L",
+        "hand_tip.L",
+        "thigh.R",
+        "shin.R",
+        "foot.R",
+        "toe.R",
+        "toe_tip.R",
+        "heel.R",
+        "thigh.L",
+        "shin.L",
+        "foot.L",
+        "toe.L",
+        "toe_tip.L",
+        "heel.L"
+      ],
+      "quantidade_ossos": 28,
+      "animacoes_duracao_s": {
+        "celebrate": 1.2,
+        "idle": 4.0,
+        "jump": 1.0,
+        "look_up": 2.0,
+        "pull_rope": 1.6,
+        "react_surprise": 0.9,
+        "run": 0.6,
+        "stop": 0.5,
+        "team_pose": 1.5,
+        "walk": 1.0,
+        "wave": 1.6
+      },
+      "shape_keys": [
+        "Basis",
+        "neutra",
+        "atenta",
+        "surpresa",
+        "alegre",
+        "triste",
+        "brava_leve",
+        "blink",
+        "mouth_A",
+        "mouth_E",
+        "mouth_O",
+        "mouth_M",
+        "look_left",
+        "look_right",
+        "look_up"
+      ],
+      "texturas": {
+        "pico_v2_gear_color": [
+          2048,
+          2048
+        ],
+        "pico_v2_gear_normal": [
+          2048,
+          2048
+        ],
+        "pico_v2_gear_orm": [
+          2048,
+          2048
+        ],
+        "pico_v2_hair_color": [
+          1024,
+          1024
+        ],
+        "pico_v2_hair_normal": [
+          1024,
+          1024
+        ],
+        "pico_v2_hair_orm": [
+          1024,
+          1024
+        ],
+        "pico_v2_skin_color": [
+          1024,
+          1024
+        ],
+        "pico_v2_skin_normal": [
+          1024,
+          1024
+        ],
+        "pico_v2_skin_orm": [
+          1024,
+          1024
+        ],
+        "pico_v2_suit_color": [
+          2048,
+          2048
+        ],
+        "pico_v2_suit_normal": [
+          2048,
+          2048
+        ],
+        "pico_v2_suit_orm": [
+          2048,
+          2048
+        ]
+      },
+      "altura_m": 1.0602,
+      "razao_cabeca_altura": 0.3708,
+      "velocidade_walk_mps": 0.5183,
+      "velocidade_run_mps": 1.1012
     }
   ]
 }
