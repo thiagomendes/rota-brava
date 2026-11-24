@@ -1,0 +1,262 @@
+{
+  "tris": 24674,
+  "tris_por_objeto": {
+    "Leme_Skin": 5325,
+    "Leme_Hair": 1513,
+    "Leme_Gear": 7376,
+    "Leme_Suit": 7912,
+    "Leme_Glass": 180,
+    "Leme_Face": 2368
+  },
+  "materials": [
+    "mat_leme_v2_face_dark",
+    "mat_leme_v2_face_eye",
+    "mat_leme_v2_face_iris",
+    "mat_leme_v2_face_mouth",
+    "mat_leme_v2_face_skin",
+    "mat_leme_v2_gear",
+    "mat_leme_v2_glass",
+    "mat_leme_v2_hair",
+    "mat_leme_v2_skin",
+    "mat_leme_v2_suit"
+  ],
+  "height_m": 1.1307,
+  "min_z": -0.0002,
+  "head_h_m": 0.4013,
+  "head_ratio": 0.3549,
+  "eye_h_ratio": 0.2926,
+  "objects": [
+    "Leme_Face",
+    "Leme_Gear",
+    "Leme_Glass",
+    "Leme_Hair",
+    "Leme_Skin",
+    "Leme_Suit"
+  ],
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "hand_tip.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "hand_tip.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R",
+    "toe.R",
+    "toe_tip.R",
+    "heel.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "toe.L",
+    "toe_tip.L",
+    "heel.L"
+  ],
+  "bone_count": 28,
+  "animations": {
+    "celebrate": [
+      0,
+      36
+    ],
+    "idle": [
+      0,
+      156
+    ],
+    "idle_wheel": [
+      0,
+      72
+    ],
+    "point": [
+      0,
+      36
+    ],
+    "react_horn": [
+      0,
+      27
+    ],
+    "run": [
+      0,
+      18
+    ],
+    "steer_left": [
+      0,
+      30
+    ],
+    "steer_right": [
+      0,
+      30
+    ],
+    "stop": [
+      0,
+      15
+    ],
+    "team_pose": [
+      0,
+      45
+    ],
+    "walk": [
+      0,
+      30
+    ],
+    "wave": [
+      0,
+      48
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "triste",
+    "brava_leve",
+    "blink",
+    "mouth_A",
+    "mouth_E",
+    "mouth_O",
+    "mouth_M",
+    "look_left",
+    "look_right",
+    "look_up"
+  ],
+  "walk_speed_mps": 0.5711,
+  "run_speed_mps": 1.2133,
+  "pes": {
+    "hip_x_m": 0.0728,
+    "foot_x_m": 0.0915
+  },
+  "texturas": {
+    "leme_v2_gear_color": [
+      2048,
+      2048
+    ],
+    "leme_v2_gear_normal": [
+      2048,
+      2048
+    ],
+    "leme_v2_gear_orm": [
+      2048,
+      2048
+    ],
+    "leme_v2_hair_color": [
+      1024,
+      1024
+    ],
+    "leme_v2_hair_normal": [
+      1024,
+      1024
+    ],
+    "leme_v2_hair_orm": [
+      1024,
+      1024
+    ],
+    "leme_v2_skin_color": [
+      2048,
+      2048
+    ],
+    "leme_v2_skin_normal": [
+      2048,
+      2048
+    ],
+    "leme_v2_skin_orm": [
+      2048,
+      2048
+    ],
+    "leme_v2_suit_color": [
+      2048,
+      2048
+    ],
+    "leme_v2_suit_normal": [
+      2048,
+      2048
+    ],
+    "leme_v2_suit_orm": [
+      2048,
+      2048
+    ]
+  },
+  "wheel_mid_err_m": 0.01,
+  "botas": {
+    "min_m": 0.0522,
+    "min_clip": "team_pose",
+    "min_frame": 0,
+    "por_clipe": {
+      "idle": {
+        "min_m": 0.0522,
+        "quadro": 127
+      },
+      "walk": {
+        "min_m": 0.0689,
+        "quadro": 9
+      },
+      "run": {
+        "min_m": 0.0736,
+        "quadro": 12
+      },
+      "stop": {
+        "min_m": 0.0522,
+        "quadro": 13
+      },
+      "idle_wheel": {
+        "min_m": 0.0863,
+        "quadro": 18
+      },
+      "steer_left": {
+        "min_m": 0.0869,
+        "quadro": 0
+      },
+      "steer_right": {
+        "min_m": 0.0869,
+        "quadro": 0
+      },
+      "react_horn": {
+        "min_m": 0.0869,
+        "quadro": 0
+      },
+      "celebrate": {
+        "min_m": 0.0522,
+        "quadro": 14
+      },
+      "wave": {
+        "min_m": 0.0522,
+        "quadro": 4
+      },
+      "point": {
+        "min_m": 0.0522,
+        "quadro": 0
+      },
+      "team_pose": {
+        "min_m": 0.0522,
+        "quadro": 0
+      }
+    },
+    "deslize": {
+      "walk": {
+        "nominal_mps": 0.5711,
+        "pares_de_quadros_em_apoio": 30,
+        "erro_medio_mps": 0.0059,
+        "erro_max_mps": 0.0598,
+        "min_z_m": -0.0034
+      },
+      "run": {
+        "nominal_mps": 1.2133,
+        "pares_de_quadros_em_apoio": 12,
+        "erro_medio_mps": 0.0039,
+        "erro_max_mps": 0.0183,
+        "min_z_m": -0.004
+      }
+    }
+  }
+}
