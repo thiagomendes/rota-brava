@@ -10,9 +10,12 @@ const KEYS := {
 	&"move_down": [KEY_S, KEY_DOWN],
 	&"interact": [KEY_E],
 	&"pause": [KEY_ESCAPE],
+	&"run": [KEY_SHIFT],
+	&"jump": [KEY_SPACE],
 }
 const BUTTONS := {
-	&"interact": [JOY_BUTTON_A],
+	&"interact": [JOY_BUTTON_X],
+	&"jump": [JOY_BUTTON_A],
 	&"pause": [JOY_BUTTON_START],
 }
 ## acao -> [eixo, sinal]

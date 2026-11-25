@@ -101,6 +101,9 @@ var options_open: bool = false
 var _queue: Array[Dictionary] = []
 var _speaking: bool = false
 var _skip_current: bool = false
+## C2: fim da ultima fala (ms) e janela em que `interact` e ignorado depois dela (o mesmo E nao vira acao).
+const SPEECH_GRACE_MS := 250
+var _speech_end_ms: int = -100000
 var _hint_active: bool = false
 var _pulse: Tween
 var choice_open: bool = false
@@ -895,6 +898,7 @@ func _pump() -> void:
 		line_finished.emit()
 	_sub_panel.visible = false
 	_speaking = false
+	_speech_end_ms = Time.get_ticks_msec()
 
 
 # ---------- escolha ----------
@@ -1043,6 +1047,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif handoff_open and not pause_open and event.is_action_pressed(&"interact"):
 		get_viewport().set_input_as_handled()
 		_confirm_handoff()
-	elif event.is_action_pressed(&"ui_accept") and not choice_open and not handoff_open \
+	# C2: a fala avanca por `interact` e consome o aperto (um E so avanca, nao interage). Nunca por `ui_accept`, que
+	# inclui Espaco (o pulo). Logo depois da fala acabar, `interact` fica ignorado por SPEECH_GRACE_MS.
+	elif event.is_action_pressed(&"interact") and not choice_open and not handoff_open \
 			and not pause_open and not complete_open and _speaking:
+		get_viewport().set_input_as_handled()
 		skip_line()
+	elif event.is_action_pressed(&"interact") and not handoff_open and not pause_open \
+			and Time.get_ticks_msec() - _speech_end_ms < SPEECH_GRACE_MS:
+		get_viewport().set_input_as_handled()

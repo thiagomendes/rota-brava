@@ -29,7 +29,7 @@ func _physics(n: int) -> void:
 
 
 func _release() -> void:
-	for a: StringName in [&"move_left", &"move_right", &"move_up", &"move_down"]:
+	for a: StringName in [&"move_left", &"move_right", &"move_up", &"move_down", &"run"]:
 		Input.action_release(a)
 
 
@@ -170,7 +170,8 @@ func _walk_feel() -> void:
 	r.check(absf(up - 0.12) <= 0.02, "rampa de partida ~0,12 s ate a velocidade (medido %.3f s)" % up)
 	r.check(absf(down - 0.08) <= 0.02, "parada em ~0,08 s (medido %.3f s)" % down)
 	r.check(MemberActor.target_speed(0.3) < 1.0 and MemberActor.target_speed(0.3) > 0.3, "analogico pouco inclinado anda devagar (%.2f m/s)" % MemberActor.target_speed(0.3))
-	r.check(MemberActor.target_speed(1.0) == MemberActor.SPEED and MemberActor.target_speed(0.05) == 0.0, "inclinacao total corre; zona morta para")
+	r.check(MemberActor.target_speed(1.0, true) == MemberActor.SPEED and MemberActor.target_speed(0.05, true) == 0.0, "inclinacao total com `run` corre; zona morta para")
+	r.check(MemberActor.target_speed(1.0) == MemberActor.WALK_SPEED, "sem `run`, inclinacao total anda (C2)")
 
 	var m: Ep01Main = await _start(&"dock_investigation")
 	var a := m.actors[&"tracker"] as MemberActor
@@ -178,6 +179,7 @@ func _walk_feel() -> void:
 	a.teleport(Vector3(0, 0.05, 8.0))
 	await _physics(5)
 	_push(m, Vector3.RIGHT)
+	Input.action_press(&"run")
 	var frames := 0
 	while _planar(a) < MemberActor.SPEED * 0.95 and frames < 60:
 		await r.tree.physics_frame
@@ -206,6 +208,7 @@ func _walk_feel() -> void:
 	# MUTACAO: escala de velocidade baixa -> a medida da rampa reprova; restaurada.
 	a.speed_scale = 0.4
 	_push(m, Vector3.RIGHT)
+	Input.action_press(&"run")
 	frames = 0
 	while _planar(a) < MemberActor.SPEED * 0.95 and frames < 30:
 		await r.tree.physics_frame
