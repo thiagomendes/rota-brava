@@ -20,24 +20,27 @@ TRIM = ("silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.02,
         "areverse,silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.06,areverse")
 
 # semitons: altura; tempo: fator de duracao do rubberband (1 = igual); eq: filtros ffmpeg.
+# D19d: em uso so o "raw" (Thiago escolheu as vozes cruas). Os demais ficam como opcao, desligados.
 PRESETS: dict[str, dict] = {
-    "rastro": {"desc": "menina atenta: +3 st com formantes deslocados, corte de grave, presenca suave",
+    "raw": {"desc": "D19d: so apara silencio e normaliza (-16 LUFS, -1 dBTP); sem altura, formantes nem EQ",
+            "semitones": 0.0, "tempo": 1.0, "eq": "", "enabled": True},
+    "rastro": {"enabled": False, "desc": "menina atenta: +3 st com formantes deslocados, corte de grave, presenca suave",
                "semitones": 3.0, "tempo": 1.0,
                "eq": "highpass=f=150,equalizer=f=320:t=q:w=1.2:g=-2,equalizer=f=3500:t=q:w=1.0:g=3"},
-    "pico": {"desc": "menino energetico: +3.5 st, 4% mais rapido, presenca mais forte",
+    "pico": {"enabled": False, "desc": "menino energetico: +3.5 st, 4% mais rapido, presenca mais forte",
              "semitones": 3.5, "tempo": 1.04,
              "eq": "highpass=f=150,equalizer=f=280:t=q:w=1.2:g=-2,equalizer=f=4000:t=q:w=1.0:g=4"},
-    "leme": {"desc": "menina firme, pilota: +2 st, corpo medio mantido, presenca em 2,5 kHz",
+    "leme": {"enabled": False, "desc": "menina firme, pilota: +2 st, corpo medio mantido, presenca em 2,5 kHz",
              "semitones": 2.0, "tempo": 1.0,
              "eq": "highpass=f=130,equalizer=f=2500:t=q:w=1.0:g=2.5,acompressor=threshold=-20dB:ratio=2.5:attack=5:release=80"},
-    "capitao": {"desc": "adulto caloroso: sem altura, calor em 160 Hz, aspereza 3 kHz contida",
+    "capitao": {"enabled": False, "desc": "adulto caloroso: sem altura, calor em 160 Hz, aspereza 3 kHz contida",
                 "semitones": 0.0, "tempo": 1.0,
                 "eq": "highpass=f=70,equalizer=f=160:t=q:w=1.0:g=2,equalizer=f=3000:t=q:w=1.2:g=-1.5"},
-    "farol7": {"desc": "radio: banda 300-3400 Hz, leve saturacao, chiado sintetizado -38 dB",
+    "farol7": {"enabled": False, "desc": "radio: banda 300-3400 Hz, leve saturacao, chiado sintetizado -38 dB",
                "semitones": 0.0, "tempo": 1.0, "radio": True,
                "eq": "highpass=f=300,lowpass=f=3400,equalizer=f=1800:t=q:w=1.0:g=4,"
                      "acompressor=threshold=-24dB:ratio=4:attack=3:release=60,asoftclip=type=tanh"},
-    "amora": {"desc": "senhora feirante: -0.5 st, 3% mais lenta, calor e presenca leves",
+    "amora": {"enabled": False, "desc": "senhora feirante: -0.5 st, 3% mais lenta, calor e presenca leves",
               "semitones": -0.5, "tempo": 0.97,
               "eq": "highpass=f=90,equalizer=f=220:t=q:w=1.0:g=1.5,equalizer=f=2800:t=q:w=1.2:g=1.5"},
 }
@@ -50,7 +53,8 @@ def core_chain(p: dict) -> str:
     if p["semitones"] or p["tempo"] != 1.0:
         parts.append(f"rubberband=pitch={2 ** (p['semitones'] / 12):.6f}:tempo={p['tempo']:.4f}"
                      ":formant=shifted:pitchq=quality")
-    parts.append(p["eq"])
+    if p["eq"]:
+        parts.append(p["eq"])
     return ",".join(parts)
 
 

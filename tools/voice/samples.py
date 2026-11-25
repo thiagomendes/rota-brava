@@ -29,11 +29,11 @@ LINES = {
     "leme": ["ep01.arrival.pilot.no_captain", "ep01.market.pilot.cart_go"],
     "capitao": ["ep01.bay.captain.thanks_tow", "ep01.festival.captain.thanks"],
     "farol7": ["ep01.arrival.radio.festival", "ep01.plaza.radio.water_back"],
+    "dona_amora": ["ep01.market.vendor.mess", "ep01.market.vendor.gull_hint"],
 }
 ORDINAL = ["voz um", "voz dois", "voz tres", "voz quatro"]
 LABEL_VOICE = "Schedar"  # rotulo neutro, sem estilo e sem tratamento
 GAP_CAND, GAP_IN = 0.8, 0.4
-CHARS_PER_S = 13.0  # fala infantil em pt-BR, estimativa grosseira para detectar instrucao lida
 
 
 def texts() -> dict:
@@ -73,7 +73,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, default=ROOT.parent.parent.parent / "captures/d19/amostras"
                     if ".claude/worktrees" in str(ROOT) else ROOT / "captures/d19/amostras")
-    ap.add_argument("--only", default=",".join(LINES))
+    ap.add_argument("--only", default=",".join(k for k in LINES if k != "dona_amora"))
+    ap.add_argument("--no-emotions", action="store_true", help="so as candidatas; acrescenta ao indice existente")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args(argv)
     cast, dr, tx = load_json("cast.json"), load_json("direction.json"), texts()
@@ -112,11 +113,11 @@ def main(argv: list[str] | None = None) -> int:
                     if a.dry_run:
                         continue
                     treat(c["preset"], raw / f"{stem}.wav", trt / f"{stem}.wav")
-                    exp = len(text) / CHARS_PER_S
+                    exp = p["expected_duration_s"]
                     index.append({"personagem": ch, "voz": voice, "fala": key, "texto": text,
                                   "bruto": str(raw / f"{stem}.wav"), "tratado": str(trt / f"{stem}.wav"),
                                   "duracao_bruto_s": p["duration_s"], "duracao_esperada_s": round(exp, 2),
-                                  "suspeita_instrucao_lida": p["duration_s"] > 2.2 * exp + 0.8,
+                                  "suspeita_instrucao_lida": p["suspect_instruction_read"], "tentativas": p["tries"],
                                   **{f"tratado_{k}": v for k, v in loudness(trt / f"{stem}.wav").items()}})
                     rws.append(raw / f"{stem}.wav")
                     tts.append(trt / f"{stem}.wav")
@@ -127,6 +128,8 @@ def main(argv: list[str] | None = None) -> int:
             if not a.dry_run:
                 concat_mp3(parts, a.out / f"{ch}.mp3", work)
         # emocoes: voz recomendada de cada heroi, mesma frase em 2 direcoes
+        if a.no_emotions:
+            raise StopIteration
         demo = dr["demo"]
         parts = []
         leia += ["", "emocoes.mp3: para cada heroi (rastro, pico, leme), a mesma frase 'curiosa' e depois 'animada', crua e depois tratada."]
@@ -145,9 +148,16 @@ def main(argv: list[str] | None = None) -> int:
             leia.append(f"  {ch} ({c['voice']}): \"{tx[key]}\" curiosa (crua, tratada), animada (crua, tratada)")
         if not a.dry_run:
             concat_mp3(parts, a.out / "emocoes.mp3", work)
+    except StopIteration:
+        pass
     except AuthError as e:
         print(f"[samples] {e}", file=sys.stderr)
         return 2
+    if a.no_emotions and (a.out / "index.json").exists():
+        old = json.loads((a.out / "index.json").read_text(encoding="utf-8"))
+        names = set(a.only.split(","))
+        index = [e for e in old if e["personagem"] not in names] + index
+        leia = [(a.out / "LEIA.txt").read_text(encoding="utf-8").rstrip(), ""] + leia[3:]
     (a.out / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     (a.out / "LEIA.txt").write_text("\n".join(leia) + "\n", encoding="utf-8")
     print(f"chamadas a API nesta execucao: {calls}; itens no indice: {len(index)}")

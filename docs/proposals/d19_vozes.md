@@ -49,6 +49,25 @@ Pedido de Thiago: aproveitar o controle de tom e emoção para cada fala combina
 - O tratamento local é sempre o preset do personagem, igual em todas as suas falas, para manter a identidade; a emoção vem só da atuação do TTS.
 - Prova: `emocoes.mp3` tem a mesma frase de cada herói "curiosa" (energia 1, lento) e "animada" (energia 3, rápido).
 
+## D19d · Escolha de Thiago: vozes cruas (2026-11-25)
+
+Thiago ouviu o esboço e escolheu, todas na versão **crua**:
+
+| Personagem | Voz |
+|---|---|
+| Rastro | Leda |
+| Pico | Fenrir |
+| Leme | Erinome |
+| Capitão | Algieba |
+| Farol 7 | Schedar, sem efeito de rádio |
+
+Consequências:
+- **Tratamento:** todos usam o preset `raw` de `treat.py`, que só apara o silêncio do começo e do fim e normaliza o volume (−16 LUFS, −1 dBTP), sem altura, formantes nem EQ. O tom infantil vem só da voz e da direção do Gemini.
+- **Presets antigos:** os 6 presets de personagem continuam em `treat.py` com `enabled: False`; o `cast.json` guarda o antigo de cada personagem em `treat_preset_off`.
+- **Refação automática:** o `gemini_tts.py` compara a duração com a esperada (~5 sílabas/s + pausas + 0,6 s). Acima de 1,8 vezes a esperada, gera de novo, até 3 tentativas; se ainda passar, grava `suspect_instruction_read: true` na procedência. Cada refação usa um cache próprio (`<hash>.r2.wav`, `<hash>.r3.wav`).
+- **Dona Amora:** 3 candidatas (Vindemiatrix, Gacrux, Sulafat) em `captures/d19/amostras/dona_amora.mp3`, aguardando escolha.
+- **Roteiro inteiro:** não gerado. O texto ainda pode mudar com a auditoria de roteiro (F2) e com as variantes da D19c.
+
 ## Falas repetidas em grupos (D19c, planejamento da geração)
 
 Decisão de Thiago: o que se repete por situação vira grupo de 3 a 5 variantes, sorteadas sem repetir a última. Texto das variantes: `adventure`; lógica no jogo: `gameplay`. Aqui só o plano; o espaço está em `direction.json` → `groups` (id → `keys`, `target`, `direction`).

@@ -40,6 +40,22 @@ MIN_INTERVAL_S = float(os.environ.get("RB_TTS_MIN_INTERVAL", "4.0"))  # limite d
 _STAMP = CACHE / ".last_call"
 
 
+MAX_TRIES = 3
+SUSPECT_RATIO = 1.8
+VOWELS = set("aeiouáéíóúâêôãõày")
+
+
+def expected_duration(text: str) -> float:
+    """Estimativa grosseira: ~1 silaba por grupo de vogais, ~5 silabas/s + 0,3 s por pausa e 0,6 s de margem."""
+    t = text.lower()
+    syl, prev = 0, False
+    for ch in t:
+        v = ch in VOWELS
+        syl += v and not prev
+        prev = v
+    return syl / 5.0 + 0.3 * sum(t.count(c) for c in ".!?,:") + 0.6
+
+
 class AuthError(RuntimeError):
     pass
 
@@ -172,16 +188,24 @@ def synth(text: str, voice: str, style: str, model: str, out: Path, dry_run: boo
     body = request_body(text, voice, style, mode)
     if dry_run:
         return {"dry_run": True, "endpoint": ENDPOINT.format(model=model), "body": body, "input_sha256": h}
-    cached = CACHE / f"{h}.wav"
-    calls = 0
-    if cached.exists():
-        cache_hit = True
+    calls, cache_hit, suspect, tries = 0, True, False, 0
+    exp = expected_duration(text)
+    for tries in range(1, MAX_TRIES + 1):
+        # tentativa 1 usa o hash da entrada; refacoes ganham sufixo, para nao reler o mesmo cache
+        cached = CACHE / (f"{h}.wav" if tries == 1 else f"{h}.r{tries}.wav")
+        if not cached.exists():
+            cache_hit = False
+            pcm, mime, c = call_api(model, body)
+            calls += c
+            write_wav(cached, pcm, rate_from_mime(mime))
         pcm_wav = cached.read_bytes()
-    else:
-        cache_hit = False
-        pcm, mime, calls = call_api(model, body)
-        write_wav(cached, pcm, rate_from_mime(mime))
-        pcm_wav = cached.read_bytes()
+        with wave.open(str(cached)) as w:
+            dur = w.getnframes() / w.getframerate()
+        suspect = dur > SUSPECT_RATIO * exp
+        if not suspect:
+            break
+        print(f"[gemini_tts] {dur:.1f} s > {SUSPECT_RATIO}x {exp:.1f} s esperados (instrucao lida?); "
+              f"tentativa {tries}/{MAX_TRIES}", file=sys.stderr)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_bytes(pcm_wav)
     with wave.open(str(out)) as w:
@@ -193,7 +217,8 @@ def synth(text: str, voice: str, style: str, model: str, out: Path, dry_run: boo
         "prompt_sent": body["contents"][0]["parts"][0]["text"], "input_sha256": h,
         "sha256": hashlib.sha256(pcm_wav).hexdigest(), "sample_rate": rate, "duration_s": round(dur, 3),
         "date": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
-        "cache_hit": cache_hit, "api_calls": calls,
+        "cache_hit": cache_hit, "api_calls": calls, "tries": tries,
+        "expected_duration_s": round(exp, 2), "suspect_instruction_read": suspect,
         "status": "provisorio (aguarda aprovacao de Thiago; termos de uso a confirmar)",
     }
     out.with_suffix(".json").write_text(json.dumps(prov, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
