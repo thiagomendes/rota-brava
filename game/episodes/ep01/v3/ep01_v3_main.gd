@@ -143,6 +143,7 @@ func _ready() -> void:
 
 ## Camera desvia de paredes, telhados e troncos (camada 1) e das copas das arvores; paredes invisiveis nao contam.
 func _setup_camera_avoidance() -> void:
+	camera_rig.orbit_enabled = true
 	camera_rig.collision_mask = 1
 	for path: String in ["Collision/WaterLimits", "Collision/MapBounds", "Collision/AccessRamps"]:
 		var b := world.get_node_or_null(path) as CollisionObject3D
@@ -594,6 +595,7 @@ func _on_footstep(speed: float, pos: Vector3) -> void:
 
 
 func _pause() -> void:
+	camera_rig.release_mouse()
 	get_tree().paused = true
 	hud.open_pause()
 

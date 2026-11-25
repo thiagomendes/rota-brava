@@ -19,9 +19,11 @@ const HOP_TIME := 0.42
 const HOP_HEIGHT := 0.55
 ## Folga alem da duracao do salto antes de considerar o salto interrompido (s).
 const HOP_GRACE := 0.6
-## Varal: o marcador e o centro; 3 ganchos a 0,6 m no eixo X, a 1,45 m do chao; cesto 0,9 m ao norte.
+## Varal: o marcador e o centro; 3 ganchos a 0,6 m ao longo da corda real do mundo (diagonal a -23 graus em Y, corda a
+## ~1,75 m; aviso do lead na E5, nao medido aqui); a peca pendura com o centro 0,17 m abaixo da corda; cesto 0,9 m ao norte.
 const LINE_SLOTS: Array[float] = [-0.6, 0.0, 0.6]
-const LINE_HEIGHT := 1.45
+const LINE_YAW_DEG := -23.0
+const LINE_HEIGHT := 1.58
 ## Carrinho a frente da Leme (m) e cores das cargas (barraca -> cor do caixote).
 const CART_AHEAD := 1.05
 const STALL_COLORS := {&"M4_Stall_Apple": Color("e0412b"), &"M4_Stall_Lemon": Color("f2c81d"), &"M4_Stall_Grapes": Color("4a6fd8")}
@@ -77,7 +79,8 @@ func _derive_points() -> void:
 	points[&"TreeBase"] = Vector3(branch.x, 0.0, branch.z) + to_line.normalized() * 1.3
 	points[&"Basket"] = line + Vector3(0, 0.0, -0.9)
 	for i in LINE_SLOTS.size():
-		points[StringName("LineSlot_%d" % i)] = line + Vector3(LINE_SLOTS[i], LINE_HEIGHT, 0)
+		points[StringName("LineSlot_%d" % i)] = line + Basis(Vector3.UP, deg_to_rad(LINE_YAW_DEG)) * Vector3(LINE_SLOTS[i], 0, 0) \
+			+ Vector3(0, LINE_HEIGHT, 0)
 	var f1 := _mk(&"M3_FountainStep_1")
 	var f2 := _mk(&"M3_FountainStep_2")
 	var out := f1 - f2
@@ -191,11 +194,11 @@ func _paw_decal(pos: Vector3, tint: Color = Color("6b4a2f")) -> Sprite3D:
 func _emblem(id: StringName, pos: Vector3, member: StringName) -> void:
 	var it := _spot(id, pos, &"star", "ui.action.pick", member, 1.1)
 	it.set_meta(&"emblem", true)
-	Ep01V3Pieces.emblem(it)
+	Ep01V3Pieces.emblem(it, member)
 
 
 func _cloth(pos: Vector3, color: Color, n: String) -> Node3D:
-	var c := Ep01V3Pieces.cloth(_root, n, color)
+	var c := Ep01V3Pieces.cloth(_root, n, color, _pieces.size())
 	c.global_position = pos
 	_pieces.append(c)
 	return c
@@ -313,7 +316,7 @@ func _refresh_cargo() -> void:
 		c.queue_free()
 	for i in range(_cargo, CARGO_ORDER.size()):
 		var col: Color = STALL_COLORS[CARGO_ORDER[i]]
-		var b := Ep01V3Pieces.crate(_cargo_box, "Crate%d" % i, col)
+		var b := Ep01V3Pieces.crate(_cargo_box, "Crate%d" % i, col, CARGO_ORDER[i])
 		b.position = Vector3(0, 0.01 + (i - _cargo) * 0.28, 0)
 		b.set_meta(&"stall", CARGO_ORDER[i])
 
@@ -467,7 +470,8 @@ func _on_spot(id: StringName, actor: Node3D) -> void:
 		&"hang":
 			if _hung < 3:
 				_fly(_pieces[_hung], points[StringName("LineSlot_%d" % _hung)], 0.45)
-				_pieces[_hung].rotation = Vector3.ZERO
+				_pieces[_hung].rotation = Vector3(0, deg_to_rad(LINE_YAW_DEG), 0)
+				Ep01V3Pieces.play(_pieces[_hung], &"sway")
 				_hung += 1
 				FeedbackFx.sparkle(world, points[StringName("LineSlot_%d" % (_hung - 1))])
 				main.notify_mission(&"piece_hung")

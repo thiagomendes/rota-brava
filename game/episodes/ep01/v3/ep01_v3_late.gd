@@ -232,7 +232,9 @@ func _build_m7() -> void:
 	_lit = 0
 	for s in _icons:
 		Ep01V3Pieces.light_boat_icon(s, false)
-	_spot(&"lens", _mk(&"M7_Lens"), &"magnifier", "ui.action.examine", &"tracker", 1.5)
+	# Lente meio tapada por arbustos: o ponto fica do lado do caminho (rumo ao pe da escada), com a lente a vista.
+	var lens_side := _mk(&"M7_Lens").lerp(points[&"StairFoot"] as Vector3, 0.25)
+	_spot(&"lens", Vector3(lens_side.x, _mk(&"M7_Lens").y, lens_side.z), &"magnifier", "ui.action.examine", &"tracker", 1.8)
 	_spot(&"stair_climb", points[&"StairFoot"], &"carabiner", "ui.action.climb", &"climber", 1.5)
 	# Filhote ao lado do pouso; o emblema fica no proprio pouso (a galeria e estreita: nada de andar nela).
 	_spot(&"pup", g + Vector3(0, 0, 0.4), &"heart", "ui.action.rescue", &"climber", 1.4)
@@ -406,6 +408,10 @@ func _recover_fish(a: MemberActor) -> void:
 			_gull.remove_child(_fish)
 			_root.add_child(_fish)
 			_fish.global_position = at
+			_fish.visible = true
+		if "carrying_fish" in _gull:
+			_gull.set("carrying_fish", false)
+		Ep01V3Pieces.play(_gull, &"flee")
 		var tw := _gull.create_tween()
 		tw.tween_property(_gull, "global_position", _gull.global_position + Vector3(6.0, 7.0, 8.0), 1.6) \
 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
@@ -462,6 +468,7 @@ func _board() -> void:
 	sailing = true
 	main.set_controlled(boat)
 	main.camera_rig.set_view(BOAT_VIEW, boat.heading, BOAT_LOOK_Y)
+	main.camera_rig.orbit_enabled = false
 	main.camera_rig.follow(boat, true)
 	main.say("ep01.bay.pilot.start")
 	main.notify_mission(&"boat_boarded")
@@ -473,6 +480,7 @@ func _end_sailing() -> void:
 	if sailing:
 		sailing = false
 		main.boat.input_locked = false
+		main.camera_rig.orbit_enabled = true
 		main.camera_rig.set_low_view(main.camera_rig.yaw)
 
 
@@ -563,6 +571,7 @@ func _land_on_dock() -> void:
 	captain.global_position = _mk(&"M8_CaptainDock")
 	StoryFigure.face(captain, land)
 	sailing = false
+	main.camera_rig.orbit_enabled = true
 	boat.input_locked = false
 	main.set_controlled(main.actors[main.active_member])
 	main.camera_rig.set_low_view(main.camera_rig.yaw)

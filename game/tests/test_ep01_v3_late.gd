@@ -15,6 +15,7 @@ func run(runner) -> void:
 	await _m7_lighthouse()
 	await _m8_festival()
 	await _camera_shed_top()
+	await _orbit()
 	await _hop_interrupted()
 	await _cart_after_real_m4()
 	await _save_other_version()
@@ -321,3 +322,46 @@ func _save_other_version() -> void:
 	await _free(main)
 	Ep01V3Main.save_path = ""
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+
+## C1: orbita pela Input Map (deterministica: passo fixo), inclinacao limitada, heroi anda relativo a camera.
+func _orbit() -> void:
+	var main := await _new_main(&"M1")
+	var rig := main.camera_rig
+	r.check(rig.orbit_enabled and rig.pitch == 0.0, "v3 C1: orbita ligada, comeca no enquadramento baixo aprovado")
+	var y0 := rig.yaw
+	Input.action_press(&"cam_right")
+	for i in 30:
+		rig.orbit_step(1.0 / 60.0)
+	Input.action_release(&"cam_right")
+	var dy := wrapf(rig.yaw - y0, -PI, PI)
+	r.check(absf(dy + CameraRig.ORBIT_SPEED * 0.5) < 0.001, "v3 C1: cam_right gira %.3f rad em 0,5 s (esperado %.3f)" % [dy, -CameraRig.ORBIT_SPEED * 0.5])
+	rig.orbit_step(0.5)
+	r.check(absf(wrapf(rig.yaw - y0, -PI, PI) - dy) < 0.0001, "v3 C1: sem acao a camera nao gira (bot deterministico)")
+	Input.action_press(&"cam_down")
+	for i in 600:
+		rig.orbit_step(1.0 / 60.0)
+	Input.action_release(&"cam_down")
+	r.check(is_equal_approx(rig.pitch, CameraRig.PITCH_MAX), "v3 C1: inclinacao limitada em cima (%.2f)" % rig.pitch)
+	Input.action_press(&"cam_up")
+	for i in 600:
+		rig.orbit_step(1.0 / 60.0)
+	Input.action_release(&"cam_up")
+	r.check(is_equal_approx(rig.pitch, CameraRig.PITCH_MIN), "v3 C1: inclinacao limitada embaixo (%.2f)" % rig.pitch)
+	rig.pitch = 0.0
+	# Movimento relativo a camera: "para cima" anda para onde a camera olha.
+	var t := main.controlled_node as MemberActor
+	await r.frames(2)
+	var p0 := t.global_position
+	Input.action_press(&"move_up")
+	await r.tree.create_timer(0.5).timeout
+	Input.action_release(&"move_up")
+	var mv := t.global_position - p0
+	mv.y = 0.0
+	var fwd := Basis(Vector3.UP, rig.yaw) * Vector3(0, 0, -1)
+	r.check(mv.length() > 0.3 and mv.normalized().dot(fwd) > 0.95, "v3 C1: heroi anda para a frente da camera girada (dot %.2f)" % (mv.normalized().dot(fwd) if mv.length() > 0 else 0.0))
+	await r.frames(2)
+	var cam := rig.camera.global_position
+	var focus := t.global_position + rig.look_offset
+	r.check(rig.camera.global_position.distance_to(focus) <= (CameraRig.LOW_OFFSET.length() + CameraRig.LEAD_MAX + 0.6), "v3 C1: orbita mantem a distancia do enquadramento (%.2f m)" % cam.distance_to(focus))
+	await _free(main)
