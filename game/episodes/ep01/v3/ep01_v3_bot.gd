@@ -88,6 +88,9 @@ func _physics_process(delta: float) -> void:
 		_force_route = false
 		_stuck_t = 0.0
 		_stuck_from = main.controlled_node.global_position
+	if main.controlled_node is BoatActor:
+		_drive(goal.global_position)
+		return
 	var here := main.controlled_node.global_position
 	var it := goal as Ep01Interactable
 	if it != null and not it.get_meta(&"auto", false) and main.best_interactable() == it:
@@ -155,6 +158,19 @@ func _plan(target: Vector3, reach: float) -> bool:
 		_finish(false, "sem caminho em %s para %s (%s) a partir de %s" % [main.current.id, _goal.name, target, from])
 		return false
 	return true
+
+
+## Pilotagem (M6) com as mesmas intencoes do jogador: move_up acelera, move_left/right viram. Menos motor em curva fechada.
+func _drive(target: Vector3) -> void:
+	var boat := main.boat
+	var d := target - boat.global_position
+	d.y = 0.0
+	var err := wrapf(atan2(-d.x, -d.z) - boat.heading, -PI, PI)
+	var steer := clampf(err * 2.0, -1.0, 1.0)
+	_hold(&"move_left", maxf(steer, 0.0))
+	_hold(&"move_right", maxf(-steer, 0.0))
+	_hold(&"move_up", clampf(1.0 - absf(err) / 1.6, 0.25, 1.0))
+	_hold(&"move_down", 0.0)
 
 
 func _walk(dir_world: Vector3) -> void:

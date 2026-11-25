@@ -1,7 +1,7 @@
 {
  "version": 1,
  "episode": "ep01",
- "_note": "RB-R1 E4: M1-M4 reais (pontos montados por Ep01V3Land; eventos via notify_mission). M0 e M5-M8 ainda PROVISORIAS ('chegar ao marcador', E5). Campos fora do formato de Mission (radius, camera_yaw, icon) sao lidos so por Ep01V3Main/Ep01V3Bot.",
+ "_note": "RB-R1 E5: M1-M8 reais (pontos montados por Ep01V3Land/Ep01V3Late; eventos via notify_mission). M0 segue 'chegar ao marcador' (cena de chegada). Campos fora do formato de Mission (radius, camera_yaw, icon) sao lidos so por Ep01V3Main/Ep01V3Bot.",
  "missions": [
   {
    "id": "M0",
@@ -192,18 +192,43 @@
     "pilot",
     "climber"
    ],
-   "emblems": [],
-   "icon": "notebook",
+   "emblems": [
+    "emb_m5_vane",
+    "emb_m5_roof"
+   ],
+   "icon": "look",
    "steps": [
     {
-     "id": "reach",
-     "icon": "notebook",
-     "hero": "",
-     "event": "marker_reached",
-     "target": "M5_FeatherTrail_1"
+     "id": "feathers",
+     "icon": "paw",
+     "hero": "tracker",
+     "event": "feather_followed",
+     "count": 4,
+     "target": "M5_FeatherTrail_1",
+     "hint_gesture_key": "ep01v3.M5.feathers.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m5.feathers"
+    },
+    {
+     "id": "compass",
+     "icon": "star",
+     "hero": "pilot",
+     "event": "compass_read",
+     "count": 1,
+     "target": "M5_Weathervane",
+     "hint_gesture_key": "ep01v3.M5.compass.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m5.compass"
+    },
+    {
+     "id": "fish",
+     "icon": "carabiner",
+     "hero": "climber",
+     "event": "fish_recovered",
+     "count": 1,
+     "target": "M5_ShedRoof",
+     "hint_gesture_key": "ep01v3.M5.fish.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m5.fish"
     }
-   ],
-   "radius": 1.2
+   ]
   },
   {
    "id": "M6",
@@ -213,18 +238,52 @@
     "pilot",
     "climber"
    ],
-   "emblems": [],
+   "emblems": [
+    "emb_m6_bay"
+   ],
    "icon": "helm",
    "steps": [
     {
-     "id": "reach",
+     "id": "board",
+     "icon": "boat",
+     "hero": "pilot",
+     "event": "boat_boarded",
+     "count": 1,
+     "target": "M6_BoatStart",
+     "hint_gesture_key": "ep01v3.M6.board.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m6.board"
+    },
+    {
+     "id": "buoys",
+     "icon": "buoy",
+     "hero": "pilot",
+     "event": "buoy_passed",
+     "count": 2,
+     "target": "M6_BuoyB",
+     "hint_gesture_key": "ep01v3.M6.buoys.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m6.buoys"
+    },
+    {
+     "id": "approach",
      "icon": "helm",
-     "hero": "",
-     "event": "marker_reached",
-     "target": "M1_BenchClue"
+     "hero": "pilot",
+     "event": "dinghy_reached",
+     "count": 1,
+     "target": "M6_DinghyApproach",
+     "hint_gesture_key": "ep01v3.M6.approach.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m6.approach"
+    },
+    {
+     "id": "rope",
+     "icon": "rope",
+     "hero": "climber",
+     "event": "rope_thrown",
+     "count": 1,
+     "target": "M6_Dinghy",
+     "hint_gesture_key": "ep01v3.M6.rope.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m6.rope"
     }
-   ],
-   "radius": 2.0
+   ]
   },
   {
    "id": "M7",
@@ -235,18 +294,43 @@
     "climber",
     "pilot"
    ],
-   "emblems": [],
-   "icon": "notebook",
+   "emblems": [
+    "emb_m7_lens",
+    "emb_m7_gallery"
+   ],
+   "icon": "look",
    "steps": [
     {
-     "id": "reach",
-     "icon": "notebook",
-     "hero": "",
-     "event": "marker_reached",
-     "target": "M7_StairBase"
+     "id": "lens",
+     "icon": "magnifier",
+     "hero": "tracker",
+     "event": "lens_found",
+     "count": 1,
+     "target": "M7_Lens",
+     "hint_gesture_key": "ep01v3.M7.lens.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m7.lens"
+    },
+    {
+     "id": "climb",
+     "icon": "carabiner",
+     "hero": "climber",
+     "event": "pup_rescued",
+     "count": 1,
+     "target": "M7_Gallery",
+     "hint_gesture_key": "ep01v3.M7.climb.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m7.climb"
+    },
+    {
+     "id": "aim",
+     "icon": "star",
+     "hero": "pilot",
+     "event": "boat_lit",
+     "count": 4,
+     "target": "M7_StairStep",
+     "hint_gesture_key": "ep01v3.M7.aim.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m7.aim"
     }
-   ],
-   "radius": 1.6
+   ]
   },
   {
    "id": "M8",
@@ -258,17 +342,19 @@
     "pilot"
    ],
    "emblems": [],
-   "icon": "notebook",
+   "icon": "music",
    "steps": [
     {
-     "id": "reach",
-     "icon": "notebook",
+     "id": "thanks",
+     "icon": "heart",
      "hero": "",
-     "event": "marker_reached",
-     "target": "M8_FestaPlaza"
+     "event": "captain_thanked",
+     "count": 1,
+     "target": "M8_FestaPlaza",
+     "hint_gesture_key": "ep01v3.M8.thanks.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m8.thanks"
     }
-   ],
-   "radius": 1.6
+   ]
   }
  ]
 }

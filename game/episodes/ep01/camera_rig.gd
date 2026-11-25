@@ -24,6 +24,28 @@ const LEAD_MAX := 1.4
 const LEAD_SMOOTH := 2.5
 ## Enquadramento livre (pose de equipe): offset em coordenadas do mundo, ignora `yaw`.
 var framing_world: bool = false
+## Desvio de obstaculos (RB-R1 E5): com mascara != 0, uma esfera de PROBE_RADIUS vai do ponto de mira ate a camera e a
+## camera para antes do primeiro obstaculo (como um spring arm), nunca a menos de MIN_ARM do ponto de mira. Encurta na
+## hora e volta suave (o proprio atraso da camera). `exclude` tira corpos invisiveis (paredes da agua, limites do mapa).
+## `occluders` = esferas (xyz centro, w raio) sem colisao que tapam o heroi (copas das arvores). Mascara 0 = desligado.
+var collision_mask: int = 0
+var exclude: Array[RID] = []
+var occluders: Array[Vector4] = []
+const PROBE_RADIUS := 0.2
+const MIN_ARM := 0.9
+const ARM_MARGIN := 0.08
+## Encurtamento do ultimo quadro (m; 0 = livre), para testes e depuracao.
+var last_pull: float = 0.0
+var _probe: SphereShape3D
+## Orbita (C1, RB-R1): alavanca direita (`cam_left/right/up/down`) e mouse capturado giram em volta do heroi; guinada livre,
+## inclinacao limitada. `pitch` 0 = enquadramento baixo aprovado (positivo sobe a camera). Desligada por padrao (fluxo antigo).
+var orbit_enabled: bool = false
+var pitch: float = 0.0
+const ORBIT_SPEED := 2.4
+const PITCH_SPEED := 1.4
+const PITCH_MIN := -0.22
+const PITCH_MAX := 0.55
+const MOUSE_SENS := 0.004
 
 var lead: Vector3 = Vector3.ZERO
 var _last_focus: Vector3 = Vector3.ZERO
@@ -50,9 +72,10 @@ func set_view(new_offset: Vector3, new_yaw: float = 0.0, look_y: float = LOOK_Y)
 	look_offset = Vector3(0, look_y, 0)
 
 
-## Camera baixa do jogo (vila v3) com giro `new_yaw`.
+## Camera baixa do jogo (vila v3) com giro `new_yaw` (inclinacao volta ao enquadramento aprovado).
 func set_low_view(new_yaw: float = 0.0) -> void:
 	set_view(LOW_OFFSET, new_yaw, LOW_LOOK_Y)
+	pitch = 0.0
 	if camera != null:
 		camera.fov = LOW_FOV
 
@@ -86,6 +109,8 @@ func shake(amplitude: float = 0.12, duration: float = 0.25) -> void:
 
 
 func _process(delta: float) -> void:
+	if orbit_enabled:
+		orbit_step(delta)
 	_update(1.0 if reduced_motion else clampf(smooth * delta, 0.0, 1.0), delta)
 
 
@@ -96,10 +121,12 @@ func _update(weight: float, delta: float) -> void:
 	var focus := target.global_position
 	_update_lead(focus, delta)
 	var base := focus + (lead if not framing_world else Vector3.ZERO)
-	var rel := offset if framing_world else Basis(Vector3.UP, yaw) * offset
+	var rel := offset if framing_world else Basis(Vector3.UP, yaw) * (Basis(Vector3.RIGHT, -pitch) * offset)
 	var wanted := base + rel
 	camera.global_position = camera.global_position.lerp(wanted, weight)
 	var look := base + look_offset
+	if collision_mask != 0:
+		camera.global_position = avoid(look, camera.global_position)
 	if _shake_time > 0.0 and not reduced_motion:
 		_shake_time = maxf(0.0, _shake_time - delta)
 		var a := _shake_amp * (_shake_time / maxf(_shake_time + delta, 0.001))
@@ -108,6 +135,79 @@ func _update(weight: float, delta: float) -> void:
 			_shake_amp = 0.0
 	if camera.global_position.distance_to(look) > 0.01:
 		camera.look_at(look, Vector3.UP)
+
+
+## Posicao da camera sem obstaculo entre `from` (ponto de mira) e `to` (camera desejada).
+func avoid(from: Vector3, to: Vector3) -> Vector3:
+	last_pull = 0.0
+	var seg := to - from
+	var dist := seg.length()
+	if dist < 0.01 or not is_inside_tree():
+		return to
+	var dir := seg / dist
+	var allowed := dist
+	if _probe == null:
+		_probe = SphereShape3D.new()
+		_probe.radius = PROBE_RADIUS
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = _probe
+	q.transform = Transform3D(Basis(), from)
+	q.motion = seg
+	q.collision_mask = collision_mask
+	q.exclude = exclude
+	var res := get_world_3d().direct_space_state.cast_motion(q)
+	# [1, 1] = livre; [0, 0] = a mira ja comeca dentro de algo (ignora: nao colar a camera no heroi).
+	if res.size() == 2 and res[1] > 0.0 and res[0] < 1.0:
+		allowed = minf(allowed, dist * res[0] - ARM_MARGIN)
+	for s in occluders:
+		var c := Vector3(s.x, s.y, s.z)
+		var oc := from - c
+		if oc.length() <= s.w:
+			continue
+		var b := oc.dot(dir)
+		var disc := b * b - (oc.length_squared() - s.w * s.w)
+		if disc < 0.0:
+			continue
+		var t := -b - sqrt(disc)
+		if t > 0.0 and t < allowed:
+			allowed = t - ARM_MARGIN
+	if allowed >= dist:
+		return to
+	allowed = maxf(allowed, MIN_ARM)
+	last_pull = dist - allowed
+	return from + dir * allowed
+
+
+## Um passo de orbita pelas acoes da Input Map (publico para teste deterministico).
+func orbit_step(delta: float) -> void:
+	var h := Input.get_axis(&"cam_left", &"cam_right")
+	var v := Input.get_axis(&"cam_down", &"cam_up")
+	yaw = wrapf(yaw - h * ORBIT_SPEED * delta, -PI, PI)
+	pitch = clampf(pitch - v * PITCH_SPEED * delta, PITCH_MIN, PITCH_MAX)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not orbit_enabled:
+		return
+	if event is InputEventMouseButton and (event as InputEventMouseButton).pressed \
+			and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED and not get_tree().paused:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		var rel := (event as InputEventMouseMotion).relative
+		yaw = wrapf(yaw - rel.x * MOUSE_SENS, -PI, PI)
+		pitch = clampf(pitch + rel.y * MOUSE_SENS, PITCH_MIN, PITCH_MAX)
+	elif event.is_action_pressed(&"pause") or event.is_action_pressed(&"ui_cancel"):
+		# Esc/pausa soltam o mouse (o evento segue para o HUD abrir a pausa).
+		release_mouse()
+
+
+func release_mouse() -> void:
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+
+func _exit_tree() -> void:
+	release_mouse()
 
 
 func _update_lead(focus: Vector3, delta: float) -> void:
