@@ -1,0 +1,51 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://assets/models/props_v3/props_v3_piece.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/fish.glb" id="2_glb"]
+
+[sub_resource type="Animation" id="Animation_flop"]
+resource_name = "flop"
+length = 0.5
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Body:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0625, 0.125, 0.1875, 0.25, 0.3125, 0.375, 0.4375, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0.24749, 0.12), Vector3(0, 0.35, 0), Vector3(0, 0.24749, -0.12), Vector3(0, 0, 0), Vector3(0, -0.24749, 0.12), Vector3(0, -0.35, 0), Vector3(0, -0.24749, -0.12), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_pv3"]
+_data = {
+&"flop": SubResource("Animation_flop")
+}
+
+[node name="Pv3Fish" type="Node3D"]
+script = ExtResource("1_script")
+metadata/piece_id = "fish"
+metadata/mission = "M5"
+metadata/interactive = true
+metadata/interaction = "pick"
+metadata/member = "climber"
+metadata/note = "peixe roubado (no bico da gaivota ou solto no telhado)"
+metadata/tris = 564
+metadata/tris_budget = 1500
+metadata/pivot = "meio do corpo (pega do bico)"
+metadata/provisional = false
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/props_v3/build_props_v3.py"
+
+[node name="Body" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Model" parent="Body" instance=ExtResource("2_glb")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_pv3")
+}

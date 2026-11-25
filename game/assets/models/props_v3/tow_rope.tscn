@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://assets/models/props_v3/tow_rope.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/tow_rope.glb" id="2_glb"]
+
+[node name="Pv3TowRope" type="Node3D"]
+script = ExtResource("1_script")
+length = 3.0
+metadata/piece_id = "tow_rope"
+metadata/mission = "M6"
+metadata/interactive = true
+metadata/interaction = "throw"
+metadata/member = "climber"
+metadata/note = "corda de reboque (rolo ou trecho esticado de comprimento variavel)"
+metadata/tris = 2144
+metadata/tris_budget = 2500
+metadata/pivot = "inicio da corda (o Span vai de z 0 a z 1)"
+metadata/provisional = false
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/props_v3/build_props_v3.py"
+
+[node name="Model" parent="." instance=ExtResource("2_glb")]
+
+[node name="End" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)

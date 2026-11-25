@@ -1,0 +1,336 @@
+{
+ "blender": "4.5.16 LTS",
+ "data": "2026-11-25",
+ "pecas": {
+  "ball": {
+   "glb": "game/assets/models/props_v3/ball.glb",
+   "glb_bytes": 32924,
+   "materiais": [
+    "wv2_glossy"
+   ],
+   "objetos": {
+    "pv3_ball": 920
+   },
+   "orcamento_tris": 1500,
+   "pivo": "centro da bola (a cena poe o centro a 0,16 m do chao)",
+   "triangulos": 920
+  },
+  "basket": {
+   "glb": "game/assets/models/props_v3/basket.glb",
+   "glb_bytes": 168676,
+   "materiais": [
+    "pv3_cloth",
+    "wv2_burlap",
+    "wv2_rope",
+    "wv2_wood"
+   ],
+   "objetos": {
+    "pv3_basket": 3260
+   },
+   "orcamento_tris": 4000,
+   "pivo": "centro do fundo, no chao",
+   "triangulos": 3260
+  },
+  "cloth_scarf": {
+   "glb": "game/assets/models/props_v3/cloth_scarf.glb",
+   "glb_bytes": 94644,
+   "materiais": [
+    "pv3_cloth",
+    "wv2_metal",
+    "wv2_wood"
+   ],
+   "objetos": {
+    "pv3_cloth_scarf": 1956
+   },
+   "orcamento_tris": 2500,
+   "pivo": "meio da dobra, na linha do varal",
+   "triangulos": 1956
+  },
+  "cloth_sock": {
+   "glb": "game/assets/models/props_v3/cloth_sock.glb",
+   "glb_bytes": 71308,
+   "materiais": [
+    "pv3_cloth",
+    "pv3_vinyl",
+    "wv2_metal",
+    "wv2_wood"
+   ],
+   "objetos": {
+    "pv3_cloth_sock": 1300
+   },
+   "orcamento_tris": 2500,
+   "pivo": "meio do punho, na linha do varal",
+   "triangulos": 1300
+  },
+  "cloth_tshirt": {
+   "glb": "game/assets/models/props_v3/cloth_tshirt.glb",
+   "glb_bytes": 79356,
+   "materiais": [
+    "pv3_cloth",
+    "pv3_vinyl",
+    "wv2_metal",
+    "wv2_wood"
+   ],
+   "objetos": {
+    "pv3_cloth_tshirt": 1840
+   },
+   "orcamento_tris": 2500,
+   "pivo": "meio da gola, na linha do varal",
+   "triangulos": 1840
+  },
+  "crate_apple": {
+   "glb": "game/assets/models/props_v3/crate_apple.glb",
+   "glb_bytes": 74176,
+   "materiais": [
+    "wv2_glossy",
+    "wv2_paint",
+    "wv2_wood"
+   ],
+   "objetos": {
+    "pv3_crate_apple": 1404
+   },
+   "orcamento_tris": 4500,
+   "pivo": "centro do fundo",
+   "triangulos": 1404
+  },
+  "crate_grapes": {
+   "glb": "game/assets/models/props_v3/crate_grapes.glb",
+   "glb_bytes": 92964,
+   "materiais": [
+    "wv2_glossy",
+    "wv2_paint",
+    "wv2_wood"
+   ],
+   "objetos": {
+    "pv3_crate_grapes": 1948
+   },
+   "orcamento_tris": 4500,
+   "pivo": "centro do fundo",
+   "triangulos": 1948
+  },
+  "crate_lemon": {
+   "glb": "game/assets/models/props_v3/crate_lemon.glb",
+   "glb_bytes": 75032,
+   "materiais": [
+    "wv2_glossy",
+    "wv2_paint",
+    "wv2_wood"
+   ],
+   "objetos": {
+    "pv3_crate_lemon": 1708
+   },
+   "orcamento_tris": 4500,
+   "pivo": "centro do fundo",
+   "triangulos": 1708
+  },
+  "emblem_carabiner": {
+   "glb": "game/assets/models/props_v3/emblem_carabiner.glb",
+   "glb_bytes": 140592,
+   "materiais": [
+    "wv2_glossy",
+    "wv2_metal"
+   ],
+   "objetos": {
+    "pv3_emblem_carabiner": 2840
+   },
+   "orcamento_tris": 3000,
+   "pivo": "centro da moeda",
+   "triangulos": 2840
+  },
+  "emblem_compass": {
+   "glb": "game/assets/models/props_v3/emblem_compass.glb",
+   "glb_bytes": 112092,
+   "materiais": [
+    "wv2_glossy",
+    "wv2_metal"
+   ],
+   "objetos": {
+    "pv3_emblem_compass": 2064
+   },
+   "orcamento_tris": 3000,
+   "pivo": "centro da moeda",
+   "triangulos": 2064
+  },
+  "emblem_helm": {
+   "glb": "game/assets/models/props_v3/emblem_helm.glb",
+   "glb_bytes": 154664,
+   "materiais": [
+    "wv2_glossy",
+    "wv2_metal"
+   ],
+   "objetos": {
+    "pv3_emblem_helm": 2920
+   },
+   "orcamento_tris": 3000,
+   "pivo": "centro da moeda",
+   "triangulos": 2920
+  },
+  "emblem_paw": {
+   "glb": "game/assets/models/props_v3/emblem_paw.glb",
+   "glb_bytes": 114576,
+   "materiais": [
+    "wv2_glossy",
+    "wv2_metal"
+   ],
+   "objetos": {
+    "pv3_emblem_paw": 2240
+   },
+   "orcamento_tris": 3000,
+   "pivo": "centro da moeda",
+   "triangulos": 2240
+  },
+  "emblem_star": {
+   "glb": "game/assets/models/props_v3/emblem_star.glb",
+   "glb_bytes": 108608,
+   "materiais": [
+    "wv2_glossy",
+    "wv2_metal"
+   ],
+   "objetos": {
+    "pv3_emblem_star": 1992
+   },
+   "orcamento_tris": 3000,
+   "pivo": "centro da moeda",
+   "triangulos": 1992
+  },
+  "fish": {
+   "glb": "game/assets/models/props_v3/fish.glb",
+   "glb_bytes": 29232,
+   "materiais": [
+    "wv2_glossy"
+   ],
+   "objetos": {
+    "pv3_fish": 564
+   },
+   "orcamento_tris": 1500,
+   "pivo": "meio do corpo (pega do bico)",
+   "triangulos": 564
+  },
+  "fountain_leaves": {
+   "glb": "game/assets/models/props_v3/fountain_leaves.glb",
+   "glb_bytes": 74484,
+   "materiais": [
+    "wv2_bark",
+    "wv2_leaf"
+   ],
+   "objetos": {
+    "pv3_fountain_leaves": 1172
+   },
+   "orcamento_tris": 3000,
+   "pivo": "centro da base (assenta na agua da bacia de cima)",
+   "triangulos": 1172
+  },
+  "gull": {
+   "animacoes": {
+    "flee": {
+     "frames": [
+      0,
+      30
+     ],
+     "loop": false,
+     "seconds": 1.0
+    },
+    "fly": {
+     "frames": [
+      0,
+      24
+     ],
+     "loop": true,
+     "seconds": 0.8
+    },
+    "glide": {
+     "frames": [
+      0,
+      60
+     ],
+     "loop": true,
+     "seconds": 2.0
+    },
+    "land": {
+     "frames": [
+      0,
+      36
+     ],
+     "loop": false,
+     "seconds": 1.2
+    },
+    "perch_idle": {
+     "frames": [
+      0,
+      60
+     ],
+     "loop": true,
+     "seconds": 2.0
+    }
+   },
+   "glb": "game/assets/models/props_v3/gull.glb",
+   "glb_bytes": 284624,
+   "materiais": [
+    "pv3_vinyl",
+    "wv2_glossy"
+   ],
+   "objetos": {
+    "pv3_gull": 3564
+   },
+   "orcamento_tris": 6000,
+   "ossos": [
+    "root",
+    "body",
+    "head",
+    "tail",
+    "wing_in_R",
+    "wing_out_R",
+    "wing_in_L",
+    "wing_out_L",
+    "leg_R",
+    "leg_L"
+   ],
+   "pivo": "entre os pes, no chao; frente = +Z",
+   "triangulos": 3564
+  },
+  "help_arrow": {
+   "glb": "game/assets/models/props_v3/help_arrow.glb",
+   "glb_bytes": 12904,
+   "materiais": [
+    "pv3_glow",
+    "pv3_glow_rim"
+   ],
+   "objetos": {
+    "pv3_help_arrow": 232
+   },
+   "orcamento_tris": 600,
+   "pivo": "ponta da seta",
+   "triangulos": 232
+  },
+  "target_ring": {
+   "glb": "game/assets/models/props_v3/target_ring.glb",
+   "glb_bytes": 10308,
+   "materiais": [
+    "pv3_ring"
+   ],
+   "objetos": {
+    "pv3_ring_inner": 80,
+    "pv3_ring_outer": 96
+   },
+   "orcamento_tris": 400,
+   "pivo": "centro, no chao",
+   "triangulos": 176
+  },
+  "tow_rope": {
+   "glb": "game/assets/models/props_v3/tow_rope.glb",
+   "glb_bytes": 110172,
+   "materiais": [
+    "wv2_rope"
+   ],
+   "objetos": {
+    "pv3_rope_coil": 1412,
+    "pv3_rope_eye_end": 168,
+    "pv3_rope_eye_start": 168,
+    "pv3_rope_span": 396
+   },
+   "orcamento_tris": 2500,
+   "pivo": "inicio da corda (o Span vai de z 0 a z 1)",
+   "triangulos": 2144
+  }
+ }
+}
