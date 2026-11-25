@@ -33,6 +33,9 @@ import build_boat_wv2 as BOAT  # noqa: E402
 import wv2_houses as HS  # noqa: E402
 import wv2_kit as KIT  # noqa: E402
 import wv2_textures as TX  # noqa: E402
+import wv3_collision as COL  # noqa: E402
+import wv3_glb  # noqa: E402
+import wv3_world as W3  # noqa: E402
 from wv2lib import MB, R, T, hexc, lin  # noqa: E402
 
 ARGS = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
@@ -49,7 +52,7 @@ MAT_PREVIEW = {
     "wv2_rope": "#D6BF85", "wv2_net": "#9C9C9C", "wv2_bark": "#7A5636", "wv2_leaf": "#5DB043", "wv2_grass": "#6DBA48",
     "wv2_rock": "#A9A3B8", "wv2_terrain": "#7CB850", "wv2_glass": "#355A78", "wv2_glass_lit": "#FFD9A0", "wv2_lamp": "#FFE3A6",
     "wv2_glossy": "#FFFFFF", "wv2_paw": "#5A3B2A", "wv2_burlap": "#C8A878", "wv2_interior": "#E8D8C0",
-    "wv2_interior_lit": "#FFD9A0",
+    "wv2_interior_lit": "#FFD9A0", "wv2_paper": "#FFD9A0", "wv2_beam": "#FFF2C0",
 }
 
 PAL = {
@@ -59,7 +62,18 @@ PAL = {
     "green": hexc("#3E9A57"), "red": hexc("#D9473A"), "yellow": hexc("#F2B632"),
 }
 
+# E3 (peso, D18): simplificacao por objeto (wv2lib.MB.lod). Medido nas 4 vistas baixas: sem diferenca visivel.
+LOD = {"wv2_back": 2, "wv2_street": 1, "wv2_plaza": 1}
+
 lights = []      # (tipo, (x, y, z))
+bank_info = {}
+houses = []      # (pos, ry, W, D, H) de cada casa: colisao do mundo jogavel (E3)
+
+
+def build_house(m, pos, ry, p, seed, lights_):
+    H = HS.build_house(m, pos, ry, p, seed, lights_)
+    houses.append((tuple(pos), ry, p["W"], p["D"], H))
+    return H
 inst = {}        # kit -> lista de [x, y, z, ry, escala]
 
 
@@ -202,6 +216,7 @@ def build_dock():
     put("crate_dark", 2.4, 0.6, -0.45, 30, 0.9)
     put("barrel", 1.3, 0.0, -1.7, 0)
     put("float_buoy", 0.9, 0.0, -1.3, 0)
+    W3.dock_loose_rope(m)   # E3, M1: amarra vazia do bote do capitao
     return m
 
 
@@ -295,19 +310,20 @@ def house_params(w, floors, roof, wall, roofc, extra, detail=2):
 
 def build_street():
     m = MB("wv2_street")
+    m.lod = LOD.get("wv2_street", 0)
     rng = random.Random(21)
     x = -15.5
     fronts = []
     for i, (w, fl, roof, wall, roofc, extra) in enumerate(ROW1):
         z = -17.8 + rng.uniform(-0.18, 0.18)
         p = house_params(w, fl, roof, wall, roofc, extra)
-        HS.build_house(m, (x, 0, z), 0, p, 100 + i, lights)
+        build_house(m, (x, 0, z), 0, p, 100 + i, lights)
         fronts.append((x, w, z, fl, p))
         x += w
     # casa de esquina (fecha a praca ao norte)
     p0 = house_params(7.7, 3, "eave", "lilac", "terracotta", dict(door_color=PAL["teal"], shutter=PAL["navy"], chimneys=2,
                                                                   cols=4, balcony=1, balcony_col=2))
-    HS.build_house(m, (-29.5, 0, -17.8), 0, p0, 99, lights)
+    build_house(m, (-29.5, 0, -17.8), 0, p0, 99, lights)
     # cata-vento com bussola na cumeeira da padaria (missoes v3, M5)
     hx, hw = fronts[2][0], fronts[2][1]
     weathervane(m, hx + hw * 0.62, 6.0 + 2.5 * math.tan(math.radians(34.0)) + 0.1, fronts[2][2] - 2.5)
@@ -393,6 +409,7 @@ def build_shed(m, rng):
 
 def build_plaza():
     m = MB("wv2_plaza")
+    m.lod = LOD.get("wv2_plaza", 0)
     rng = random.Random(31)
     specs = [  # (z da borda norte (local x = 0 fica no z maior), largura, andares, telhado, parede, telha, extras)
         (-10.5, 5.5, 3, "eave", "mint", "terracotta", dict(door_color=PAL["red"], shutter=PAL["navy"], balcony=1, chimneys=1)),
@@ -404,23 +421,10 @@ def build_plaza():
     ]
     for i, (z, w, fl, roof, wall, roofc, extra) in enumerate(specs):
         x = -30.0 + rng.uniform(-0.15, 0.15)
-        HS.build_house(m, (x, 0, z), 90, house_params(w, fl, roof, wall, roofc, extra), 200 + i, lights)
-    # fonte (chafariz) e banco circular em volta da arvore
-    fx, fz = -22.8, 3.6
-    # degrau largo em volta do chafariz (missoes v3, M3: apoio para o Pico pular) e borda larga
-    m.lathe((fx, 0, fz), [(0.0, 0.0), (2.05, 0.0), (2.08, 0.04), (2.08, 0.22), (2.02, 0.26), (0.0, 0.26)], "wv2_stone", (0.95, 0.95, 0.97),
-            seg=32)
-    m.lathe((fx, 0, fz), [(0.0, 0.0), (1.55, 0.0), (1.6, 0.1), (1.6, 0.5), (1.48, 0.55), (1.38, 0.5), (1.38, 0.25), (0.0, 0.25)],
-            "wv2_stone", (1, 1, 1), seg=28)
-    m.cyl((fx, 0.38, fz), 1.38, 0.02, "wv2_glossy", hexc("#3FA7C9"), seg=28)
-    m.lathe((fx, 0.25, fz), [(0.22, 0.0), (0.16, 0.6), (0.12, 1.0), (0.62, 1.1), (0.66, 1.2), (0.5, 1.24), (0.1, 1.2), (0.08, 1.55),
-                             (0.14, 1.62), (0.0, 1.7)], "wv2_stone", (1, 1, 1), seg=20)
-    m.cyl((fx, 1.36, fz), 0.5, 0.02, "wv2_glossy", hexc("#3FA7C9"), seg=20)
-    for k in range(4):
-        a = k * math.pi / 2
-        pts = [(fx + math.cos(a) * (0.1 + 0.55 * t), 1.68 + 0.25 * math.sin(math.pi * t * 0.9) - 0.9 * t * t, fz + math.sin(a) *
-                (0.1 + 0.55 * t)) for t in [i / 8 for i in range(9)]]
-        m.tube(pts, 0.025, "wv2_glossy", hexc("#BFE9F5"), seg=6)
+        build_house(m, (x, 0, z), 90, house_params(w, fl, roof, wall, roofc, extra), 200 + i, lights)
+    # chafariz com degraus 0,5/1,0/1,5, bacia superior, canaleta e grade (E3, M3) e placas de fruta nas barracas (M4)
+    W3.fountain(m, random.Random(33))
+    W3.stall_icons(m, random.Random(34))
     tx, tz = -24.0, -4.0
     put("tree_a", tx, 0.0, tz, 15, 1.2)
     m.lathe((tx, 0, tz), [(0.0, 0.0), (1.0, 0.0), (1.0, 0.3), (0.0, 0.3)], "wv2_stone", (1, 1, 1), seg=24)
@@ -443,6 +447,7 @@ def build_plaza():
 
 def build_row2():
     m = MB("wv2_back")
+    m.lod = LOD.get("wv2_back", 0)   # segunda fileira: so aparece ao fundo (>= 8 m da camera baixa)
     rng = random.Random(41)
     specs = [(6.0, 3, "eave", "cream", "blue"), (5.5, 2, "gable", "sky", "terracotta"), (6.5, 3, "eave", "peach", "terracotta"),
              (5.0, 2, "eave", "mint", "terracotta"), (6.0, 3, "gable", "lemon", "blue"), (5.5, 2, "eave", "rose", "terracotta"),
@@ -450,54 +455,9 @@ def build_row2():
     x = -18.0
     for i, (w, fl, roof, wall, roofc) in enumerate(specs):
         p = house_params(w, fl, roof, wall, roofc, dict(chimneys=1, ground="door", shutter=PAL["navy"], flowers=0.3), detail=1)
-        HS.build_house(m, (x, 1.2, -24.6 + rng.uniform(-0.3, 0.3)), 0, p, 300 + i, lights)
+        build_house(m, (x, 1.2, -24.6 + rng.uniform(-0.3, 0.3)), 0, p, 300 + i, lights)
         x += w + rng.uniform(0.0, 0.4)
-    build_lighthouse(m)
     return m
-
-
-def build_lighthouse(m):
-    bx, by, bz = 31.0, 2.4, -24.0
-    m.lathe((bx, by - 0.4, bz), [(3.0, 0.0), (3.0, 0.9), (2.7, 1.0), (0.0, 1.0)], "wv2_stone", (1, 1, 1), seg=32)
-    y = by + 0.6
-    H = 13.0
-    bands = 6
-    for k in range(bands):
-        y0 = y + H * k / bands
-        y1 = y + H * (k + 1) / bands
-        r0 = 2.1 - 0.6 * k / bands
-        r1 = 2.1 - 0.6 * (k + 1) / bands
-        col = PAL["red"] if k % 2 else hexc("#FFF6EA")
-        m.lathe((bx, 0, bz), [(r0, y0), (r1, y1)], "wv2_plaster", col, seg=32)
-    m.lathe((bx, 0, bz), [(2.1, y), (0.0, y)], "wv2_plaster", (1, 1, 1), seg=32)
-    for k in range(4):
-        a = k * 1.9
-        yy = y + 2.5 + k * 2.8
-        r = 2.1 - 0.6 * (yy - y) / H + 0.02
-        m.box((bx + math.sin(a) * r, yy, bz + math.cos(a) * r), (0.5, 0.8, 0.12), "wv2_glass", (1, 1, 1), 0.0, 1,
-              rot=R(ry=math.degrees(a)))
-        m.box((bx + math.sin(a) * (r + 0.04), yy - 0.45, bz + math.cos(a) * (r + 0.04)), (0.7, 0.1, 0.16), "wv2_stone", (1, 1, 1),
-              0.02, 1, rot=R(ry=math.degrees(a)))
-    top = y + H
-    m.cyl((bx, top, bz), 2.1, 0.25, "wv2_stone", (1, 1, 1), seg=32, bevel=0.04)
-    for k in range(28):
-        a = k / 28 * 2 * math.pi
-        m.cyl((bx + math.cos(a) * 1.95, top + 0.25, bz + math.sin(a) * 1.95), 0.025, 0.9, "wv2_metal", hexc("#2B2F33"), seg=6)
-    ring = [(bx + math.cos(a) * 1.95, top + 1.15, bz + math.sin(a) * 1.95) for a in [i / 40 * 6.2832 for i in range(41)]]
-    m.tube(ring, 0.04, "wv2_metal", hexc("#2B2F33"), seg=6, caps=False)
-    m.cyl((bx, top + 0.25, bz), 1.1, 0.5, "wv2_plaster", hexc("#FFF6EA"), seg=24)
-    m.cyl((bx, top + 0.75, bz), 0.95, 1.6, "wv2_lamp", hexc("#FFE8B8"), seg=16)
-    for k in range(8):
-        a = k / 8 * 2 * math.pi
-        m.box((bx + math.cos(a) * 0.97, top + 1.55, bz + math.sin(a) * 0.97), (0.06, 1.6, 0.06), "wv2_metal", hexc("#2B2F33"), 0.0, 1)
-    m.lathe((bx, top + 2.35, bz), [(1.25, 0.0), (1.2, 0.1), (0.9, 0.5), (0.4, 0.9), (0.12, 1.1), (0.0, 1.15)], "wv2_glossy",
-            PAL["red"], seg=24)
-    m.lathe((bx, top + 3.45, bz), [(0.0, 0.0), (0.1, 0.0), (0.14, 0.15), (0.0, 0.32)], "wv2_metal", hexc("#C9A13A"), seg=10)
-    lights.append(("lighthouse", (bx, top + 1.5, bz)))
-    p = house_params(4.4, 1, "gable", "cream", "red", dict(chimneys=1, ground="door", shutter=PAL["red"], cols=2, door_col=0),
-                     detail=1)
-    p["D"] = 4.0
-    HS.build_house(m, (27.0, 2.4, -19.0), -90, p, 400, lights)
 
 
 # ================================================================== terreno
@@ -718,7 +678,7 @@ def build_bank():
                                                                 flowers=1.0), detail=2)
     p["D"] = 3.6
     p["gh"] = 2.7
-    HS.build_house(m, (9.5, bank_h(11.6, 10.6) - 0.05, 9.2), 200, p, 501, lights)
+    build_house(m, (9.5, bank_h(11.6, 10.6) - 0.05, 9.2), 200, p, 501, lights)
     # varal com roupas entre o galpao do pescador e a arvore (missoes v3, M2): mao-francesa na quina do galpao,
     # laco de corda no tronco da arvore (tree_a em (15,5; 6,5))
     a = Vector((9.75, 0.0, 9.0))
@@ -767,6 +727,8 @@ def build_bank():
     put("lobster_trap", 9.3, bank_h(9.3, 6.0), 6.0, -10)
     put("net_pile", 7.6, bank_h(7.6, 8.4), 8.4, 0, 0.8)
     put("barrel", 12.1, bank_h(12.1, 7.4), 7.4, 0)
+    global bank_info
+    bank_info = W3.bank_extras(m, bank_h, random.Random(35))   # E3, M2: anexo de topo plano + 2 degraus + galho baixo
     return m
 
 
@@ -822,7 +784,7 @@ def street_props():
     put("stall_yellow", -26.0, 0.0, -1.2, 90)
     put("stall_blue", -19.2, 0.0, -6.4, -90)
     put("cart", -18.6, 0.0, 0.8, 120)
-    for (x, z, k) in ((-25.2, -11.4, "crate_fruit"), (-25.4, -7.8, "crate"), (-24.8, -7.6, "sack"), (-25.3, 0.6, "barrel"),
+    for (x, z, k) in ((-25.2, -11.4, "crate_fruit"), (-25.4, -7.8, "crate"), (-24.8, -7.6, "sack"), (-27.0, 1.5, "barrel"),
                       (-20.3, -8.2, "crate_fruit"), (-20.2, -4.6, "sack"), (-27.6, 5.0, "pot_a"), (-27.6, -3.2, "pot_c"),
                       (-27.6, -13.4, "pot_b"), (-20.0, 7.0, "bench"), (-17.0, -9.5, "barrel_lid"), (-16.5, -9.0, "crate")):
         put(k, x, 0.0, z, rng.uniform(-20, 20) if k != "bench" else 200)
@@ -927,6 +889,7 @@ def export_glb(objs, path):
 
 MANIFEST = os.path.join(REPO, "source_art", "manifest.json")
 SOURCES = ["source_art/environment_v2/build_world_v2.py", "source_art/environment_v2/build_boat_wv2.py", "source_art/environment_v2/wv2lib.py",
+           "source_art/environment_v2/wv3_world.py", "source_art/environment_v2/wv3_collision.py", "source_art/environment_v2/wv3_glb.py",
            "source_art/environment_v2/wv2_houses.py", "source_art/environment_v2/wv2_kit.py",
            "source_art/environment_v2/wv2_textures.py", "source_art/environment_v2/render_world_v2.py",
            "source_art/environment_v2/world_v2.blend", "source_art/environment_v2/PROVENANCE.md"]
@@ -945,7 +908,7 @@ def update_manifest(info):
     with open(MANIFEST, encoding="utf-8") as f:
         man = json.load(f)
     common = {
-        "agente": "art3d", "status": "provisorio", "aprovacao": "pendente (Thiago)", "data": "2026-11-25",
+        "agente": "art3d", "status": "provisorio", "aprovacao": "direcao aprovada (D14); E3 pendente (Thiago)", "data": "2026-11-25",
         "proposta": "RB-R1 W1: vitrine vila e cais v2; NAO substitui o porto do jogo (so game/lookdev/world_v2/)",
         "originalidade": "geometria e texturas 100% procedurais por script (bmesh, formulas e numpy); nenhum modelo, malha, "
                          "textura, foto, HDRI ou kit de terceiros",
@@ -960,22 +923,25 @@ def update_manifest(info):
     entries = [
         dict(id="world_v2_static", nome="Mundo v2: cenario fixo do recorte do porto", processo=proc,
              saida_glb="game/assets/models/environment_v2/wv2_static.glb",
-             glb_sha256=_sha(os.path.join(GLB_DIR, "wv2_static.glb")),
+             glb_sha256=_sha(os.path.join(GLB_DIR, "wv2_static.glb")), glb_bytes=os.path.getsize(os.path.join(GLB_DIR, "wv2_static.glb")),
              triangulos=info["triangulos_estatico"],
              materiais=sorted({m for v in st.values() for m in v["materiais"]}),
              objetos=sorted(st.keys()),
              nota="cais de madeira, cais de pedra, ruas e praca calcadas, 20 casas (vaos recuados, venezianas, floreiras, "
-                  "sacadas, toldos, telhas modeladas), galpao, chafariz, farol, margem, morros e fundo do porto"),
+                  "sacadas, toldos, telhas modeladas), galpao, chafariz, farol, margem, morros e fundo do porto. E3: farol em "
+                  "objeto proprio com 3 patamares + galeria, chafariz em 3 degraus com canaleta e grade, anexo do galpao da "
+                  "margem com 2 degraus, galho baixo, placas de fruta nas barracas; peso: LOD por objeto (wv2_back 2, rua e "
+                  "praca 1), micro-simplificacao e cor de vertice em 8 bits (wv3_glb.py); antes 13.902.076 bytes / 273.880 tris"),
         dict(id="world_v2_kit", nome="Mundo v2: kit de aderecos e vegetacao (MultiMesh)", processo=proc,
              saida_glb="game/assets/models/environment_v2/wv2_kit.glb",
-             glb_sha256=_sha(os.path.join(GLB_DIR, "wv2_kit.glb")),
+             glb_sha256=_sha(os.path.join(GLB_DIR, "wv2_kit.glb")), glb_bytes=os.path.getsize(os.path.join(GLB_DIR, "wv2_kit.glb")),
              triangulos=sum(v["triangulos"] for v in kit.values()),
              materiais=sorted({m for v in kit.values() for m in v["materiais"]}),
              objetos=sorted("kit_" + k for k in kit.keys()),
              nota="%d pecas, %d instancias no layout (game/lookdev/world_v2/world_v2_layout.json)" % (len(kit), info["instancias"])),
         dict(id="world_v2_boat", nome="Mundo v2: barco do porto (proposta para substituir boat_v2)", processo=proc,
              saida_glb="game/assets/models/environment_v2/wv2_boat.glb",
-             glb_sha256=_sha(os.path.join(GLB_DIR, "wv2_boat.glb")),
+             glb_sha256=_sha(os.path.join(GLB_DIR, "wv2_boat.glb")), glb_bytes=os.path.getsize(os.path.join(GLB_DIR, "wv2_boat.glb")),
              triangulos=info["barco"]["triangulos"], materiais=info["barco"]["materiais"],
              empties=info["barco"]["empties"],
              nota="mesmas medidas e pontos de encaixe do boat_v2 (pivo, popa z 2, proa z -3, boca 2,2, convez 0,40, banco 0,5 "
@@ -985,9 +951,29 @@ def update_manifest(info):
                        "ferramenta": "Blender 4.5.16 (numpy embutido); JPEG pelo Blender, PNG escrito pelo script",
                        "exportador": "cor em JPEG (sRGB); dados em PNG RGBA (normal OpenGL, mascara de tinta, rugosidade)"},
              saida="game/assets/textures/environment_v2",
-             arquivos_sha256={f: _sha(os.path.join(TEX_DIR, f)) for f in sorted(os.listdir(TEX_DIR))
-                              if f.endswith((".jpg", ".png"))},
-             nota="ruido de valor, Voronoi e formas analiticas; mipmaps e sem compressao com perda no .import"),
+             arquivos_sha256={f: _sha(os.path.join(TEX_DIR, f)) for f in sorted(os.listdir(TEX_DIR)) if f.endswith((".jpg", ".png"))},
+             arquivos_bytes={f: os.path.getsize(os.path.join(TEX_DIR, f)) for f in sorted(os.listdir(TEX_DIR))
+                             if f.endswith((".jpg", ".png"))},
+             bytes_total=sum(os.path.getsize(os.path.join(TEX_DIR, f)) for f in os.listdir(TEX_DIR) if f.endswith((".jpg", ".png"))),
+             nota="ruido de valor, Voronoi e formas analiticas; mipmaps e sem compressao com perda no .import. E3 (peso): PNG de "
+                  "dados com filtro adaptativo por linha (sem perda) e dados de plaster/stone/grass/dirt/leaf em meia resolucao; "
+                  "decal_* = decalques RGBA (pegadinha seca/molhada, pena, escamas) de wv3_world.decals()"),
+        dict(id="world_v3_props", nome="Ep01 v3: pecas soltas das missoes (lanterna do farol, bote do capitao, boias, barquinhos "
+                                       "da festa, lanternas de papel, lente)", processo=proc,
+             saida_glb="game/assets/models/environment_v2/wv3_props.glb",
+             glb_sha256=_sha(os.path.join(GLB_DIR, "wv3_props.glb")), glb_bytes=os.path.getsize(os.path.join(GLB_DIR, "wv3_props.glb")),
+             triangulos=info["props"]["triangulos"], materiais=info["props"]["materiais"], objetos=info["props"]["objetos"],
+             nota="RB-R1 E3; um no por peca com origem no pivo; wv3_lantern gira em Y (filho wv3_lantern_beam = feixe)"),
+        dict(id="world_v3_village_scenes", nome="Ep01 v3: colisao, limites e marcadores M0-M8 da vila (cenas geradas)",
+             processo={"script": "source_art/environment_v2/wv3_collision.py", "ferramenta": "Blender 4.5.16 (Python)",
+                       "exportador": "texto .tscn da Godot 4 (BoxShape3D, CylinderShape3D, HeightMapShape3D, Marker3D)"},
+             saida="game/worlds/village_v3",
+             arquivos_sha256={f: _sha(os.path.join(REPO, "game", "worlds", "village_v3", f))
+                              for f in ("village_collision.tscn", "village_world.tscn")},
+             arquivos_bytes={f: os.path.getsize(os.path.join(REPO, "game", "worlds", "village_v3", f))
+                             for f in ("village_collision.tscn", "village_world.tscn")},
+             colisao=info.get("colisao", {}),
+             nota="formas simples; camada 1, mascara 0; beira d'agua por contorno do nivel -0,3 m"),
     ]
     ids = {e["id"] for e in entries}
     man["ativos"] = [a for a in man["ativos"] if a.get("id") not in ids]
@@ -998,6 +984,62 @@ def update_manifest(info):
         man["ativos"].append(full)
     with open(MANIFEST, "w", encoding="utf-8") as f:
         f.write(json.dumps(man, indent=2, ensure_ascii=False) + "\n")
+
+
+FESTA_LINES = [  # cordoes de lanternas da festa (E3, M8): rua da frente, praca e cais
+    ((-12.0, 4.6, -17.4), (-12.0, 3.0, -13.75), 4), ((1.0, 4.6, -17.4), (0.5, 3.0, -13.75), 4),
+    ((14.0, 4.6, -17.4), (14.5, 3.0, -13.75), 4), ((-10.0, 3.0, -13.75), (4.0, 3.0, -13.75), 12),
+    ((4.0, 3.0, -13.75), (18.0, 3.0, -13.75), 12), ((-29.6, 4.4, -3.0), (-21.2, 3.0, -11.0), 9),
+    ((-29.6, 4.4, 5.0), (-21.2, 3.0, 6.5), 8), ((-21.2, 3.0, 6.5), (-16.0, 3.0, -1.0), 7),
+    ((-7.55, 3.0, 2.6), (7.55, 3.0, 2.6), 12), ((-3.4, 3.0, 6.6), (-11.8, 3.0, 7.0), 7),
+]
+
+
+def build_props(mats, kit):
+    """Pecas soltas do Ep01 v3 (E3) em wv3_props.glb, cada uma com origem no proprio pivo (a Godot move/gira/acende)."""
+    col = bpy.data.collections.new("WV3_Props")
+    bpy.context.scene.collection.children.link(col)
+    objs = []
+    pos = {}
+
+    def add(mb, x, y, z, ry=0.0, rx=0.0, rz=0.0, parent=None):
+        ob = mb.to_object(mats, col)
+        ob.location = (x, -z, y)
+        W3._to_godot_rot(ob, rx, ry, rz)
+        if parent is not None:
+            ob.parent = parent
+        else:
+            pos[mb.name] = [round(x, 3), round(y, 3), round(z, 3), round(ry, 2), round(rx, 2), round(rz, 2)]
+        objs.append(ob)
+        return ob
+
+    lan, beam = W3.lantern_parts()
+    lob = add(lan, W3.LH[0], W3.LANTERN_Y, W3.LH[2], 0.0)
+    add(beam, 0.0, 0.0, 0.0, parent=lob)
+    dx, dz, dry = W3.DINGHY
+    add(W3.dinghy(), dx, max(head_h(dx, dz), -0.4) + 0.02, dz, dry, rx=-7.0, rz=9.0)
+    for name, x, z, c in W3.BUOYS:
+        add(W3.buoy(name, c), x, -0.4, z)
+    boat_lanterns = []
+    for i, (x, z, ry, hull, icon) in enumerate(W3.FESTA_BOATS):
+        mb, lp = W3.festa_boat(i + 1, hull, icon)
+        add(mb, x, -0.42, z, ry)
+        a = math.radians(ry)
+        boat_lanterns.append([round(x + lp[0] * math.cos(a) + lp[2] * math.sin(a), 3), round(-0.42 + lp[1], 3),
+                              round(z - lp[0] * math.sin(a) + lp[2] * math.cos(a), 3)])
+    fl, fpts = W3.festa_lanterns(FESTA_LINES)
+    add(fl, 0.0, 0.0, 0.0)
+    lx, lz = W3.LENS
+    add(W3.lens(), lx, head_h(lx, lz) - 0.02, lz, 30.0, rx=-6.0)
+    info = {"pos": pos, "festa_lanternas": [[round(c, 3) for c in p_] for p_ in fpts], "festa_barcos_lanternas": boat_lanterns,
+            "objetos": sorted(pos.keys()) + ["wv3_lantern_beam"],
+            "materiais": sorted({mt.name for o in objs for mt in o.data.materials}),
+            "triangulos": sum(len(o.data.polygons) for o in objs)}
+    tris = 0
+    for o in objs:
+        tris += sum(len(pp.vertices) - 2 for pp in o.data.polygons)
+    info["triangulos"] = tris
+    return objs, info
 
 
 def main():
@@ -1018,13 +1060,15 @@ def main():
     bunting(street)
     plaza = build_plaza()
     back = build_row2()
+    lighthouse = MB("wv2_lighthouse")   # E3: farol em objeto proprio (detalhe cheio), com patamares e galeria
+    W3.lighthouse(lighthouse, build_house, house_params, lights)
     bank = build_bank()
     terrain = build_terrain()
     scatter_vegetation()
     street_props()
     info = {"gerado_por": "source_art/environment_v2/build_world_v2.py", "provisorio": True, "texturas": tex_info,
             "estatico": {}, "kit": {}}
-    for mb in (dock, quay, street, plaza, back, bank, terrain):
+    for mb in (dock, quay, street, plaza, back, lighthouse, bank, terrain):
         ob = mb.to_object(mats, col_static)
         statics.append(ob)
         info["estatico"][mb.name] = {"triangulos": mb.tris(), "materiais": mb.mats}
@@ -1054,6 +1098,14 @@ def main():
             ob.rotation_euler = (0.0, 0.0, math.pi / 2)
     export_glb(statics, os.path.join(GLB_DIR, "wv2_static.glb"))
     export_glb(kit_objs, os.path.join(GLB_DIR, "wv2_kit.glb"))
+    props_objs, props_info = build_props(mats, kit)
+    export_glb(props_objs, os.path.join(GLB_DIR, "wv3_props.glb"))
+    info["props"] = props_info
+    for g in ("wv2_static.glb", "wv2_kit.glb", "wv2_boat.glb", "wv3_props.glb"):
+        b0, b1 = wv3_glb.compact(os.path.join(GLB_DIR, g))
+        print("WV3 GLB %s %d -> %d bytes" % (g, b0, b1))
+    info["decalques"] = W3.decals(TEX_DIR)
+    TX.write_imports(TEX_DIR, os.path.join(REPO, "game"))
     # vitrine do .blend: kit em fila ao lado do mapa (nao afeta os GLB, ja exportados)
     for ob in kit_objs:
         ob.location.x = 50.0 + xcur
@@ -1066,7 +1118,9 @@ def main():
     layout = {"provisorio": True, "fonte": "source_art/environment_v2/build_world_v2.py", "kit": inst,
               "luzes": [{"tipo": k, "pos": [round(c, 3) for c in p]} for k, p in lights], "vistas": VIEWS, "trio": TRIO,
               "percurso": PATH_CAM,
-              "texturas": {k: v["metros"] for k, v in tex_info.items()}}
+              "texturas": {k: v["metros"] for k, v in tex_info.items()},
+              "props": props_info["pos"], "festa_lanternas": props_info["festa_lanternas"],
+              "festa_barcos_lanternas": props_info["festa_barcos_lanternas"]}
     os.makedirs(os.path.dirname(LAYOUT_JSON), exist_ok=True)
     with open(LAYOUT_JSON, "w") as f:
         json.dump(layout, f, indent=1, sort_keys=True)
@@ -1075,6 +1129,11 @@ def main():
     bpy.ops.wm.save_as_mainfile(filepath=BLEND, compress=True)
     if os.path.exists(BLEND + "1"):
         os.remove(BLEND + "1")
+    col_info = COL.write_scenes(REPO, inst, houses, lights, props_info, bank_info,
+                                dict(bank_h=bank_h, head_h=head_h, hill_h=hill_h, west_h=west_h))
+    info["colisao"] = col_info
+    with open(INFO_JSON, "w") as f:
+        json.dump(info, f, indent=1, sort_keys=True)
     update_manifest(info)
     if "--renders" in ARGS:
         import render_world_v2
