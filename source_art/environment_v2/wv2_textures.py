@@ -15,6 +15,10 @@ import zlib
 
 import numpy as np
 
+# E3 (peso, D18): dados destas texturas saem com METADE da resolucao da cor (relevo largo/difuso; a cor segue cheia).
+# Cais e calcamento (chao em primeiro plano da camera baixa) mantem os dados na resolucao cheia.
+DATA_HALF = {"plaster", "stone", "grass", "dirt", "leaf"}
+
 # Tamanho de cada textura em metros (o shader usa uv_scale = 1 / tamanho) e resolucao.
 SPECS = {
     "deck": (2.0, 1024),
@@ -515,11 +519,35 @@ FUNCS = {
 
 
 # ------------------------------------------------------------------ saida
+def _png_filter_rows(a):
+    """Filtros PNG por linha (0 nenhum, 1 Sub, 2 Up, 3 Average, 4 Paeth), escolhendo o de menor soma |residuo| (heuristica
+    do libpng). Sem perda: o arquivo decodifica nos mesmos bytes; so comprime melhor (E3, peso do repositorio)."""
+    h, w, c = a.shape
+    x = a.reshape(h, w * c).astype(np.int16)
+    left = np.zeros_like(x)
+    left[:, c:] = x[:, :-c]
+    up = np.zeros_like(x)
+    up[1:] = x[:-1]
+    ul = np.zeros_like(x)
+    ul[1:, c:] = x[:-1, :-c]
+    p = left + up - ul
+    pa, pb, pc = np.abs(p - left), np.abs(p - up), np.abs(p - ul)
+    paeth = np.where((pa <= pb) & (pa <= pc), left, np.where(pb <= pc, up, ul))
+    cands = [x, x - left, x - up, x - (left + up) // 2, x - paeth]
+    res = [(cd & 0xFF).astype(np.uint8) for cd in cands]
+    cost = np.stack([np.abs(r.astype(np.int8).astype(np.int16)).sum(axis=1) for r in res])
+    best = cost.argmin(axis=0)
+    out = bytearray()
+    for y in range(h):
+        out += bytes((int(best[y]),)) + res[best[y]][y].tobytes()
+    return bytes(out)
+
+
 def write_png_rgba(path, arr):
-    """arr (h,w,4) 0..1, linha 0 = base da imagem."""
+    """arr (h,w,4) 0..1, linha 0 = base da imagem. PNG RGBA 8 bits com filtro adaptativo por linha."""
     a = (np.clip(arr, 0, 1) * 255 + 0.5).astype(np.uint8)[::-1]
     h, w, _ = a.shape
-    raw = b"".join(b"\x00" + a[y].tobytes() for y in range(h))
+    raw = _png_filter_rows(np.ascontiguousarray(a))
     def chunk(t, d):
         c = struct.pack(">I", len(d)) + t + d
         return c + struct.pack(">I", zlib.crc32(t + d) & 0xFFFFFFFF)
@@ -527,6 +555,12 @@ def write_png_rgba(path, arr):
     png += chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b"")
     with open(path, "wb") as f:
         f.write(png)
+
+
+def half(arr):
+    """Reduz pela metade (media 2x2). Usado nos dados (normal, mascara, rugosidade) que nao precisam da resolucao da cor."""
+    h, w, c = arr.shape
+    return arr.reshape(h // 2, 2, w // 2, 2, c).mean(axis=(1, 3))
 
 
 def write_jpg(path, arr, name):
@@ -556,8 +590,10 @@ def build(out_dir, only=None, log=print):
         nrm = normal_from_height(h, meters, res, depth)
         data = np.concatenate([nrm[..., :2], np.clip(mask, 0, 1)[..., None], np.clip(rough, 0, 1)[..., None]], axis=-1)
         write_jpg(os.path.join(out_dir, name + "_albedo.jpg"), col, name)
+        if name in DATA_HALF:
+            data = half(data)
         write_png_rgba(os.path.join(out_dir, name + "_data.png"), data)
-        info[name] = {"metros": meters, "resolucao": res}
+        info[name] = {"metros": meters, "resolucao": res, "resolucao_dados": data.shape[0]}
         log("textura %s %dpx %.2fm" % (name, res, meters))
     return info
 

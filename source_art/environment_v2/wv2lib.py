@@ -169,6 +169,9 @@ class MB:
         self.cuv = []    # uv por canto (lista por face)
         self.ccol = []   # cor por canto (linear rgba)
         self.mats = []
+        # E3 (peso, D18): nivel de simplificacao para partes DISTANTES da camera baixa (0 = cheio).
+        # 1: chanfro em 1 segmento, esfera subd <= 1; 2: + sem chanfro ate 2 cm, cilindros/tornos/tubos com metade dos lados.
+        self.lod = 0
 
     def mat_index(self, m):
         if m not in self.mats:
@@ -256,18 +259,33 @@ class MB:
         bm.free()
 
     # atalhos -----------------------------------------------------------
+    def _seg(self, seg, low=6):
+        return max(low, (seg + 1) // 2) if self.lod >= 2 else seg
+
     def box(self, c, size, mat, color=(1, 1, 1), bevel=0.02, segs=2, rot=None, uv="box", grain="x", **kw):
+        if self.lod >= 1:
+            segs = 1
+        if self.lod >= 2 and bevel <= 0.02:
+            bevel = 0.0
+        # micro (todos os niveis): chanfro de ate 1,2 cm em peca fina (<= 5 cm) nao aparece na camera do jogo
+        if bevel <= 0.012 and min(size) <= 0.05:
+            bevel = 0.0
         bm = _bm_box(size[0], size[1], size[2], bevel, segs)
         xf = T(*c) @ (rot if rot is not None else Matrix.Identity(4))
         self.add_bm(bm, xf, mat, color, uv, grain, **kw)
 
     def cyl(self, base, r0, h, mat, color=(1, 1, 1), r1=None, seg=12, rot=None, bevel=0.0, caps=True, uv="cyl", **kw):
-        bm = _bm_cyl(r0, r0 if r1 is None else r1, h, seg, caps, bevel)
+        bm = _bm_cyl(r0, r0 if r1 is None else r1, h, self._seg(seg), caps, bevel)
         xf = T(*base) @ (rot if rot is not None else Matrix.Identity(4))
         self.add_bm(bm, xf, mat, color, uv, "y", **kw)
 
     def sphere(self, c, r, mat, color=(1, 1, 1), subd=2, scale=(1, 1, 1), rot=None, uv="none", seed=None, amp=0.0,
                freq=2.2, flat_bottom=None, **kw):
+        if self.lod >= 1:
+            subd = min(subd, 1)
+        # micro: esferas de ate 4,5 cm (flores de floreira, rebites) com 1 nivel de subdivisao a menos
+        if r * max(scale) <= 0.045 and subd >= 1:
+            subd -= 1
         bm = _bm_sphere(1.0, subd)
         if seed is not None and amp > 0:
             blob(bm, seed, amp, freq, None)
@@ -279,7 +297,7 @@ class MB:
         self.add_bm(bm, xf, mat, color, uv, "x", **kw)
 
     def lathe(self, base, profile, mat, color=(1, 1, 1), seg=16, rot=None, uv="cyl", **kw):
-        bm = _bm_lathe(profile, seg)
+        bm = _bm_lathe(profile, self._seg(seg, 8))
         xf = T(*base) @ (rot if rot is not None else Matrix.Identity(4))
         self.add_bm(bm, xf, mat, color, uv, "y", **kw)
 
@@ -289,7 +307,7 @@ class MB:
         self.add_bm(bm, xf, mat, color, uv, grain, **kw)
 
     def tube(self, pts, r, mat, color=(1, 1, 1), seg=8, caps=True, uv="box", **kw):
-        bm = _bm_tube(pts, r, seg, caps)
+        bm = _bm_tube(pts, r, self._seg(seg, 4), caps)
         # UV ao longo do comprimento: usa projecao no mundo (as cordas sao finas, a textura e quase isotropica)
         self.add_bm(bm, Matrix.Identity(4), mat, color, uv, "x", **kw)
 
