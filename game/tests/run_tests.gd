@@ -50,6 +50,9 @@ func _run() -> void:
 		printerr("FAIL  nenhum teste encontrado (filtro '%s')" % only)
 		quit(1)
 		return
+	# Nenhum teste grava no salvo real do jogador (user://missions.save.json): quem quer salvo define o proprio caminho.
+	Ep01V3Main.save_path = ""
+	Ep01V3Main.start_mission = &""
 	for f in files:
 		print("== ", f)
 		var script := load("res://tests/" + f) as GDScript
@@ -69,6 +72,8 @@ func _run() -> void:
 ## contamina os seguintes).
 func _reset_shared_state() -> void:
 	Engine.time_scale = 1.0
+	Ep01V3Main.save_path = ""
+	Ep01V3Main.start_mission = &""
 	for action: StringName in InputMap.get_actions():
 		Input.action_release(action)
 	paused = false

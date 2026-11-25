@@ -9,13 +9,15 @@ extends Node
 
 signal finished(success: bool)
 
-const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down", &"interact", &"help"]
+const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down", &"interact", &"help", &"run"]
 const STUCK_SECONDS := 4.0
 const STUCK_MIN_MOVE := 0.4
 const WAYPOINT_REACH := 0.6
 const PRESS_COOLDOWN := 0.5
 ## Perto e no mesmo nivel: anda reto (o A* nao precisa).
 const DIRECT_RANGE := 1.6
+## C2: segura `run` (corre) enquanto o alvo esta a mais que isto; perto, anda para mirar o ponto.
+const RUN_DIST := 3.0
 
 var main: Ep01V3Main
 var timeout_seconds: float = 600.0
@@ -88,6 +90,9 @@ func _physics_process(delta: float) -> void:
 		_force_route = false
 		_stuck_t = 0.0
 		_stuck_from = main.controlled_node.global_position
+	if main.controlled_node is BoatActor:
+		_drive(goal.global_position)
+		return
 	var here := main.controlled_node.global_position
 	var it := goal as Ep01Interactable
 	if it != null and not it.get_meta(&"auto", false) and main.best_interactable() == it:
@@ -113,7 +118,7 @@ func _physics_process(delta: float) -> void:
 		if _wp < _route.size() and d.length() <= WAYPOINT_REACH:
 			_wp += 1
 			return
-	_walk(d.normalized() if d.length() > 0.05 else Vector3.ZERO)
+	_walk(d.normalized() if d.length() > 0.05 else Vector3.ZERO, flat.length() > RUN_DIST)
 	_stuck_t += delta
 	if _stuck_t >= STUCK_SECONDS:
 		if here.distance_to(_stuck_from) < STUCK_MIN_MOVE:
@@ -157,7 +162,21 @@ func _plan(target: Vector3, reach: float) -> bool:
 	return true
 
 
-func _walk(dir_world: Vector3) -> void:
+## Pilotagem (M6) com as mesmas intencoes do jogador: move_up acelera, move_left/right viram. Menos motor em curva fechada.
+func _drive(target: Vector3) -> void:
+	var boat := main.boat
+	var d := target - boat.global_position
+	d.y = 0.0
+	var err := wrapf(atan2(-d.x, -d.z) - boat.heading, -PI, PI)
+	var steer := clampf(err * 2.0, -1.0, 1.0)
+	_hold(&"move_left", maxf(steer, 0.0))
+	_hold(&"move_right", maxf(-steer, 0.0))
+	_hold(&"move_up", clampf(1.0 - absf(err) / 1.6, 0.25, 1.0))
+	_hold(&"move_down", 0.0)
+
+
+func _walk(dir_world: Vector3, run: bool = false) -> void:
+	_hold(&"run", 1.0 if run and dir_world.length() > 0.01 else 0.0)
 	var local := Basis(Vector3.UP, -main.camera_rig.yaw) * dir_world
 	_hold(&"move_right", maxf(local.x, 0.0))
 	_hold(&"move_left", maxf(-local.x, 0.0))

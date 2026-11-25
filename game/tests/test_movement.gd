@@ -24,6 +24,7 @@ func run(runner) -> void:
 	await _jump_arc()
 	await _jump_blocked()
 	await _jump_map_edge()
+	await _buttons()
 	_release()
 	main.queue_free()
 	await r.frames(2)
@@ -306,3 +307,65 @@ func _jump_map_edge() -> void:
 	await _physics(10)
 	r.check(max_z < wall_z - 0.3 and lead.global_position.y > start.y - 0.1,
 		"mov limite: pulando contra a beira d'agua fica do lado de terra (z max %.2f, parede %.2f)" % [max_z, wall_z])
+
+
+func _key(code: Key, pressed: bool) -> void:
+	var ev := InputEventKey.new()
+	ev.physical_keycode = code
+	ev.pressed = pressed
+	Input.parse_input_event(ev)
+
+
+func _pad(button: JoyButton, pressed: bool) -> void:
+	var ev := InputEventJoypadButton.new()
+	ev.button_index = button
+	ev.pressed = pressed
+	ev.device = 0
+	Input.parse_input_event(ev)
+
+
+## Botoes (decisao do lead): `interact` = E / X, `jump` = Espaco / A. Interagir nao pula; Espaco nao avanca a fala; E avanca.
+func _buttons() -> void:
+	r.check(not _has_button(&"interact", JOY_BUTTON_A) and _has_button(&"interact", JOY_BUTTON_X) and _has_button(&"jump", JOY_BUTTON_A),
+		"mov botoes: interact no X, jump no A (sem botao compartilhado)")
+	var lane := _open_lane(3.0)
+	if not lane.is_empty():
+		_place_trio(lane[0] as Vector3, lane[1] as Vector3)
+	var lead := main.actors[&"tracker"] as MemberActor
+	await _physics(20)
+	var j0 := lead.jumps
+	_key(KEY_E, true)
+	await _physics(3)
+	_key(KEY_E, false)
+	_pad(JOY_BUTTON_X, true)
+	await _physics(3)
+	_pad(JOY_BUTTON_X, false)
+	await _physics(30)
+	r.check(lead.jumps == j0, "mov botoes: interagir (E e X) nao pula")
+	main.hud.say("ep01.test.c2_line_a")
+	main.hud.say("ep01.test.c2_line_b")
+	await r.frames(2)
+	r.check(main.hud.is_speaking(), "mov botoes: fala aberta")
+	var q0: int = main.hud._queue.size()
+	_key(KEY_SPACE, true)
+	await _physics(3)
+	_key(KEY_SPACE, false)
+	await r.frames(1)
+	r.check(main.hud._queue.size() == q0 and q0 > 0, "mov botoes: Espaco nao avanca a fala")
+	r.check(lead.jumps == j0 + 1, "mov botoes: Espaco pula (fala aberta nao bloqueia o pulo)")
+	await _physics(40)
+	_key(KEY_E, true)
+	await r.frames(1)
+	await r.frames(3)
+	var skipped: bool = main.hud._queue.size() < q0
+	_key(KEY_E, false)
+	r.check(skipped, "mov botoes: E (interact) avanca a fala")
+	main.hud.clear_speech()
+	await r.frames(2)
+
+
+func _has_button(action: StringName, b: JoyButton) -> bool:
+	for ev in InputMap.action_get_events(action):
+		if ev is InputEventJoypadButton and (ev as InputEventJoypadButton).button_index == b:
+			return true
+	return false

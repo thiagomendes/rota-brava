@@ -4,8 +4,9 @@ extends Node3D
 ## v2, a camera baixa da vitrine e o barco v2 atracado no M6. O fluxo antigo (porto, rio, ilha, volta) segue em
 ## episodes/ep01/ep01_main.tscn, fora do fluxo do jogo (cenas e testes guardados).
 ##
-## Missoes M0-M8 em ep01_v3_missions.json no formato de game/systems/mission (Mission). E4: M1-M4 em terra sao reais
-## (Ep01V3Land monta os pontos de acao e informa `notify_mission`); M0 e M5-M8 seguem "chegar ao marcador" (PROVISORIO).
+## Missoes M0-M8 em ep01_v3_missions.json no formato de game/systems/mission (Mission). M1-M4 (E4, Ep01V3Land) e M5-M8
+## (E5, Ep01V3Late, que estende a Land) sao reais: montam os pontos de acao e informam `notify_mission`. M0 segue
+## "chegar ao marcador" (cena de chegada).
 ## Aqui ficam: acao contextual (`interact`), troca de heroi contextual (cartao + pose de equipe), ajuda em 3 degraus
 ## (MissionHelp: gesto, Farol 7 no radio, seta), emblemas por missao, objetivo por icone do passo, salvamento em user://
 ## e o trio que acompanha o heroi em controle.
@@ -51,7 +52,7 @@ var missions: Array[Mission] = []
 var mission_data: Dictionary = {}
 var current: Mission
 var complete: bool = false
-var land: Ep01V3Land
+var land: Ep01V3Late
 var help: MissionHelp
 var posing: bool = false
 var emblems_found: int = 0
@@ -82,6 +83,7 @@ func _ready() -> void:
 	camera_rig = CameraRig.new()
 	add_child(camera_rig)
 	camera_rig.set_low_view(0.0)
+	_setup_camera_avoidance()
 	Options.apply_all()
 	camera_rig.reduced_motion = Options.reduced_motion()
 	hud = Hud.new()
@@ -102,7 +104,7 @@ func _ready() -> void:
 	audio.set_ambience_zone(&"dock")
 	_setup_speech()
 	hud.handoff_confirmed.connect(_on_handoff_confirmed)
-	land = Ep01V3Land.new()
+	land = Ep01V3Late.new()
 	add_child(land)
 	land.setup(self)
 	_build_arrow()
@@ -137,6 +139,37 @@ func _ready() -> void:
 		bot.main = self
 		bot.finished.connect(func(ok: bool) -> void: get_tree().quit(0 if ok else 1))
 		add_child(bot)
+
+
+## Camera desvia de paredes, telhados e troncos (camada 1) e das copas das arvores; paredes invisiveis nao contam.
+func _setup_camera_avoidance() -> void:
+	camera_rig.orbit_enabled = true
+	camera_rig.collision_mask = 1
+	for path: String in ["Collision/WaterLimits", "Collision/MapBounds", "Collision/AccessRamps"]:
+		var b := world.get_node_or_null(path) as CollisionObject3D
+		if b != null:
+			camera_rig.exclude.append(b.get_rid())
+	camera_rig.occluders = tree_canopies()
+
+
+## Copas das arvores do kit como esferas (centro, raio), da caixa da malha de cada tipo e do layout do mundo.
+func tree_canopies() -> Array[Vector4]:
+	var out: Array[Vector4] = []
+	var kit: Dictionary = world.layout.get("kit", {})
+	for kind: String in kit:
+		if not kind.begins_with("tree_"):
+			continue
+		var mmi := world.get_node_or_null("Kit/" + kind) as MultiMeshInstance3D
+		var box := AABB(Vector3(-1.2, 0, -1.2), Vector3(2.4, 4.0, 2.4))
+		if mmi != null and mmi.multimesh != null and mmi.multimesh.mesh != null:
+			box = mmi.multimesh.mesh.get_aabb()
+		for row: Variant in kit[kind]:
+			var r: Array = row
+			var s := float(r[4])
+			var radius := maxf(box.size.x, box.size.z) * 0.5 * s * 0.85
+			var cy := float(r[1]) + (box.position.y + box.size.y * 0.68) * s
+			out.append(Vector4(float(r[0]), cy, float(r[2]), radius))
+	return out
 
 
 ## Dev/captura: --ep01v3-at=<marcador> poe o trio junto do marcador; --ep01v3-yaw=<graus> gira a camera baixa;
@@ -273,6 +306,7 @@ func _finish_episode() -> void:
 	complete = true
 	world.set_festival(true)
 	print("[RB] v3 complete")
+	hud.set_complete_emblems(land.emblems_by_hero(missions))
 	episode_completed.emit()
 	hud.open_complete()
 
@@ -444,7 +478,8 @@ func _update_followers() -> void:
 	for m: StringName in actors:
 		var a := actors[m] as MemberActor
 		a.auto_dir = Vector3.ZERO
-		if lead == null or a == lead or a.airborne:
+		# Embarcados (M6) nao seguem nem sao seguidos: o barco leva quem esta nele.
+		if lead == null or a == lead or a.airborne or a.riding_on != null or lead.riding_on != null:
 			continue
 		var d := lead.global_position - a.global_position
 		d.y = 0.0
@@ -457,32 +492,7 @@ func _update_followers() -> void:
 # ---------- ajuda em 3 degraus ----------
 
 func _build_arrow() -> void:
-	arrow = Node3D.new()
-	arrow.name = "HelpArrow"
-	arrow.set_meta(&"provisional", true)
-	add_child(arrow)
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color("ffd23f")
-	mat.emission_enabled = true
-	mat.emission = Color("ffb000")
-	mat.emission_energy_multiplier = 1.2
-	var cone := MeshInstance3D.new()
-	var cm := CylinderMesh.new()
-	cm.top_radius = 0.28
-	cm.bottom_radius = 0.0
-	cm.height = 0.5
-	cone.mesh = cm
-	cone.material_override = mat
-	arrow.add_child(cone)
-	var stem := MeshInstance3D.new()
-	var sm := CylinderMesh.new()
-	sm.top_radius = 0.1
-	sm.bottom_radius = 0.1
-	sm.height = 0.4
-	stem.mesh = sm
-	stem.material_override = mat
-	stem.position.y = 0.45
-	arrow.add_child(stem)
+	arrow = Ep01V3Pieces.help_arrow(self)
 	arrow.visible = false
 
 
@@ -519,7 +529,7 @@ func _on_pointer_hint(_target: StringName, move_camera: bool) -> void:
 	print("[RB] v3 help arrow")
 	arrow.visible = true
 	arrow.global_position = t.global_position + Vector3(0, 2.0, 0)
-	if move_camera:
+	if move_camera and not land.sailing:
 		var d := t.global_position - controlled_node.global_position
 		d.y = 0.0
 		if d.length() > 0.5:
@@ -585,6 +595,7 @@ func _on_footstep(speed: float, pos: Vector3) -> void:
 
 
 func _pause() -> void:
+	camera_rig.release_mouse()
 	get_tree().paused = true
 	hud.open_pause()
 

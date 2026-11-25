@@ -102,7 +102,9 @@ func _walkthrough() -> void:
 	r.check(switches.has(&"climber") and switches.has(&"tracker") and switches.has(&"pilot"),
 		"v3 E4: troca de heroi pedida para Pico, Rastro e Leme (%s)" % str(switches))
 	r.check(bot.switches >= 4, "v3 E4: bot confirmou %d cartoes de troca" % bot.switches)
-	r.check(main.emblems_total == 5 and main.emblems_found == 5, "v3 E4: emblemas M1-M4 %d/%d" % [main.emblems_found, main.emblems_total])
+	r.check(main.emblems_total == 10 and main.emblems_found == 10, "v3 E5: emblemas M1-M8 %d/%d" % [main.emblems_found, main.emblems_total])
+	r.check(main.boat.global_position.distance_to(main.world.marker(&"M6_BoatStart").global_position) < 0.05,
+		"v3 E5: barco de volta ao cais depois do resgate")
 	r.check(bot.presses >= 20, "v3 E4: bot apertou interact %d vezes (acoes reais)" % bot.presses)
 	await _free(main)
 
