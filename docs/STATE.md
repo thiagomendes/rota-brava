@@ -18,7 +18,7 @@
 - **E4 integrado** (`OK (2937 PASS)`): M1–M4 em terra com mecânicas reais, troca de herói, ajuda em 3 degraus, 5 emblemas, retomada pelo menu em `user://missions.save.json`.
 - **E5 + C1 integrados** (`OK (3351 PASS)`): M5–M8 (gaivota, barco com colete, farol, festa), 10 emblemas, câmera orbital pelo mouse/alavanca e desvio de obstáculos, peças finais do props v3 pelo ponto de troca. Bot M0→M8 ~226 s; ritmo humano estimado ~11 min (acima da meta, medir na E7).
 - **C2 integrado** (`OK (3409 PASS)`): andar por padrão, Shift corre, pulo (Espaço/A) bloqueado em zonas de subida das missões, interact E/X, seguidores em formação.
-- **Em curso:** `art3d` refaz os ciclos `walk`/`run` dos 3 heróis com passada mais longa (`feature/rb-r1-ciclos-v2`).
+- **Ciclos v2 integrados:** passada longa em `walk`/`run` (2,3–4,1 passos/s). Aguardando Thiago jogar (movimento, câmera, pulo, duração).
 - **Próximo:** E6 (falas) e E7 (bot humano, capturas, build Windows, Portão 2).
 - **Páginas para Thiago:** trio 3D https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (Leme antiga), mundo v2 https://claude.ai/artifact/6WpRQzYXY2hW74LxMiPVww, novidades https://claude.ai/artifact/2WyeZqg8DNSLWegCPcCXAt.
 - **Dívidas:** `wv2_static.glb` ainda 10,6 MB e `world_v2.blend` 5,2 MB; materiais do mundo em `game/lookdev/world_v2/`; tris dos heróis no teto; cabelos de trás facetados; luz de parede estoura à noite; GPU real não medida; retratos do HUD antigos; branches `wip/*` a apagar pelo GitHub.
