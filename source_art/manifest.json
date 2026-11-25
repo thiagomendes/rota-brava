@@ -1549,8 +1549,8 @@
         "source_art/scripts/rbart.py"
       ],
       "saida_glb": "game/assets/models/characters/leme_v2.glb",
-      "glb_sha256": "bd06ca7979dc09146212a2ec30e9c431afe7b13a533f397053fd6c0e8f8aee7a",
-      "glb_bytes": 7684272,
+      "glb_sha256": "4c99a6cfe5e8b39f5340ff745fad63b7dff3efb6df7a8591af1482485ef89161",
+      "glb_bytes": 7707140,
       "triangulos": 24531,
       "materiais": [
         "mat_leme_v2_acc_lifevest",

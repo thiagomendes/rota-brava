@@ -30,7 +30,7 @@ from rbart import hex_to_linear
 # ------------------------------------------------------------------ paleta (sRGB hex) e ids das partes
 C = dict(white="#F7FBFF", blue="#2F8CFF", deep="#1F5FBF", navy="#1F3A5F", navy_lt="#2B5285", navy_emb="#123A5E", navy_dk="#142B4A",
          gold="#FFC83D", silver="#B9C7D4", skin="#8C5634", blush="#B8624F", palm="#C08A68", hair="#1E1410", hair_lt="#5A3826",
-         red="#E2473B", whistle="#FFB020", cyan="#7FE3FF")
+         red="#E2473B", whistle="#2B5285", cyan="#7FE3FF", vest="#FFC83D")
 
 PARTS = ["none", "jacket", "pants", "jacket_collar", "zip_pull", "elbow_pad", "elbow_pad_rim", "knee_pad", "knee_pad_rim",
          "vest", "vest_rim", "collar_pillow", "cap_crown", "skin_head", "skin_neck", "glove", "glove_cuff", "hair", "hair_tie",
@@ -50,7 +50,7 @@ GEAR = {
     "elbow_pad": ("navy", 0.42, 0.0), "elbow_pad_rim": ("navy_dk", 0.50, 0.0), "knee_pad": ("white", 0.36, 0.0),
     "knee_pad_rim": ("navy", 0.46, 0.0), "glove": ("white", 0.44, 0.0), "glove_cuff": ("blue", 0.40, 0.0),
     "vest_strap": ("navy", 0.50, 0.0),
-    "vest_buckle": ("white", 0.40, 0.0), "whistle": ("whistle", 0.30, 0.0), "whistle_cord": ("white", 0.55, 0.0), "whistle_slot": ("navy_dk", 0.6, 0.0), "whistle_ring": ("gold", 0.28, 0.6),
+    "vest_buckle": ("white", 0.40, 0.0), "whistle": ("whistle", 0.30, 0.0), "whistle_cord": ("navy", 0.55, 0.0), "whistle_slot": ("navy_dk", 0.6, 0.0), "whistle_ring": ("silver", 0.28, 0.6),
     "emblem": ("navy_emb", 0.34, 0.0), "emblem_star": ("gold", 0.28, 0.55), "emblem_band": ("white", 0.36, 0.0),
     "belt": ("navy", 0.44, 0.0), "buckle": ("gold", 0.30, 0.55), "buckle_star": ("navy_emb", 0.32, 0.0),
     "boot": ("blue", 0.36, 0.0), "sole": ("white", 0.58, 0.0), "boot_collar": ("white", 0.46, 0.0), "boot_strap": ("navy", 0.55, 0.0),
@@ -593,9 +593,10 @@ def paint_suit(m, b):
         h -= np.where(back, 0.0004 * line(dr, 0.0012), 0)
         h += np.where(back, 0.00022 * stitches(dr, x + z, 0.0030, 0.0042), 0)
     h -= np.where(pt, 0.0003 * line(z - (F.hz + 0.045), 0.0015), 0)          # cos da cintura
-    # --- colete (acessorio): nailon ripstop azul, canais costurados, faixas refletivas, vivo branco, estrela nas costas
+    # --- colete (acessorio): nailon ripstop AMARELO da equipe (#FFC83D, o amarelo do emblema; nunca laranja, que e da
+    # Rastro), canais costurados, faixas refletivas prata com vivos azul-marinho, vivo azul-marinho na borda, estrela nas costas
     vest = sel("vest") | sel("collar_pillow")
-    col[vest] = deep                     # um tom abaixo da jaqueta: o colete se le por cima dela
+    col[vest] = lin(C["vest"])           # contraste forte com a jaqueta azul: o colete se le por cima dela
     rp = ripstop(P, N)
     h += np.where(vest, 0.00012 * rp, 0)
     rough = np.where(vest, 0.52 - 0.06 * rp, rough)
@@ -608,6 +609,8 @@ def paint_suit(m, b):
             dc = np.radians(np.angle(np.exp(1j * np.radians(ang_d - c0)), deg=True)) * rr_
             h += np.where(isv, 0.00022 * (stitches(dc - 0.0040, z, 0.0, 0.0042) + stitches(dc + 0.0040, z, 0.0, 0.0042)), 0)
         for zb in b.reflect_z:
+            piping = isv & (np.abs(z - zb) < 0.0080)
+            col[piping] = navy                # vivo azul-marinho dos dois lados da faixa (a prata nao some no amarelo)
             band = isv & (np.abs(z - zb) < 0.0062)
             col[band] = silver
             rough = np.where(band, 0.30, rough)
@@ -626,7 +629,7 @@ def paint_suit(m, b):
         h += np.where(onb, 0.0003 * line(rho - r_star - 0.0035, 0.0012), 0)
     cp = sel("collar_pillow")
     h += np.where(cp, 0.0002 * fbm(P, 0.01, 2), 0)
-    col[sel("vest_rim")] = white
+    col[sel("vest_rim")] = navy
     rough = np.where(sel("vest_rim"), 0.55, rough)
     # --- copa do bone: sarja branca em seis gomos (o da frente azul), costuras com pesponto e vivo azul-marinho na base
     cc = sel("cap_crown")

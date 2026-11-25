@@ -28,7 +28,12 @@ balão, drone) e lê bússola e mapas (D16). Para aprovação de Thiago num visu
 ## Equipamento por missão (D16): colete salva-vidas como acessório
 - Nó próprio no mesmo GLB: **`Acc_LifeVest`** (malha com pele no mesmo esqueleto, pesos só do tronco: hips, spine, chest,
   neck; material próprio `mat_leme_v2_acc_lifevest`, textura 1K). Contém o colete de placas de espuma com canais costurados,
-  faixas refletivas e vivo branco, gola-travesseiro, tiras e fivela, apito no cordão e o emblema da equipe na placa esquerda.
+  faixas refletivas, gola-travesseiro, tiras e fivela, apito no cordão e o emblema da equipe na placa esquerda.
+- **Cor do colete (v2.2, D17, 2026-11-25):** nailon **amarelo da equipe `#FFC83D`** (o amarelo do emblema, `docs/style-bible.md`
+  §4), para não se confundir com a jaqueta azul; faixas refletivas prata `#B9C7D4` com vivos azul-marinho `#1F3A5F` dos dois
+  lados; vivo da borda, tiras e cordão do apito em azul-marinho; apito azul-marinho claro `#2B5285` com argola prata (o antigo
+  apito âmbar sumia no amarelo); emblema azul-marinho com estrela dourada, inalterado. Sem laranja (cor da Rastro). Antes:
+  colete azul `#1F5FBF`. Malha, rig, clipes e visibilidade padrão não mudaram (só `lv2_tex.py`).
 - **Oculto por padrão** na Godot: `game/lookdev/gltf_pbr_import.gd` esconde na importação todo nó cujo nome começa com `Acc_`.
   Ligar no jogo ou na vitrine: `modelo.find_child("Acc_LifeVest", true, false).visible = true`
   (na cena: `LemeV2/Model/Rig/<Armature>/Skeleton3D/Acc_LifeVest`). Vitrine: `--lookdev-hero=leme --lookdev-acc=Acc_LifeVest`.
