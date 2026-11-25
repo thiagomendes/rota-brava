@@ -66,6 +66,10 @@ func run(runner) -> void:
 	await r.frames(2)
 	r.check(main.hud.prompt_visible() and main.hud.prompt_text() == Loc.t("ui.action.examine"),
 		"perto do alvo aparece 'Examinar'")
+	# Este bloco mede a interacao, nao a fala: com a legenda no tempo de leitura (E6), a fala de
+	# abertura ainda esta aberta e o E a avancaria (consumido pelo HUD), depois vem a carencia de 250 ms.
+	main.hud.clear_speech()
+	await r.tree.create_timer(0.4).timeout  # carencia de 250 ms apos a fala (C2)
 	await _press(&"interact")
 	r.check(_hits == 1, "uma pressao gera exatamente uma interacao")
 	it.global_position = Vector3(30, 0, 0)

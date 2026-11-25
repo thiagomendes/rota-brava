@@ -84,7 +84,7 @@
   "ep01.arrival.pilot.no_captain",
   "ep01.arrival.tracker.look_dock",
   "ep01.dock.tracker.small_print",
-  "ep01.dock.tracker.boot_observation",
+  "ep01.dock.tracker.boot_captain",
   "ep01.dock.tracker.two_trails",
   "ep01.bank.tracker.pup_village",
   "ep01.bank.pilot.pup_clothes",
@@ -175,7 +175,7 @@
    "mission": "M1",
    "when": "paw_examined"
   },
-  "ep01.dock.tracker.boot_observation": {
+  "ep01.dock.tracker.boot_captain": {
    "speaker": "tracker",
    "emotes": [
     "boot",

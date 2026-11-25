@@ -440,7 +440,7 @@ func _on_spot(id: StringName, actor: Node3D) -> void:
 		&"boot":
 			_examine(actor, it)
 			if main.notify_mission(&"boot_examined"):
-				main.say("ep01.dock.tracker.boot_observation")
+				main.say("ep01.dock.tracker.boot_captain")
 				main.say("ep01.dock.tracker.two_trails")
 		&"paw_1", &"paw_2", &"paw_3", &"paw_4":
 			FeedbackFx.pulse(world, it.global_position)
