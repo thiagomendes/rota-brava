@@ -31,6 +31,10 @@ const SLOT_RESUME := 0.45
 const CATCHUP_DIST := 4.0
 const CAPSULE_RADIUS := 0.35
 const SLOT_CLEARANCE := 0.55
+## Camada das zonas de subida das missoes (Area3D criadas pelo episodio): dentro delas o pulo livre fica bloqueado.
+const CLIMB_ZONE_LAYER := 1 << 9
+## Seguidor nao vai para a formacao de um lider em outra altura (degrau, patamar).
+const FOLLOW_MAX_DY := 0.3
 const TURN_SPEED := 14.0
 
 const MODEL_SCENES := {
@@ -270,6 +274,8 @@ func can_jump() -> bool:
 		return false
 	if _jump_tween and _jump_tween.is_valid() and _jump_tween.is_running():
 		return false
+	if in_climb_zone():
+		return false
 	if jump_gate.is_valid():
 		return not bool(jump_gate.call())
 	var n := get_parent()
@@ -278,6 +284,18 @@ func can_jump() -> bool:
 			return not bool(n.call(&"blocked"))
 		n = n.get_parent()
 	return true
+
+
+## Dentro de uma zona de subida de missao (camada CLIMB_ZONE_LAYER)?
+func in_climb_zone() -> bool:
+	if not is_inside_tree():
+		return false
+	var q := PhysicsPointQueryParameters3D.new()
+	q.position = global_position + Vector3(0, 0.3, 0)
+	q.collision_mask = CLIMB_ZONE_LAYER
+	q.collide_with_areas = true
+	q.collide_with_bodies = false
+	return not get_world_3d().direct_space_state.intersect_point(q, 1).is_empty()
 
 
 ## Lider atual: `leader` se definido, senao o irmao MemberActor em controle.
@@ -313,14 +331,14 @@ func formation_slot() -> Vector3:
 	# Lugar proprio; se a parede/agua o impede, o do outro lado; senao fica onde esta (nunca entra num canto sem saida).
 	for k in [i, i + 1]:
 		var p := l.global_position + basis * FORMATION_SLOTS[k % FORMATION_SLOTS.size()]
-		if _slot_clear(l.global_position, p):
+		if slot_clear(l.global_position, p):
 			p.y = global_position.y
 			return p
 	return global_position
 
 
 ## Lugar livre: linha reta do lider ate ele sem parede (largura da capsula) e chao firme na mesma altura.
-func _slot_clear(from: Vector3, to: Vector3) -> bool:
+func slot_clear(from: Vector3, to: Vector3) -> bool:
 	if not is_inside_tree():
 		return false
 	var space := get_world_3d().direct_space_state
@@ -361,7 +379,7 @@ func _follow_dir() -> Vector3:
 		_following = true
 		_settled = false
 		out = Vector3(auto_dir.x, 0.0, auto_dir.z).normalized()
-	elif _following:
+	elif _following and absf(l.global_position.y - global_position.y) <= FOLLOW_MAX_DY:
 		var to_slot := formation_slot() - global_position
 		to_slot.y = 0.0
 		if _settled and to_slot.length() > SLOT_RESUME:

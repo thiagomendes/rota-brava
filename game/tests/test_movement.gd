@@ -25,6 +25,10 @@ func run(runner) -> void:
 	await _jump_blocked()
 	await _jump_map_edge()
 	await _buttons()
+	await _speech_eats_interact()
+	await _followers_height_and_teleport()
+	await _climb_zones()
+	await _bench_jumpable()
 	_release()
 	main.queue_free()
 	await r.frames(2)
@@ -369,3 +373,161 @@ func _has_button(action: StringName, b: JoyButton) -> bool:
 		if ev is InputEventJoypadButton and (ev as InputEventJoypadButton).button_index == b:
 			return true
 	return false
+
+
+## Revisao C2: com fala aberta, um E perto de um ponto de acao so avanca a fala (a acao nao dispara); sem fala, dispara.
+func _speech_eats_interact() -> void:
+	var lead := main.actors[&"tracker"] as MemberActor
+	await _physics(10)
+	var it := Ep01Interactable.new()
+	it.name = "C2TestSpot"
+	it.radius = 2.0
+	main.world.add_child(it)
+	it.global_position = lead.global_position
+	main.land.spots[&"c2_test"] = it
+	var hits := [0]
+	it.triggered.connect(func(_a: Node3D) -> void: hits[0] += 1)
+	main.hud.clear_speech()
+	await r.frames(30)
+	_key(KEY_E, true)
+	await r.frames(2)
+	_key(KEY_E, false)
+	await r.frames(2)
+	r.check(hits[0] == 1, "mov fala: sem fala, E perto do ponto dispara a acao (%d)" % hits[0])
+	main.hud.say("ep01.test.c2_line_a")
+	main.hud.say("ep01.test.c2_line_b")
+	await r.frames(2)
+	var q0: int = main.hud._queue.size()
+	_key(KEY_E, true)
+	await r.frames(2)
+	_key(KEY_E, false)
+	await r.frames(3)
+	r.check(main.hud._queue.size() < q0 and hits[0] == 1, "mov fala: com fala aberta, E so avanca a fala (acao nao disparou: %d)" % hits[0])
+	main.hud.clear_speech()
+	main.land.spots.erase(&"c2_test")
+	it.queue_free()
+	await r.frames(2)
+
+
+## Revisao C2: seguidor nao persegue o lider em outra altura; teleporte de 9 m cai em chao livre, do lado oposto a camera.
+func _followers_height_and_teleport() -> void:
+	var lane := _open_lane(5.0)
+	if lane.is_empty():
+		r.check(false, "mov seguidor: faixa livre")
+		return
+	var o: Vector3 = lane[0]
+	var d: Vector3 = lane[1]
+	_place_trio(o, d)
+	await _physics(10)
+	var lead := main.actors[&"tracker"] as MemberActor
+	var climber := main.actors[&"climber"] as MemberActor
+	climber.teleport(o - d * 4.0 + Vector3(0, 0.05, 0))
+	await _physics(5)
+	# Lider parado 0,6 m acima (como num degrau): fisica do lider desligada enquanto mede.
+	lead.set_physics_process(false)
+	lead.global_position = o + Vector3(0, 0.6, 0)
+	var c0 := climber.global_position
+	await _physics(60)
+	r.check(climber.auto_dir == Vector3.ZERO and climber.global_position.distance_to(c0) < 0.05,
+		"mov seguidor: lider 0,6 m acima -> seguidor nao corre contra o degrau (andou %.2f m)" % climber.global_position.distance_to(c0))
+	lead.global_position = o + Vector3(0, 0.05, 0)
+	lead.set_physics_process(true)
+	await _physics(10)
+	# Seguidor preso a 12 m: teleporte para chao livre, do lado oposto a camera.
+	climber.set_physics_process(false)
+	climber.global_position = Vector3(o.x, o.y + 0.05, o.z) - d * 12.0
+	await _physics(3)
+	climber.set_physics_process(true)
+	var cam := main.camera_rig.camera.global_position
+	var rel := climber.global_position - lead.global_position
+	var to_cam := cam - lead.global_position
+	rel.y = 0.0
+	to_cam.y = 0.0
+	var p := climber.global_position
+	r.check(rel.length() < 3.0, "mov seguidor: preso a 12 m foi teleportado para perto do lider (%.2f m)" % rel.length())
+	r.check(rel.dot(to_cam) < 0.0, "mov seguidor: teleporte do lado oposto a camera (atras do lider na vista)")
+	r.check(climber.slot_clear(lead.global_position, Vector3(p.x, lead.global_position.y, p.z)), "mov seguidor: destino do teleporte com chao e sem parede")
+	await _physics(5)
+
+
+const CLIMB_SETS := {
+	"M2 galpao": [&"M2_ShedStep_1", &"M2_ShedStep_2", &"M2_ShedTop"],
+	"M3 chafariz": [&"M3_FountainStep_1", &"M3_FountainStep_2", &"M3_FountainStep_3", &"M3_UpperBasin"],
+	"M5 caixotes/toldo/telhado": [&"M5_Crates", &"M5_Awning", &"M5_ShedRoof"],
+	"M7 farol": [&"M7_StairStep", &"M7_StairBase", &"M7_Landing_1", &"M7_Landing_2", &"M7_Landing_3", &"M7_Gallery"],
+}
+
+
+## Revisao C2: por estrutura da tabela de degraus, de 12 lados, correndo e pulando a cada 0,5 s por 4 s em direcao aos
+## marcadores: no chao, o heroi nunca fica na altura de um marcador perto dele.
+func _climb_zones() -> void:
+	var lead := main.actors[&"tracker"] as MemberActor
+	for label: String in CLIMB_SETS:
+		var marks: Array[Vector3] = []
+		var center := Vector3.ZERO
+		for mk: StringName in CLIMB_SETS[label]:
+			var mm := main.world.marker(mk)
+			if mm != null:
+				marks.append(mm.global_position)
+				center += mm.global_position
+		center /= maxf(marks.size(), 1)
+		var reached: Array[String] = []
+		var tries := 0
+		var jumps0 := lead.jumps
+		for i in 12:
+			var dir := Vector3.FORWARD.rotated(Vector3.UP, TAU * i / 12.0)
+			var start := center + dir * 6.5
+			var fl := _floor(start.x, start.z)
+			if fl.y > marks[0].y - 0.2 or fl.y < marks[0].y - 1.2:
+				continue
+			tries += 1
+			lead.teleport(fl + Vector3(0, 0.05, 0))
+			await _physics(5)
+			Input.action_press(&"run")
+			for t in 240:
+				var tgt := marks[(t / 60) % marks.size()]
+				var dd := tgt - lead.global_position
+				dd.y = 0.0
+				_push(dd if dd.length() > 0.05 else dir)
+				if t % 30 == 0:
+					Input.action_press(&"jump")
+				elif t % 30 == 2:
+					Input.action_release(&"jump")
+				await r.tree.physics_frame
+				if lead.is_on_floor():
+					for mp: Vector3 in marks:
+						var h := Vector2(mp.x - lead.global_position.x, mp.z - lead.global_position.z).length()
+						if h < 1.2 and lead.global_position.y > mp.y - 0.08:
+							reached.append("%s y%.2f" % [mp, lead.global_position.y])
+			_release()
+			await _physics(3)
+		r.check(tries >= 4 and reached.is_empty(), "mov subida %s: %d lados correndo e pulando, nenhum marcador alcancado %s (pulos %d)" % [
+			label, tries, reached.slice(0, 2), lead.jumps - jumps0])
+
+
+## Fora das zonas o pulo e livre: o banco de 0,48 m (Props/bench_2 em -6,8; -14,0) e pulavel.
+func _bench_jumpable() -> void:
+	var lead := main.actors[&"tracker"] as MemberActor
+	var bench := Vector3(-6.8, 0, -14.0)
+	var best := -INF
+	for dir: Vector3 in [Vector3.BACK, Vector3.FORWARD, Vector3.LEFT, Vector3.RIGHT]:
+		var start := bench + dir * 1.6
+		lead.teleport(_floor(start.x, start.z) + Vector3(0, 0.05, 0))
+		await _physics(5)
+		var y0 := lead.global_position.y
+		for t in 90:
+			var dd := bench - lead.global_position
+			dd.y = 0.0
+			_push(dd if dd.length() > 0.1 else -dir)
+			if t == 8:
+				Input.action_press(&"jump")
+			elif t == 11:
+				Input.action_release(&"jump")
+			await r.tree.physics_frame
+			if lead.is_on_floor():
+				best = maxf(best, lead.global_position.y - y0)
+		_release()
+		await _physics(3)
+		if best > 0.4:
+			break
+	r.check(best > 0.4, "mov banco: fora das zonas o pulo sobe o banco de 0,48 m (%.2f m)" % best)
