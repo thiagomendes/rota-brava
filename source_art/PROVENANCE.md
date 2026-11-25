@@ -57,3 +57,18 @@
   O jogo citado por Thiago como referencia de qualidade nao foi copiado (nenhum elemento, cor-assinatura ou forma).
 - **Uso:** `game/lookdev/lookdev_materials.gd` (`LookdevMaterials.make/apply`) troca os materiais em tempo de execucao, sem editar os recursos
   importados. Vitrine: `game/lookdev/lookdev_dock.tscn` (`--lookdev=before|after`, `--lookdev-cam=low|close|high`).
+
+
+## RB-R1 E3b: retratos do HUD dos herois v2 (PROVISORIO)
+- **Agente:** `art3d`, 2026-11-25. **Status:** `provisorio`; aprovacao de Thiago pendente. Manifesto: entrada `portraits_v2`
+  (a entrada `portraits` passa a cobrir so `captain` e `pup`, que continuam os da primeira geracao).
+- **Originalidade:** renders dos proprios herois v2 do projeto (`source_art/characters/{rastro,pico,leme}_v2/*.blend`, geometria,
+  rig, shape keys e texturas 100% por script, ver os PROVENANCE de cada pasta). Nenhum modelo, imagem ou retrato de terceiros;
+  sem modelo de imagem.
+- **Processo:** `source_art/scripts/hero_portraits_v2.py` abre o `.blend` v2 (sem salvar), poe o corpo no quadro 0 do `idle`,
+  o rosto na shape key `neutra`/`alegre`/`surpresa`, esconde `Acc_*` (colete da Leme) e renderiza em Cycles (96 amostras +
+  OpenImageDenoise) com a luz de cena das provas v2, fundo transparente. Mesmo tamanho (512x512), formato (PNG RGBA) e caminho
+  (`game/ui/portraits/<id>_<expr>.png`) dos antigos; enquadramento calibrado lado a lado com os antigos (camera 1,60 m do meio
+  do osso `head` menos 7 cm, elevacao 6 graus, giro -20 graus, lente 85 mm).
+- **Reproduzir:** `bash tools/blender.sh --background source_art/characters/<id>_v2/<id>_v2.blend --python source_art/scripts/hero_portraits_v2.py -- <id>`
+  para `rastro`, `pico`, `leme`. Comparacao antes/depois: `captures/e3b/retratos_antes_depois.png` (fora do Git).
