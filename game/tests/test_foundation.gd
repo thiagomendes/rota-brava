@@ -121,8 +121,8 @@ func run(runner) -> void:
 
 	await _tap(&"ui_accept")
 	await r.frames(3)
-	var play := r.tree.current_scene as Ep01Main
-	r.check(play != null, "ui_accept em Jogar abre o episodio")
+	var play := r.tree.current_scene as Ep01V3Main
+	r.check(play != null, "ui_accept em Jogar abre o episodio (Ep01 v3 na vila)")
 	if play:
 		await _tap(&"pause")
 		r.check(play.hud.pause_open and r.tree.paused, "Esc no episodio abre a pausa")

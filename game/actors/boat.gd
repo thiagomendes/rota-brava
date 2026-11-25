@@ -12,6 +12,7 @@ const CREW := {
 	&"tracker": Vector3(-0.55, 0.40, -0.85),
 	&"climber": Vector3(0.50, 0.40, -1.30),
 }
+const MODEL_SCENE := "res://worlds/village_v3/boat_wv2.tscn"
 const MAX_SPEED := 7.0
 const ACCEL := 4.0
 const BRAKE := 6.0
@@ -36,20 +37,22 @@ var throttle: float = 0.0
 var steer: float = 0.0
 var last_slow_factor: float = 1.0
 var wheel: Node3D
+var bow_light: Light3D
 var deck_point: Marker3D
 var _lean: float = 0.0
 
 
 func _ready() -> void:
 	name = "Boat"
-	# Modelo do RB-04 (art3d): casco curvo, cabine na popa, banco, volante, lampiao. Sem colisao solida (o barco anda por funcao).
-	var model := (load("res://actors/environment/boat_v2.tscn") as PackedScene).instantiate()
+	# Barco v2 do mundo v2.1 (RB-R1 E1): boat_wv2.tscn com Model (GLB com materiais do mundo), Body/Collision, BowLight e
+	# WheelPoint. Sem toon (materiais PBR do mundo). A colisao do casco fica desligada: o barco anda por funcao.
+	var model := (load(MODEL_SCENE) as PackedScene).instantiate()
 	model.name = "Model"
 	add_child(model)
-	Stylize.apply(model)
 	var body := model.get_node_or_null("Body") as CollisionObject3D
 	if body != null:
 		body.collision_layer = 0
+	bow_light = model.get_node_or_null("BowLight") as Light3D
 	wheel = model.find_child("WheelPoint", true, false) as Node3D
 	deck_point = Marker3D.new()
 	deck_point.name = "DeckPoint"

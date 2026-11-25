@@ -8,6 +8,11 @@ var camera: Camera3D
 var target: Node3D
 var offset: Vector3 = Vector3(0, 7.5, 9.5)
 const LOOK_Y := 0.75
+## Camera baixa aprovada na vitrine do mundo v2 (lookdev, D14): ~1,95 m do chao, ~12 graus para baixo, FOV 50; a 4,1 m atras do
+## heroi (~1,1 m) ele ocupa ~28% da altura da tela. Usada pelo Ep01 v3 (vila); o fluxo antigo mantem a camera alta.
+const LOW_OFFSET := Vector3(0, 1.95, 4.1)
+const LOW_LOOK_Y := 1.08
+const LOW_FOV := 50.0
 var look_offset: Vector3 = Vector3(0, LOOK_Y, 0)
 ## Giro em Y do conjunto; a entrada de movimento usa este valor.
 var yaw: float = 0.0
@@ -43,6 +48,13 @@ func set_view(new_offset: Vector3, new_yaw: float = 0.0, look_y: float = LOOK_Y)
 	yaw = new_yaw
 	framing_world = false
 	look_offset = Vector3(0, look_y, 0)
+
+
+## Camera baixa do jogo (vila v3) com giro `new_yaw`.
+func set_low_view(new_yaw: float = 0.0) -> void:
+	set_view(LOW_OFFSET, new_yaw, LOW_LOOK_Y)
+	if camera != null:
+		camera.fov = LOW_FOV
 
 
 ## Enquadra `node` de frente: camera em `node + front * distance + altura`, olhando para o peito.
