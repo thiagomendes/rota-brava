@@ -24,12 +24,27 @@ from char_anim import blink_curve, lerp, put_foot, reach, smooth, torso
 from char_lib import eul
 
 FPS = ha.FPS
+# v2.3: elevacao (graus acima da horizontal) dos bracos em V no alongamento do idle, no punho da team_pose e no celebrate
+IDLE_V_DEG = 42.0
+TEAM_UP_DEG = 58.0
+CELEB_V_DEG = 48.0
+WAVE_DEG = 32.0
 
 
 def on_toes(R, lift_deg, dxs=(0.0, 0.0), lift=(0.0, 0.0)):
     """Pes plantados pela bola do pe (nao patinam); o calcanhar sobe `lift_deg` graus."""
     for s, dx, lf in (("R", dxs[0], lift[0]), ("L", dxs[1], lift[1])):
         put_foot(R, s, R.rest_head["heel." + s].y, -lift_deg, "ball", lift=lf, dx=dx, pole=((0.05 if s == "R" else -0.05), 1.0, 0.0))
+
+
+def v_target(R, F, s, elev_deg, fwd=0.07, frac=0.92, dx=0.0, dz=0.0):
+    """v2.3: alvo da ponta da mao num V aberto acima do ombro, a `frac` do alcance do braco (braco mais curto que na v2.1:
+    o alvo segue o comprimento real do rig em vez de coordenadas fixas)."""
+    sx = 1 if s == "R" else -1
+    L = R.length("upper_arm." + s) + R.length("forearm." + s) + R.length("hand." + s)
+    e = math.radians(elev_deg)
+    d = Vector((sx * math.cos(e), 0.0, math.sin(e)))
+    return Vector((sx * F.sh.x, 0.0, F.sh.z)) + d * (L * frac) + Vector((dx, fwd, dz))
 
 
 def pose_idle_pico(R, F, t, T):
@@ -63,9 +78,9 @@ def pose_idle_pico(R, F, t, T):
         R.evaluate()
         for s, sx in (("R", 1), ("L", -1)):
             rest = R.tip("hand." + s)
-            # V largo: ~47 graus acima da horizontal, mao a ~0,40 m do eixo (cabelo/capacete vao ate 0,26 m)
-            tgt = Vector((sx * (F.sh.x + 0.28) - 0.03 * side, 0.07, F.sh.z + 0.33 + 0.02 * sx * side))
-            reach(R, s, rest.lerp(tgt, st), Vector((0.1 * sx, 0.2, -1.0)).lerp(Vector((0.55 * sx, 0.10, 0.85)), st), pole=(sx * 0.6, -0.2, -1.0))
+            # V aberto bem acima dos ombros (v2.3: bracos mais curtos; alvo pelo alcance do rig), fora da silhueta da cabeca
+            tgt = v_target(R, F, s, IDLE_V_DEG, frac=0.97, dx=-0.02 * side, dz=0.02 * sx * side)
+            reach(R, s, rest.lerp(tgt, st), Vector((0.1 * sx, 0.2, -1.0)).lerp(Vector((0.75 * sx, 0.10, 0.75)), st), pole=(sx * 0.6, -0.2, -1.0))
     on_toes(R, 22.0 * hop + 24.0 * st)
     happy = smooth(t, 3.12, 3.22) * (1 - smooth(t, 3.58, 3.68))     # > 0 so de 3,12 a 3,68 s (0,56 s)
     blink = max(blink_curve(t, 0.85), blink_curve(t, 2.70))
@@ -93,7 +108,7 @@ def pose_team_pico(R, F, t, T):
     R.evaluate()
     rr, rl = R.tip("hand.R"), R.tip("hand.L")
     # punho ao alto e PARA FORA (ao lado do capacete, nunca por cima/atras dele): legivel de frente na camera baixa
-    up = Vector((F.sh.x + 0.24, 0.09, F.sh.z + 0.38))
+    up = v_target(R, F, "R", TEAM_UP_DEG, fwd=0.09, frac=0.94)
     R.rel("shoulder.R", eul(y=-26.0 * fist))
     mid = Vector((F.sh.x + 0.16, 0.16, F.sh.z + 0.02))
     tr = rr.lerp(mid, smooth(t, 0.20, 0.55) * (1 - fist)).lerp(up, fist)
@@ -126,7 +141,7 @@ def pose_celebrate_pico(R, F, t, T):
     R.evaluate()
     for s, sx in (("R", 1), ("L", -1)):
         rest = R.tip("hand." + s)
-        tgt = Vector((sx * (F.sh.x + 0.28), 0.07, F.sh.z + 0.28 + 0.04 * air))
+        tgt = v_target(R, F, s, CELEB_V_DEG, dz=0.04 * air)
         reach(R, s, rest.lerp(tgt, arms), Vector((0.1 * sx, 0.2, -1.0)).lerp(Vector((0.45 * sx, 0.1, 0.9)), arms), pole=(sx * 0.6, -0.2, -1.0))
     for s in ("R", "L"):
         put_foot(R, s, R.rest_head["heel." + s].y, -25.0 * air if air > 0.02 else 0.0, "ball" if air > 0.02 else "heel",
@@ -140,7 +155,17 @@ def pose_celebrate_pico(R, F, t, T):
 
 def pose_wave_pico(R, F, t, T):
     """Aceno do conjunto antigo com o rosto da regra v2.2: olhos abertos; sorriso de olhos fechados so num pulso < 0,6 s."""
-    f = ha.pose_wave(R, F, t, T)
+    # v2.3: copia do ha.pose_wave com o alvo pelo alcance do rig (braco mais curto) e a luva inclinada para fora da cabeca
+    a = smooth(t, 0.1, 0.35) * (1 - smooth(t, 1.3, 1.6))
+    ph = 2 * math.pi * t * 2.5
+    R.hips_off = Vector((0, 0, -0.010))
+    torso(R, lean=2.0, roll=3 * a, head_roll=8 * a * math.sin(ph * 0.5), head_pitch=4 * a)
+    ha.arms_down(R, F, bend=14, out=6)
+    R.evaluate()
+    rest = R.tip("hand.R")
+    tgt = v_target(R, F, "R", WAVE_DEG, fwd=0.06, dx=0.03 * math.sin(ph))
+    reach(R, "R", rest.lerp(tgt, a), Vector((0.1, 0.2, -1.0)).lerp(Vector((0.55 + 0.35 * math.sin(ph), 0.15, 1.0)), a), pole=(1.0, -0.6, -0.4))
+    ha.stand_feet(R)
     happy = smooth(t, 0.55, 0.65) * (1 - smooth(t, 1.00, 1.10))      # 0,55 a 1,10 s
     return ha.face(alegre=happy, atenta=0.3 * smooth(t, 0.1, 0.35) * (1 - smooth(t, 1.3, 1.6)) * (1 - happy),
                    blink=blink_curve(t, 1.30))

@@ -1360,7 +1360,7 @@
         "script": "source_art/characters/pico_v2/build_pico_v2.py",
         "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless) + Cycles CPU para assar mapas",
         "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, PBR metallic-roughness, KHR_materials_clearcoat, JPEG embutido",
-        "tecnicas": "corpo inteirico por SKIN+SUBSURF com gomos acolchoados, articulacoes e bolso deslocados em numpy; capacete parametrico + Solidify; metaballs e mechas por tubos achatados em tres camadas (cabelo); shape keys fist_R/fist_L nas luvas (punho); corda por laco em raycast no corpo; torno, toros, tubos e prismas (equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (ripstop, lona, pespontos, helice da corda, sardas); normal map assada por Bump; FK/IK em Python"
+        "tecnicas": "corpo inteirico por SKIN+SUBSURF com gomos acolchoados, articulacoes e bolso deslocados em numpy; capacete parametrico + Solidify; metaballs e mechas por tubos achatados em tres camadas (cabelo); shape keys fist_R/fist_L nas luvas (punho); v2.3: comprimento dos bracos e escala da luva pela media medida de Leme v2.2 e Rastro v2.1 (pv2_proporcao.py); corda por laco em raycast no corpo; torno, toros, tubos e prismas (equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (ripstop, lona, pespontos, helice da corda, sardas); normal map assada por Bump; FK/IK em Python"
       },
       "origem": [
         "source_art/characters/pico_v2/build_pico_v2.py",
@@ -1371,6 +1371,7 @@
         "source_art/characters/pico_v2/render_pico_v2.py",
         "source_art/characters/pico_v2/pv2_check.py",
         "source_art/characters/pico_v2/render_pico_leitura.py",
+        "source_art/characters/pico_v2/pv2_proporcao.py",
         "source_art/characters/pico_v2/PROVENANCE.md",
         "source_art/characters/pico_v2/pico_v2.blend",
         "source_art/scripts/hero_lib.py",
@@ -1381,8 +1382,8 @@
         "source_art/scripts/rbart.py"
       ],
       "saida_glb": "game/assets/models/characters/pico_v2.glb",
-      "glb_sha256": "9acf6768f335e9c8a2c83a8340163cef15391bd5e7f1cdf6afb521a02effafdd",
-      "glb_bytes": 6994508,
+      "glb_sha256": "4b95247bfed88bfcb5a7ade7e52dc79e509418419fa4ef86339c0132cca1f0ae",
+      "glb_bytes": 6820760,
       "triangulos": 24944,
       "materiais": [
         "mat_pico_v2_face_dark",

@@ -7,8 +7,8 @@
       "quadros": 37,
       "media_m": 0.0469,
       "mao_acima_do_capacete_max_m": {
-        "R": -0.1839,
-        "L": -0.1839
+        "R": -0.2297,
+        "L": -0.2297
       },
       "luva_sobre_cabeca_de_frente": {
         "R": {
@@ -31,8 +31,8 @@
       "quadros": 121,
       "media_m": 0.0469,
       "mao_acima_do_capacete_max_m": {
-        "R": -0.1389,
-        "L": -0.1634
+        "R": -0.2478,
+        "L": -0.2717
       },
       "luva_sobre_cabeca_de_frente": {
         "R": {
@@ -131,16 +131,16 @@
       "quadros": 46,
       "media_m": 0.0949,
       "mao_acima_do_capacete_max_m": {
-        "R": -0.118,
-        "L": -0.4536
+        "R": -0.2213,
+        "L": -0.456
       },
       "luva_sobre_cabeca_de_frente": {
         "R": {
-          "max_fracao": 0.012,
+          "max_fracao": 0.015,
           "quadros_com_sobreposicao": 5
         },
         "L": {
-          "max_fracao": 0.003,
+          "max_fracao": 0.006,
           "quadros_com_sobreposicao": 2
         }
       },

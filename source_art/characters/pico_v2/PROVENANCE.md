@@ -36,7 +36,7 @@ mãos de 4 dedos, olhos com dois brilhos), com traje, silhueta, cabelo e acessó
 | Luvas, botas, joelheiras | SKIN + SUBSURF, achatamento da palma em numpy; sola ajustada ao contorno medido da própria bota; elipsoides |
 | Corda, mosquetões, saco de magnésio, cinto, emblema | laço por raycast no próprio corpo (v2.1: envelope = média curta nunca abaixo do corpo, encosta nas costas sem atravessar; folga medida em `pico_v2.info.json`, `rope_gap`) e tubos fechados; mosquetão em D por tubo; torno, toros e prismas em bmesh |
 | Cabeça, rosto (olhos com dois brilhos, pálpebras, sobrancelhas, boca, visemas, olhar), esqueleto de 28 ossos | reuso de `source_art/scripts/hero_lib.py` e `hero_face.py` (os mesmos do Pico atual) |
-| Animações (11 clipes, mesmos nomes do `pico.glb`) | `source_art/scripts/hero_anim.py` + `pv2_anim.py` (`idle` novo: quica na ponta dos pés e alonga; `team_pose` nova: pulinho para a base aberta, dois puxões na corda, braço ao alto com punho fechado; `celebrate` com os dois punhos), FK/IK em Python. v2.1: braços mais longos (pulso 8,8 cm mais baixo no repouso) para a mão passar do topo do capacete |
+| Animações (11 clipes, mesmos nomes do `pico.glb`) | `source_art/scripts/hero_anim.py` + `pv2_anim.py` (`idle` novo: quica na ponta dos pés e alonga; `team_pose` nova: pulinho para a base aberta, dois puxões na corda, braço ao alto com punho fechado; `celebrate` com os dois punhos), FK/IK em Python. v2.1 alongou os braços (pulso 8,8 cm mais baixo); a **v2.3 desfez isso** (comprimento na média do trio, ver abaixo) |
 | Texturas (cor, normal, ORM) | assadas no Cycles a partir da própria malha (posição, normal, parte, AO) e pintadas em numpy por fórmula (`pv2_tex.py`). Nenhuma imagem de terceiros |
 
 Nenhum modelo, malha, textura, HDRI ou personagem-base baixado ou importado. Paleta da bíblia de estilo (`docs/style-bible.md` §3).
@@ -61,9 +61,33 @@ fechados. Correção só em `pv2_anim.py` (malha, texturas, rig e nomes de clipe
   Folga mínima entre as botas **4,69 cm** em todos os quadros dos 11 clipes; pés plantados (deslize 0,0 mm/quadro).
 - `render_pico_leitura.py`: prancha de frente na distância da câmera baixa da vitrine (herói a 4,1 m, ~265 px de altura).
 
+## v2.3 · comprimento dos braços (2026-11-25)
+Thiago comparou o trio de frente: as mãos do Pico desciam até o meio da coxa, as da Leme e do Rastro param no quadril/cinto
+(herança da v2.1, que alongou os braços para a luva passar do capacete). Medido por `pv2_proporcao.py` nos GLBs (malha
+avaliada, rest pose do rig; quadril = cabeça do osso `thigh`; frações da altura total H):
+
+| em repouso (/H) | pulso | ponta dos dedos | dedos − quadril | braço (ombro→pulso) | mão (pulso→ponta) |
+|---|---|---|---|---|---|
+| Pico v2.2 (antes) | 0,278 | 0,147 | −0,180 | 0,288 | 0,133 |
+| Leme v2.2 | 0,384 | 0,282 | −0,058 | 0,198 | 0,104 |
+| Rastro v2.1 | 0,373 | 0,243 | −0,097 | 0,212 | 0,133 |
+| média Leme/Rastro | 0,378 | 0,263 | −0,077 | 0,205 | 0,119 |
+| **Pico v2.3** | **0,378** | **0,261** | **−0,067** | **0,195** | **0,119** |
+
+- `pv2_body.ARM_DROP` 0,088 → **−0,019** (pulso 10,7 cm mais alto que na v2.2) e luva `hand` 1,36 → **1,22**. Largura das
+  mangas não mudou (não era o foco; com o braço mais curto a manga acolchoada lê proporcional na prancha).
+- Animação: os alvos dos braços erguidos passam a seguir o alcance real do rig (`pv2_anim.v_target`), em V aberto acima
+  dos ombros: alongamento do `idle` a 42° (a 55° a luva caía sobre o cabelo de frente: 23–36% em 19 quadros, recusado),
+  punho da `team_pose` a 58°, `celebrate` a 48°; o `wave` ganhou cópia própria com alvo a 32° (o alvo fixo do
+  `hero_anim` levava a luva sobre a cabeça: 17,9% em 5 quadros). A mão não passa mais do capacete (por pedido).
+- Leitura de frente (`pico_v2.check.json`): luva sobre a silhueta da cabeça 0% em `idle`, `celebrate`, `wave`, `jump`;
+  `team_pose` 1,5% em 5 quadros (transição do braço, igual à v2.2). Olhos fechados iguais à v2.2. Folga mínima entre as
+  botas **4,69 cm** em todos os quadros dos 11 clipes. 24.944 triângulos, 28 ossos, `fist_R`/`fist_L`, GLB 6,82 MB.
+- No quadro 0 do `idle` (cotovelo dobrado 24°) a ponta dos dedos fica 3,4% de H acima da média dos outros dois (pulso +1,9%).
+
 ## Arquivos
 - Fonte: `build_pico_v2.py` (entrada), `pv2_body.py`, `pv2_tex.py`, `pv2_anim.py`, `pv2_render.py`, `render_pico_v2.py`,
-  `pv2_check.py` (medições dos pés e da leitura de frente), `render_pico_leitura.py` (prancha de leitura); `pico_v2.blend` (texturas empacotadas); `pico_v2.info.json` (medidas);
+  `pv2_check.py` (medições dos pés e da leitura de frente), `render_pico_leitura.py` (prancha de leitura), `pv2_proporcao.py` (proporção dos braços do trio); `pico_v2.blend` (texturas empacotadas); `pico_v2.info.json` (medidas);
   `pico_v2.check.json` (folga entre as botas por clipe/quadro, deriva e deslize dos pés).
 - Saída: `game/assets/models/characters/pico_v2.glb` (glTF 2.0 binário, metros, +Y para cima, PBR metallic-roughness,
   `KHR_materials_clearcoat`, texturas JPEG embutidas).
