@@ -1,0 +1,13 @@
+{
+  "mission.sample.arrival.title": "Chegada",
+  "mission.sample.arrival.hint_gesture": "Olhe o barco.",
+  "mission.sample.arrival.hint_spoken": "Rastro, olhe o barco amarelo no cais.",
+  "mission.sample.clothesline.title": "Varal levado pelo vento",
+  "mission.sample.clothesline.obs_fall": "Opa! Vamos subir de novo, devagar.",
+  "mission.sample.clothesline.hint_gesture": "Lá em cima!",
+  "mission.sample.clothesline.hint_spoken": "Pico, suba no galpão e solte as roupas presas.",
+  "mission.sample.clothesline.hint_gesture_find": "Pegadinha molhada!",
+  "mission.sample.clothesline.hint_spoken_find": "Rastro, siga a pegadinha molhada até os juncos.",
+  "mission.sample.clothesline.hint_gesture_hang": "No varal!",
+  "mission.sample.clothesline.hint_spoken_hang": "Equipe, pendurem as três roupas no varal."
+}

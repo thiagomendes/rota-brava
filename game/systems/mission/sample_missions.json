@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "episode": "sample",
+  "_note": "Exemplo do formato (RB-R1 E2), usado pelos testes. As missoes do Ep01 v3 entram na E4.",
+  "missions": [
+    {
+      "id": "clothesline",
+      "order": 2,
+      "title_key": "mission.sample.clothesline.title",
+      "heroes": ["climber", "tracker"],
+      "emblems": ["emb_shed_roof", "emb_reeds"],
+      "steps": [
+        {"id": "free_pieces", "icon": "climb", "hero": "climber", "event": "piece_freed", "count": 2, "target": "shed_roof",
+         "safe_point": "shed_base", "obs_key": "mission.sample.clothesline.obs_fall",
+         "hint_gesture_key": "mission.sample.clothesline.hint_gesture", "hint_spoken_key": "mission.sample.clothesline.hint_spoken"},
+        {"id": "find_third", "icon": "footprint", "hero": "tracker", "event": "piece_found", "count": 1, "target": "reeds",
+         "hint_gesture_key": "mission.sample.clothesline.hint_gesture_find", "hint_spoken_key": "mission.sample.clothesline.hint_spoken_find"},
+        {"id": "hang", "icon": "hand", "hero": "", "event": "piece_hung", "count": 3, "target": "clothesline",
+         "hint_gesture_key": "mission.sample.clothesline.hint_gesture_hang", "hint_spoken_key": "mission.sample.clothesline.hint_spoken_hang"}
+      ]
+    },
+    {
+      "id": "arrival",
+      "order": 1,
+      "title_key": "mission.sample.arrival.title",
+      "heroes": ["tracker"],
+      "emblems": [],
+      "steps": [
+        {"id": "look_boat", "icon": "eye", "hero": "tracker", "event": "boat_seen", "count": 1, "target": "boat",
+         "hint_gesture_key": "mission.sample.arrival.hint_gesture", "hint_spoken_key": "mission.sample.arrival.hint_spoken"}
+      ]
+    }
+  ]
+}
