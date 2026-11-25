@@ -25,6 +25,8 @@ Frase de teste "O barco chegou sem o capitão!", voz Leda, `gemini-3.8-flash-tts
 
 Leitura das medidas: no `prefix` a duração triplica e a F0 não muda, o que indica que a instrução foi falada (o teste do lead, 7,55 s, é o mesmo caso; o retorno do 3.8 já vem como WAV com cabeçalho, `audio/wav`, e o script grava como está). No `notes` a duração é a do texto puro e a F0 sobe ~6 semitons: a instrução agiu e não foi lida. **Não verificado por transcrição** (não há reconhecedor local; o modelo Whisper/Piper não baixa daqui, Hugging Face bloqueado). `samples.py` marca `suspeita_instrucao_lida` quando a duração passa de 2,2× a estimada.
 
+Mesmo no `notes`, a primeira rodada de amostras teve 7 de 36 falas com duração de 9 a 35 s (instrução provavelmente lida), marcadas pela checagem de duração. Elas foram refeitas apagando a entrada do cache, e na nova tentativa todas ficaram na duração esperada (uma precisou de 2 tentativas). Na produção, a checagem e a refação devem ser automáticas (pendente).
+
 ## Elenco (`tools/voice/cast.json`)
 
 Modelo: `gemini-3.8-flash-tts`. Rótulos de timbre são os de uma palavra que o Google dá a cada voz, de memória (página oficial inacessível daqui: **não verificado**); o gênero de cada voz também não foi verificado. Evitadas: Zephyr (padrão do AI Studio), Kore e Puck (as dos exemplos oficiais).
