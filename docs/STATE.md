@@ -15,7 +15,8 @@
 - **Visualizador 3D:** https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (GLB em base64 `.glb.txt`).
 - **Heróis v2 ainda não substituem os do jogo** (só na vitrine `game/lookdev/`). Decidir a troca na fase do mundo.
 - **Dívidas:** `.blend` 17–22 MB com texturas embutidas (`img.pack()`); tris dos v2 a < 3% de 25k; teste de ducking intermitente; branches `wip/rb-r1-*-acabamento` a apagar pelo GitHub (o proxy recusou).
-- **Próximo:** proposta de mundo como vitrine (densidade para câmera baixa, mais conteúdo de missão para ≥ 8 min), depois som. Agentes `art3d`/`ux` em medium.
+- **Mundo v2 pronto para aprovação (2026-11-25):** W1 vitrine `feature/rb-r1-mundo-v2` (`7e56ad3`, `game/lookdev/world_v2/world_v2.tscn`, suíte do autor 2749 PASS, pior vista 876 draw calls) e W2 proposta `feature/rb-r1-missoes-v2` (`1864dab`, `docs/proposals/ep01_missoes_v2.md`, ~620 s estimados). Página: https://claude.ai/artifact/6WpRQzYXY2hW74LxMiPVww. Aguarda Thiago.
+- **Antes:** proposta de mundo como vitrine (densidade para câmera baixa, mais conteúdo de missão para ≥ 8 min), depois som. Agentes `art3d`/`ux` em medium.
 
 ## 1. Onde estamos
 - **Ticket ativo:** `RB-R1 · Reorientação de qualidade (premium)`. Origem: Thiago reprovou arte/som/UI do RB-04 (“personagens nada infantis, gráfico ruim, som primitivo, mapa sem tamanho/densidade”).
