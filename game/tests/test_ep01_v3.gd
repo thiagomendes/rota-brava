@@ -17,6 +17,9 @@ func run(runner) -> void:
 	await _boat_scene()
 	await _walkthrough()
 	await _resume_from_save()
+	await _resume_from_menu()
+	await _help_tiers()
+	await _market_wrong_stall()
 
 
 func _new_main() -> Ep01V3Main:
@@ -78,28 +81,50 @@ func _walkthrough() -> void:
 
 	var started: Array[StringName] = []
 	main.mission_started.connect(func(id: StringName) -> void: started.append(id))
-	var bot := Ep01V3Bot.new()
-	bot.main = main
-	main.add_child(bot)
-	var result := {"done": false, "ok": false}
-	bot.finished.connect(func(ok: bool) -> void:
-		result["done"] = true
-		result["ok"] = ok)
-	Engine.time_scale = TIME_SCALE
-	var frames := 0
-	while not result["done"] and frames < MAX_FRAMES:
-		await r.tree.process_frame
-		frames += 1
-	Engine.time_scale = 1.0
+	var switches: Array[StringName] = []
+	for m in main.missions:
+		m.hero_switch_requested.connect(func(_mid: StringName, hero: StringName, _i: StringName) -> void: switches.append(hero))
+	var bot := await _run_bot(main, &"")
 	var done_ids: Array[StringName] = []
+	var prev := 0.0
+	var times: Array[String] = []
 	for h: Dictionary in bot.history:
 		done_ids.append(h["id"] as StringName)
-	r.check(bool(result["ok"]), "v3: bot terminou M0->M8 com entrada real (%s; %.1f s de jogo) %s" % [
+		times.append("%s %.1f s" % [h["id"], float(h["t"]) - prev])
+		prev = float(h["t"])
+	print("[RB] v3 tempos do bot (jogo): ", ", ".join(times))
+	r.check(bot.done and bot.fail_reason == "", "v3: bot terminou M0->M8 com entrada real (%s; %.1f s de jogo) %s" % [
 		bot.fail_reason, bot.elapsed, str(done_ids)])
 	r.check(done_ids == ORDER, "v3: missoes concluidas em ordem M0..M8")
 	r.check(main.complete and main.hud.complete_open, "v3: episodio concluido e tela de conclusao aberta")
 	r.check(main.world.festival, "v3: vila em noite de festa no fim")
+	# E4: M1-M4 com mecanica real (pontos de acao, saltos do Pico, carrinho), troca contextual e emblemas.
+	r.check(switches.has(&"climber") and switches.has(&"tracker") and switches.has(&"pilot"),
+		"v3 E4: troca de heroi pedida para Pico, Rastro e Leme (%s)" % str(switches))
+	r.check(bot.switches >= 4, "v3 E4: bot confirmou %d cartoes de troca" % bot.switches)
+	r.check(main.emblems_total == 5 and main.emblems_found == 5, "v3 E4: emblemas M1-M4 %d/%d" % [main.emblems_found, main.emblems_total])
+	r.check(bot.presses >= 20, "v3 E4: bot apertou interact %d vezes (acoes reais)" % bot.presses)
 	await _free(main)
+
+
+## Roda o bot ate o fim (ou ate a missao stop_at comecar) com tempo acelerado e limite de quadros. O bot devolve o tempo e
+## solta as acoes ao sair da arvore, mesmo se este teste abortar no meio.
+func _run_bot(main: Ep01V3Main, stop_at: StringName) -> Ep01V3Bot:
+	var bot := Ep01V3Bot.new()
+	bot.main = main
+	main.add_child(bot)
+	Engine.time_scale = TIME_SCALE
+	var frames := 0
+	while not bot.done and frames < MAX_FRAMES:
+		await r.tree.process_frame
+		frames += 1
+		if stop_at != &"" and main.current != null and main.current.id == stop_at:
+			break
+	Engine.time_scale = 1.0
+	Ep01V3Bot.release_all()
+	if not bot.done and stop_at == &"":
+		bot.fail_reason = "limite de %d quadros" % MAX_FRAMES
+	return bot
 
 
 func _hero_fraction(cam: Camera3D, hero: Node3D) -> float:
@@ -119,7 +144,8 @@ func _resume_from_save() -> void:
 	# Completa M0 e M1 pela API da missao (o evento que o mundo dispara) e confere o salvo.
 	main.notify_mission(&"marker_reached")
 	await r.frames(2)
-	main.notify_mission(&"marker_reached")
+	for ev: StringName in [&"paw_examined", &"boot_examined", &"paw_followed", &"paw_followed", &"paw_followed", &"paw_followed"]:
+		main.current.notify(ev, &"tracker")
 	await r.frames(2)
 	r.check(main.current != null and main.current.id == &"M2", "v3 salvo: depois de 2 missoes a atual e M2")
 	await _free(main)
@@ -136,3 +162,132 @@ func _resume_from_save() -> void:
 	await _free(fresh)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	Ep01V3Main.save_path = ""
+
+
+func _send(action: StringName, pressed: bool) -> void:
+	var ev := InputEventAction.new()
+	ev.action = action
+	ev.pressed = pressed
+	Input.parse_input_event(ev)
+	await r.frames()
+
+
+func _tap(action: StringName) -> void:
+	await _send(action, true)
+	await _send(action, false)
+
+
+## Retomada pelo caminho do jogador: menu -> Jogar; o bot joga M0 e M1 de verdade; pausa -> Menu -> Jogar retoma no M2
+## com o trio onde o M1 terminou e o emblema do M1 contado.
+func _resume_from_menu() -> void:
+	var path := "user://test_ep01_v3_menu.save.json"
+	if FileAccess.file_exists(path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	Ep01V3Main.start_mission = &""
+	Ep01V3Main.save_path = path
+	var menu := (load("res://ui/main_menu.tscn") as PackedScene).instantiate()
+	r.tree.root.add_child(menu)
+	r.tree.current_scene = menu
+	await r.frames(3)
+	await _tap(&"ui_accept")
+	await r.frames(4)
+	var play := r.tree.current_scene as Ep01V3Main
+	r.check(play != null and play.current != null and play.current.id == &"M0", "v3 menu: Jogar sem salvo comeca no M0")
+	if play == null:
+		return
+	var bot := await _run_bot(play, &"M2")
+	bot.queue_free()
+	await r.frames(2)
+	r.check(play.current.id == &"M2" and FileAccess.file_exists(path), "v3 menu: depois de jogar M0 e M1 o salvo existe")
+	await _tap(&"pause")
+	await _tap(&"ui_down")
+	await _tap(&"ui_down")
+	await _tap(&"ui_accept")
+	await r.frames(4)
+	var menu2 := r.tree.current_scene as MainMenu
+	r.check(menu2 != null, "v3 menu: Menu na pausa volta ao menu")
+	if menu2 == null:
+		return
+	await _tap(&"ui_accept")
+	await r.frames(4)
+	var again := r.tree.current_scene as Ep01V3Main
+	r.check(again != null and again.current != null and again.current.id == &"M2", "v3 menu: Jogar retoma no M2")
+	if again != null:
+		var p := again.land.start_position(&"M2")
+		var t := again.actors[&"tracker"] as MemberActor
+		r.check(Vector2(t.global_position.x - p.x, t.global_position.z - p.z).length() < 0.5,
+			"v3 menu: trio retoma onde o M1 terminou")
+		r.check(again.missions[1].is_completed() and again.emblems_found == 1, "v3 menu: M1 concluida e emblema do M1 contado (%d)" % again.emblems_found)
+		await _free(again)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	Ep01V3Main.save_path = ""
+
+
+## Ajuda em 3 degraus no fluxo v3: gesto (pulso no alvo), radio do Farol 7 (chave do passo) e seta no alvo; progresso
+## apaga a seta. Tempo simulado pelo MissionHelp (sem esperar 35 s).
+func _help_tiers() -> void:
+	Ep01V3Main.start_mission = &"M2"
+	Ep01V3Main.save_path = ""
+	var main := await _new_main()
+	await r.frames(3)
+	if main.hud.handoff_open:
+		await _tap(&"interact")
+		await r.frames(3)
+	var said: Array[String] = []
+	main.hud.line_started.connect(func(k: String) -> void: said.append(k))
+	var tiers: Array[int] = []
+	main.help.gesture_hint.connect(func(_t: StringName, _k: StringName) -> void: tiers.append(1))
+	main.help.radio_hint.connect(func(_k: StringName) -> void: tiers.append(2))
+	main.help.pointer_hint.connect(func(_t: StringName, _m: bool) -> void: tiers.append(3))
+	main.help.tick(10.5)
+	main.help.tick(10.0)
+	main.help.tick(15.0)
+	await r.frames(3)
+	r.check(tiers == [1, 2, 3], "v3 ajuda: 3 degraus em ordem %s" % str(tiers))
+	r.check(said.has("ep01.radio.v3_m2.free_pieces"), "v3 ajuda: Farol 7 fala a dica do passo %s" % str(said))
+	var t := main.help_target()
+	r.check(main.arrow.visible and t != null and Vector2(main.arrow.global_position.x - t.global_position.x,
+		main.arrow.global_position.z - t.global_position.z).length() < 0.05, "v3 ajuda: seta sobre o alvo do passo")
+	await _tap(&"help")
+	r.check(main.help.tier == 3, "v3 ajuda: botao de ajuda no ultimo degrau nao quebra")
+	main.current.notify(&"piece_freed", &"climber")
+	await r.frames(2)
+	r.check(not main.arrow.visible and main.help.tier == 0, "v3 ajuda: progresso apaga a seta e zera a ajuda")
+	# Entrega errada no mercado: sem castigo (carga fica, nada volta).
+	await _free(main)
+	Ep01V3Main.start_mission = &""
+
+
+## Mercado: entrega na barraca errada nao castiga (carga fica, progresso igual) e mostra a barraca certa (seta);
+## a caixa estatica do carrinho gerado fica desligada so durante o M4.
+func _market_wrong_stall() -> void:
+	Ep01V3Main.start_mission = &"M4"
+	Ep01V3Main.save_path = ""
+	var main := await _new_main()
+	var shape := main.world.get_node_or_null(Ep01V3Land.CART_STATIC_SHAPE) as CollisionShape3D
+	r.check(shape != null and shape.disabled, "v3 M4: caixa estatica do carrinho desligada durante o M4")
+	r.check(main.land.cart != null and main.land.cart.global_position.distance_to(Vector3(-18.6, 0, 0.8)) < 0.05,
+		"v3 M4: carrinho dirigivel no lugar do carrinho do mundo")
+	main.current.notify(&"icons_read", &"tracker")
+	await r.frames(3)
+	r.check(main.hud.handoff_open, "v3 M4: entregar pede a Leme (cartao de troca)")
+	await r.tree.create_timer(0.6).timeout
+	await _tap(&"interact")
+	await r.tree.create_timer(1.5).timeout
+	r.check(main.active_member == &"pilot", "v3 M4: Leme em controle depois do cartao")
+	main.land._on_spot(&"take_cart", main.actors[&"pilot"])
+	var before := main.current.step_progress
+	main.land._on_spot(&"deliver_M4_Stall_Lemon", main.actors[&"pilot"])
+	await r.frames(2)
+	r.check(main.current.step_progress == before and main.land.cargo_stall() == &"M4_Stall_Apple",
+		"v3 M4: barraca errada nao conta e a carga fica no carrinho")
+	r.check(main.arrow.visible, "v3 M4: barraca errada mostra a seta na barraca certa")
+	main.land._on_spot(&"deliver_M4_Stall_Apple", main.actors[&"pilot"])
+	await r.frames(2)
+	r.check(main.current.step_progress == before + 1 and main.land.cargo_stall() == &"M4_Stall_Lemon",
+		"v3 M4: barraca certa conta e passa para a proxima carga")
+	main.land.build(&"M5")
+	await r.frames(2)
+	r.check(shape != null and not shape.disabled, "v3 M4: fora do M4 a caixa estatica do carrinho volta")
+	await _free(main)
+	Ep01V3Main.start_mission = &""

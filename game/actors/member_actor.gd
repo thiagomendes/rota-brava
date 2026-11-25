@@ -37,6 +37,8 @@ var controlled: bool = false
 ## Giro (rad, em Y) da camera; define o que significa "para cima" na entrada.
 var move_yaw: float = 0.0
 var speed_scale: float = 1.0
+## Fora de controle: direcao no mundo (0..1) para acompanhar o heroi em controle (Ep01 v3); ignorada quando controlado.
+var auto_dir: Vector3 = Vector3.ZERO
 var model: CharacterVisual
 var riding_on: Node3D = null
 var _action_until: float = 0.0
@@ -176,6 +178,9 @@ func _physics_process(delta: float) -> void:
 	if controlled:
 		dir = Input.get_vector(&"move_left", &"move_right", &"move_up", &"move_down")
 	var world := Basis(Vector3.UP, move_yaw) * Vector3(dir.x, 0.0, dir.y)
+	if not controlled and auto_dir.length() > 0.01:
+		world = Vector3(auto_dir.x, 0.0, auto_dir.z)
+		dir = Vector2(world.x, world.z)
 	var want := Vector3.ZERO
 	if world.length() > 0.01:
 		want = world.normalized() * target_speed(dir.length()) * speed_scale

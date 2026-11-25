@@ -79,6 +79,8 @@ func _focus(node: Node) -> Control:
 
 func run(runner) -> void:
 	r = runner
+	# Nao le nem grava o salvo real do jogador (user://missions.save.json) durante a suite.
+	Ep01V3Main.save_path = ""
 	for action: StringName in KEYS:
 		for key: Key in KEYS[action]:
 			r.check(_has_key(action, key), "'%s' tem a tecla %s" % [action, OS.get_keycode_string(key)])
