@@ -46,6 +46,8 @@ Objetivo observável: Thiago abre na Godot (Windows) uma vitrine do mundo refina
 - **D15 · Missões variadas na vila (Thiago, 2026-11-25):** a proposta W2 está focada demais em barco/navegação. Como Patrulha Canina e PJ Masks, as missões devem ser diversas e concentradas num lugar (a vila e arredores). Escolha de Thiago: refazer o Ep01 com várias missões curtas e diferentes dentro da vila; o barco vira só uma parte; rio e ilha ficam menores.
 - **W3 · Proposta v3 de missões (`adventure`):** refazer `docs/proposals/ep01_missoes_v2.md` como v3 segundo D15.
 - **W4 · Vila v2.1 e barco v2 (`art3d`):** corrigir os fracos da W1 (barco chapado, janelas sem interior, vitrines, calçamento carregado, sacos, bote virado) e refazer o barco no acabamento D11.
+- **D16 · Trajes menos náuticos (Thiago, 2026-11-25, "segue sim"):** só a Leme estava presa ao mar. Leme deixa de ser capitã de barco e vira **pilota e navegadora da equipe** (conduz barco, carrinho, kart, balão, drone; bússola e mapas): traje de pilota com faixas refletivas, luvas, capacete ou boné de pilota; mantém rosto, cachos, pele, azul e branco, bússola de pulso, jeito calmo. **Equipamento por missão** (estilo mochilas da Patrulha Canina): traje base neutro + acessório da missão; agora só o colete salva-vidas da Leme vira acessório separado (missão de barco). Rastro e Pico ficam como estão. Marca (Farol 7, bússola) continua como lugar, não nicho.
+- **W5 · Leme pilota (`art3d`):** refazer o traje da Leme v2 segundo D16, colete como acessório ligável.
 - Fora de escopo agora: trocar heróis/mundo do episódio, som.
 
 ## Barra de qualidade (mensurável e perceptual)
