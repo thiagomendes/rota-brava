@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://assets/models/props_v3/gull.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/gull.glb" id="2_glb"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/fish.tscn" id="3_fish"]
+
+[node name="Pv3Gull" type="Node3D"]
+script = ExtResource("1_script")
+autoplay_anim = &"perch_idle"
+metadata/piece_id = "gull"
+metadata/mission = "M5"
+metadata/interactive = true
+metadata/interaction = "chase"
+metadata/member = ""
+metadata/note = "gaivota: pousa, foge e voa; leva o peixe no bico"
+metadata/tris = 4128
+metadata/tris_budget = 6000
+metadata/pivot = "entre os pes, no chao; frente = +Z"
+metadata/provisional = false
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/props_v3/build_props_v3.py"
+
+[node name="Model" parent="." instance=ExtResource("2_glb")]
+
+[node name="BeakSocket" type="BoneAttachment3D" parent="Model/gull_rig/Skeleton3D"]
+bone_name = "head"
+bone_idx = 2
+
+[node name="FishHold" type="Marker3D" parent="Model/gull_rig/Skeleton3D/BeakSocket"]
+
+[node name="Fish" parent="Model/gull_rig/Skeleton3D/BeakSocket/FishHold" instance=ExtResource("3_fish")]
+
+[editable path="Model"]

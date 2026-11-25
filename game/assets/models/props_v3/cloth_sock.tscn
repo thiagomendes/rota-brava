@@ -1,0 +1,69 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://assets/models/props_v3/props_v3_piece.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/cloth_sock.glb" id="2_glb"]
+
+[sub_resource type="Animation" id="Animation_sway"]
+resource_name = "sway"
+length = 2.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Cloth:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.11869, 0, 0.03449), Vector3(0.11446, 0, 0.0224), Vector3(0.08759, 0, -0.01209), Vector3(0.0453, 0, -0.03449), Vector3(-0.0011, 0, -0.0224), Vector3(-0.03916, 0, 0.01209), Vector3(-0.05869, 0, 0.03449), Vector3(-0.05446, 0, 0.0224), Vector3(-0.02759, 0, -0.01209), Vector3(0.0147, 0, -0.03449), Vector3(0.0611, 0, -0.0224), Vector3(0.09916, 0, 0.01209), Vector3(0.11869, 0, 0.03449)]
+}
+
+[sub_resource type="Animation" id="Animation_shake"]
+resource_name = "shake"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Cloth:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.32, 0.45, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0.35, 0, 0.12), Vector3(-0.25, 0, -0.1), Vector3(0.18, 0, 0.06), Vector3(-0.08, 0, -0.03), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_pv3"]
+_data = {
+&"sway": SubResource("Animation_sway"),
+&"shake": SubResource("Animation_shake")
+}
+
+[node name="Pv3ClothSock" type="Node3D"]
+script = ExtResource("1_script")
+autoplay_anim = &"sway"
+metadata/piece_id = "cloth_sock"
+metadata/mission = "M2"
+metadata/interactive = true
+metadata/interaction = "find_then_hang"
+metadata/member = "tracker"
+metadata/note = "meia amarela com pelo do filhote (nos juncos; a pista)"
+metadata/tris = 1300
+metadata/tris_budget = 2500
+metadata/pivot = "meio do punho, na linha do varal"
+metadata/provisional = false
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/props_v3/build_props_v3.py"
+
+[node name="Cloth" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Model" parent="Cloth" instance=ExtResource("2_glb")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_pv3")
+}

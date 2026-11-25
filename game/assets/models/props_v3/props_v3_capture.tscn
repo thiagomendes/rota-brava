@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://assets/models/props_v3/props_v3_capture.gd" id="1_cap"]
+
+[node name="PropsV3Capture" type="Node3D"]
+script = ExtResource("1_cap")
+metadata/capture_only = true

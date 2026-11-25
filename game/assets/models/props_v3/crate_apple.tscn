@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://assets/models/props_v3/props_v3_piece.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/crate_apple.glb" id="2_glb"]
+
+[node name="Pv3CrateApple" type="Node3D"]
+script = ExtResource("1_script")
+metadata/piece_id = "crate_apple"
+metadata/mission = "M4"
+metadata/interactive = true
+metadata/interaction = "carry_deliver"
+metadata/member = "pilot"
+metadata/note = "entrega na barraca vermelha (M4_Stall_Apple)"
+metadata/tris = 1404
+metadata/tris_budget = 4500
+metadata/pivot = "centro do fundo"
+metadata/provisional = false
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/props_v3/build_props_v3.py"
+metadata/stall = "M4_Stall_Apple"
+metadata/fruit = "apple"
+metadata/color = "e0412b"
+
+[node name="Model" parent="." instance=ExtResource("2_glb")]
