@@ -1,0 +1,66 @@
+{
+ "_doc": "D19: elenco. Voz base do Gemini TTS + estilo base + preset local (tools/voice/treat.py) por personagem. A direcao por fala fica em direction.json. Timbres segundo os rotulos de uma palavra que o Google da a cada voz (lembrados, NAO verificados nesta sessao: a pagina oficial nao abria pela rede); genero das vozes tambem nao verificado, conferir pela F0 medida e pelo ouvido de Thiago. Evitadas como escolha: Zephyr (padrao do AI Studio), Kore e Puck (as dos exemplos oficiais, as que todo app usa).",
+ "model": "gemini-3.8-flash-tts",
+ "style_mode": "notes",
+ "characters": {
+  "rastro": {
+   "speaker": "tracker", "preset": "rastro",
+   "voice": "Leda",
+   "candidates": {
+    "Leda": "rotulo 'Youthful': o mais jovem da lista, base natural para menina",
+    "Autonoe": "rotulo 'Bright': timbre claro, ajuda a atencao/curiosidade",
+    "Achernar": "rotulo 'Soft': macio, bom para os sussurros de descoberta",
+    "Laomedeia": "rotulo 'Upbeat': mais animada, contraste para comparar"
+   },
+   "style": "Voz de uma menina de 7 anos, curiosa e atenta, detetive da turma, fala de portugues do Brasil com sotaque neutro, sorriso na voz, nunca assustada."
+  },
+  "pico": {
+   "speaker": "climber", "preset": "pico",
+   "voice": "Fenrir",
+   "candidates": {
+    "Fenrir": "rotulo 'Excitable': energia alta, combina com o escalador agitado",
+    "Sadachbia": "rotulo 'Lively': vivo, menos estridente que Fenrir",
+    "Achird": "rotulo 'Friendly': amigavel, mais leve, para comparar"
+   },
+   "style": "Voz de um menino de 7 anos, cheio de energia e coragem, escalador da turma, fala de portugues do Brasil, empolgado e brincalhao, nunca gritando."
+  },
+  "leme": {
+   "speaker": "pilot", "preset": "leme",
+   "voice": "Pulcherrima",
+   "candidates": {
+    "Pulcherrima": "rotulo 'Forward': direta, segura, cara de quem pilota",
+    "Erinome": "rotulo 'Clear': dicao limpa, firme sem ser dura",
+    "Despina": "rotulo 'Smooth': suave, versao mais calma da pilota",
+    "Aoede": "rotulo 'Breezy': leve, para comparar o lado alegre"
+   },
+   "style": "Voz de uma menina de 8 anos, firme e confiante, pilota do barco da turma, fala de portugues do Brasil, decidida e gentil, lider sem mandar."
+  },
+  "capitao": {
+   "speaker": "captain", "preset": "capitao",
+   "voice": "Algieba",
+   "candidates": {
+    "Algieba": "rotulo 'Smooth': grave suave, tom de avo caloroso",
+    "Umbriel": "rotulo 'Easy-going': tranquilo, bem-humorado"
+   },
+   "style": "Voz de um capitao de barco adulto, uns 60 anos, caloroso e bem-humorado, fala de portugues do Brasil devagar, como um avo carinhoso."
+  },
+  "farol7": {
+   "speaker": "radio", "preset": "farol7",
+   "voice": "Iapetus",
+   "candidates": {
+    "Iapetus": "rotulo 'Clear': dicao clara, sobrevive a banda de radio",
+    "Schedar": "rotulo 'Even': constante, locutor calmo"
+   },
+   "style": "Voz de Farol 7, o radio amigo da vila, locutor gentil e claro, fala de portugues do Brasil com boa diccao, simpatico como quem conta noticias boas para criancas."
+  },
+  "amora": {
+   "speaker": "vendor", "preset": "amora",
+   "voice": "Vindemiatrix",
+   "candidates": {
+    "Vindemiatrix": "rotulo 'Gentle': gentil, de avo",
+    "Gacrux": "rotulo 'Mature': madura, feirante experiente"
+   },
+   "style": "Voz de Dona Amora, senhora feirante de uns 65 anos, doce e espirituosa, fala de portugues do Brasil, risonha mesmo quando ha bagunca."
+  }
+ }
+}

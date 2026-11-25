@@ -1,0 +1,350 @@
+{
+ "_doc": "D19: direção por fala, separada do elenco (cast.json). emotion/energy(1-3)/pace/note entram nas notas de direção do pedido ao Gemini (modo notes, não lido em voz alta); o preset local é sempre o do personagem. Público 4-8 anos: sem medo nem bronca. ep01.lighthouse.pup.horn fica fora (filhote late, sem TTS).",
+ "source": "game/episodes/ep01/v3/ep01_v3_dialogue.json",
+ "energy_text": {
+  "1": "energia baixa, voz contida",
+  "2": "energia média",
+  "3": "energia alta, vibrante"
+ },
+ "pace_text": {
+  "lento": "ritmo lento",
+  "normal": "ritmo natural",
+  "rápido": "ritmo um pouco rápido"
+ },
+ "lines": {
+  "ep01.arrival.radio.festival": {
+   "emotion": "alegria",
+   "energy": 2,
+   "pace": "normal",
+   "note": "anúncio festivo de rádio, sorriso na voz, convite"
+  },
+  "ep01.arrival.pilot.no_captain": {
+   "emotion": "surpresa",
+   "energy": 2,
+   "pace": "normal",
+   "note": "notou algo estranho; surpresa curiosa, pergunta no ar, sem susto"
+  },
+  "ep01.arrival.tracker.look_dock": {
+   "emotion": "decisão animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "toma a iniciativa, confiante e curiosa"
+  },
+  "ep01.dock.tracker.small_print": {
+   "emotion": "sussurro de descoberta",
+   "energy": 1,
+   "pace": "lento",
+   "note": "descobriu a pegada; surpresa contida, como quem conta um segredo"
+  },
+  "ep01.dock.tracker.boot_captain": {
+   "emotion": "descoberta atenta",
+   "energy": 1,
+   "pace": "normal",
+   "note": "observa e deduz, voz baixa e segura"
+  },
+  "ep01.dock.tracker.two_trails": {
+   "emotion": "surpresa que vira ideia",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "'Duas trilhas!' com brilho; a segunda frase é a ideia que se encaixa"
+  },
+  "ep01.bank.tracker.pup_village": {
+   "emotion": "chamado animado",
+   "energy": 2,
+   "pace": "rápido",
+   "note": "aponta o caminho, chama o time para seguir"
+  },
+  "ep01.bank.pilot.pup_clothes": {
+   "emotion": "surpresa divertida",
+   "energy": 2,
+   "pace": "normal",
+   "note": "'Ih!' meio rindo; travessura do filhote, nada grave"
+  },
+  "ep01.bank.tracker.call_climber": {
+   "emotion": "chamado",
+   "energy": 2,
+   "pace": "normal",
+   "note": "chama o amigo pelo nome, alegre, confiando nele"
+  },
+  "ep01.bank.climber.sock_high": {
+   "emotion": "orgulho",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "conseguiu! já pensa na próxima"
+  },
+  "ep01.bank.climber.call_tracker": {
+   "emotion": "dúvida leve",
+   "energy": 2,
+   "pace": "normal",
+   "note": "pergunta amigável, pedindo ajuda à amiga"
+  },
+  "ep01.bank.tracker.wet_paw": {
+   "emotion": "sussurro de descoberta",
+   "energy": 1,
+   "pace": "normal",
+   "note": "achou a pista, cochicho animado"
+  },
+  "ep01.bank.tracker.next_clue": {
+   "emotion": "descoberta",
+   "energy": 2,
+   "pace": "normal",
+   "note": "junta as pistas, satisfeita"
+  },
+  "ep01.bank.pilot.m2_done": {
+   "emotion": "orgulho",
+   "energy": 3,
+   "pace": "normal",
+   "note": "comemora o time, calorosa"
+  },
+  "ep01.plaza.tracker.no_water": {
+   "emotion": "preocupação leve",
+   "energy": 1,
+   "pace": "lento",
+   "note": "estranha o chafariz; intrigada, sem tristeza"
+  },
+  "ep01.plaza.tracker.dry_stream": {
+   "emotion": "decisão atenta",
+   "energy": 2,
+   "pace": "normal",
+   "note": "segue a pista com foco"
+  },
+  "ep01.plaza.tracker.ball_stuck": {
+   "emotion": "surpresa",
+   "energy": 2,
+   "pace": "rápido",
+   "note": "achou a causa; quase rindo da bola presa"
+  },
+  "ep01.plaza.tracker.call_climber": {
+   "emotion": "chamado",
+   "energy": 2,
+   "pace": "normal",
+   "note": "chama o Pico, apontando para cima"
+  },
+  "ep01.plaza.climber.top_basin": {
+   "emotion": "orgulho",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "feito, voz de quem está lá no alto"
+  },
+  "ep01.plaza.radio.water_back": {
+   "emotion": "alegria",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narra a boa notícia, sorrindo"
+  },
+  "ep01.plaza.climber.m3_done": {
+   "emotion": "alegria",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "comemoração, 'Viva!' bem aberto"
+  },
+  "ep01.market.vendor.mess": {
+   "emotion": "preocupação leve",
+   "energy": 2,
+   "pace": "normal",
+   "note": "'Ai' cômico de quem vê a bagunça; nada de bronca"
+  },
+  "ep01.market.vendor.pup_crates": {
+   "emotion": "preocupação leve",
+   "energy": 1,
+   "pace": "normal",
+   "note": "explica com carinho, achando graça do filhote"
+  },
+  "ep01.market.tracker.read_icon": {
+   "emotion": "ideia",
+   "energy": 2,
+   "pace": "normal",
+   "note": "explica a regra como quem resolve um enigma"
+  },
+  "ep01.market.tracker.call_pilot": {
+   "emotion": "chamado",
+   "energy": 2,
+   "pace": "normal",
+   "note": "passa a tarefa à Leme, confiante"
+  },
+  "ep01.market.pilot.cart_go": {
+   "emotion": "confiança",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "pilota decidida, 'Deixa comigo!'"
+  },
+  "ep01.market.vendor.wrong_stall": {
+   "emotion": "gentileza",
+   "energy": 1,
+   "pace": "lento",
+   "note": "corrige com doçura, ajudando"
+  },
+  "ep01.market.vendor.gull_hint": {
+   "emotion": "gratidão",
+   "energy": 2,
+   "pace": "normal",
+   "note": "agradece sorrindo e dá a pista"
+  },
+  "ep01.street.climber.gull_fish": {
+   "emotion": "surpresa",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "viu a gaivota, aponta empolgado"
+  },
+  "ep01.street.tracker.feathers": {
+   "emotion": "sussurro de descoberta",
+   "energy": 1,
+   "pace": "normal",
+   "note": "achou as penas, curiosa"
+  },
+  "ep01.street.tracker.call_pilot": {
+   "emotion": "dúvida e chamado",
+   "energy": 2,
+   "pace": "normal",
+   "note": "pergunta à Leme, confiando na bússola"
+  },
+  "ep01.street.pilot.compass_west": {
+   "emotion": "ideia",
+   "energy": 2,
+   "pace": "normal",
+   "note": "lê a bússola com segurança de pilota"
+  },
+  "ep01.street.pilot.call_climber": {
+   "emotion": "chamado",
+   "energy": 2,
+   "pace": "rápido",
+   "note": "pedido rápido e firme, amigável"
+  },
+  "ep01.street.climber.fish_got": {
+   "emotion": "orgulho",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "pegou o peixe, comemora ao lançar"
+  },
+  "ep01.street.climber.sees_boat": {
+   "emotion": "surpresa",
+   "energy": 2,
+   "pace": "normal",
+   "note": "vê o bote ao longe, admirado"
+  },
+  "ep01.bay.tracker.go_boat": {
+   "emotion": "chamado",
+   "energy": 2,
+   "pace": "normal",
+   "note": "decidida e carinhosa: vamos ajudar"
+  },
+  "ep01.bay.pilot.start": {
+   "emotion": "confiança",
+   "energy": 3,
+   "pace": "normal",
+   "note": "capitã a bordo, alegre e organizada"
+  },
+  "ep01.bay.pilot.slow": {
+   "emotion": "cuidado calmo",
+   "energy": 1,
+   "pace": "lento",
+   "note": "pilotando com calma, quase cochichando"
+  },
+  "ep01.bay.pilot.call_climber": {
+   "emotion": "chamado",
+   "energy": 2,
+   "pace": "rápido",
+   "note": "pede a corda, firme e gentil"
+  },
+  "ep01.bay.climber.throw_rope": {
+   "emotion": "orgulho",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "arremesso feito, vibrante"
+  },
+  "ep01.bay.captain.thanks_tow": {
+   "emotion": "gratidão",
+   "energy": 2,
+   "pace": "normal",
+   "note": "aliviado e caloroso, sorriso de avô"
+  },
+  "ep01.bay.captain.pup_lighthouse": {
+   "emotion": "surpresa",
+   "energy": 2,
+   "pace": "normal",
+   "note": "aponta o farol, admirado com o filhote aventureiro"
+  },
+  "ep01.lighthouse.pilot.lamp_off": {
+   "emotion": "preocupação leve",
+   "energy": 1,
+   "pace": "normal",
+   "note": "nota o problema e já pensa em resolver"
+  },
+  "ep01.lighthouse.tracker.lens": {
+   "emotion": "descoberta",
+   "energy": 2,
+   "pace": "normal",
+   "note": "achou a lente, animada"
+  },
+  "ep01.lighthouse.tracker.call_climber": {
+   "emotion": "chamado",
+   "energy": 2,
+   "pace": "normal",
+   "note": "chama o Pico, aponta para o alto"
+  },
+  "ep01.lighthouse.climber.pup_safe": {
+   "emotion": "alívio feliz",
+   "energy": 2,
+   "pace": "normal",
+   "note": "abraça o filhote, carinhoso"
+  },
+  "ep01.lighthouse.climber.call_pilot": {
+   "emotion": "chamado",
+   "energy": 2,
+   "pace": "rápido",
+   "note": "passa a vez à Leme, animado"
+  },
+  "ep01.lighthouse.pilot.aim": {
+   "emotion": "concentração",
+   "energy": 2,
+   "pace": "lento",
+   "note": "foco e calma, girando a luz"
+  },
+  "ep01.lighthouse.radio.lights_on": {
+   "emotion": "alegria",
+   "energy": 2,
+   "pace": "normal",
+   "note": "boa notícia no rádio, convite para a festa"
+  },
+  "ep01.festival.radio.night": {
+   "emotion": "alegria",
+   "energy": 3,
+   "pace": "normal",
+   "note": "abre a festa, festivo"
+  },
+  "ep01.festival.captain.thanks": {
+   "emotion": "gratidão",
+   "energy": 2,
+   "pace": "lento",
+   "note": "agradecimento caloroso e orgulhoso"
+  },
+  "ep01.festival.tracker.cheer": {
+   "emotion": "alegria",
+   "energy": 3,
+   "pace": "normal",
+   "note": "fecha o episódio, 'Viva!' e carinho pelo time"
+  }
+ },
+ "demo": {
+  "_doc": "mesma frase em 2 emoções, por herói, para mostrar que a direção funciona",
+  "variants": {
+   "curiosa": {
+    "emotion": "curiosidade",
+    "energy": 1,
+    "pace": "lento",
+    "note": "pensando alto, intrigada, quase cochichando"
+   },
+   "animada": {
+    "emotion": "alegria animada",
+    "energy": 3,
+    "pace": "rápido",
+    "note": "descobriu e quer contar a todos, empolgada"
+   }
+  },
+  "text": {
+   "rastro": "ep01.dock.tracker.two_trails",
+   "pico": "ep01.street.climber.sees_boat",
+   "leme": "ep01.street.pilot.compass_west"
+  }
+ }
+}
