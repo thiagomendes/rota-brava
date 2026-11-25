@@ -16,7 +16,9 @@
 - **E1 integrado** (`698d64d`, `OK (2900 PASS)`): Jogar abre `game/episodes/ep01/v3/ep01_v3_main.tscn` na vila v3, câmera baixa, barco v2, M0–M8 provisórias (chegar ao marcador), bot M0→M8 em 123,9 s.
 - **E3b integrado** (suíte `OK (2914 PASS)`): passagem praça→rua ~2 m, subida do promontório lisa, rampas `AccessRamps` (camada 5, desligadas), retratos v2 do HUD.
 - **E4 integrado** (`OK (2937 PASS)`): M1–M4 em terra com mecânicas reais, troca de herói, ajuda em 3 degraus, 5 emblemas, retomada pelo menu em `user://missions.save.json`.
-- **Próximo:** E5 (M5–M8: telhado do Pico, gaivota, barco, festa) + câmera que desvia de obstáculos + ressalvas baixas da E4; depois E6 (falas) e E7 (fechamento, Portão 2).
+- **E5 + C1 integrados** (`OK (3351 PASS)`): M5–M8 (gaivota, barco com colete, farol, festa), 10 emblemas, câmera orbital pelo mouse/alavanca e desvio de obstáculos, peças finais do props v3 pelo ponto de troca. Bot M0→M8 ~226 s; ritmo humano estimado ~11 min (acima da meta, medir na E7).
+- **Em curso:** C2 movimento (`feature/rb-r1-c2-movimento`): andar/correr com Shift, pulo, cadência, formação. Conflito de botão pular/interagir a resolver; passo curto das animações de andar/correr vai para o `art3d`.
+- **Próximo:** E6 (falas) e E7 (bot humano, capturas, build Windows, Portão 2).
 - **Páginas para Thiago:** trio 3D https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (Leme antiga), mundo v2 https://claude.ai/artifact/6WpRQzYXY2hW74LxMiPVww, novidades https://claude.ai/artifact/2WyeZqg8DNSLWegCPcCXAt.
 - **Dívidas:** `wv2_static.glb` ainda 10,6 MB e `world_v2.blend` 5,2 MB; materiais do mundo em `game/lookdev/world_v2/`; tris dos heróis no teto; cabelos de trás facetados; luz de parede estoura à noite; GPU real não medida; retratos do HUD antigos; branches `wip/*` a apagar pelo GitHub.
 
