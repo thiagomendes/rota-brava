@@ -11,10 +11,12 @@
 **Nuvem (2026-11-24):** `tools/setup-linux.sh` e `tools/test.sh` verificados no Linux: 2650 PASS em 1 min 42 s no `5f877ec`. Ambiente pessoal `rota-brava` libera `download.blender.org` (o Default bloqueava o Blender).
 
 ## 0. Agora (2026-11-25)
-- **Integrado e revisado** na `feature/rb-r1-reorientacao`: trio v2 final (Rastro v2.1, Pico v2.3, Leme pilota com colete amarelo `Acc_LifeVest`), vitrine vila v2.1 + barco v2 (`game/lookdev/world_v2/`), propostas de missões v2/v3. Jogo ainda usa os modelos e o porto antigos.
-- **Plano do Ep01 v3 (E1–E7)** no ticket, aguardando Thiago aprovar a história/7 missões e adiar vozes para a fase de som.
+- **Ep01 v3 aprovado (D18):** história e 7 missões na vila; som/vozes novas ficam para depois. Plano E1–E7 no ticket.
+- **Integrado e revisado** na `feature/rb-r1-reorientacao` (suíte `OK (2877 PASS)`): heróis v2 nas cenas do jogo (E1b), sistema de missão curta em `game/systems/mission/` ainda não ligado (E2), mundo jogável `game/worlds/village_v3/village_world.tscn` com colisão, limites e 54 marcadores M0–M8, barco `boat_wv2.tscn` e geometria das missões (E1a/E3).
+- **Próximo:** `gameplay` liga a vila v3, a câmera baixa e o barco v2 ao Ep01, tira rio/ilha/volta do fluxo (E1); depois missões M1–M4 (E4).
+- **Decidir na E4:** M2 tem um marcador só para o varal (3 peças); carrinho do M4 está como caixa estática; paredes da água na camada 1 podem barrar barco com física.
 - **Páginas para Thiago:** trio 3D https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (Leme antiga), mundo v2 https://claude.ai/artifact/6WpRQzYXY2hW74LxMiPVww, novidades https://claude.ai/artifact/2WyeZqg8DNSLWegCPcCXAt.
-- **Dívidas:** peso do repositório (environment_v2 ~40 MB, .blend com texturas embutidas; decidir LOD/LFS na E1); manifesto sem bytes/sha das texturas do environment_v2; tris dos heróis no teto; cabelos de trás facetados; luz de parede estoura à noite; GPU real não medida; branches `wip/*` a apagar pelo GitHub.
+- **Dívidas:** `wv2_static.glb` ainda 10,6 MB e `world_v2.blend` 5,2 MB; materiais do mundo em `game/lookdev/world_v2/`; tris dos heróis no teto; cabelos de trás facetados; luz de parede estoura à noite; GPU real não medida; retratos do HUD antigos; branches `wip/*` a apagar pelo GitHub.
 
 ## 1. Onde estamos
 - **Ticket ativo:** `RB-R1 · Reorientação de qualidade (premium)`. Origem: Thiago reprovou arte/som/UI do RB-04 (“personagens nada infantis, gráfico ruim, som primitivo, mapa sem tamanho/densidade”).
