@@ -64,6 +64,8 @@ Objetivo observável: Thiago joga no Windows o Ep01 com os heróis v2, a vila v2
 - **E6 · Falas (`adventure` + `audio`):** ~30 chaves novas no catálogo, legenda com ícones e balbucio atual; rádio do Farol 7 com o TTS local atual. Vozes novas ficam para a fase de som.
 - **E7 · Fechamento:** bot humano mede ≥ 8 min, capturas, vídeo, `reviewer`, build Windows, pacote do Portão 2. Depois: PARAR (não iniciar RB-05).
 
+- **E1b + E2 (`gameplay`, 2026-11-25, `feature/rb-r1-e2-missoes` `d6d927a`):** heróis v2 nas cenas do jogo (marca `metadata/pbr`, `CharacterVisual.stylize_if_toon`; antigos mantêm estilo e contorno, teste positivo no capitão), `set_accessory` (colete oculto por padrão), sistema de missão curta em `game/systems/mission/` (missão, ajuda em 3 degraus, salvamento atômico versionado, troca de herói contextual) ainda não ligado ao Ep01. `reviewer`: APROVADO COM RESSALVAS; médias e baixas corrigidas (cabeça v2 38–44% do pescoço ao topo, medida 40,1/41,8/40,4%; Pico exatamente 4 puxões; equipamento do Pico nas costas z ≥ 0,15 e no peito; corda/emblema não separáveis por material, prova indireta). Suíte `OK (2811 PASS)`. Visto pelo lead: tela-título e cais com o trio v2. Fraco: retratos do HUD antigos; câmera ainda a alta.
+
 ## Barra de qualidade (mensurável e perceptual)
 **Personagens (crianças-heróis)**
 - Altura ~1,05 a 1,15 m no mundo; **cabeça 33 a 38% da altura** (~3 cabeças); olhos grandes (altura do olho ≥ 20% da altura da cabeça) com íris, pupila e dois brilhos; mãos de 4 dedos legíveis; pés grandes e arredondados.
