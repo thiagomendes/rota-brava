@@ -11,10 +11,14 @@ extends Node3D
 ## cesto e 3 ganchos do varal, carrinho dirigivel. Todos PROVISORIOS.
 
 signal busy_changed(busy: bool)
+## Um salto da cadeia do Pico foi interrompido (sem pouso); a cadeia parou e `busy` foi solto.
+signal hop_aborted
 
 const PROVISIONAL := &"provisional"
 const HOP_TIME := 0.42
 const HOP_HEIGHT := 0.55
+## Folga alem da duracao do salto antes de considerar o salto interrompido (s).
+const HOP_GRACE := 0.6
 ## Varal: o marcador e o centro; 3 ganchos a 0,6 m no eixo X, a 1,45 m do chao; cesto 0,9 m ao norte.
 const LINE_SLOTS: Array[float] = [-0.6, 0.0, 0.6]
 const LINE_HEIGHT := 1.45
@@ -43,6 +47,7 @@ var cart_holder: MemberActor = null
 var _cargo_box: Node3D
 var _ball: Node3D
 var _cart_xf: Transform3D
+var _hop_serial: int = 0
 
 
 func setup(m: Ep01V3Main) -> void:
@@ -140,6 +145,7 @@ func clear() -> void:
 	_paw_next = 0
 	_stream_next = 0
 	_cargo = 0
+	_hop_serial += 1
 	_set_busy(false)
 	if _root != null:
 		_root.queue_free()
@@ -185,14 +191,11 @@ func _paw_decal(pos: Vector3, tint: Color = Color("6b4a2f")) -> Sprite3D:
 func _emblem(id: StringName, pos: Vector3, member: StringName) -> void:
 	var it := _spot(id, pos, &"star", "ui.action.pick", member, 1.1)
 	it.set_meta(&"emblem", true)
-	var coin := Blocks.cylinder(it, "Coin", 0.26, 0.06, Vector3(0, 0.75, 0), Color("ffc93c"), 0.9)
-	coin.rotation.x = PI / 2.0
-	var tw := coin.create_tween().set_loops()
-	tw.tween_property(coin, "rotation:y", TAU, 2.4).from(0.0)
+	Ep01V3Pieces.emblem(it)
 
 
 func _cloth(pos: Vector3, color: Color, n: String) -> Node3D:
-	var c := Blocks.box(_root, n, Vector3(0.42, 0.34, 0.04), Vector3.ZERO, color)
+	var c := Ep01V3Pieces.cloth(_root, n, color)
 	c.global_position = pos
 	_pieces.append(c)
 	return c
@@ -235,9 +238,9 @@ func _build_m3() -> void:
 	_spot(&"stream_2", _mk(&"M3_Grate"), &"look", "ui.action.examine", &"tracker")
 	_spot(&"fountain_climb", points[&"FountainBase"], &"carabiner", "ui.action.climb", &"climber")
 	_spot(&"leaves", _mk(&"M3_UpperBasin"), &"leaf", "ui.action.pull", &"climber", 1.1)
-	_ball = Blocks.sphere(_root, "Ball", 0.16, Vector3.ZERO, Color("e8452c"))
+	_ball = Ep01V3Pieces.ball(_root)
 	_ball.global_position = _mk(&"M3_Grate") + Vector3(0, 0.16, 0)
-	var leaves := Blocks.box(_root, "Leaves", Vector3(0.5, 0.08, 0.5), Vector3.ZERO, Color("5c8a2e"))
+	var leaves := Ep01V3Pieces.leaves(_root)
 	leaves.global_position = _mk(&"M3_UpperBasin") + Vector3(0, 0.08, 0)
 	_pieces.append(leaves)
 	_emblem(&"emb_m3_basin", _mk(&"M3_FountainStep_3") + Vector3(0, 0.05, 0), &"climber")
@@ -250,8 +253,7 @@ func _build_m4() -> void:
 	_spot(&"take_cart", cart.global_position, &"helm", "ui.action.push", &"pilot", 1.8)
 	for st: StringName in CARGO_ORDER:
 		_spot(StringName("deliver_" + String(st)), _mk(st), &"heart", "ui.action.deliver", &"pilot", 1.9)
-		var sign := Blocks.cylinder(_root, "Sign_" + String(st), 0.22, 0.04, Vector3.ZERO, STALL_COLORS[st], 0.6)
-		sign.rotation.x = PI / 2.0
+		var sign := Ep01V3Pieces.stall_sign(_root, "Sign_" + String(st), STALL_COLORS[st])
 		sign.global_position = _mk(st) + Vector3(0, 2.1, 0)
 	_emblem(&"emb_m4_stall", _mk(&"M4_Cart").lerp(_mk(&"M4_Stall_Apple"), 0.45), &"pilot")
 
@@ -311,7 +313,8 @@ func _refresh_cargo() -> void:
 		c.queue_free()
 	for i in range(_cargo, CARGO_ORDER.size()):
 		var col: Color = STALL_COLORS[CARGO_ORDER[i]]
-		var b := Blocks.box(_cargo_box, "Crate%d" % i, Vector3(0.42, 0.26, 0.32), Vector3(0, 0.14 + (i - _cargo) * 0.28, 0), col, 0.15)
+		var b := Ep01V3Pieces.crate(_cargo_box, "Crate%d" % i, col)
+		b.position = Vector3(0, 0.01 + (i - _cargo) * 0.28, 0)
 		b.set_meta(&"stall", CARGO_ORDER[i])
 
 
@@ -557,17 +560,37 @@ func _examine(actor: Node3D, it: Ep01Interactable) -> void:
 
 
 ## Saltos encadeados do Pico (um aperto): pousa em cada ponto e segue. A Ep01V3Main fica ocupada ate o ultimo pouso.
+## Se um salto for interrompido (teleporte, outro `jump_to`, ator removido), `landed` nunca chega: cada salto espera no
+## maximo HOP_TIME + HOP_GRACE e a cadeia termina soltando `busy` (a crianca nunca fica sem controle).
 func _hop_chain(a: MemberActor, targets: Array) -> void:
 	if a == null:
 		return
 	_set_busy(true)
+	_hop_serial += 1
+	var serial := _hop_serial
 	for p: Vector3 in targets:
 		a.jump_to(p + Vector3(0, 0.04, 0), HOP_TIME, HOP_HEIGHT + maxf(0.0, p.y - a.global_position.y) * 0.5)
-		await a.landed
-		if not is_inside_tree():
+		var ok := await _await_landing(a, p + Vector3(0, 0.04, 0), HOP_TIME + HOP_GRACE)
+		if not is_inside_tree() or serial != _hop_serial:
 			return
+		if not ok:
+			hop_aborted.emit()
+			break
 	_set_busy(false)
 	refresh()
+
+
+## Espera o pouso do salto atual; false se o salto sumiu (interrompido) ou passou do limite.
+func _await_landing(a: MemberActor, to: Vector3, limit: float) -> bool:
+	var t := 0.0
+	while t < limit:
+		await get_tree().physics_frame
+		if not is_inside_tree() or not is_instance_valid(a):
+			return false
+		if not a.airborne:
+			return a.global_position.distance_to(to) < 0.1
+		t += get_physics_process_delta_time()
+	return false
 
 
 # ---------------------------------------------------------------- alvo da ajuda e do bot

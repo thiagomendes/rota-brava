@@ -24,6 +24,19 @@ const LEAD_MAX := 1.4
 const LEAD_SMOOTH := 2.5
 ## Enquadramento livre (pose de equipe): offset em coordenadas do mundo, ignora `yaw`.
 var framing_world: bool = false
+## Desvio de obstaculos (RB-R1 E5): com mascara != 0, uma esfera de PROBE_RADIUS vai do ponto de mira ate a camera e a
+## camera para antes do primeiro obstaculo (como um spring arm), nunca a menos de MIN_ARM do ponto de mira. Encurta na
+## hora e volta suave (o proprio atraso da camera). `exclude` tira corpos invisiveis (paredes da agua, limites do mapa).
+## `occluders` = esferas (xyz centro, w raio) sem colisao que tapam o heroi (copas das arvores). Mascara 0 = desligado.
+var collision_mask: int = 0
+var exclude: Array[RID] = []
+var occluders: Array[Vector4] = []
+const PROBE_RADIUS := 0.2
+const MIN_ARM := 0.9
+const ARM_MARGIN := 0.08
+## Encurtamento do ultimo quadro (m; 0 = livre), para testes e depuracao.
+var last_pull: float = 0.0
+var _probe: SphereShape3D
 
 var lead: Vector3 = Vector3.ZERO
 var _last_focus: Vector3 = Vector3.ZERO
@@ -100,6 +113,8 @@ func _update(weight: float, delta: float) -> void:
 	var wanted := base + rel
 	camera.global_position = camera.global_position.lerp(wanted, weight)
 	var look := base + look_offset
+	if collision_mask != 0:
+		camera.global_position = avoid(look, camera.global_position)
 	if _shake_time > 0.0 and not reduced_motion:
 		_shake_time = maxf(0.0, _shake_time - delta)
 		var a := _shake_amp * (_shake_time / maxf(_shake_time + delta, 0.001))
@@ -108,6 +123,47 @@ func _update(weight: float, delta: float) -> void:
 			_shake_amp = 0.0
 	if camera.global_position.distance_to(look) > 0.01:
 		camera.look_at(look, Vector3.UP)
+
+
+## Posicao da camera sem obstaculo entre `from` (ponto de mira) e `to` (camera desejada).
+func avoid(from: Vector3, to: Vector3) -> Vector3:
+	last_pull = 0.0
+	var seg := to - from
+	var dist := seg.length()
+	if dist < 0.01 or not is_inside_tree():
+		return to
+	var dir := seg / dist
+	var allowed := dist
+	if _probe == null:
+		_probe = SphereShape3D.new()
+		_probe.radius = PROBE_RADIUS
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = _probe
+	q.transform = Transform3D(Basis(), from)
+	q.motion = seg
+	q.collision_mask = collision_mask
+	q.exclude = exclude
+	var res := get_world_3d().direct_space_state.cast_motion(q)
+	# [1, 1] = livre; [0, 0] = a mira ja comeca dentro de algo (ignora: nao colar a camera no heroi).
+	if res.size() == 2 and res[1] > 0.0 and res[0] < 1.0:
+		allowed = minf(allowed, dist * res[0] - ARM_MARGIN)
+	for s in occluders:
+		var c := Vector3(s.x, s.y, s.z)
+		var oc := from - c
+		if oc.length() <= s.w:
+			continue
+		var b := oc.dot(dir)
+		var disc := b * b - (oc.length_squared() - s.w * s.w)
+		if disc < 0.0:
+			continue
+		var t := -b - sqrt(disc)
+		if t > 0.0 and t < allowed:
+			allowed = t - ARM_MARGIN
+	if allowed >= dist:
+		return to
+	allowed = maxf(allowed, MIN_ARM)
+	last_pull = dist - allowed
+	return from + dir * allowed
 
 
 func _update_lead(focus: Vector3, delta: float) -> void:

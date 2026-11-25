@@ -89,6 +89,7 @@ var _complete_panel: Control
 var _complete_box: Control
 var _complete_stars: Array[IconView] = []
 var _complete_replay: Button
+var _complete_emblems: Dictionary = {}
 var _pause_panel: Control
 var _pause_box: Control
 var _pause_resume: Button
@@ -542,7 +543,22 @@ func _build_complete(root: Control) -> void:
 	team.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.add_child(team)
 	for m in MEMBERS:
-		_icon(team, SKILL_ICONS[m], 104, MEMBER_COLORS[m]).ring = 0.09
+		var col := VBoxContainer.new()
+		col.alignment = BoxContainer.ALIGNMENT_CENTER
+		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		team.add_child(col)
+		_icon(col, SKILL_ICONS[m], 104, MEMBER_COLORS[m]).ring = 0.09
+		# Emblemas do heroi (Ep01 v3): so numeros ao lado da estrela; vazio ate set_complete_emblems.
+		var row_e := HBoxContainer.new()
+		row_e.alignment = BoxContainer.ALIGNMENT_CENTER
+		row_e.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row_e.visible = false
+		row_e.name = "Emblems_" + String(m)
+		col.add_child(row_e)
+		_icon(row_e, &"star", 40, MEMBER_COLORS[m], true)
+		var n := _label(row_e, 34)
+		n.name = "Count"
+		_complete_emblems[m] = row_e
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 28)
@@ -984,6 +1000,21 @@ func open_complete() -> void:
 		if is_inside_tree() and not Options.reduced_motion():
 			get_tree().create_timer(0.35 + i * 0.25).timeout.connect(func() -> void: ui_sound.emit(&"star"))
 	_complete_replay.grab_focus()
+
+
+## Emblemas por heroi na tela final: heroi -> [achados, total]. So numeros (sem texto fora do catalogo).
+func set_complete_emblems(by_hero: Dictionary) -> void:
+	for m: StringName in _complete_emblems:
+		var row := _complete_emblems[m] as Control
+		var v: Array = by_hero.get(m, [])
+		row.visible = v.size() == 2 and int(v[1]) > 0
+		if row.visible:
+			(row.get_node("Count") as Label).text = "%d/%d" % [int(v[0]), int(v[1])]
+
+
+func complete_emblems_text(member: StringName) -> String:
+	var row := _complete_emblems.get(member) as Control
+	return (row.get_node("Count") as Label).text if row != null and row.visible else ""
 
 
 func close_complete() -> void:
