@@ -496,29 +496,50 @@ func _update_followers() -> void:
 	for m: StringName in actors:
 		var a := actors[m] as MemberActor
 		a.auto_dir = Vector3.ZERO
-		# Embarcados (M6) nao seguem nem sao seguidos: o barco leva quem esta nele.
-		if lead == null or a == lead or a.airborne or a.riding_on != null or lead.riding_on != null:
+		# F1: o ator e o dono unico do proprio movimento de seguidor (formacao, parada, desistencia); aqui so liga o modo
+		# e decide o teleporte. Embarcados (M6) nao seguem nem sao seguidos: o barco leva quem esta nele.
+		a.follow_on = lead != null and a != lead and lead.riding_on == null
+		if not a.follow_on or a.airborne or a.riding_on != null:
 			continue
 		var d := lead.global_position - a.global_position
-		var dy := absf(d.y)
 		d.y = 0.0
 		if d.length() > FOLLOW_FAR and lead.is_on_floor() and not lead.airborne:
 			var to: Variant = follower_teleport_point(lead, a, m)
 			if to != null:
 				a.teleport(to as Vector3)
-		elif d.length() > FOLLOW_NEAR and dy <= FOLLOW_MAX_DY:
-			a.auto_dir = d.normalized()
 
 
-## Destino do teleporte de um seguidor: do outro lado do lider em relacao a camera (longe dela, encoberto pelo lider),
-## com chao e sem parede (`slot_clear`). null se nenhum lugar serve (fica onde esta).
+## F1: algum ponto do corpo (pes, peito, cabeca, com a largura da capsula) dentro do enquadramento da camera?
+func in_camera_view(feet: Vector3) -> bool:
+	var cam := camera_rig.camera if camera_rig != null else null
+	if cam == null or not cam.is_inside_tree():
+		return false
+	var right := cam.global_transform.basis.x
+	right.y = 0.0
+	right = right.normalized() * (MemberActor.CAPSULE_RADIUS + 0.15)
+	for h: float in [0.05, 0.75, 1.5]:
+		for off: Vector3 in [Vector3.ZERO, right, -right]:
+			if cam.is_position_in_frustum(feet + off + Vector3(0, h, 0)):
+				return true
+	return false
+
+
+## Destino do teleporte de um seguidor (F1): em aneis em volta do lider, so pontos FORA do frustum da camera, com chao
+## livre e linha reta ate o lider sem parede (`slot_clear`); prefere o mais perto e o lado do seguidor. null: nenhum
+## lugar fora da vista serve, e o seguidor espera (nunca aparece na frente do jogador).
 func follower_teleport_point(lead: MemberActor, a: MemberActor, m: StringName) -> Variant:
 	var cam_basis := Basis(Vector3.UP, camera_rig.yaw)
-	var side := (TRIO_OFFSETS[m] as Vector3).x
-	for back: Vector3 in [Vector3(side, 0, -1.3), Vector3(side * 0.5, 0, -2.0), Vector3(-side, 0, -1.3), Vector3(0, 0, -1.6)]:
-		var p := lead.global_position + cam_basis * back
-		if a.slot_clear(lead.global_position, p):
-			return p + Vector3(0, 0.05, 0)
+	var side := signf((TRIO_OFFSETS[m] as Vector3).x)
+	for radius: float in [1.6, 2.4, 3.4, 4.6, 6.0]:
+		for k in 16:
+			# Comeca atras do lider na vista (-Z da camera) e abre para o lado do seguidor, alternando.
+			var step := (k + 1) / 2
+			var ang := PI + side * (1.0 if k % 2 == 1 else -1.0) * step * TAU / 16.0
+			var p := lead.global_position + cam_basis * (Vector3(0, 0, radius).rotated(Vector3.UP, ang))
+			if in_camera_view(p):
+				continue
+			if a.slot_clear(lead.global_position, p):
+				return p + Vector3(0, 0.05, 0)
 	return null
 
 

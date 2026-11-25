@@ -15,8 +15,19 @@ const STOP_TIME := 0.08
 ## RB-R1 C2: andar e o padrao (ate WALK_SPEED); segurando `run`, ate RUN_SPEED. A inclinacao do analogico escala as duas.
 const WALK_SPEED := 1.4
 const DEADZONE := 0.12
-## Acima deste ritmo o clipe e `run`; abaixo, `walk` (entre os dois so passa a rampa de 0,12 s).
+## F1: menor velocidade de quem anda (m/s), logo depois da zona morta; a inclinacao do analogico vai dela ao maximo.
+## Garante walk em escala >= WALK_SCALE_MIN nos tres herois (avanco do pe ~1,17-1,22 m/s): sem "camera lenta".
+const MIN_MOVE_SPEED := 0.75
+## Acima deste ritmo o clipe e `run`; volta a `walk` abaixo de RUN_EXIT (histerese, sem piscar entre os dois).
 const RUN_THRESHOLD := 2.2
+const RUN_EXIT := 1.9
+## F1: o clipe segue a velocidade planar REAL medida (deslocamento/dt), nao a entrada. Sai de idle acima de MOVE_ENTER,
+## volta a idle abaixo de MOVE_EXIT; a escala do walk nunca fica abaixo de WALK_SCALE_MIN.
+const MOVE_ENTER := 0.25
+const MOVE_EXIT := 0.15
+const WALK_SCALE_MIN := 0.6
+## Clipes de acao que nao sao cancelados por movimento (o resto, como `stop` ou gestos, cede ao andar: sem deslizar).
+const ACTIONS_KEEP_WHILE_MOVING: Array[StringName] = [&"jump"]
 const GRAVITY := 20.0
 ## Pulo do jogador (C2): curto e infantil, so fisica (respeita colisao e limites do mapa), sem dano de queda.
 const JUMP_HEIGHT := 0.42
@@ -25,8 +36,18 @@ const JUMP_VELOCITY := 4.0988  # sqrt(2 * GRAVITY * JUMP_HEIGHT)
 const FORMATION_SLOTS: Array[Vector3] = [Vector3(-0.95, 0.0, 1.05), Vector3(0.95, 0.0, 1.05)]
 ## Distancia minima mantida entre integrantes (m) e zonas de chegada/retomada do lugar (histerese: sem tremer).
 const MIN_GAP := 0.9
-const SLOT_ARRIVE := 0.12
-const SLOT_RESUME := 0.45
+const SLOT_ARRIVE := 0.15
+const SLOT_RESUME := 0.6
+## F1: o lugar na formacao so e recalculado quando o lider se afasta REANCHOR m do ultimo calculo (girar no lugar nao
+## mexe nos seguidores) e o alvo desliza ate o novo lugar a SLOT_GLIDE m/s.
+const REANCHOR := 0.5
+const SLOT_GLIDE := 5.0
+## F1: seguidor que nao chega (parede, obstaculo) desiste: se em STUCK_WINDOW s nao se aproximou STUCK_PROGRESS m do
+## lugar, para em idle ate o lider mudar de lugar (nao insiste contra o obstaculo).
+const STUCK_WINDOW := 0.5
+const STUCK_PROGRESS := 0.12
+## Abaixo disto o seguidor parado se afasta de quem chegou perto (passo unico, nao empurrao continuo).
+const GAP_RESUME := 0.7
 ## Seguidor longe do lider corre mesmo que o lider ande (para alcancar).
 const CATCHUP_DIST := 4.0
 const CAPSULE_RADIUS := 0.35
@@ -35,6 +56,8 @@ const SLOT_CLEARANCE := 0.55
 const CLIMB_ZONE_LAYER := 1 << 9
 ## Seguidor nao vai para a formacao de um lider em outra altura (degrau, patamar).
 const FOLLOW_MAX_DY := 0.3
+## Histerese da regra de desnivel: so volta a seguir com o lider abaixo disto.
+const FOLLOW_RESUME_DY := 0.2
 const TURN_SPEED := 14.0
 
 const MODEL_SCENES := {
@@ -83,6 +106,21 @@ var jump_gate: Callable
 var leader: MemberActor = null
 var _settled: bool = true
 var _following: bool = false
+## F1: o episodio liga o modo seguidor (dono unico do movimento fora de controle: formacao, parada, desistencia).
+var follow_on: bool = false
+## Velocidade planar real (m/s) medida pelo deslocamento entre quadros de fisica, e o estado de locomocao que ela dirige.
+var real_speed: float = 0.0
+var _raw_speed: float = 0.0
+var loco: StringName = &"idle"
+var _prev_pos: Variant = null
+var _action_anim: StringName = &""
+var _anchor: Variant = null
+var _slot_goal: Vector3 = Vector3.ZERO
+var _slot: Vector3 = Vector3.ZERO
+var _level_ok: bool = true
+var _stuck: bool = false
+var _stuck_clock: float = 0.0
+var _stuck_ref: float = INF
 
 
 func setup(member_id: StringName) -> void:
@@ -129,6 +167,7 @@ func play_action(anim: StringName, speed: float = 1.0) -> float:
 		return 0.0
 	var length := model.animation_length(anim) / maxf(speed, 0.01)
 	_action_until = Time.get_ticks_msec() / 1000.0 + length
+	_action_anim = anim
 	model.play(anim, speed)
 	return length
 
@@ -144,9 +183,16 @@ func set_expression(expr: StringName, weight: float = 1.0) -> void:
 
 
 func _update_animation() -> void:
-	if model == null or Time.get_ticks_msec() / 1000.0 < _action_until:
+	if model == null:
 		return
-	var planar := Vector2(velocity.x, velocity.z).length()
+	# O maior entre o medido suavizado e o bruto do quadro: nunca idle/parada com o corpo de fato andando.
+	var planar := maxf(real_speed, _raw_speed)
+	if Time.get_ticks_msec() / 1000.0 < _action_until:
+		# Acao (parar, gesto) cede quando o corpo volta a andar: nunca corpo andando com o pe parado.
+		if planar > MOVE_ENTER and not (_action_anim in ACTIONS_KEEP_WHILE_MOVING) and riding_on == null and not airborne:
+			_action_until = 0.0
+		else:
+			return
 	if riding_on != null and is_instance_valid(riding_on):
 		var want: StringName = &"idle"
 		if member == &"pilot" and riding_on is BoatActor:
@@ -157,11 +203,15 @@ func _update_animation() -> void:
 				want = &"steer_right"
 			elif model.has_animation(&"idle_wheel"):
 				want = &"idle_wheel"
+		loco = &"idle"
 		model.play(want)
+		return
 	elif jumping and not is_on_floor():
 		return
-	elif planar > 0.2 and model.has_animation(&"walk"):
-		var g := gait(planar)
+	var next := next_loco(loco, planar, model.has_animation(&"run") and model.run_speed_mps > 0.0)
+	if next != &"idle" and model.has_animation(&"walk"):
+		loco = next
+		var g := gait(planar, loco)
 		var anim: StringName = g["anim"]
 		var anim_scale: float = g["scale"]
 		model.play(anim, anim_scale)
@@ -172,6 +222,7 @@ func _update_animation() -> void:
 			_step_clock = 0.0
 			footstep.emit(planar, global_position)
 	else:
+		loco = &"idle"
 		_step_clock = 0.0
 		if _was_moving and model.has_animation(&"stop"):
 			_was_moving = false
@@ -181,16 +232,35 @@ func _update_animation() -> void:
 		model.play(&"idle")
 
 
+## Proximo estado de locomocao para a velocidade real `planar` (histerese em idle<->walk e walk<->run).
+static func next_loco(current: StringName, planar: float, has_run: bool = true) -> StringName:
+	if current == &"idle":
+		if planar <= MOVE_ENTER:
+			return &"idle"
+		return &"run" if has_run and planar > RUN_THRESHOLD else &"walk"
+	if planar < MOVE_EXIT:
+		return &"idle"
+	if not has_run:
+		return &"walk"
+	if current == &"run":
+		return &"run" if planar >= RUN_EXIT else &"walk"
+	return &"run" if planar > RUN_THRESHOLD else &"walk"
+
+
 ## Clipe e escala de tempo para o ritmo `planar` (m/s): o pe de apoio anda para tras na velocidade do corpo.
-func gait(planar: float) -> Dictionary:
+## `state` vazio decide walk/run so pelo limiar; a escala do walk nunca fica abaixo de WALK_SCALE_MIN.
+func gait(planar: float, state: StringName = &"") -> Dictionary:
 	var anim := &"walk"
 	var nominal := WALK_SPEED_FALLBACK
+	var has_run := model != null and model.has_animation(&"run") and model.run_speed_mps > 0.0
 	if model != null:
 		nominal = model.walk_speed_mps
-		if planar > RUN_THRESHOLD and model.has_animation(&"run") and model.run_speed_mps > 0.0:
-			anim = &"run"
-			nominal = model.run_speed_mps
-	return {"anim": anim, "scale": clampf(planar / maxf(nominal, 0.01), 0.0, ANIM_SCALE_MAX)}
+	var want_run := (state == &"run") if state != &"" else planar > RUN_THRESHOLD
+	if want_run and has_run:
+		anim = &"run"
+		nominal = model.run_speed_mps
+	var lo := WALK_SCALE_MIN if anim == &"walk" else 0.0
+	return {"anim": anim, "scale": clampf(planar / maxf(nominal, 0.01), lo, ANIM_SCALE_MAX)}
 
 
 func face_point(point: Vector3) -> void:
@@ -209,6 +279,7 @@ func _physics_process(delta: float) -> void:
 	if riding_on != null and is_instance_valid(riding_on):
 		global_position = riding_on.to_global(ride_offset)
 		velocity = Vector3.ZERO
+		_mark_position(delta)
 		_update_animation()
 		if _face_target != null:
 			var f: Vector3 = (_face_target as Vector3) - global_position
@@ -217,6 +288,7 @@ func _physics_process(delta: float) -> void:
 				_visual.rotation.y = lerp_angle(_visual.rotation.y, atan2(-f.x, -f.z), clampf(TURN_SPEED * delta, 0.0, 1.0))
 		return
 	if airborne:
+		_mark_position(delta)
 		return
 	var dir := Vector2.ZERO
 	var world := Vector3.ZERO
@@ -248,6 +320,7 @@ func _physics_process(delta: float) -> void:
 		jumping = false
 		_action_until = 0.0
 		footstep.emit(Vector2(velocity.x, velocity.z).length(), global_position)
+	_mark_position(delta)
 	_update_animation()
 	if world.length() > 0.1:
 		_face_target = null
@@ -259,6 +332,18 @@ func _physics_process(delta: float) -> void:
 			_visual.rotation.y = lerp_angle(_visual.rotation.y, atan2(-d.x, -d.z), clampf(TURN_SPEED * delta, 0.0, 1.0))
 	elif not controlled and _following and _settled and lead() != null:
 		_visual.rotation.y = lerp_angle(_visual.rotation.y, lead()._visual.rotation.y, clampf(TURN_SPEED * 0.4 * delta, 0.0, 1.0))
+
+
+## Mede a velocidade planar real deste quadro (deslocamento / dt), com suavizacao leve; saltos de posicao zeram.
+func _mark_position(delta: float) -> void:
+	var p := global_position
+	if _prev_pos != null and delta > 0.0:
+		var dp := p - (_prev_pos as Vector3)
+		dp.y = 0.0
+		var v := dp.length() / delta
+		_raw_speed = 0.0 if dp.length() > 0.5 else v
+		real_speed = 0.0 if dp.length() > 0.5 else lerpf(real_speed, v, 0.6)
+	_prev_pos = p
 
 
 ## Duracao do pulo livre no chao plano (s): sobe e desce com a mesma gravidade.
@@ -363,42 +448,87 @@ func slot_clear(from: Vector3, to: Vector3) -> bool:
 	return not hit.is_empty() and absf((hit["position"] as Vector3).y - from.y) < 0.3
 
 
-## Seguidor: o episodio pede para seguir com `auto_dir`; o ator acompanha o ritmo do lider, depois vai ao seu lugar da
-## formacao e para ali (histerese), mantendo MIN_GAP dos outros. Nunca empurra o lider: so o seguidor se desvia.
+## Seguidor (F1): dono unico do movimento fora de controle. Com `follow_on`, vai ao lugar da formacao (recalculado so
+## quando o lider se afasta REANCHOR m, alvo suavizado), para com histerese, desiste em idle quando nao consegue chegar
+## e mantem MIN_GAP com passos unicos. Sem `follow_on`, so `auto_dir` (fases antigas). Nunca empurra o lider.
 func _follow_dir() -> Vector3:
 	var l := lead()
 	var asked := auto_dir.length() > 0.01
-	if l == null:
+	if not follow_on or l == null:
 		running = false
+		_anchor = null
 		return Vector3(auto_dir.x, 0.0, auto_dir.z) if asked else Vector3.ZERO
-	var to_lead := l.global_position - global_position
-	to_lead.y = 0.0
-	running = l.running or to_lead.length() > CATCHUP_DIST
-	var out := Vector3.ZERO
-	if asked:
-		_following = true
+	_following = true
+	var delta := get_physics_process_delta_time()
+	var dy := absf(l.global_position.y - global_position.y)
+	_level_ok = dy <= (FOLLOW_RESUME_DY if not _level_ok else FOLLOW_MAX_DY)
+	if not _level_ok:
+		_settled = true
+		running = false
+		return Vector3.ZERO
+	var lp := l.global_position
+	if _anchor == null or Vector2(lp.x - (_anchor as Vector3).x, lp.z - (_anchor as Vector3).z).length() > REANCHOR:
+		var first := _anchor == null
+		_anchor = lp
+		_slot_goal = formation_slot()
+		if first:
+			_slot = _slot_goal
+		_stuck = false
+		_stuck_ref = INF
+	_slot = _slot.move_toward(_slot_goal, SLOT_GLIDE * delta)
+	var to_slot := _slot - global_position
+	to_slot.y = 0.0
+	var dist := to_slot.length()
+	if _settled and dist > SLOT_RESUME and not _stuck:
 		_settled = false
-		out = Vector3(auto_dir.x, 0.0, auto_dir.z).normalized()
-	elif _following and absf(l.global_position.y - global_position.y) <= FOLLOW_MAX_DY:
-		var to_slot := formation_slot() - global_position
-		to_slot.y = 0.0
-		if _settled and to_slot.length() > SLOT_RESUME:
-			_settled = false
-		if not _settled:
-			if to_slot.length() <= SLOT_ARRIVE:
-				_settled = true
-			else:
-				# Freia perto do lugar (inclinacao cai com a distancia) para nao passar do ponto nem tremer.
-				out = to_slot.normalized() * clampf(to_slot.length() / 0.6, 0.3, 1.0)
-	# So quem esta no modo seguidor (Ep01 v3) se afasta; posicoes encenadas pelas fases antigas ficam como estao.
-	var sep := _separation() if _following else Vector3.ZERO
+		_stuck_clock = 0.0
+		_stuck_ref = dist
+	var out := Vector3.ZERO
+	if not _settled:
+		if dist <= SLOT_ARRIVE:
+			_settled = true
+		else:
+			# Freia perto do lugar para nao passar do ponto (a velocidade minima de andar ja garante o clipe).
+			out = to_slot / dist * clampf(dist / 0.8, DEADZONE + 0.05, 1.0)
+			_stuck_clock += delta
+			if _stuck_clock >= STUCK_WINDOW:
+				if _stuck_ref - dist < STUCK_PROGRESS:
+					_stuck = true
+					_settled = true
+					out = Vector3.ZERO
+				_stuck_clock = 0.0
+				_stuck_ref = dist
+	var to_lead := lp - global_position
+	to_lead.y = 0.0
+	running = not _settled and (l.running or to_lead.length() > CATCHUP_DIST)
+	var sep := _separation()
 	if sep.length() > 0.01:
-		out += sep
-		if out.length() < DEADZONE + 0.05:
-			out = sep.normalized() * (DEADZONE + 0.05)
+		if not _settled:
+			out += sep
+		elif _closest_gap() < GAP_RESUME:
+			# Passo unico para o lado: o alvo vira um ponto afastado e o seguidor anda ate ele e para.
+			_slot_goal = global_position + sep.normalized() * (MIN_GAP - _closest_gap() + 0.2)
+			_slot = _slot_goal
+			_settled = false
+			_stuck = false
+			_stuck_clock = 0.0
+			_stuck_ref = INF
 	if out.length() > 1.0:
 		out = out.normalized()
 	return out
+
+
+func _closest_gap() -> float:
+	var best := INF
+	for c in get_parent().get_children():
+		if c == self or not (c is MemberActor) or (c as MemberActor).riding_on != null:
+			continue
+		var d := (c as Node3D).global_position - global_position
+		if absf(d.y) > 1.0:
+			continue
+		d.y = 0.0
+		best = minf(best, d.length())
+	return best
 
 
 ## Afasta este seguidor de quem estiver a menos de MIN_GAP (o lider tambem conta, mas so o seguidor se move).
@@ -430,7 +560,8 @@ static func target_speed(tilt: float, run: bool = false) -> float:
 	tilt = clampf(tilt, 0.0, 1.0)
 	if tilt < DEADZONE:
 		return 0.0
-	return (RUN_SPEED if run else WALK_SPEED) * tilt
+	var top := RUN_SPEED if run else WALK_SPEED
+	return lerpf(MIN_MOVE_SPEED, top, (tilt - DEADZONE) / (1.0 - DEADZONE))
 
 
 ## Um passo da rampa: acelera ate SPEED em ACCEL_TIME e para em STOP_TIME (freia tambem ao inverter).
@@ -486,6 +617,11 @@ func teleport(pos: Vector3) -> void:
 	jumping = false
 	_following = false
 	_settled = true
+	_prev_pos = pos
+	real_speed = 0.0
+	_raw_speed = 0.0
+	_anchor = null
+	_stuck = false
 
 
 ## Acompanha um no (ex.: convés do barco) em vez de usar fisica.
