@@ -10,10 +10,11 @@
 **Última suíte medida na integração:** `RESULTADO: OK (2650 PASS, 0 FALHA(S))` (Windows, Godot 4.7.2).
 **Nuvem (2026-11-24):** `tools/setup-linux.sh` e `tools/test.sh` verificados no Linux: 2650 PASS em 1 min 42 s no `5f877ec`. Ambiente pessoal `rota-brava` libera `download.blender.org` (o Default bloqueava o Blender).
 
-## 0. Retomada após a pausa (Thiago pediu retomar com art3d/ux em esforço medium)
-- **Feito e no GitHub:** trio v2 aprovado por Thiago ("gostei muito"): `feature/rb-r1-rastro-v2` (`b1dcd27`, Rastro v2.1 pronto), `feature/rb-r1-pico-v2` (`7d293d5`), `feature/rb-r1-leme-v2` (`003ea04`). Visualizador 3D: https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (fonte da página fica no scratchpad da sessão; regerar com os GLB em base64 `.glb.txt`, o servidor de artefatos não serve `.glb`).
-- **Interrompido:** acabamento do Pico e da Leme (lista no ticket, "Trio aprovado"). Scripts parcialmente editados, GLB **não** regerado, salvos sem prova em `wip/rb-r1-pico-v2-acabamento` (`625d9b0`) e `wip/rb-r1-leme-v2-acabamento` (`c1d970d`). Retomar: `art3d` parte da branch wip, termina, regera GLB, mede folga das botas (≥ 2 cm), roda suíte; depois o lead leva para a feature branch (fast-forward) e apaga a wip.
-- **Depois:** integrar rastro/pico/leme v2 (conflito esperado só no fim de `source_art/manifest.json`; Pico e Leme ainda não têm a calibração de brilho do import, que vem do Rastro), `reviewer`, atualizar a página 3D, proposta de mundo (vitrine antes), som. `feature/rb-r1-lookdev` (Forward+) ainda não integrada na `feature/rb-r1-reorientacao`.
+## 0. Agora (2026-11-25)
+- **Trio v2 aprovado e acabado:** `feature/rb-r1-trio-v2` (= `feature/rb-r1-rastro-v2` + `pico-v2` 49b888d + `leme-v2` 49249b7; base `feature/rb-r1-lookdev`), suíte `OK (2702 PASS)`. Visualizador 3D: https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (GLB em base64 `.glb.txt`; o servidor de artefatos não serve `.glb`). Branches wip apagadas (absorvidas).
+- **Em curso:** revisão do `reviewer` na `feature/rb-r1-trio-v2`.
+- **Depois:** aplicar achados; integrar `feature/rb-r1-trio-v2` (traz lookdev/Forward+) na `feature/rb-r1-reorientacao`; atualizar SPEC.md (renderizador); proposta de mundo como vitrine antes; som. Heróis v2 ainda **não** substituem os do jogo (decidir na fase do mundo).
+- **Agentes:** `art3d` e `ux` em esforço medium (Thiago, retomada).
 
 ## 1. Onde estamos
 - **Ticket ativo:** `RB-R1 · Reorientação de qualidade (premium)`. Origem: Thiago reprovou arte/som/UI do RB-04 (“personagens nada infantis, gráfico ruim, som primitivo, mapa sem tamanho/densidade”).
