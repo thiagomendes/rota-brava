@@ -1,0 +1,308 @@
+extends RefCounted
+## RB-R1 C2 - movimento a pe no Ep01 v3: andar por padrao, correr segurando `run`, pulo `jump` curto, cadencia dos pes
+## proporcional a velocidade real e seguidores parando em formacao sem se sobrepor. Entrada so pela Input Map.
+## Mede estado (velocidade, altura, distancias, escala do clipe); nao comprova como a corrida parece na tela.
+
+var r
+var main: Ep01V3Main
+
+
+func run(runner) -> void:
+	r = runner
+	_static_rules()
+	Ep01V3Main.start_mission = &""
+	Ep01V3Main.save_path = ""
+	main = (load("res://episodes/ep01/v3/ep01_v3_main.tscn") as PackedScene).instantiate() as Ep01V3Main
+	r.tree.root.add_child(main)
+	r.tree.current_scene = main
+	await r.frames(3)
+	# Sem missao ativa: nenhum gatilho, gesto de ajuda ou pose interfere na medida do movimento.
+	main.current = null
+	r.check(InputMap.has_action(&"run") and InputMap.has_action(&"jump"), "mov: acoes `run` e `jump` na Input Map")
+	await _gait_and_formation(false)
+	await _gait_and_formation(true)
+	await _jump_arc()
+	await _jump_blocked()
+	await _jump_map_edge()
+	_release()
+	main.queue_free()
+	await r.frames(2)
+	r.tree.current_scene = null
+
+
+func _static_rules() -> void:
+	r.check(is_equal_approx(MemberActor.target_speed(1.0), MemberActor.WALK_SPEED), "mov: sem `run` a inclinacao total anda a %.1f m/s" % MemberActor.WALK_SPEED)
+	r.check(is_equal_approx(MemberActor.target_speed(1.0, true), MemberActor.RUN_SPEED), "mov: com `run` corre a %.1f m/s" % MemberActor.RUN_SPEED)
+	r.check(MemberActor.target_speed(0.05, true) == 0.0, "mov: zona morta do analogico para")
+	var a := MemberActor.new()
+	a.setup(&"tracker")
+	var w1: Dictionary = a.gait(0.7)
+	var w2: Dictionary = a.gait(1.4)
+	var r1: Dictionary = a.gait(2.6)
+	var r2: Dictionary = a.gait(3.2)
+	r.check(w1["anim"] == &"walk" and r2["anim"] == &"run", "mov: 1,4 m/s toca walk e 3,2 m/s toca run")
+	r.check(absf(float(w2["scale"]) / float(w1["scale"]) - 2.0) < 0.001 and absf(float(r2["scale"]) / float(r1["scale"]) - 3.2 / 2.6) < 0.001,
+		"mov: escala do clipe proporcional a velocidade (walk x%.2f/x%.2f, run x%.2f/x%.2f)" % [w1["scale"], w2["scale"], r1["scale"], r2["scale"]])
+	r.check(absf(float(r2["scale"]) * a.model.run_speed_mps - 3.2) < 0.01 and absf(float(w2["scale"]) * a.model.walk_speed_mps - 1.4) < 0.01,
+		"mov: pe de apoio anda na velocidade do corpo (escala x avanco do pe = velocidade)")
+	print("  medida cadencia Rastro: walk x%.2f a 1,4 m/s (%.2f passos/s), run x%.2f a 3,2 m/s (%.2f passos/s)" % [
+		w2["scale"], 2.0 * float(w2["scale"]) / a.model.animation_length(&"walk"),
+		r2["scale"], 2.0 * float(r2["scale"]) / a.model.animation_length(&"run")])
+	a.free()
+	var h := MemberActor.JUMP_VELOCITY * MemberActor.JUMP_VELOCITY / (2.0 * MemberActor.GRAVITY)
+	r.check(absf(h - MemberActor.JUMP_HEIGHT) < 0.005, "mov: impulso do pulo bate com a altura %.2f m" % h)
+
+
+func _physics(n: int) -> void:
+	for i in n:
+		await r.tree.physics_frame
+
+
+func _release() -> void:
+	for a: StringName in [&"move_left", &"move_right", &"move_up", &"move_down", &"run", &"jump"]:
+		Input.action_release(a)
+
+
+func _push(dir: Vector3) -> void:
+	var local := Basis(Vector3.UP, -main.camera_rig.yaw) * dir.normalized()
+	for pair: Array in [[&"move_right", local.x], [&"move_left", -local.x], [&"move_down", local.z], [&"move_up", -local.z]]:
+		if float(pair[1]) > 0.01:
+			Input.action_press(pair[0] as StringName, float(pair[1]))
+		else:
+			Input.action_release(pair[0] as StringName)
+
+
+func _planar(a: MemberActor) -> float:
+	return Vector2(a.velocity.x, a.velocity.z).length()
+
+
+func _floor(x: float, z: float) -> Vector3:
+	var space := main.world.get_world_3d().direct_space_state
+	var h := space.intersect_ray(PhysicsRayQueryParameters3D.create(Vector3(x, 6.0, z), Vector3(x, -3.0, z), 1))
+	return h.position as Vector3 if not h.is_empty() else Vector3(x, 0.0, z)
+
+
+## Ponto e direcao de chao livre por `length` m (sem parede a 0,8 m e chao ate o fim), perto da praca da festa.
+func _open_lane(length: float) -> Array:
+	var space := main.world.get_world_3d().direct_space_state
+	var base := main.world.marker(&"M8_FestaPlaza").global_position
+	for oz: float in [0.0, 4.0, -4.0, 8.0]:
+		for i in 16:
+			var d := Vector3.FORWARD.rotated(Vector3.UP, TAU * i / 16.0)
+			var o := base + Vector3(0, 0, oz)
+			var ok := true
+			var q := PhysicsShapeQueryParameters3D.new()
+			var sph := SphereShape3D.new()
+			sph.radius = 1.4
+			q.shape = sph
+			q.collision_mask = 1
+			q.motion = d * (length + 2.5)
+			for h: float in [1.5, 2.2]:
+				q.transform = Transform3D(Basis(), o - d * 2.5 + Vector3(0, h, 0))
+				var res := space.cast_motion(q)
+				if res.is_empty() or res[0] < 1.0:
+					ok = false
+			for k in 9:
+				var p := o + d * length * k / 8.0
+				if absf(_floor(p.x, p.z).y - o.y) > 0.15:
+					ok = false
+			if ok:
+				return [o, d]
+	return []
+
+
+func _place_trio(origin: Vector3, d: Vector3) -> void:
+	var lead := main.actors[&"tracker"] as MemberActor
+	main.set_controlled(lead)
+	var back := -d
+	var side := d.cross(Vector3.UP)
+	lead.teleport(origin + Vector3(0, 0.05, 0))
+	(main.actors[&"climber"] as MemberActor).teleport(origin + back * 1.2 + side * 1.0 + Vector3(0, 0.05, 0))
+	(main.actors[&"pilot"] as MemberActor).teleport(origin + back * 1.2 - side * 1.0 + Vector3(0, 0.05, 0))
+	lead.face_now(origin + d)
+
+
+func _min_gap() -> float:
+	var ms: Array = main.actors.keys()
+	var best := INF
+	for i in ms.size():
+		for j in range(i + 1, ms.size()):
+			var a := (main.actors[ms[i]] as Node3D).global_position
+			var b := (main.actors[ms[j]] as Node3D).global_position
+			best = minf(best, Vector2(a.x - b.x, a.z - b.z).length())
+	return best
+
+
+## Anda (ou corre) 2,5 s em linha reta pela entrada real, para, e mede velocidade, clipe, escala e formacao.
+func _gait_and_formation(running: bool) -> void:
+	var tag := "corrida" if running else "caminhada"
+	var lane := _open_lane(10.5 if running else 5.0)
+	r.check(not lane.is_empty(), "mov %s: achou faixa livre na praca" % tag)
+	if lane.is_empty():
+		return
+	var d: Vector3 = lane[1]
+	_place_trio(lane[0] as Vector3, d)
+	await _physics(10)
+	var lead := main.actors[&"tracker"] as MemberActor
+	main.camera_rig.yaw = 0.0
+	if running:
+		Input.action_press(&"run")
+	_push(d)
+	var t := 0.0
+	var speeds: Array[float] = []
+	var scales_ok := true
+	var follower_ran := false
+	while t < 2.5:
+		await r.tree.physics_frame
+		t += 1.0 / Engine.physics_ticks_per_second
+		if t > 0.5:
+			speeds.append(_planar(lead))
+			var g := lead.gait(_planar(lead))
+			var cur := lead.model.current_animation()
+			var want_scale := _planar(lead) / (lead.model.run_speed_mps if cur == &"run" else lead.model.walk_speed_mps)
+			if cur != g["anim"] or absf(float(g["scale"]) - want_scale) > 0.01:
+				scales_ok = false
+			for m: StringName in [&"climber", &"pilot"]:
+				follower_ran = follower_ran or ((main.actors[m] as MemberActor).running and _planar(main.actors[m] as MemberActor) > MemberActor.RUN_THRESHOLD)
+	var avg := 0.0
+	for s in speeds:
+		avg += s
+	avg /= maxf(speeds.size(), 1)
+	var want := MemberActor.RUN_SPEED if running else MemberActor.WALK_SPEED
+	r.check(absf(avg - want) < want * 0.04, "mov %s: velocidade media %.2f m/s (alvo %.2f)" % [tag, avg, want])
+	var clip := lead.model.current_animation()
+	r.check(clip == (&"run" if running else &"walk"), "mov %s: clipe %s" % [tag, clip])
+	r.check(scales_ok, "mov %s: escala do clipe = velocidade real / avanco do pe em todos os quadros" % tag)
+	if running:
+		r.check(follower_ran, "mov corrida: seguidores correm com o lider")
+	_release()
+	var lead_stop := Vector3.ZERO
+	var settle_frames := 0
+	await _physics(12)
+	lead_stop = lead.global_position
+	var last := {}
+	var jitter := 0.0
+	var frames := 0
+	while frames < 300:
+		await r.tree.physics_frame
+		frames += 1
+		if frames > 240:
+			for m: StringName in [&"climber", &"pilot"]:
+				var p := (main.actors[m] as Node3D).global_position
+				if last.has(m):
+					jitter += p.distance_to(last[m] as Vector3)
+				last[m] = p
+		settle_frames = frames
+	var gap := _min_gap()
+	r.check(gap >= 0.8, "mov %s: distancia minima entre os tres depois de parar %.2f m (>= 0,8)" % [tag, gap])
+	r.check(lead.global_position.distance_to(lead_stop) < 0.02, "mov %s: lider nao e empurrado (%.3f m)" % [tag, lead.global_position.distance_to(lead_stop)])
+	r.check(jitter < 0.02, "mov %s: seguidores parados sem tremer (%.3f m no ultimo 1 s)" % [tag, jitter])
+	var fwd := lead.facing()
+	var behind := true
+	var sides: Array[float] = []
+	for m: StringName in [&"climber", &"pilot"]:
+		var rel := (main.actors[m] as Node3D).global_position - lead.global_position
+		rel.y = 0.0
+		behind = behind and rel.dot(fwd) < -0.3
+		sides.append(rel.dot(fwd.cross(Vector3.UP)))
+	r.check(behind and sides[0] * sides[1] < 0.0, "mov %s: seguidores atras e um de cada lado do lider (lados %.2f / %.2f)" % [tag, sides[0], sides[1]])
+	print("  medida %s: %.2f m/s, gap minimo %.2f m, tremor %.3f m, %d quadros" % [tag, avg, gap, jitter, settle_frames])
+	for m: StringName in [&"climber", &"pilot"]:
+		var f := main.actors[m] as MemberActor
+		print("  medida %s %s: a %.2f m do lugar na formacao (lugar livre=%s)" % [tag, m, f.global_position.distance_to(f.formation_slot()), f.formation_slot() != f.global_position])
+	if running:
+		# Recuperacao: um seguidor jogado dentro do outro (o caso que Thiago viu) se separa e volta a formacao.
+		var climber := main.actors[&"climber"] as MemberActor
+		climber.global_position = (main.actors[&"pilot"] as Node3D).global_position + Vector3(0.05, 0, 0)
+		await _physics(240)
+		r.check(_min_gap() >= 0.8 and lead.global_position.distance_to(lead_stop) < 0.02,
+			"mov recuperacao: seguidores sobrepostos se separam (gap %.2f m) sem mover o lider" % _min_gap())
+
+
+func _jump_arc() -> void:
+	var lane := _open_lane(4.0)
+	if lane.is_empty():
+		r.check(false, "mov pulo: faixa livre")
+		return
+	_place_trio(lane[0] as Vector3, lane[1] as Vector3)
+	var lead := main.actors[&"tracker"] as MemberActor
+	await _physics(15)
+	var y0 := lead.global_position.y
+	r.check(lead.can_jump(), "mov pulo: no chao e livre, pode pular")
+	var jumps0 := lead.jumps
+	Input.action_press(&"jump")
+	await r.tree.physics_frame
+	Input.action_release(&"jump")
+	var top := y0
+	var frames := 1
+	while frames < 120:
+		await r.tree.physics_frame
+		frames += 1
+		top = maxf(top, lead.global_position.y)
+		if not lead.jumping:
+			break
+	var dur := float(frames) / Engine.physics_ticks_per_second
+	r.check(lead.jumps == jumps0 + 1, "mov pulo: `jump` pula uma vez")
+	r.check(absf(top - y0 - MemberActor.JUMP_HEIGHT) < 0.05, "mov pulo: altura %.2f m (alvo %.2f)" % [top - y0, MemberActor.JUMP_HEIGHT])
+	r.check(absf(dur - MemberActor.jump_duration()) < 0.06, "mov pulo: duracao %.2f s (alvo %.2f)" % [dur, MemberActor.jump_duration()])
+	r.check(absf(lead.global_position.y - y0) < 0.03 and lead.is_on_floor(), "mov pulo: pousa no chao sem dano (y %.3f)" % (lead.global_position.y - y0))
+	print("  medida pulo: altura %.3f m, duracao %.3f s" % [top - y0, dur])
+
+
+func _jump_blocked() -> void:
+	var lead := main.actors[&"tracker"] as MemberActor
+	await _physics(5)
+	var y0 := lead.global_position.y
+	var jumps0 := lead.jumps
+	main.land.busy = true
+	Input.action_press(&"jump")
+	await _physics(10)
+	Input.action_release(&"jump")
+	r.check(lead.jumps == jumps0 and absf(lead.global_position.y - y0) < 0.02, "mov pulo: bloqueado durante `busy`")
+	main.land.busy = false
+	await _physics(2)
+	# Durante o salto programado (`jump_to`) tambem nao pula, e o jump_to chega ao alvo.
+	var to := lead.global_position + lead.facing() * 0.8
+	lead.jump_to(to, 0.5, 0.6)
+	await r.tree.physics_frame
+	Input.action_press(&"jump")
+	await _physics(3)
+	Input.action_release(&"jump")
+	r.check(lead.jumps == jumps0, "mov pulo: bloqueado durante `jump_to`")
+	await lead.landed
+	r.check(lead.global_position.distance_to(to) < 0.01, "mov pulo: salto programado `jump_to` (o do Pico) intacto, chega ao alvo")
+	await _physics(5)
+	# Recuperacao: livre de novo, volta a pular.
+	Input.action_press(&"jump")
+	await _physics(3)
+	Input.action_release(&"jump")
+	r.check(lead.jumps == jumps0 + 1, "mov pulo: depois de `busy`/`jump_to`, pula de novo")
+	await _physics(40)
+
+
+## Beira do cais norte (parede de agua): pular encostado na parede nao passa por cima nem atravessa.
+func _jump_map_edge() -> void:
+	var space := main.world.get_world_3d().direct_space_state
+	var hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(Vector3(0, 0.8, -15.0), Vector3(0, 0.8, -10.0), 1))
+	r.check(not hit.is_empty(), "mov limite: parede da beira d'agua encontrada")
+	if hit.is_empty():
+		return
+	var wall_z := (hit.position as Vector3).z
+	var start := _floor(0.0, wall_z - 1.2)
+	var lead := main.actors[&"tracker"] as MemberActor
+	_place_trio(start, Vector3.BACK)
+	await _physics(10)
+	var max_z := -INF
+	Input.action_press(&"run")
+	_push(Vector3.BACK)
+	for i in 8:
+		Input.action_press(&"jump")
+		await r.tree.physics_frame
+		Input.action_release(&"jump")
+		for k in 30:
+			await r.tree.physics_frame
+			max_z = maxf(max_z, lead.global_position.z)
+	_release()
+	await _physics(10)
+	r.check(max_z < wall_z - 0.3 and lead.global_position.y > start.y - 0.1,
+		"mov limite: pulando contra a beira d'agua fica do lado de terra (z max %.2f, parede %.2f)" % [max_z, wall_z])
