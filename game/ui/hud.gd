@@ -29,6 +29,13 @@ const MEMBERS: Array[StringName] = [&"tracker", &"climber", &"pilot"]
 ## Cores-assinatura da style-bible (secao 3).
 const MEMBER_COLORS := {&"tracker": Color("FF8A1F"), &"climber": Color("3DBE5A"), &"pilot": Color("2F8CFF")}
 const SKILL_ICONS := {&"tracker": &"notebook", &"climber": &"rope", &"pilot": &"helm"}
+## Retrato da legenda de quem nao e heroi (RB-R1 E7, PROVISORIO): render do modelo 3D (capitao, filhote; mesmo
+## enquadramento dos retratos v2) ou retrato-icone da marca (Dona Amora sem modelo; Farol 7 = farol com ondas de radio).
+const SPEAKER_PORTRAITS := {&"captain": "res://ui/portraits/captain_neutra.png", &"pup": "res://ui/portraits/pup_neutra.png"}
+const SPEAKER_ICONS := {&"captain": &"helm", &"pup": &"paw", &"vendor": &"vendor", &"radio": &"radio"}
+## Anel e nome do falante; cores escolhidas para o nome (escurecido 20%) ler sobre o papel do balao.
+const SPEAKER_COLORS := {&"captain": Color("123A5E"), &"pup": Color("2A9D8F"), &"vendor": Color("7A3E9D"),
+	&"radio": Color("FF5A4E")}
 const HANDOFF_MIN_SECONDS := 0.45
 const FONT := 34
 ## Alvo de toque minimo em unidades virtuais (>= 48 dp em aparelho com lado curto >= ~410 dp; ver README).
@@ -642,6 +649,26 @@ func portrait_texture(member: StringName) -> Texture2D:
 	return _portrait_textures.get(member, null)
 
 
+## Pictograma da legenda do falante (usado quando nao ha retrato renderizado). "notebook" so para o Rastro.
+func speaker_icon(who: StringName) -> StringName:
+	return SKILL_ICONS.get(who, SPEAKER_ICONS.get(who, &"horn"))
+
+
+## Retrato renderizado do falante: o do heroi (set_portrait_texture) ou o PNG de SPEAKER_PORTRAITS; null = pictograma.
+func speaker_texture(who: StringName) -> Texture2D:
+	if _portrait_textures.has(who):
+		return _portrait_textures[who]
+	var path: String = SPEAKER_PORTRAITS.get(who, "")
+	if path != "" and ResourceLoader.exists(path):
+		_portrait_textures[who] = load(path) as Texture2D
+		return _portrait_textures[who]
+	return null
+
+
+func speaker_color(who: StringName) -> Color:
+	return MEMBER_COLORS.get(who, SPEAKER_COLORS.get(who, ThemeV2.NAVY))
+
+
 func set_member(member: StringName) -> void:
 	if member == &"":
 		_member_panel.visible = false
@@ -841,10 +868,10 @@ func _show_line(entry: Dictionary) -> void:
 	_sub_speaker.text = speaker_name_for(key)
 	_sub_speaker.visible = not _sub_speaker.text.is_empty()
 	if who != &"":
-		_sub_portrait.kind = SKILL_ICONS.get(who, &"notebook")
-		_sub_portrait.color = MEMBER_COLORS.get(who, ThemeV2.NAVY)
-		_sub_portrait.texture_override = _portrait_textures.get(who, null)
-		_sub_speaker.add_theme_color_override("font_color", (MEMBER_COLORS.get(who, ThemeV2.NAVY) as Color).darkened(0.2))
+		_sub_portrait.kind = speaker_icon(who)
+		_sub_portrait.color = speaker_color(who)
+		_sub_portrait.texture_override = speaker_texture(who)
+		_sub_speaker.add_theme_color_override("font_color", speaker_color(who).darkened(0.2))
 	else:
 		# Sem falante (dica de Farol 7 no radio, sons): buzina/radio.
 		_sub_portrait.kind = &"horn"

@@ -22,17 +22,23 @@ from mathutils import Vector
 args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 HID = args[0]
 HERE = os.path.dirname(bpy.data.filepath)
-REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 OUT = os.path.join(REPO, args[args.index("--out") + 1] if "--out" in args else os.path.join("game", "ui", "portraits"))
 SAMPLES = int(args[args.index("--samples") + 1]) if "--samples" in args else 96
-for p in (HERE, os.path.join(REPO, "source_art", "scripts")):
+for p in (HERE, os.path.join(REPO, "source_art", "scripts"), os.path.join(REPO, "source_art", "characters", "rastro_v2")):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-RR = __import__({"rastro": "rv2_render", "pico": "pv2_render", "leme": "lv2_render"}[HID])
+# RB-R1 E7 (ux): capitao e filhote (source_art/characters/heroes/<id>/<id>.blend, primeira geracao, sem modelo v2)
+# usam a mesma luz e render do Rastro v2 (rv2_render), para a legenda nao misturar estilos com os herois v2.
+RR = __import__({"rastro": "rv2_render", "pico": "pv2_render", "leme": "lv2_render",
+                 "captain": "rv2_render", "pup": "rv2_render"}[HID])
 EXPRS = ("neutra", "alegre", "surpresa")
 # 1,60 m e 7 cm abaixo do meio do osso: calibrado para a cabeca v2 ocupar a mesma area do quadro que a dos antigos
 DIST, ELEV, AZIM, LENS, DROP = 1.60, 6.0, -20.0, 85.0, 0.07
+# Capitao (adulto) e filhote: calibrados lado a lado com os retratos v2 dos herois (cabeca na mesma area do quadro).
+# Capitao: mais longe e alvo 2 cm acima para caber o quepe; filhote: perto (cabeca pequena), alvo 2 cm abaixo.
+DIST, AZIM, DROP = {"captain": (1.85, AZIM, -0.02), "pup": (0.95, AZIM, 0.02)}.get(HID, (DIST, AZIM, DROP))
 
 
 def _opt(flag, default):
