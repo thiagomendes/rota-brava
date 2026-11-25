@@ -92,6 +92,8 @@ Objetivo observável: Thiago joga no Windows o Ep01 com os heróis v2, a vila v2
   | M1/M8 cais de madeira, borda sul (z 3,0) | margem −0,12 → cais 0,00 | +0,12 | x −8..8 | sobe sem rampa (medido) |
   Fraco: o muro baixo da escadaria enterrada do beco (x 22,3) agora aparece ~0,5 m acima da grama (tem colisão, igual ao visual); as rampas são só colisão (o chafariz e o farol continuam com degraus visíveis); retratos em Cycles PBR, sem o contorno dos antigos (`captain` e `pup` continuam os da primeira geração); GPU real não medida.
 
+- **Revisão E4 (`reviewer`, 2026-11-25):** APROVADO COM RESSALVAS, suíte `OK (2937 PASS)` com a base E3b. Ressalvas baixas (vão para a E5): `_hop_chain` pode deixar `busy` preso se um `jump_to` for interrompido (pôr timeout ou sinal no kill); `run_tests.gd` deve zerar `save_path` antes do laço; sem teste da caixa do carrinho religada ao sair do M4 nem de salvo de versão diferente. Visto pelo lead: M4 com Leme e carrinho, M3 com Pico na bacia, seta de ajuda no M3 (Rastro tapado pelo carrinho). Integrado na `feature/rb-r1-reorientacao`.
+
 ## Barra de qualidade (mensurável e perceptual)
 **Personagens (crianças-heróis)**
 - Altura ~1,05 a 1,15 m no mundo; **cabeça 33 a 38% da altura** (~3 cabeças); olhos grandes (altura do olho ≥ 20% da altura da cabeça) com íris, pupila e dois brilhos; mãos de 4 dedos legíveis; pés grandes e arredondados.
