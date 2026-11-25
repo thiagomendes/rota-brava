@@ -1,14 +1,16 @@
 {
-  "tris": 24790,
+  "tris": 24531,
   "tris_por_objeto": {
-    "Leme_Skin": 5291,
-    "Leme_Hair": 2986,
-    "Leme_Gear": 6800,
-    "Leme_Suit": 7217,
+    "Leme_Skin": 2068,
+    "Leme_Hair": 2618,
+    "Leme_Gear": 9265,
+    "Leme_Suit": 4570,
+    "Acc_LifeVest": 3514,
     "Leme_Glass": 128,
     "Leme_Face": 2368
   },
   "materials": [
+    "mat_leme_v2_acc_lifevest",
     "mat_leme_v2_face_dark",
     "mat_leme_v2_face_eye",
     "mat_leme_v2_face_iris",
@@ -20,12 +22,13 @@
     "mat_leme_v2_skin",
     "mat_leme_v2_suit"
   ],
-  "height_m": 1.1307,
+  "height_m": 1.1374,
   "min_z": -0.0002,
   "head_h_m": 0.4013,
-  "head_ratio": 0.3549,
+  "head_ratio": 0.3528,
   "eye_h_ratio": 0.2926,
   "objects": [
+    "Acc_LifeVest",
     "Leme_Face",
     "Leme_Gear",
     "Leme_Glass",
@@ -131,12 +134,19 @@
     "look_right",
     "look_up"
   ],
-  "shape_keys_maos": [
+  "shape_keys_luvas": [
     "fist_R",
     "thumb_up_R",
     "fist_L",
     "thumb_up_L"
   ],
+  "acessorios": {
+    "acc_lifevest": {
+      "no": "Acc_LifeVest",
+      "tris": 3514,
+      "oculto_por_padrao": true
+    }
+  },
   "walk_speed_mps": 0.5711,
   "run_speed_mps": 1.2133,
   "pes": {
@@ -144,6 +154,18 @@
     "foot_x_m": 0.0915
   },
   "texturas": {
+    "leme_v2_acc_lifevest_color": [
+      1024,
+      1024
+    ],
+    "leme_v2_acc_lifevest_normal": [
+      1024,
+      1024
+    ],
+    "leme_v2_acc_lifevest_orm": [
+      1024,
+      1024
+    ],
     "leme_v2_gear_color": [
       2048,
       2048
@@ -169,16 +191,16 @@
       1024
     ],
     "leme_v2_skin_color": [
-      2048,
-      2048
+      1024,
+      1024
     ],
     "leme_v2_skin_normal": [
-      2048,
-      2048
+      1024,
+      1024
     ],
     "leme_v2_skin_orm": [
-      2048,
-      2048
+      1024,
+      1024
     ],
     "leme_v2_suit_color": [
       2048,
@@ -204,12 +226,12 @@
         "quadro": 149
       },
       "walk": {
-        "min_m": 0.0689,
+        "min_m": 0.0663,
         "quadro": 9
       },
       "run": {
-        "min_m": 0.0736,
-        "quadro": 12
+        "min_m": 0.0709,
+        "quadro": 4
       },
       "stop": {
         "min_m": 0.0522,

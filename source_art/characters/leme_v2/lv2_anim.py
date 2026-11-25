@@ -1,10 +1,10 @@
 """Leme v2: animacoes. Mesmo esqueleto de 28 ossos e os MESMOS 12 nomes de clipe da Leme do jogo (leme.glb):
 idle, walk, run, stop, idle_wheel, steer_left, steer_right, react_horn, celebrate, wave, point, team_pose.
-Novos nesta proposta: `idle` (gira a bussola de pulso e depois sorri para o mar, mao na cintura), `team_pose`
-(continencia de capita: mao aberta na pala, a outra na cintura, base aberta) e `wave` (aceno aberto, braco alto, palma
+Novos nesta proposta: `idle` (gira a bussola de pulso e depois olha o horizonte sorrindo, mao na cintura), `team_pose`
+(v2.2 pilota, D16: mao direita no fone, joinha da esquerda, base aberta) e `wave` (aceno aberto, braco alto, palma
 para a frente). Os demais vem de source_art/scripts/hero_anim.py. FK + IK de 2 ossos, 30 fps, sem root motion. PROVISORIO.
 
-Sem ossos de dedo (28 ossos): as maos de pele tem shape keys fist_R/fist_L (punho) e thumb_up_R/thumb_up_L (joinha),
+Sem ossos de dedo (28 ossos): as luvas tem shape keys fist_R/fist_L (punho) e thumb_up_R/thumb_up_L (joinha),
 animadas por clipe numa Action propria (<clipe>_hand): punhos no celebrate, joinha da mao esquerda no team_pose (junto da
 continencia) e pegada leve no volante (idle_wheel/steer). Contato dos pes: a sola nunca afunda no chao ao rolar o pe
 (put_foot corrigido abaixo com os pontos reais da sola).
@@ -102,7 +102,7 @@ def pose_idle_lv2(R, F, t, T):
         # centro da bussola: dorso do pulso esquerdo, um pouco para cima
         w = R.pos["hand.L"]
         fa = (R.pos["hand.L"] - R.pos["forearm.L"]).normalized()
-        c = w - fa * 0.024 + Vector((0, 0.0, 0.034))
+        c = w - fa * F.compass_back + Vector((0, 0.0, 0.034))   # a bussola subiu pelo antebraco (acima do punho da luva)
         a = 2 * math.pi * 1.4 * smooth(t, 1.1, 2.4)
         circ = Vector((0.012 * math.cos(a), 0.012 * math.sin(a), 0.0)) * turn
         restr = R.tip("hand.R")
@@ -118,21 +118,25 @@ def pose_idle_lv2(R, F, t, T):
                    blink=blink_curve(t, 0.25) + blink_curve(t, 2.8) + blink_curve(t, 4.85))
 
 
+TEAM_ROLL = -20.0          # giro da mao direita no fone (ajustado olhando o palmo: dedos para cima, palma na concha)
+TEAM_DIR = (-0.30, -0.10, 1.0)
+
+
 def pose_team_lv2(R, F, t, T):
-    """Pose de equipe (1,5 s): pequeno impulso, pousa na base aberta, CONTINENCIA de capita (mao direita aberta na pala do
-    bone), mao esquerda na cintura, peito aberto, queixo erguido e sorriso; segura e assenta."""
+    """Pose de equipe de PILOTA (1,5 s, D16): pequeno impulso, pousa na base aberta, MAO DIREITA NO FONE (como quem fala no
+    radio: "na escuta!"), JOINHA da esquerda a frente do peito, peito aberto, queixo erguido e sorriso; segura e assenta."""
     pre = smooth(t, 0.0, 0.14) * (1 - smooth(t, 0.14, 0.26))
     air = math.sin(math.pi * min(max((t - 0.20) / 0.22, 0.0), 1.0))
     a = smooth(t, 0.14, 0.44) * (1 - smooth(t, 1.22, 1.5))
     land = math.sin(math.pi * min(max((t - 0.40) / 0.22, 0.0), 1.0))
     R.hips_off = Vector((0.0, 0.0, -0.036 * pre + 0.040 * air - 0.026 * land - 0.010 * a))
     R.rel("hips", eul(z=6.0 * a))
-    torso(R, lean=lerp(2.0, -6.0, a) + 9 * pre, yaw=-6.0 * a, roll=2.0 * a, head_pitch=7.0 * a, head_roll=-4.0 * a, head_yaw=4.0 * a)
+    torso(R, lean=lerp(2.0, -6.0, a) + 9 * pre, yaw=-6.0 * a, roll=2.0 * a, head_pitch=7.0 * a, head_roll=-7.0 * a, head_yaw=4.0 * a)
     ha.arms_down(R, F, bend=14, out=6)
     R.evaluate()
     rr, rl = R.tip("hand.R"), R.tip("hand.L")
-    sal = head_point(R, F.brim_r) + Vector((0.022, 0.006, 0.012))
-    reach(R, "R", rr.lerp(sal, a), Vector((0.1, 0.2, -1.0)).lerp(Vector((-0.40, 0.42, 0.80)), a), pole=(1.0, -0.15, -0.25), roll=-20.0 * a)
+    cup = head_point(R, F.cup_out_R) + Vector((0.028, -0.014, 0.030))
+    reach(R, "R", rr.lerp(cup, a), Vector((0.1, 0.2, -1.0)).lerp(Vector(TEAM_DIR), a), pole=(1.0, -0.35, -0.35), roll=TEAM_ROLL * a)
     # mao esquerda: JOINHA a frente do peito (punho deitado, polegar para cima), cotovelo baixo
     thumb = Vector((-0.085, F.v["belly"] + 0.17, F.sh.z - 0.11))
     reach(R, "L", rl.lerp(thumb, a), Vector((-0.1, 0.2, -1.0)).lerp(Vector((0.25, 1.0, 0.10)), a), pole=(-0.8, -0.4, -1.0))
@@ -258,7 +262,7 @@ def author(rig, face_ob, F, names=CLIP_SET, hand_ob=None, sole=None):
 
 
 # ------------------------------------------------------------------ medidas (botas nunca se tocam; pes sem patinar)
-BOOT_PARTS = ("boot", "sole", "boot_collar", "laces", "eyelets")
+BOOT_PARTS = ("boot", "sole", "boot_collar", "boot_strap", "boot_tab")
 
 
 def _use_clip(rig, face_ob, name):

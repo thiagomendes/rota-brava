@@ -1,47 +1,72 @@
-# Leme v2 · proveniência (RB-R1 D11/D13) — PROPOSTA PROVISÓRIA
+# Leme v2.2 pilota · proveniência (RB-R1 D11/D13/D16) — PROPOSTA PROVISÓRIA
 
-Heroína piloto (9 anos, a mais velha e calma) para aprovação de Thiago num visualizador 3D. **Não substitui** a Leme do
-jogo (`game/assets/models/characters/leme.glb` continua em uso); aparece só na vitrine `game/lookdev/` (modo `after`,
-via `game/lookdev/leme_v2_model.tscn`).
+Heroína **pilota e navegadora** da equipe (9 anos, a mais velha e calma): conduz qualquer veículo (barco, carrinho, kart,
+balão, drone) e lê bússola e mapas (D16). Para aprovação de Thiago num visualizador 3D. **Não substitui** a Leme do jogo
+(`game/assets/models/characters/leme.glb` continua em uso); aparece só na vitrine `game/lookdev/` (modo `after`, via
+`game/lookdev/leme_v2_model.tscn`). A versão "capitã de barco" (v2.1) fica no histórico do Git (commit `003ea04` e seguintes).
 
-## Conceito do traje (D13: distinta do Rastro e do Pico)
-- **Silhueta:** boné náutico de capitania (copa branca alta, mais larga em cima, faixa azul-marinho, pala envernizada,
-  cordão dourado, emblema da equipe na frente) + cabelo cacheado com volume nas laterais e um **puff grande atrás**;
-  colete salva-vidas com **gola-travesseiro em ferradura** atrás do pescoço.
-- **Traje:** camisa de capitania branca de **manga curta** (vivo azul, carcela com botões no decote), **colete salva-vidas
-  azul** de placas de espuma (abertura na frente, canais costurados, duas faixas refletivas, vivo branco, tira com fivela de
-  engate, laterais abertas com tiras, apito no cordão, estrela branca nas costas), **bermuda azul** (faixa lateral branca,
-  bolsos com pesponto, barra dobrada), **meias de meio cano** brancas com duas listras azuis, **botinas náuticas** azul-marinho
-  com sola branca grossa, friso azul, cadarço e ilhoses.
-- **Equipamento:** bússola de pulso (esquerda: aro dourado, mostrador com rosa dos ventos, agulha, cúpula de vidro) e
-  pulseira de corda trançada azul e branca (direita).
-- **Comum da equipe:** emblema da Rota Brava no peito (placa esquerda do colete) e cinto azul-marinho com fivela-bússola dourada.
-- **Pele e cabelo:** pele marrom-escura quente (#8C5634; Rastro #C98B60, Pico #F3C9A2), palmas mais claras; cachos quase pretos.
-- **Pernas em leve "A"** (quadril ±0,073 m, tornozelos ±0,092 m): as botinas ficam separadas em todos os quadros.
+## Conceito do traje (D13: distinta do Rastro e do Pico; D16: nada náutico fixo)
+- **Silhueta:** **boné de pilota com fones** — copa arredondada de seis gomos (branca, gomo da frente azul, vivo azul-marinho
+  na base, botão no alto), pala curta quase reta (olhos livres), emblema da equipe na frente; por cima, **fones de pilota**:
+  arco azul-marinho com almofada branca passando sobre o boné, conchas grandes azuis com tampa branca e estrela azul-marinho,
+  almofadas azul-marinho assentadas no cabelo e **haste de microfone** saindo da concha esquerda e parando ao lado da boca
+  (liga com o rádio de Farol 7). Conchas largas + arco + haste = silhueta própria, diferente do chapéu/óculos-lupa do Rastro e
+  do capacete redondo com lanterna do Pico. Cachos com volume nas laterais e **puff grande atrás** continuam à mostra.
+- **Traje:** **jaqueta curta de pilota** azul `#2F8CFF` em sarja técnica (gola alta branca com friso azul, zíper com dentes
+  prata e puxador, ombros brancos em recorte com pesponto, laterais azul-marinho sob os braços, **faixa refletiva** no peito e
+  em cada braço, barra canelada), **calça de pilota** azul `#1F5FBF` (vivo branco lateral, bolsos com
+  pesponto), **cotoveleiras** azul-marinho e **joelheiras** brancas com vivo azul-marinho e filete refletivo (cascas
+  acolchoadas leves), **luvas de pilota** brancas de 4 dedos (protetor azul-marinho nos nós dos dedos, palma lisa) com
+  **punho largo** azul de borda branca, **botas de pilota** azuis com biqueira e cano brancos, duas **tiras de velcro**
+  azul-marinho com passador prata, aba refletiva no calcanhar e sola branca com friso azul-marinho.
+- **Equipamento:** bússola de pulso (esquerda, sobre a manga acima do punho da luva: aro dourado, mostrador com rosa dos
+  ventos, agulha, cúpula de vidro).
+- **Comum da equipe:** emblema da Rota Brava no peito esquerdo (na jaqueta) e cinto azul-marinho com fivela-bússola dourada.
+- **Pele e cabelo:** pele marrom-escura quente (#8C5634; Rastro #C98B60, Pico #F3C9A2); cachos quase pretos.
+- **Pernas em leve "A"** (quadril ±0,073 m, tornozelos ±0,092 m): as botas ficam separadas em todos os quadros.
+
+## Equipamento por missão (D16): colete salva-vidas como acessório
+- Nó próprio no mesmo GLB: **`Acc_LifeVest`** (malha com pele no mesmo esqueleto, pesos só do tronco: hips, spine, chest,
+  neck; material próprio `mat_leme_v2_acc_lifevest`, textura 1K). Contém o colete de placas de espuma com canais costurados,
+  faixas refletivas, gola-travesseiro, tiras e fivela, apito no cordão e o emblema da equipe na placa esquerda.
+- **Cor do colete (v2.2, D17, 2026-11-25):** nailon **amarelo da equipe `#FFC83D`** (o amarelo do emblema, `docs/style-bible.md`
+  §4), para não se confundir com a jaqueta azul; faixas refletivas prata `#B9C7D4` com vivos azul-marinho `#1F3A5F` dos dois
+  lados; vivo da borda, tiras e cordão do apito em azul-marinho; apito azul-marinho claro `#2B5285` com argola prata (o antigo
+  apito âmbar sumia no amarelo); emblema azul-marinho com estrela dourada, inalterado. Sem laranja (cor da Rastro). Antes:
+  colete azul `#1F5FBF`. Malha, rig, clipes e visibilidade padrão não mudaram (só `lv2_tex.py`).
+- **Oculto por padrão** na Godot: `game/lookdev/gltf_pbr_import.gd` esconde na importação todo nó cujo nome começa com `Acc_`.
+  Ligar no jogo ou na vitrine: `modelo.find_child("Acc_LifeVest", true, false).visible = true`
+  (na cena: `LemeV2/Model/Rig/<Armature>/Skeleton3D/Acc_LifeVest`). Vitrine: `--lookdev-hero=leme --lookdev-acc=Acc_LifeVest`.
+- glTF não tem visibilidade de nó (o exportador do Blender 4.5 não grava `KHR_node_visibility`): num visualizador web o
+  colete aparece até ser escondido pelo próprio visualizador.
 
 ## Origem de tudo (100% gerado no projeto)
 | Item | Como foi feito |
 |---|---|
-| Corpo inteiriço (tronco + braços + pernas numa malha só) | grafo de pele (SKIN) + SUBSURF 3, ombro/cotovelo/joelho/panturrilha deslocados em numpy, Decimate por colapso; depois cortado por planos exatos em camisa, bermuda, pele (braço e joelho) e meia, com bordas coincidentes cobertas por vivos/barras modelados (`lv2_body.split_body`) |
-| Colete salva-vidas | superfície paramétrica (θ, z) projetada no corpo por raycast em BVH, espessura com borda arredondada e canais modelados, vivo (borda) até o corpo; gola-travesseiro por SKIN |
-| Mãos de 4 dedos (pele, relaxadas e levemente curvas, polegar à mostra), botinas, sola, cadarço | SKIN + SUBSURF, palma achatada em numpy; shape keys `fist_R/fist_L` (punho) e `thumb_up_R/thumb_up_L` (joinha) por rotação das falanges em numpy, pesos suaves pela distância aos esqueletos dos dedos (`lv2_body.add_hand_keys`); sola pelo contorno medido da própria bota; cadarço/ilhoses por tubos e toros sobre a bota (raycast) |
-| Boné, cinto, fivela, emblema, bússola, pulseira, apito | torno (lathe), toros, tubos, prismas e caixas arredondadas em bmesh; apito esportivo = câmara redonda + bocal + janela do som + argola do cordão |
-| Punho da meia | faixa que segue o raio real da perna (pele + meia) por ângulo e altura, medido por raios em BVH (6 por segmento, máximo da janela), com borda rolada (`_cuff`) |
+| Corpo inteiriço (tronco + braços + pernas numa malha só) | grafo de pele (SKIN) + SUBSURF 3, ombro/cotovelo/joelho/panturrilha deslocados em numpy, Decimate por colapso; depois cortado por planos exatos em jaqueta e calça (cintura sob o cinto; fim da manga no pulso, sob o punho da luva; calça entra na bota) (`lv2_body.split_body`) |
+| Cotoveleiras e joelheiras | casca paramétrica sobre o tecido (raycast em BVH em volta do eixo do membro, grade levada para um disco = contorno oval), espessura com borda arredondada e vivo até o tecido; pesos copiados da jaqueta/calça (`lv2_body._shell`) |
+| Colete (acessório) | superfície paramétrica (θ, z) projetada no corpo por raycast em BVH, espessura com borda arredondada e canais modelados, vivo até o corpo; gola-travesseiro por SKIN |
+| Luvas de 4 dedos (relaxadas e levemente curvas, polegar à mostra), botas, sola | SKIN + SUBSURF, palma achatada em numpy; shape keys `fist_R/fist_L` (punho) e `thumb_up_R/thumb_up_L` (joinha) por rotação das falanges em numpy, pesos suaves pela distância aos esqueletos dos dedos (`lv2_body.add_hand_keys`, agora na malha das luvas); punho largo por torno; sola pelo contorno medido da própria bota |
+| Tiras de velcro e aba das botas | fitas que seguem a superfície da bota (raycast em BVH) com seção arredondada; passadores e aba por caixas arredondadas |
+| Boné, fones, microfone, cinto, fivela, emblema, bússola, zíper | torno (lathe), toros, tubos, prismas e caixas arredondadas em bmesh; o arco dos fones tem o raio medido por raycast na própria copa do boné (com folga) e é suavizado |
 | Cabeça, rosto (olhos com dois brilhos, pálpebras, sobrancelhas, boca, visemas, olhar), esqueleto de 28 ossos | biblioteca dos heróis: `source_art/scripts/hero_lib.py`, `hero_face.py` (pernas do esqueleto em leve A) |
-| Cabelo | massa de base por metaball (o que fica dentro dos cachos ou do boné sai da malha) + 39 cachos individuais (elipsoides lisos de tamanho variado: cachos-mola pendentes nos três anéis, curtos no puff); a mola de dois fios e o verniz são pintados por cacho, no referencial do cacho (`lv2_tex.paint_hair`) |
-| Animações (12 clipes, os MESMOS nomes do `leme.glb`) | `source_art/scripts/hero_anim.py` + `lv2_anim.py` (idle, team_pose e wave novos; punhos no celebrate, joinha da mão esquerda junto da continência no team_pose, pegada leve no volante; correção de contato que impede a sola de afundar ao rolar o pé), FK/IK em Python |
-| Texturas (cor, normal, ORM) | assadas no Cycles a partir da própria malha (posição, normal, parte, AO) e pintadas em numpy: algodão, sarja, canelado, nailon ripstop, faixas refletivas, pespontos, bolsos, botões, cachos em hélice, palmas (`lv2_tex.py`). Nenhuma imagem de terceiros |
+| Cabelo | massa de base por metaball (o que fica dentro dos cachos ou do boné sai da malha) + cachos individuais (elipsoides lisos de tamanho variado); os cachos que cairiam dentro das conchas, do arco ou da haste do microfone não são criados (`headset_layout`); mola de dois fios e verniz pintados por cacho (`lv2_tex.paint_hair`) |
+| Animações (12 clipes, os MESMOS nomes do `leme.glb`) | `source_art/scripts/hero_anim.py` + `lv2_anim.py` (idle, team_pose e wave próprios; **team_pose de pilota**: mão direita no fone + joinha da esquerda; punhos no celebrate; pegada leve no volante; correção de contato que impede a sola de afundar ao rolar o pé), FK/IK em Python |
+| Texturas (cor, normal, ORM) | assadas no Cycles a partir da própria malha (posição, normal, parte, AO) e pintadas em numpy: sarja técnica, recortes, zíper, faixas refletivas, pespontos, velcro, acolchoado, ripstop (colete), gomos do boné, cachos em hélice (`lv2_tex.py`). Nenhuma imagem de terceiros |
 
 Nenhum modelo, malha, textura, HDRI ou personagem-base baixado ou importado. Paleta da bíblia de estilo (`docs/style-bible.md` §3).
+O render de prova do trio importa `rastro_v2.glb` e `pico_v2.glb` (do próprio projeto) só para a comparação lado a lado.
 
 ## Medidas (Blender, `leme_v2.info.json`)
-- Acabamento (2026-11-25): 24.790 triângulos; altura 1,131 m (com o boné); cabeça 35,5% da altura; olho 29,3% da cabeça; 28 ossos; 12 clipes;
-  shape keys das mãos `fist_R`, `fist_L`, `thumb_up_R`, `thumb_up_L` (Actions `<clipe>_hand`).
-- **Botas nunca se tocam:** menor distância entre as malhas das duas botinas (sola, cano, cadarço, ilhoses), vértice→superfície
-  nos dois sentidos, em todos os quadros dos 12 clipes = **5,22 cm** (team_pose quadro 4; walk 6,89 cm, run 7,36 cm).
-- Pés plantados: no walk/run, erro médio 0,0075 m/s no walk (máx. 0,058 m/s); a sola desce no máximo 0,7 mm abaixo do chão no
-  walk e 0,1 mm no run (antes 3,4 e 4,0 mm).
-- Mãos no volante (`idle_wheel`): ponto médio das mãos a 1,0 cm do centro do volante.
+- v2.2 pilota (2026-11-25): **24.531 triângulos com o colete** (21.017 sem: `Acc_LifeVest` tem 3.514); altura 1,137 m (com os
+  fones); cabeça 35,3% da altura; olho 29,3% da cabeça; 28 ossos; 12 clipes; shape keys das luvas `fist_R`, `fist_L`,
+  `thumb_up_R`, `thumb_up_L` (Actions `<clipe>_hand`).
+- **Botas nunca se tocam:** menor distância entre as malhas das duas botas (bota, sola, colarinho, tiras, passadores e aba),
+  vértice→superfície nos dois sentidos, em todos os quadros dos 12 clipes = **5,22 cm** (team_pose quadro 4; walk 6,63 cm,
+  run 7,09 cm).
+- Pés plantados: walk erro médio 0,0075 m/s (máx. 0,058 m/s), run 0,0; a sola desce no máximo 0,7 mm abaixo do chão no walk
+  e 0,1 mm no run.
+- Mãos no volante (`idle_wheel`): ponto médio das mãos a 0,97 cm do centro do volante.
 
 ## Arquivos
 - Fonte: `build_leme_v2.py` (entrada), `lv2_body.py`, `lv2_tex.py`, `lv2_anim.py`, `lv2_render.py`, `render_leme_v2.py`;
@@ -56,6 +81,6 @@ Nenhum modelo, malha, textura, HDRI ou personagem-base baixado ou importado. Pal
 bash tools/blender.sh --background --factory-startup --python source_art/characters/leme_v2/build_leme_v2.py -- \
   --glb $PWD/game/assets/models/characters/leme_v2.glb --blend $PWD/source_art/characters/leme_v2/leme_v2.blend
 bash tools/blender.sh --background source_art/characters/leme_v2/leme_v2.blend \
-  --python source_art/characters/leme_v2/render_leme_v2.py -- $PWD/captures/leme_v2
+  --python source_art/characters/leme_v2/render_leme_v2.py -- $PWD/captures/leme_pilota
 ```
 O GLB não sai byte a byte idêntico entre exportações (JPEG e ordem interna), mas malha, materiais e medidas sim.
