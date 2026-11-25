@@ -7,6 +7,7 @@ extends Node3D
 ##   --vc-night  --vc-festa  --vc-lantern=<graus>  --vc-beam  --vc-perf  --vc-decals
 ##   --vc-only-collision (com --debug-collisions na linha da Godot: so as formas de colisao)
 ##   --vc-hero=<id>@<marcador>      poe um heroi v2 (rastro|pico|leme) em pe num marcador (escala)
+##   --vc-hero-at=<id>@x,z          idem num ponto livre, em pe no chao da colisao (raycast para baixo)
 ## Imprime "VC PERF view=... draw_calls=... primitives=... objects=..." no quadro 12.
 
 const WORLD := "res://worlds/village_v3/village_world.tscn"
@@ -78,6 +79,25 @@ func _ready() -> void:
 		if a2.begins_with("--vc-hero="):
 			var spec := a2.trim_prefix("--vc-hero=").split("@")
 			_hero(spec[0], spec[1])
+		elif a2.begins_with("--vc-hero-at="):
+			var spec2 := a2.trim_prefix("--vc-hero-at=").split("@")
+			_hero_at.call_deferred(spec2[0], spec2[1].split_floats(","))
+
+
+## Heroi v2 em pe num ponto (x, z): a altura vem de um raycast na colisao do mundo (espera a fisica montar).
+func _hero_at(id: String, xz: PackedFloat64Array) -> void:
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	var q := PhysicsRayQueryParameters3D.create(Vector3(xz[0], 30.0, xz[1]), Vector3(xz[0], -5.0, xz[1]), 1)
+	var hit := get_world_3d().direct_space_state.intersect_ray(q)
+	var y := (hit.position as Vector3).y if not hit.is_empty() else 0.0
+	var h := (load(HERO_MODEL % id) as PackedScene).instantiate() as Node3D
+	add_child(h)
+	h.global_position = Vector3(xz[0], y, xz[1])
+	h.look_at(Vector3(cam.global_position.x, y, cam.global_position.z), Vector3.UP, true)
+	var vis := h.get_node_or_null("Model") as CharacterVisual
+	if vis != null:
+		vis.play(&"idle")
 
 
 func _hero(id: String, marker_name: String) -> void:

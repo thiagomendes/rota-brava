@@ -400,8 +400,8 @@ def build_shed(m, rng):
               grain="y", rng=rng)
     put("crate_fish", -16.55, 0.85, -16.6, 90, 0.85)
     put("crate_fish", -16.55, 0.85, -15.6, 95, 0.85)
-    # caixotes de 0,6 m (primeiro degrau)
-    for (cx_, cz_, ry) in ((-15.05, -14.0, 5), (-15.05, -14.62, -4), (-14.45, -14.3, 12)):
+    # caixotes de 0,6 m (primeiro degrau); E3b: recuados para liberar a passagem da praca para a rua (W3.PICO_CRATES)
+    for (cx_, cz_, ry) in W3.PICO_CRATES:
         put("crate", cx_, 0.0, cz_, ry)
     put("barrel_lid", -18.0, 0.0, -14.4, 0)
     put("net_pile", -20.6, 0.0, -14.2, -10, 0.8)
@@ -510,6 +510,11 @@ def hill_h(x, z):
 def head_h(x, z):
     d = math.hypot((x - 31.5) / 1.25, (z + 23.0) / 1.0)
     h = 2.4 - max(0.0, d - 7.0) * 0.45 + 0.25 * noise2(x * 1.4, z * 1.4, 7.0)
+    # E3b: o retalho do promontorio comeca em x = 20 sobre a rua (y 0); antes a borda ficava solta ate 0,55 m acima do
+    # calcamento (chapa no ar atras do cafe e degrau que travava o heroi em (20; -16)). Agora nasce 2 cm abaixo da rua e
+    # sobe no maximo 0,55 m por metro (29 graus, caminhavel). So em x >= 20 (onde ha retalho): pedras a oeste nao mudam.
+    if x >= 20.0:
+        h = min(h, (x - 20.0) * 0.55 - 0.02)
     return max(-1.8, h)
 
 
@@ -582,6 +587,41 @@ def build_terrain():
     return m
 
 
+def clear_head_path(x, z, rad):
+    """E3b: tira uma pedra de raio `rad` do corredor W3.HEAD_PATH (+ ramal da lente), empurrando-a para o lado mais
+    proximo ate a borda do corredor. Devolve (None, None) se o novo lugar cair na rua, na casa do faroleiro, no
+    embasamento do farol ou de novo no corredor."""
+    need = W3.HEAD_PATH_HALF + rad
+    moved = False
+    for _ in range(3):
+        best = None
+        for path in (W3.HEAD_PATH, W3.HEAD_PATH_LENS):
+            for (ax, az), (bx, bz) in zip(path[:-1], path[1:]):
+                dx, dz = bx - ax, bz - az
+                t = max(0.0, min(1.0, ((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz)))
+                px, pz = ax + dx * t, az + dz * t
+                d = math.hypot(x - px, z - pz)
+                if d < need and (best is None or d < best[0]):
+                    best = (d, px, pz, dx, dz)
+        if best is None:
+            break
+        d, px, pz, dx, dz = best
+        if d > 1e-3:
+            ux, uz = (x - px) / d, (z - pz) / d
+        else:   # em cima da linha: para a esquerda do segmento
+            L = math.hypot(dx, dz)
+            ux, uz = -dz / L, dx / L
+        x, z = px + ux * (need + 0.05), pz + uz * (need + 0.05)
+        moved = True
+    else:
+        return None, None
+    if not moved:
+        return x, z
+    if head_h(x, z) < 0.5 or math.hypot(x - 31.0, z + 24.0) < 3.0 + rad or (27.0 - rad < x < 31.0 + rad and -19.0 - rad < z < -14.6 + rad):
+        return None, None
+    return x, z
+
+
 def scatter_vegetation():
     rng = random.Random(55)
     # arvores da margem sul e encosta
@@ -646,13 +686,19 @@ def scatter_vegetation():
         if -8.8 < x < 8.8:
             continue
         put(rng.choice(["rock_a", "rock_b"]), x, bank_h(x, z) - 0.15, z, rng.uniform(0, 360), rng.uniform(0.5, 1.0))
-    # promontorio do farol
+    # promontorio do farol (E3b: pedras empurradas para fora do caminho da rua ate a escada do farol; mesma ordem de
+    # sorteio, entao o resto da dispersao nao muda)
     for i in range(40):
         a = rng.uniform(0, 6.28)
         r = rng.uniform(7.5, 11.0)
         x = 31.5 + math.cos(a) * r * 1.25
         z = -23.0 + math.sin(a) * r
-        put(rng.choice(["rock_a", "rock_b", "rock_b"]), x, head_h(x, z) - 0.2, z, rng.uniform(0, 360), rng.uniform(0.8, 1.8))
+        kind = rng.choice(["rock_a", "rock_b", "rock_b"])
+        ry, s = rng.uniform(0, 360), rng.uniform(0.8, 1.8)
+        x, z = clear_head_path(x, z, (0.62 if kind == "rock_a" else 1.15) * s)
+        if x is None:
+            continue
+        put(kind, x, head_h(x, z) - 0.2, z, ry, s)
     for i in range(160):
         x = rng.uniform(22, 42)
         z = rng.uniform(-34, -12)
