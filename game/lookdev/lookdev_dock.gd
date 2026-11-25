@@ -7,6 +7,8 @@ extends Node3D
 ##   --lookdev-rastro=v2 | v1   no modo after, cada heroi com proposta v2 (lookdev/<id>_v2_model.tscn) a mostra (padrao, PBR do proprio GLB); v1 volta os antigos
 ##                              ou o Rastro do jogo com os materiais de lookdev. O jogo NAO muda: so esta vitrine.
 ##   --lookdev-anim=<clipe> --lookdev-t=<s>   clipe e instante do heroi principal (provas); --lookdev-ssao=off (diagnostico)
+##   --lookdev-hero=rastro | pico | leme   heroi principal (o da frente da camera; padrao rastro)
+##   --lookdev-acc=<no>   liga um acessorio por missao nos herois que o tem (ex. Acc_LifeVest, colete da Leme; D16)
 ## Imprime "LOOKDEV PERF ..." com chamadas de desenho e primitivas no quadro 15.
 ## Uso (nuvem): xvfb-run -a -s "-screen 0 1600x900x24" bash tools/godot.sh --path game --rendering-driver vulkan \
 ##   res://lookdev/lookdev_dock.tscn --write-movie /ABS/f.png --fixed-fps 10 --quit-after 20 -- --lookdev=after
@@ -67,7 +69,17 @@ func _ready() -> void:
 		Stylize.trim_small_shadows(slice)
 		Stylize.apply(boat)
 	_place_camera()
-	for h: Array in HEROES:
+	# Heroi principal escolhivel (--lookdev-hero): troca de lugar com o primeiro da lista.
+	var order: Array = HEROES.duplicate(true)
+	var main_id := _arg("--lookdev-hero", "rastro")
+	for i in order.size():
+		if String(order[i][0]).get_file().begins_with(main_id + "_"):
+			var tmp: String = order[0][0]
+			order[0][0] = order[i][0]
+			order[i][0] = tmp
+			break
+	var acc := _arg("--lookdev-acc", "")
+	for h: Array in order:
 		var path := String(h[0])
 		# Proposta v2 de cada heroi (RB-R1 D13): res://lookdev/<id>_v2_model.tscn, se ja existir.
 		var v2_path := V2_MODEL % path.get_file().trim_suffix("_model.tscn")
@@ -79,6 +91,10 @@ func _ready() -> void:
 		inst.position = HERO_POS + (h[1] as Vector3)
 		inst.rotation_degrees.y = float(h[2])
 		var vis := inst.get_node("Model") as CharacterVisual
+		if acc != "":
+			var acc_node := vis.find_child(acc, true, false) as Node3D
+			if acc_node != null:
+				acc_node.visible = true
 		if after:
 			if not pbr:
 				LookdevMaterials.apply(vis, true)

@@ -7,18 +7,46 @@
       "quadros": 37,
       "media_m": 0.0469,
       "mao_acima_do_capacete_max_m": {
-        "R": -0.24,
-        "L": -0.2396
+        "R": -0.2297,
+        "L": -0.2297
+      },
+      "luva_sobre_cabeca_de_frente": {
+        "R": {
+          "max_fracao": 0.0,
+          "quadros_com_sobreposicao": 0
+        },
+        "L": {
+          "max_fracao": 0.0,
+          "quadros_com_sobreposicao": 0
+        }
+      },
+      "olhos_fechados_sorriso": {
+        "alegre_gt_0_05_s": 0.533,
+        "alegre_gt_0_5_s": 0.467
       }
     },
     "idle": {
       "min_gap_m": 0.0469,
-      "quadro": 68,
+      "quadro": 60,
       "quadros": 121,
       "media_m": 0.0469,
       "mao_acima_do_capacete_max_m": {
-        "R": 0.036,
-        "L": 0.0256
+        "R": -0.2478,
+        "L": -0.2717
+      },
+      "luva_sobre_cabeca_de_frente": {
+        "R": {
+          "max_fracao": 0.0,
+          "quadros_com_sobreposicao": 0
+        },
+        "L": {
+          "max_fracao": 0.0,
+          "quadros_com_sobreposicao": 0
+        }
+      },
+      "olhos_fechados_sorriso": {
+        "alegre_gt_0_05_s": 0.5,
+        "alegre_gt_0_5_s": 0.433
       },
       "deslize_pe_plantado_m_por_quadro": 0.0
     },
@@ -26,13 +54,31 @@
       "min_gap_m": 0.0469,
       "quadro": 0,
       "quadros": 31,
-      "media_m": 0.0469
+      "media_m": 0.0469,
+      "luva_sobre_cabeca_de_frente": {
+        "R": {
+          "max_fracao": 0.0,
+          "quadros_com_sobreposicao": 0
+        },
+        "L": {
+          "max_fracao": 0.0,
+          "quadros_com_sobreposicao": 0
+        }
+      },
+      "olhos_fechados_sorriso": {
+        "alegre_gt_0_05_s": 0.0,
+        "alegre_gt_0_5_s": 0.0
+      }
     },
     "look_up": {
       "min_gap_m": 0.0469,
       "quadro": 0,
       "quadros": 61,
       "media_m": 0.0469,
+      "olhos_fechados_sorriso": {
+        "alegre_gt_0_05_s": 0.0,
+        "alegre_gt_0_5_s": 0.0
+      },
       "deslize_pe_plantado_m_por_quadro": 0.0
     },
     "pull_rope": {
@@ -40,19 +86,31 @@
       "quadro": 21,
       "quadros": 49,
       "media_m": 0.101,
+      "olhos_fechados_sorriso": {
+        "alegre_gt_0_05_s": 0.0,
+        "alegre_gt_0_5_s": 0.0
+      },
       "deslize_pe_plantado_m_por_quadro": 0.0
     },
     "react_surprise": {
       "min_gap_m": 0.0469,
       "quadro": 3,
       "quadros": 28,
-      "media_m": 0.0469
+      "media_m": 0.0469,
+      "olhos_fechados_sorriso": {
+        "alegre_gt_0_05_s": 0.0,
+        "alegre_gt_0_5_s": 0.0
+      }
     },
     "run": {
       "min_gap_m": 0.0648,
       "quadro": 12,
       "quadros": 19,
       "media_m": 0.0991,
+      "olhos_fechados_sorriso": {
+        "alegre_gt_0_05_s": 0.633,
+        "alegre_gt_0_5_s": 0.0
+      },
       "deslize_apoio_mps_max": 0.0,
       "quadros_apoio_medidos": 12
     },
@@ -61,6 +119,10 @@
       "quadro": 7,
       "quadros": 16,
       "media_m": 0.0469,
+      "olhos_fechados_sorriso": {
+        "alegre_gt_0_05_s": 0.0,
+        "alegre_gt_0_5_s": 0.0
+      },
       "deslize_pe_plantado_m_por_quadro": 0.0
     },
     "team_pose": {
@@ -69,8 +131,22 @@
       "quadros": 46,
       "media_m": 0.0949,
       "mao_acima_do_capacete_max_m": {
-        "R": 0.027,
-        "L": -0.453
+        "R": -0.2213,
+        "L": -0.456
+      },
+      "luva_sobre_cabeca_de_frente": {
+        "R": {
+          "max_fracao": 0.015,
+          "quadros_com_sobreposicao": 5
+        },
+        "L": {
+          "max_fracao": 0.006,
+          "quadros_com_sobreposicao": 2
+        }
+      },
+      "olhos_fechados_sorriso": {
+        "alegre_gt_0_05_s": 0.367,
+        "alegre_gt_0_5_s": 0.3
       },
       "deslize_pe_plantado_m_por_quadro": 0.0
     },
@@ -79,6 +155,10 @@
       "quadro": 23,
       "quadros": 31,
       "media_m": 0.1015,
+      "olhos_fechados_sorriso": {
+        "alegre_gt_0_05_s": 0.0,
+        "alegre_gt_0_5_s": 0.0
+      },
       "deslize_apoio_mps_max": 0.0007,
       "quadros_apoio_medidos": 30
     },
@@ -87,12 +167,26 @@
       "quadro": 0,
       "quadros": 49,
       "media_m": 0.0469,
+      "luva_sobre_cabeca_de_frente": {
+        "R": {
+          "max_fracao": 0.0,
+          "quadros_com_sobreposicao": 0
+        },
+        "L": {
+          "max_fracao": 0.0,
+          "quadros_com_sobreposicao": 0
+        }
+      },
+      "olhos_fechados_sorriso": {
+        "alegre_gt_0_05_s": 0.533,
+        "alegre_gt_0_5_s": 0.433
+      },
       "deslize_pe_plantado_m_por_quadro": 0.0
     }
   },
   "vao_repouso_m": 0.0469,
   "minimo_global_m": 0.0469,
   "minimo_global_clipe": "idle",
-  "minimo_global_quadro": 68,
+  "minimo_global_quadro": 60,
   "aprovado": true
 }

@@ -6,6 +6,8 @@ extends EditorScenePostImport
 ##  2) ignora KHR_materials_clearcoat -> aqui lemos o verniz do proprio GLB e ligamos clearcoat no StandardMaterial3D;
 ##  3) nos materiais com verniz (vinil), calibra especular e rugosidade para o brilho ficar perto do visto no Blender.
 ## Assim o heroi abre igual na Godot e num visualizador web (que ja le essas duas coisas do glTF).
+##  4) acessorios por missao (RB-R1 D16): nos cujo nome comeca com "Acc_" (ex. Acc_LifeVest, colete da Leme) entram OCULTOS;
+##     liga-se no jogo/vitrine com `modelo.find_child("Acc_LifeVest", true, false).visible = true`.
 ## Ligado pelo .import do GLB: import_script/path="res://lookdev/gltf_pbr_import.gd" e gltf/embedded_image_handling=3.
 
 
@@ -13,6 +15,8 @@ extends EditorScenePostImport
 const VINYL_SPECULAR := 0.7
 ## Fator sobre a rugosidade do glTF nos materiais com verniz (a textura ORM continua mandando no detalhe).
 const VINYL_ROUGHNESS_SCALE := 0.82
+## Prefixo dos nos de acessorio por missao (equipamento opcional, oculto por padrao).
+const ACC_PREFIX := "Acc_"
 
 
 func _post_import(scene: Node) -> Object:
@@ -28,6 +32,8 @@ func _post_import(scene: Node) -> Object:
 				continue
 			done[m] = true
 			finish_material(m, coats)
+	for node in scene.find_children(ACC_PREFIX + "*", "Node3D", true, false):
+		(node as Node3D).visible = false
 	return scene
 
 

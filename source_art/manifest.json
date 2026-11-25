@@ -1360,7 +1360,7 @@
         "script": "source_art/characters/pico_v2/build_pico_v2.py",
         "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless) + Cycles CPU para assar mapas",
         "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, PBR metallic-roughness, KHR_materials_clearcoat, JPEG embutido",
-        "tecnicas": "corpo inteirico por SKIN+SUBSURF com gomos acolchoados, articulacoes e bolso deslocados em numpy; capacete parametrico + Solidify; metaballs e mechas por tubos achatados em tres camadas (cabelo); shape keys fist_R/fist_L nas luvas (punho); corda por laco em raycast no corpo; torno, toros, tubos e prismas (equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (ripstop, lona, pespontos, helice da corda, sardas); normal map assada por Bump; FK/IK em Python"
+        "tecnicas": "corpo inteirico por SKIN+SUBSURF com gomos acolchoados, articulacoes e bolso deslocados em numpy; capacete parametrico + Solidify; metaballs e mechas por tubos achatados em tres camadas (cabelo); shape keys fist_R/fist_L nas luvas (punho); v2.3: comprimento dos bracos e escala da luva pela media medida de Leme v2.2 e Rastro v2.1 (pv2_proporcao.py); corda por laco em raycast no corpo; torno, toros, tubos e prismas (equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (ripstop, lona, pespontos, helice da corda, sardas); normal map assada por Bump; FK/IK em Python"
       },
       "origem": [
         "source_art/characters/pico_v2/build_pico_v2.py",
@@ -1370,6 +1370,8 @@
         "source_art/characters/pico_v2/pv2_render.py",
         "source_art/characters/pico_v2/render_pico_v2.py",
         "source_art/characters/pico_v2/pv2_check.py",
+        "source_art/characters/pico_v2/render_pico_leitura.py",
+        "source_art/characters/pico_v2/pv2_proporcao.py",
         "source_art/characters/pico_v2/PROVENANCE.md",
         "source_art/characters/pico_v2/pico_v2.blend",
         "source_art/scripts/hero_lib.py",
@@ -1380,8 +1382,8 @@
         "source_art/scripts/rbart.py"
       ],
       "saida_glb": "game/assets/models/characters/pico_v2.glb",
-      "glb_sha256": "7a891963046ce5f2ed3a554f6c25232246a21375e409c5533146ad701dff0350",
-      "glb_bytes": 6995068,
+      "glb_sha256": "4b95247bfed88bfcb5a7ade7e52dc79e509418419fa4ef86339c0132cca1f0ae",
+      "glb_bytes": 6820760,
       "triangulos": 24944,
       "materiais": [
         "mat_pico_v2_face_dark",
@@ -1521,16 +1523,16 @@
     },
     {
       "id": "leme_v2",
-      "nome": "Leme v2 (proposta)",
+      "nome": "Leme v2.2 pilota (proposta)",
       "papel": "pilot",
       "agente": "art3d",
       "status": "provisorio",
-      "proposta": "RB-R1 D11/D13: heroina piloto lado a lado; NAO substitui leme.glb no jogo (so na vitrine game/lookdev/)",
+      "proposta": "RB-R1 D11/D13/D16: heroina pilota e navegadora lado a lado; NAO substitui leme.glb no jogo (so na vitrine game/lookdev/)",
       "processo": {
         "script": "source_art/characters/leme_v2/build_leme_v2.py",
         "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless) + Cycles CPU para assar mapas",
         "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, PBR metallic-roughness, KHR_materials_clearcoat, JPEG embutido",
-        "tecnicas": "corpo inteirico por SKIN+SUBSURF com articulacoes deslocadas em numpy, cortado por planos em camisa/bermuda/pele/meia; colete por superficie parametrica projetada no corpo (raycast BVH); metaballs (base do cabelo) + cachos individuais com mola e verniz pintados por cacho; shape keys de punho e joinha nas maos; torno, toros, tubos e prismas (bone, equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (algodao, sarja, canelado, ripstop, refletivo, pespontos, cachos); normal map assada por Bump; FK/IK em Python"
+        "tecnicas": "corpo inteirico por SKIN+SUBSURF com articulacoes deslocadas em numpy, cortado por planos em jaqueta/calca; cotoveleiras/joelheiras e colete por superficie parametrica projetada no corpo (raycast BVH); metaballs (base do cabelo) + cachos individuais; shape keys de punho e joinha nas luvas; torno, toros, tubos e prismas (bone de pilota, fones com arco medido na copa, microfone, equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (sarja tecnica, recortes, ziper, refletivo, velcro, acolchoado, ripstop, cachos); normal map assada por Bump; FK/IK em Python"
       },
       "origem": [
         "source_art/characters/leme_v2/build_leme_v2.py",
@@ -1549,10 +1551,11 @@
         "source_art/scripts/rbart.py"
       ],
       "saida_glb": "game/assets/models/characters/leme_v2.glb",
-      "glb_sha256": "963089b7a7407ca0f7474c1c98692914b652036712d2e6de94bd2233f646c16f",
-      "glb_bytes": 7406064,
-      "triangulos": 24790,
+      "glb_sha256": "4c99a6cfe5e8b39f5340ff745fad63b7dff3efb6df7a8591af1482485ef89161",
+      "glb_bytes": 7707140,
+      "triangulos": 24531,
       "materiais": [
+        "mat_leme_v2_acc_lifevest",
         "mat_leme_v2_face_dark",
         "mat_leme_v2_face_eye",
         "mat_leme_v2_face_iris",
@@ -1565,6 +1568,7 @@
         "mat_leme_v2_suit"
       ],
       "objetos": [
+        "Acc_LifeVest",
         "Leme_Face",
         "Leme_Gear",
         "Leme_Glass",
@@ -1635,6 +1639,18 @@
         "look_up"
       ],
       "texturas": {
+        "leme_v2_acc_lifevest_color": [
+          1024,
+          1024
+        ],
+        "leme_v2_acc_lifevest_normal": [
+          1024,
+          1024
+        ],
+        "leme_v2_acc_lifevest_orm": [
+          1024,
+          1024
+        ],
         "leme_v2_gear_color": [
           2048,
           2048
@@ -1660,16 +1676,16 @@
           1024
         ],
         "leme_v2_skin_color": [
-          2048,
-          2048
+          1024,
+          1024
         ],
         "leme_v2_skin_normal": [
-          2048,
-          2048
+          1024,
+          1024
         ],
         "leme_v2_skin_orm": [
-          2048,
-          2048
+          1024,
+          1024
         ],
         "leme_v2_suit_color": [
           2048,
@@ -1684,8 +1700,8 @@
           2048
         ]
       },
-      "altura_m": 1.1307,
-      "razao_cabeca_altura": 0.3549,
+      "altura_m": 1.1374,
+      "razao_cabeca_altura": 0.3528,
       "velocidade_walk_mps": 0.5711,
       "velocidade_run_mps": 1.2133,
       "folga_minima_botas_m": 0.0522,
@@ -1694,7 +1710,293 @@
       "aprovacao": "pendente (Thiago, visualizador 3D, D13)",
       "originalidade": "geometria procedural propria (SKIN, SUBSURF, metaballs, torno, bmesh, raycast sobre o proprio corpo); rig e animacoes autorais por script; texturas pintadas por formula; nenhum modelo, malha, rig, mocap, textura ou personagem-base de terceiros; nada copiado de series de TV",
       "data": "2026-11-25",
-      "nota": "Leme v2: camisa de capitania branca de manga curta, colete salva-vidas azul (placas de espuma, gola-travesseiro em ferradura, faixas refletivas, apito), bermuda azul, meias de meio cano listradas, botinas nauticas, bone nautico de capitania, cachos com puff atras, bussola de pulso e pulseira de corda. Clipes com os mesmos nomes do leme.glb; idle, team_pose (continencia + joinha da mao esquerda) e wave novos. Acabamento 2026-11-25: cachos legiveis, bracos mais grossos e curtos, maos relaxadas com polegar, punho/joinha por shape key, bone sem vinco, apito novo, punho da meia regular, sola sem afundar."
+      "nota": "Leme v2.2 pilota (D16): bone de pilota com fones e microfone, jaqueta curta de pilota (gola alta, ziper, ombros brancos, laterais azul-marinho, faixas refletivas), calca de pilota, cotoveleiras e joelheiras, luvas de 4 dedos com punho largo (fist/thumb_up), botas de pilota com tiras de velcro, bussola de pulso, emblema no peito e cinto da equipe. Colete salva-vidas virou acessorio Acc_LifeVest (oculto por padrao). team_pose nova: mao no fone + joinha. A capita v2.1 fica no historico do Git.",
+      "triangulos_sem_acessorios": 21017,
+      "acessorios": {
+        "Acc_LifeVest": {
+          "triangulos": 3514,
+          "oculto_por_padrao": true,
+          "como_ligar": "modelo.find_child(\"Acc_LifeVest\", true, false).visible = true"
+        }
+      },
+      "maos_no_volante_erro_m": 0.0097,
+      "shape_keys_luvas": [
+        "fist_R",
+        "thumb_up_R",
+        "fist_L",
+        "thumb_up_L"
+      ]
+    },
+    {
+      "id": "world_v2_static",
+      "nome": "Mundo v2: cenario fixo do recorte do porto",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "data": "2026-11-25",
+      "proposta": "RB-R1 W1: vitrine vila e cais v2; NAO substitui o porto do jogo (so game/lookdev/world_v2/)",
+      "originalidade": "geometria e texturas 100% procedurais por script (bmesh, formulas e numpy); nenhum modelo, malha, textura, foto, HDRI ou kit de terceiros",
+      "origem": [
+        "source_art/environment_v2/build_world_v2.py",
+        "source_art/environment_v2/build_boat_wv2.py",
+        "source_art/environment_v2/wv2lib.py",
+        "source_art/environment_v2/wv2_houses.py",
+        "source_art/environment_v2/wv2_kit.py",
+        "source_art/environment_v2/wv2_textures.py",
+        "source_art/environment_v2/render_world_v2.py",
+        "source_art/environment_v2/world_v2.blend",
+        "source_art/environment_v2/PROVENANCE.md"
+      ],
+      "processo": {
+        "script": "source_art/environment_v2/build_world_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless, numpy embutido)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice (COLOR_0 linear), UV em metros, normais ponderadas por area (WeightedNormal), sem texturas embutidas"
+      },
+      "saida_glb": "game/assets/models/environment_v2/wv2_static.glb",
+      "glb_sha256": "8ae995a362170ff355c41e18f7796016d01c4c6f64df514115e3c23277ea0789",
+      "triangulos": 273880,
+      "materiais": [
+        "wv2_burlap",
+        "wv2_canvas",
+        "wv2_cobble",
+        "wv2_deck",
+        "wv2_glass",
+        "wv2_glossy",
+        "wv2_interior",
+        "wv2_interior_lit",
+        "wv2_lamp",
+        "wv2_leaf",
+        "wv2_metal",
+        "wv2_paint",
+        "wv2_plaster",
+        "wv2_rock",
+        "wv2_roof",
+        "wv2_rope",
+        "wv2_slats",
+        "wv2_stone",
+        "wv2_terrain",
+        "wv2_wood"
+      ],
+      "objetos": [
+        "wv2_back",
+        "wv2_bank",
+        "wv2_dock",
+        "wv2_plaza",
+        "wv2_quay",
+        "wv2_street",
+        "wv2_terrain"
+      ],
+      "nota": "cais de madeira, cais de pedra, ruas e praca calcadas, 20 casas (vaos recuados, venezianas, floreiras, sacadas, toldos, telhas modeladas), galpao, chafariz, farol, margem, morros e fundo do porto"
+    },
+    {
+      "id": "world_v2_kit",
+      "nome": "Mundo v2: kit de aderecos e vegetacao (MultiMesh)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "data": "2026-11-25",
+      "proposta": "RB-R1 W1: vitrine vila e cais v2; NAO substitui o porto do jogo (so game/lookdev/world_v2/)",
+      "originalidade": "geometria e texturas 100% procedurais por script (bmesh, formulas e numpy); nenhum modelo, malha, textura, foto, HDRI ou kit de terceiros",
+      "origem": [
+        "source_art/environment_v2/build_world_v2.py",
+        "source_art/environment_v2/build_boat_wv2.py",
+        "source_art/environment_v2/wv2lib.py",
+        "source_art/environment_v2/wv2_houses.py",
+        "source_art/environment_v2/wv2_kit.py",
+        "source_art/environment_v2/wv2_textures.py",
+        "source_art/environment_v2/render_world_v2.py",
+        "source_art/environment_v2/world_v2.blend",
+        "source_art/environment_v2/PROVENANCE.md"
+      ],
+      "processo": {
+        "script": "source_art/environment_v2/build_world_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless, numpy embutido)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice (COLOR_0 linear), UV em metros, normais ponderadas por area (WeightedNormal), sem texturas embutidas"
+      },
+      "saida_glb": "game/assets/models/environment_v2/wv2_kit.glb",
+      "glb_sha256": "20d296e96c94c64763b1b8fbc40aca73c3d0eef42861d642103ba5e6edf87e2a",
+      "triangulos": 47108,
+      "materiais": [
+        "wv2_bark",
+        "wv2_burlap",
+        "wv2_canvas",
+        "wv2_glossy",
+        "wv2_grass",
+        "wv2_lamp",
+        "wv2_leaf",
+        "wv2_metal",
+        "wv2_net",
+        "wv2_paint",
+        "wv2_rock",
+        "wv2_rope",
+        "wv2_terrain",
+        "wv2_wood"
+      ],
+      "objetos": [
+        "kit_barrel",
+        "kit_barrel_lid",
+        "kit_bench",
+        "kit_bollard",
+        "kit_bucket",
+        "kit_bush_a",
+        "kit_bush_b",
+        "kit_bush_c",
+        "kit_cafe_set",
+        "kit_cart",
+        "kit_crate",
+        "kit_crate_dark",
+        "kit_crate_fish",
+        "kit_crate_fruit",
+        "kit_fender",
+        "kit_float_buoy",
+        "kit_flowers_a",
+        "kit_flowers_b",
+        "kit_grass_tall",
+        "kit_grass_tuft",
+        "kit_lamp_post",
+        "kit_life_ring",
+        "kit_lobster_trap",
+        "kit_net_pile",
+        "kit_parasol",
+        "kit_planter",
+        "kit_pot_a",
+        "kit_pot_b",
+        "kit_pot_c",
+        "kit_reeds",
+        "kit_rock_a",
+        "kit_rock_b",
+        "kit_rope_coil",
+        "kit_rowboat_a",
+        "kit_rowboat_b",
+        "kit_rowboat_flip",
+        "kit_sack",
+        "kit_sign_aframe",
+        "kit_stall_blue",
+        "kit_stall_red",
+        "kit_stall_yellow",
+        "kit_tree_a",
+        "kit_tree_b",
+        "kit_tree_c"
+      ],
+      "nota": "44 pecas, 3011 instancias no layout (game/lookdev/world_v2/world_v2_layout.json)"
+    },
+    {
+      "id": "world_v2_boat",
+      "nome": "Mundo v2: barco do porto (proposta para substituir boat_v2)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "data": "2026-11-25",
+      "proposta": "RB-R1 W1: vitrine vila e cais v2; NAO substitui o porto do jogo (so game/lookdev/world_v2/)",
+      "originalidade": "geometria e texturas 100% procedurais por script (bmesh, formulas e numpy); nenhum modelo, malha, textura, foto, HDRI ou kit de terceiros",
+      "origem": [
+        "source_art/environment_v2/build_world_v2.py",
+        "source_art/environment_v2/build_boat_wv2.py",
+        "source_art/environment_v2/wv2lib.py",
+        "source_art/environment_v2/wv2_houses.py",
+        "source_art/environment_v2/wv2_kit.py",
+        "source_art/environment_v2/wv2_textures.py",
+        "source_art/environment_v2/render_world_v2.py",
+        "source_art/environment_v2/world_v2.blend",
+        "source_art/environment_v2/PROVENANCE.md"
+      ],
+      "processo": {
+        "script": "source_art/environment_v2/build_world_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless, numpy embutido)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice (COLOR_0 linear), UV em metros, normais ponderadas por area (WeightedNormal), sem texturas embutidas"
+      },
+      "saida_glb": "game/assets/models/environment_v2/wv2_boat.glb",
+      "glb_sha256": "9333ce2692937870ba437167c90ca882bb3eaee2da567ed972832374fd86f083",
+      "triangulos": 14705,
+      "materiais": [
+        "wv2_canvas",
+        "wv2_deck",
+        "wv2_glass",
+        "wv2_glossy",
+        "wv2_lamp",
+        "wv2_metal",
+        "wv2_paint",
+        "wv2_paw",
+        "wv2_rope",
+        "wv2_wood"
+      ],
+      "empties": [
+        "BenchMark",
+        "DeckPoint",
+        "HornPoint",
+        "PivotMark",
+        "RopeBow",
+        "RopeSternL",
+        "RopeSternR",
+        "WheelPoint"
+      ],
+      "nota": "mesmas medidas e pontos de encaixe do boat_v2 (pivo, popa z 2, proa z -3, boca 2,2, convez 0,40, banco 0,5 em z 0,6, WheelPoint, HornPoint, DeckPoint, BenchMark, PawMark) + pontos de corda RopeBow/RopeSternL/R"
+    },
+    {
+      "id": "world_v2_textures",
+      "nome": "Mundo v2: texturas procedurais ladrilhaveis",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "data": "2026-11-25",
+      "proposta": "RB-R1 W1: vitrine vila e cais v2; NAO substitui o porto do jogo (so game/lookdev/world_v2/)",
+      "originalidade": "geometria e texturas 100% procedurais por script (bmesh, formulas e numpy); nenhum modelo, malha, textura, foto, HDRI ou kit de terceiros",
+      "origem": [
+        "source_art/environment_v2/build_world_v2.py",
+        "source_art/environment_v2/build_boat_wv2.py",
+        "source_art/environment_v2/wv2lib.py",
+        "source_art/environment_v2/wv2_houses.py",
+        "source_art/environment_v2/wv2_kit.py",
+        "source_art/environment_v2/wv2_textures.py",
+        "source_art/environment_v2/render_world_v2.py",
+        "source_art/environment_v2/world_v2.blend",
+        "source_art/environment_v2/PROVENANCE.md"
+      ],
+      "processo": {
+        "script": "source_art/environment_v2/wv2_textures.py",
+        "ferramenta": "Blender 4.5.16 (numpy embutido); JPEG pelo Blender, PNG escrito pelo script",
+        "exportador": "cor em JPEG (sRGB); dados em PNG RGBA (normal OpenGL, mascara de tinta, rugosidade)"
+      },
+      "saida": "game/assets/textures/environment_v2",
+      "arquivos_sha256": {
+        "bark_albedo.jpg": "c08b531ea8b83cced97ffd8a58c3258aefc673e345743c3d374c979ab40de308",
+        "bark_data.png": "a4467c9944f1c67c46e50fba0ac3535d8c5ca7e45d89b9e088e5f45653ddc724",
+        "burlap_albedo.jpg": "1ce20bed2a62b7fc3005feb03141a1e717f630f11cf193308bc8e9d6b5d55a13",
+        "burlap_data.png": "7821e1107cfc70a2e0a3b2019a8f87e87bec06018636cd5c5b51403b1657ed1a",
+        "canvas_albedo.jpg": "ac4ad864a3c0c040d0126177f362f18a65a734623f5c5e3be210c4cbe51434de",
+        "canvas_data.png": "fbd8df2b2508b5e7d49026b425a60ed64169f8b1b844bbf479472a77e3fb60c1",
+        "cobble_albedo.jpg": "49f710edc6f8c350d151efe49a378adab542c1b5ff70b41bb755bb4c5c688e28",
+        "cobble_data.png": "0f8c9224b4cc1dedfaf94693248d8b8ac65512a2726a24fecb8480f7bd219a54",
+        "deck_albedo.jpg": "553005e171d813938bc76fd950cd865a1386fa62a071cb8179490ac69b14da02",
+        "deck_data.png": "fce33e590c8ec21b9803d4ad3d8ade9c6c067f848ef81e3088d9fe392c1c8d45",
+        "dirt_albedo.jpg": "00fc9479b6324a05e2dacc7d449c6c3e309523695d22fbae503ac0c5ec3ce05c",
+        "dirt_data.png": "c6f7cb67613166e2f27965596370f14bc13198a9b1155de9b1ab1523fbba3829",
+        "grass_albedo.jpg": "6358ecb7b76187f71f715ba1eb75b3234ad881ed7563f5d4fbd642d93d813516",
+        "grass_data.png": "392890fc47c5b5ee9b0cc62ffa41a07cc5486216f0929a3b2087deea2e175779",
+        "leaf_albedo.jpg": "60f9643adc2270cb7a40af3fa565f0a9dcf9a446c4fd998ab27d981d4ea32743",
+        "leaf_data.png": "ec73041ca49faf42ace5e00d8ea5db6d41ce6b1b1c3d7064ccb5d65e2a97746b",
+        "metal_albedo.jpg": "f3fb35a7b6a0ca262ab4ac6cae507b5c031d4daed16315fef1586365a1f62f26",
+        "metal_data.png": "c6c875339c4e78f77678cd4924eea673ea89f528da919a243567a6aa07d7d35d",
+        "net_albedo.jpg": "e5d5de0b419fa5b1dd0f4e24b4165d4db5516aa483de49a436952271398b647b",
+        "net_data.png": "b08aaef02b4b63dcfe29ce5b35fe7b4dcabada601f6c0361692acea8557b54ee",
+        "paint_albedo.jpg": "7f9c0003d503cc53cf30ce2cf5a044dcc8ffc27192e9480c1d805cc2577ddf14",
+        "paint_data.png": "8e39e4bbed34d10cb4e61ed0f17574655409ac74bd9cedbb76fe43794f112e4f",
+        "plaster_albedo.jpg": "215f8c952b2a6d9aa42a11f8a4a12be17d2d17a92679adf37404840b3fbfa944",
+        "plaster_data.png": "168183b65af9920ee93d0d6d942d1ae69c8d6d445a138754f8174de0fb62c70d",
+        "rock_albedo.jpg": "684fb4f9c3583913b9be19117f0760a3e4c54d58f2a8ea6f8dd054e59a36b77b",
+        "rock_data.png": "c4958acb5cc735b1eb84d86bc748782036a84471e4c0c1a62239f8cb54215bb5",
+        "roof_albedo.jpg": "645fa48ea22cd8ee174d5cf03df64749c4234b3d5e49cb11396b73f4c69bf5ce",
+        "roof_data.png": "47c495eafb9c413f7482dfe1e38a4ae6e47a6bcb8733271d0a024afc5831b347",
+        "rope_albedo.jpg": "b793e61a9840088b749aa0fed5cef70c32d12b6e558f8d105587ed642eb2171e",
+        "rope_data.png": "f98e79d274a5f69a4b640b3223c2c4a108aef9a5416729b15da0da154b9bfbed",
+        "slats_albedo.jpg": "e5df94f4b64f646ab53f4b337141fa71a3edc4f41966570a21f52a2a35279814",
+        "slats_data.png": "fddbe8c8417bddbb67c27a5be4204de7e2f83a2960917b9378e3b42de3905c75",
+        "stone_albedo.jpg": "79a1fdafa9d4502fe8ae80509b99dc889547bfe91756c1a0255e0224f7b3cd20",
+        "stone_data.png": "3a51bfa73c9bd98b9fbb839667b160a19a55eecfff94e2556a3d64549cc7fdbd",
+        "wood_albedo.jpg": "e3f4abcc049679043bfc0e17d3c5de5d3d22c8354fd92e4289f9c8a95165a864",
+        "wood_data.png": "daf5863996cdf5d0223d85139a462ca9f1ec5635b9adad3f65399adb2e4cf6f2"
+      },
+      "nota": "ruido de valor, Voronoi e formas analiticas; mipmaps e sem compressao com perda no .import"
     }
   ]
 }

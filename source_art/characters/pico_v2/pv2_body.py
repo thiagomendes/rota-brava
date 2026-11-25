@@ -35,7 +35,7 @@ import hero_lib
 from rbart import new_object
 
 # ------------------------------------------------------------------ proporcao: o menor do trio (cabeca proporcionalmente maior)
-P2 = dict(head=0.392, leg=0.370, torso=0.262, belly=0.128, sh_x=0.126, limb=0.040, hand=1.36, boot=1.08, eye=1.12, layers=False,
+P2 = dict(head=0.392, leg=0.370, torso=0.262, belly=0.128, sh_x=0.126, limb=0.040, hand=1.22, boot=1.08, eye=1.12, layers=False,
           label="v2 heroi escalador")
 hero_lib.VARIANTS["P2"] = P2
 PAL = dict(pele="#F3C9A2", cabelo="#D8612A", iris="#2F7FC9", uniforme="#3DBE5A", creme="#FFD23F", calca="#3A4A5C",
@@ -45,8 +45,10 @@ hero_lib.CAST["pico_v2"] = dict(display="Pico", K=1.0, hat="none", hair="tufts",
 
 # Afastamento lateral das pernas (eixo do quadril/joelho/tornozelo): pes separados, chao visivel entre as botas parado
 HIP_X = 0.088
-# v2.1: alongamento dos bracos (m que o pulso desce no repouso) e mao um pouco maior
-ARM_DROP = 0.088
+# v2.3: ajuste do comprimento dos bracos (m que o pulso desce no repouso em relacao ao hero_lib). A v2.1 usava +0,088
+# (pulso no meio da coxa); a v2.3 SOBE o pulso 1,9 cm acima do padrao para igualar pulso/altura e ponta dos dedos/quadril
+# a media de Leme v2.2 e Rastro v2.1 (medido em repouso; ver PROVENANCE.md). Luva 1,36 -> 1,22 (escala das maos do trio).
+ARM_DROP = -0.019
 # Bainha da jaqueta curta (acima do cinto) e passo dos gomos
 HEM_DZ = 0.054
 BAFFLE_T = 0.046      # passo dos gomos do tronco (m)
@@ -159,7 +161,7 @@ class PV2(hero_lib.Builder):
         super().__init__("pico_v2", "P2")
         self.S = "Pico"
         self.F.hip_x = HIP_X
-        # v2.1: bracos mais longos (pulso ARM_DROP mais baixo): com o braco erguido a mao passa do topo do capacete
+        # v2.3: comprimento dos bracos na proporcao do trio (ARM_DROP)
         F = self.F
         F.wrist_z -= ARM_DROP
         F.wrist = V(F.wrist.x + 0.010, F.wrist.y, F.wrist_z + 0.02)
