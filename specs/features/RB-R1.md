@@ -48,6 +48,7 @@ Objetivo observável: Thiago abre na Godot (Windows) uma vitrine do mundo refina
 - **W4 · Vila v2.1 e barco v2 (`art3d`):** corrigir os fracos da W1 (barco chapado, janelas sem interior, vitrines, calçamento carregado, sacos, bote virado) e refazer o barco no acabamento D11.
 - **D16 · Trajes menos náuticos (Thiago, 2026-11-25, "segue sim"):** só a Leme estava presa ao mar. Leme deixa de ser capitã de barco e vira **pilota e navegadora da equipe** (conduz barco, carrinho, kart, balão, drone; bússola e mapas): traje de pilota com faixas refletivas, luvas, capacete ou boné de pilota; mantém rosto, cachos, pele, azul e branco, bússola de pulso, jeito calmo. **Equipamento por missão** (estilo mochilas da Patrulha Canina): traje base neutro + acessório da missão; agora só o colete salva-vidas da Leme vira acessório separado (missão de barco). Rastro e Pico ficam como estão. Marca (Farol 7, bússola) continua como lugar, não nicho.
 - **W5 · Leme pilota (`art3d`):** refazer o traje da Leme v2 segundo D16, colete como acessório ligável.
+- **D17 · Leme pilota aprovada (Thiago, 2026-11-25).** Colete salva-vidas em **amarelo da equipe** (amarelo do emblema, faixas refletivas cinza-claro), recomendação do lead: contraste com a jaqueta azul e o laranja fica reservado à Rastro. Pico v2.3 com braços na proporção do trio (pedido de Thiago: mãos chegavam ao meio da coxa).
 - Fora de escopo agora: trocar heróis/mundo do episódio, som.
 
 ## Barra de qualidade (mensurável e perceptual)
