@@ -47,6 +47,21 @@ Pedido de Thiago: aproveitar o controle de tom e emoção para cada fala combina
 - O tratamento local é sempre o preset do personagem, igual em todas as suas falas, para manter a identidade; a emoção vem só da atuação do TTS.
 - Prova: `emocoes.mp3` tem a mesma frase de cada herói "curiosa" (energia 1, lento) e "animada" (energia 3, rápido).
 
+## Falas repetidas em grupos (D19c, planejamento da geração)
+
+Decisão de Thiago: o que se repete por situação vira grupo de 3 a 5 variantes, sorteadas sem repetir a última. Texto das variantes: `adventure`; lógica no jogo: `gameplay`. Aqui só o plano; o espaço está em `direction.json` → `groups` (id → `keys`, `target`, `direction`).
+
+| Situação | Onde se repete no Ep01 v3 | Grupos | Variantes | Falas novas |
+|---|---|---|---|---|
+| Ajuda (convite) | ajuda em 3 degraus em todas as etapas, após ~10 s parado | `help.radio.invite` (Farol 7) | 5 | 5 |
+| Dica do rádio | 21 dicas, uma por etapa; repetem quando a ajuda volta na mesma etapa | `hint.radio.<etapa>` × 21 | 3 (a atual + 2) | 42 |
+| Acerto | peças do varal (M2), 3 entregas (M4), boias (M6), barquinhos (M7) | `success.tracker/climber/pilot` | 4 cada | 11 |
+| Erro sem punição | barraca errada (M4), boia tocada (M6), tentativa errada genérica | `oops.vendor`, `oops.pilot.buoy`, `oops.tracker/climber/pilot` | 4, 3, 3 cada | 15 |
+| Chamado de troca | 9 trocas de herói (M2–M7) | `switch.to_tracker/climber/pilot` | 4 cada (as 9 atuais entram como variantes) | ~3 |
+| Comemoração | 10 emblemas / fim de missão | `cheer.tracker/climber/pilot` | 5 cada | 12 |
+
+Total planejado: ~88 falas novas além das 52 atuais, ~140 a gerar (1 chamada por fala + refações; o cache só gasta chamada quando texto, voz ou direção mudam). A direção do grupo vale para todas as variantes; o preset continua o do personagem.
+
 ## Termos de uso (resumo, NÃO verificado nesta sessão)
 
 As páginas de termos não abriram pela rede daqui. O que se sabe de memória, a confirmar por Thiago antes de usar no jogo:

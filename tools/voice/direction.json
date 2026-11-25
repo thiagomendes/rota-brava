@@ -346,5 +346,209 @@
    "pico": "ep01.street.climber.sees_boat",
    "leme": "ep01.street.pilot.compass_west"
   }
+ },
+ "groups": {
+  "_doc": "D19c: falas repetidas por situacao viram grupos de 3 a 5 variantes, sorteadas sem repetir a ultima (logica no jogo: gameplay; texto: adventure). id do grupo -> lista de chaves. 'target' = variantes planejadas; listas so com a chave atual (ou vazias) aguardam texto do adventure. Direcao do grupo vale para as variantes sem direcao propria em lines. speaker '*' = quem chama varia.",
+  "help.radio.invite": {
+   "speaker": "radio",
+   "target": 5,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 1,
+    "pace": "normal",
+    "note": "oferece ajuda sem pressa, como quem estende a mao"
+   },
+   "keys": []
+  },
+  "hint.radio.<etapa>": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01v3.<etapa>.hint_gesture"
+   ],
+   "_doc": "um grupo por etapa (21, de ep01v3.M1.bench a ep01v3.M8.thanks); a dica atual e a variante 1"
+  },
+  "success.tracker": {
+   "speaker": "tracker",
+   "target": 4,
+   "direction": {
+    "emotion": "orgulho",
+    "energy": 2,
+    "pace": "normal",
+    "note": "acertou, satisfeita"
+   },
+   "keys": []
+  },
+  "success.climber": {
+   "speaker": "climber",
+   "target": 4,
+   "direction": {
+    "emotion": "orgulho",
+    "energy": 3,
+    "pace": "rápido",
+    "note": "acertou, vibrante"
+   },
+   "keys": [
+    "ep01.bank.climber.sock_high"
+   ]
+  },
+  "success.pilot": {
+   "speaker": "pilot",
+   "target": 4,
+   "direction": {
+    "emotion": "confiança",
+    "energy": 2,
+    "pace": "normal",
+    "note": "acertou, segura"
+   },
+   "keys": []
+  },
+  "oops.vendor": {
+   "speaker": "vendor",
+   "target": 4,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 1,
+    "pace": "lento",
+    "note": "corrige com doçura, sem bronca"
+   },
+   "keys": [
+    "ep01.market.vendor.wrong_stall"
+   ]
+  },
+  "oops.pilot.buoy": {
+   "speaker": "pilot",
+   "target": 3,
+   "direction": {
+    "emotion": "cuidado calmo",
+    "energy": 1,
+    "pace": "lento",
+    "note": "encostou na boia, tudo bem, tenta de novo"
+   },
+   "keys": []
+  },
+  "oops.tracker": {
+   "speaker": "tracker",
+   "target": 3,
+   "direction": {
+    "emotion": "bom humor",
+    "energy": 2,
+    "pace": "normal",
+    "note": "'quase!' sorrindo, vamos de novo"
+   },
+   "keys": []
+  },
+  "oops.climber": {
+   "speaker": "climber",
+   "target": 3,
+   "direction": {
+    "emotion": "bom humor",
+    "energy": 2,
+    "pace": "normal",
+    "note": "'quase!' rindo, vamos de novo"
+   },
+   "keys": []
+  },
+  "oops.pilot": {
+   "speaker": "pilot",
+   "target": 3,
+   "direction": {
+    "emotion": "bom humor",
+    "energy": 2,
+    "pace": "normal",
+    "note": "'quase!' tranquila, vamos de novo"
+   },
+   "keys": []
+  },
+  "switch.to_tracker": {
+   "speaker": "*",
+   "target": 4,
+   "direction": {
+    "emotion": "chamado",
+    "energy": 2,
+    "pace": "normal",
+    "note": "chama a Rastro pelo nome, confiando nela"
+   },
+   "keys": [
+    "ep01.bank.climber.call_tracker"
+   ]
+  },
+  "switch.to_climber": {
+   "speaker": "*",
+   "target": 4,
+   "direction": {
+    "emotion": "chamado",
+    "energy": 2,
+    "pace": "normal",
+    "note": "chama o Pico, apontando para cima"
+   },
+   "keys": [
+    "ep01.bank.tracker.call_climber",
+    "ep01.plaza.tracker.call_climber",
+    "ep01.street.pilot.call_climber",
+    "ep01.bay.pilot.call_climber",
+    "ep01.lighthouse.tracker.call_climber"
+   ]
+  },
+  "switch.to_pilot": {
+   "speaker": "*",
+   "target": 4,
+   "direction": {
+    "emotion": "chamado",
+    "energy": 2,
+    "pace": "normal",
+    "note": "passa a vez a Leme, confiante"
+   },
+   "keys": [
+    "ep01.market.tracker.call_pilot",
+    "ep01.street.tracker.call_pilot",
+    "ep01.lighthouse.climber.call_pilot"
+   ]
+  },
+  "cheer.tracker": {
+   "speaker": "tracker",
+   "target": 5,
+   "direction": {
+    "emotion": "alegria",
+    "energy": 3,
+    "pace": "normal",
+    "note": "comemora o emblema"
+   },
+   "keys": [
+    "ep01.festival.tracker.cheer"
+   ]
+  },
+  "cheer.climber": {
+   "speaker": "climber",
+   "target": 5,
+   "direction": {
+    "emotion": "alegria",
+    "energy": 3,
+    "pace": "rápido",
+    "note": "comemora o emblema"
+   },
+   "keys": [
+    "ep01.plaza.climber.m3_done"
+   ]
+  },
+  "cheer.pilot": {
+   "speaker": "pilot",
+   "target": 5,
+   "direction": {
+    "emotion": "orgulho",
+    "energy": 3,
+    "pace": "normal",
+    "note": "comemora o emblema"
+   },
+   "keys": [
+    "ep01.bank.pilot.m2_done"
+   ]
+  }
  }
 }
