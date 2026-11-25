@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://lookdev/world_v2/world_v2.gd" id="1_wv2"]
+
+[node name="WorldV2" type="Node3D"]
+script = ExtResource("1_wv2")
+metadata/provisional = true
+metadata/proposal = "RB-R1 W1: vitrine vila e cais v2 (so lookdev); o jogo segue com harbor_slice.tscn"
