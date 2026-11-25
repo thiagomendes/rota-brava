@@ -5,6 +5,8 @@ extends SceneTree
 ## Nao e teste: so produz imagens para olhar.
 
 var out_dir := ""
+## --part=M5|M6|M7|M8|cam (vazio = todas); o render por software e lento.
+var part := ""
 var main: Ep01V3Main
 
 
@@ -12,6 +14,8 @@ func _initialize() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--out="):
 			out_dir = a.trim_prefix("--out=")
+		if a.begins_with("--part="):
+			part = a.trim_prefix("--part=")
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	_run.call_deferred()
 
@@ -68,9 +72,25 @@ func _mk(n: StringName) -> Vector3:
 
 
 func _run() -> void:
+	if part == "" or part == "M5":
+		await _part_M5()
+	if part == "" or part == "M6":
+		await _part_M6()
+	if part == "" or part == "M7":
+		await _part_M7()
+	if part == "" or part == "M8":
+		await _part_M8()
+	if part == "" or part == "cam":
+		await _part_cam()
+	quit(0)
+
+
+func _part_M5() -> void:
+	var t: MemberActor
+	var p: MemberActor
 	# M5: Rastro nas penas; Pico no telhado com a gaivota.
 	await _open(&"M5")
-	var t := main.actors[&"tracker"] as MemberActor
+	t = main.actors[&"tracker"] as MemberActor
 	t.teleport(_mk(&"M5_FeatherTrail_3") + Vector3(0.6, 0.05, 0.8))
 	_yaw_to(t.global_position, _mk(&"M5_FeatherTrail_1"))
 	await _wait(1.2)
@@ -80,7 +100,7 @@ func _run() -> void:
 	await _confirm()
 	main.land._on_spot(&"vane", main.actors[&"pilot"])
 	await _confirm()
-	var p := main.actors[&"climber"] as MemberActor
+	p = main.actors[&"climber"] as MemberActor
 	p.teleport(main.land.points[&"CratesBase"] + Vector3(0, 0.05, 0))
 	await _wait(0.3)
 	main.land._on_spot(&"crates_climb", p)
@@ -89,6 +109,11 @@ func _run() -> void:
 	main.camera_rig.set_low_view(main.camera_rig.yaw + 0.6)
 	await _wait(1.0)
 	await _shot("m5_2_pico_telhado_gaivota")
+
+
+func _part_M6() -> void:
+	var t: MemberActor
+	var p: MemberActor
 	# M6: barco entre as boias; corda no bote.
 	await _open(&"M6")
 	main.land._on_spot(&"board", main.actors[&"pilot"])
@@ -109,6 +134,11 @@ func _run() -> void:
 	main.camera_rig.follow(boat, true)
 	await _wait(0.4)
 	await _shot("m6_2_pico_corda_bote")
+
+
+func _part_M7() -> void:
+	var t: MemberActor
+	var p: MemberActor
 	# M7: lente; Pico na galeria com o filhote; feixe nos barquinhos.
 	await _open(&"M7")
 	t = main.actors[&"tracker"] as MemberActor
@@ -138,6 +168,11 @@ func _run() -> void:
 	main.world.set_night(true)
 	await _wait(1.5)
 	await _shot("m7_3_leme_gira_lanterna_noite")
+
+
+func _part_M8() -> void:
+	var t: MemberActor
+	var p: MemberActor
 	# M8: festa a noite; conclusao com emblemas.
 	await _open(&"M8")
 	await _wait(1.0)
@@ -147,13 +182,19 @@ func _run() -> void:
 	_yaw_to(main.controlled_node.global_position, c)
 	await _wait(1.5)
 	await _shot("m8_1_festa_noite_capitao")
-	main.camera_rig.set_view(Vector3(0, 9.0, 16.0), deg_to_rad(200.0), 0.0)
+	main.camera_rig.set_low_view(deg_to_rad(250.0))
+	main.camera_rig.pitch = CameraRig.PITCH_MAX
 	main.camera_rig.follow(main.controlled_node, true)
 	await _wait(1.5)
 	await _shot("m8_2_festa_noite_porto")
 	main.land._on_spot(&"captain", main.controlled_node)
 	await _wait(2.5)
 	await _shot("m8_3_conclusao_emblemas")
+
+
+func _part_cam() -> void:
+	var t: MemberActor
+	var p: MemberActor
 	# Camera corrigida: Pico no topo do galpao (defeito da E4), no giro em que a camera encurta.
 	await _open(&"M2")
 	p = main.actors[&"climber"] as MemberActor
@@ -174,4 +215,3 @@ func _run() -> void:
 	main.camera_rig.follow(p, true)
 	await _wait(1.2)
 	await _shot("camera_pico_topo_galpao_corrigida")
-	quit(0)
