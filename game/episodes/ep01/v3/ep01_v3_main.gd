@@ -33,6 +33,17 @@ const INTERACT_DY := 1.0
 ## Seguidores: andam ate ficar a FOLLOW_NEAR m do heroi; longe demais (preso atras de algo), reaparecem atras dele.
 const FOLLOW_NEAR := 2.0
 const FOLLOW_FAR := 9.0
+## C2: seguidor nao persegue o lider em outra altura (subiu num degrau/patamar): para e espera o teleporte.
+const FOLLOW_MAX_DY := 0.3
+## C2: zonas de subida (pulo livre bloqueado; quem sobe e o Pico pela acao da missao). Marcador -> raio (m) do
+## cilindro, cobrindo a estrutura e ~1,5 m de corrida antes da borda (pulo correndo avanca ~1,3 m). Tabela de degraus
+## do ticket RB-R1: chafariz M3 (centro -22,8; 3,6, anel r 2,08), galpao M2, caixotes/toldo/telhado M5, farol M7.
+const CLIMB_ZONES := {
+	&"M3_UpperBasin": 3.9,
+	&"M2_ShedStep_1": 2.2, &"M2_ShedStep_2": 2.2, &"M2_ShedTop": 2.6,
+	&"M5_Crates": 2.2, &"M5_Awning": 2.4, &"M5_ShedRoof": 3.4,
+	&"M7_StairStep": 2.2, &"M7_StairBase": 2.4, &"M7_Landing_1": 3.0, &"M7_Gallery": 3.6,
+}
 
 ## Teste/dev: missao inicial (vazio = M0, ou a do salvo). Salvamento: o jogo real grava e le em user:// (MissionSave);
 ## vazio = nao salva nem le (testes). Os bots de demonstracao (--ep01-demo*) comecam do zero e nao gravam.
@@ -76,6 +87,7 @@ func _ready() -> void:
 		a.footstep.connect(_on_footstep)
 		actors[m] = a
 	_place_trio()
+	_build_climb_zones()
 	boat = BoatActor.new()
 	world.add_child(boat)
 	var berth := world.marker(&"M6_BoatStart")
@@ -482,11 +494,50 @@ func _update_followers() -> void:
 		if lead == null or a == lead or a.airborne or a.riding_on != null or lead.riding_on != null:
 			continue
 		var d := lead.global_position - a.global_position
+		var dy := absf(d.y)
 		d.y = 0.0
 		if d.length() > FOLLOW_FAR and lead.is_on_floor() and not lead.airborne:
-			a.teleport(lead.global_position + Basis(Vector3.UP, camera_rig.yaw) * ((TRIO_OFFSETS[m] as Vector3) + Vector3(0, 0.05, 0.8)))
-		elif d.length() > FOLLOW_NEAR:
+			var to: Variant = follower_teleport_point(lead, a, m)
+			if to != null:
+				a.teleport(to as Vector3)
+		elif d.length() > FOLLOW_NEAR and dy <= FOLLOW_MAX_DY:
 			a.auto_dir = d.normalized()
+
+
+## Destino do teleporte de um seguidor: do outro lado do lider em relacao a camera (longe dela, encoberto pelo lider),
+## com chao e sem parede (`slot_clear`). null se nenhum lugar serve (fica onde esta).
+func follower_teleport_point(lead: MemberActor, a: MemberActor, m: StringName) -> Variant:
+	var cam_basis := Basis(Vector3.UP, camera_rig.yaw)
+	var side := (TRIO_OFFSETS[m] as Vector3).x
+	for back: Vector3 in [Vector3(side, 0, -1.3), Vector3(side * 0.5, 0, -2.0), Vector3(-side, 0, -1.3), Vector3(0, 0, -1.6)]:
+		var p := lead.global_position + cam_basis * back
+		if a.slot_clear(lead.global_position, p):
+			return p + Vector3(0, 0.05, 0)
+	return null
+
+
+## Zonas de subida (camada MemberActor.CLIMB_ZONE_LAYER): Area3D com cilindro em volta das estruturas das missoes.
+func _build_climb_zones() -> void:
+	var root := Node3D.new()
+	root.name = "ClimbZones"
+	world.add_child(root)
+	for mk: StringName in CLIMB_ZONES:
+		var marker := world.marker(mk)
+		if marker == null:
+			continue
+		var area := Area3D.new()
+		area.name = "Zone_" + String(mk)
+		area.collision_layer = MemberActor.CLIMB_ZONE_LAYER
+		area.collision_mask = 0
+		area.monitoring = false
+		var shape := CollisionShape3D.new()
+		var cyl := CylinderShape3D.new()
+		cyl.radius = float(CLIMB_ZONES[mk])
+		cyl.height = 12.0
+		shape.shape = cyl
+		area.add_child(shape)
+		root.add_child(area)
+		area.global_position = Vector3(marker.global_position.x, marker.global_position.y, marker.global_position.z)
 
 
 # ---------- ajuda em 3 degraus ----------

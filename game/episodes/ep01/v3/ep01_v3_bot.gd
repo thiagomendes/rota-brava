@@ -9,13 +9,15 @@ extends Node
 
 signal finished(success: bool)
 
-const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down", &"interact", &"help"]
+const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down", &"interact", &"help", &"run"]
 const STUCK_SECONDS := 4.0
 const STUCK_MIN_MOVE := 0.4
 const WAYPOINT_REACH := 0.6
 const PRESS_COOLDOWN := 0.5
 ## Perto e no mesmo nivel: anda reto (o A* nao precisa).
 const DIRECT_RANGE := 1.6
+## C2: segura `run` (corre) enquanto o alvo esta a mais que isto; perto, anda para mirar o ponto.
+const RUN_DIST := 3.0
 
 var main: Ep01V3Main
 var timeout_seconds: float = 600.0
@@ -116,7 +118,7 @@ func _physics_process(delta: float) -> void:
 		if _wp < _route.size() and d.length() <= WAYPOINT_REACH:
 			_wp += 1
 			return
-	_walk(d.normalized() if d.length() > 0.05 else Vector3.ZERO)
+	_walk(d.normalized() if d.length() > 0.05 else Vector3.ZERO, flat.length() > RUN_DIST)
 	_stuck_t += delta
 	if _stuck_t >= STUCK_SECONDS:
 		if here.distance_to(_stuck_from) < STUCK_MIN_MOVE:
@@ -173,7 +175,8 @@ func _drive(target: Vector3) -> void:
 	_hold(&"move_down", 0.0)
 
 
-func _walk(dir_world: Vector3) -> void:
+func _walk(dir_world: Vector3, run: bool = false) -> void:
+	_hold(&"run", 1.0 if run and dir_world.length() > 0.01 else 0.0)
 	var local := Basis(Vector3.UP, -main.camera_rig.yaw) * dir_world
 	_hold(&"move_right", maxf(local.x, 0.0))
 	_hold(&"move_left", maxf(-local.x, 0.0))
