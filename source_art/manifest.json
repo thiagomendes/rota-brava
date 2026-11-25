@@ -1348,7 +1348,7 @@
         "script": "source_art/characters/leme_v2/build_leme_v2.py",
         "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless) + Cycles CPU para assar mapas",
         "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, PBR metallic-roughness, KHR_materials_clearcoat, JPEG embutido",
-        "tecnicas": "corpo inteirico por SKIN+SUBSURF com articulacoes deslocadas em numpy, cortado por planos em camisa/bermuda/pele/meia; colete por superficie parametrica projetada no corpo (raycast BVH); metaballs (cabelo cacheado); torno, toros, tubos e prismas (bone, equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (algodao, sarja, canelado, ripstop, refletivo, pespontos, cachos); normal map assada por Bump; FK/IK em Python"
+        "tecnicas": "corpo inteirico por SKIN+SUBSURF com articulacoes deslocadas em numpy, cortado por planos em camisa/bermuda/pele/meia; colete por superficie parametrica projetada no corpo (raycast BVH); metaballs (base do cabelo) + cachos individuais com mola e verniz pintados por cacho; shape keys de punho e joinha nas maos; torno, toros, tubos e prismas (bone, equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (algodao, sarja, canelado, ripstop, refletivo, pespontos, cachos); normal map assada por Bump; FK/IK em Python"
       },
       "origem": [
         "source_art/characters/leme_v2/build_leme_v2.py",
@@ -1367,9 +1367,9 @@
         "source_art/scripts/rbart.py"
       ],
       "saida_glb": "game/assets/models/characters/leme_v2.glb",
-      "glb_sha256": "3e7a6a07d8265adc7c4ec2eebb089c919fb563214166b3c72d37b91b457d467c",
-      "glb_bytes": 6904860,
-      "triangulos": 24674,
+      "glb_sha256": "963089b7a7407ca0f7474c1c98692914b652036712d2e6de94bd2233f646c16f",
+      "glb_bytes": 7406064,
+      "triangulos": 24790,
       "materiais": [
         "mat_leme_v2_face_dark",
         "mat_leme_v2_face_eye",
@@ -1507,12 +1507,12 @@
       "velocidade_walk_mps": 0.5711,
       "velocidade_run_mps": 1.2133,
       "folga_minima_botas_m": 0.0522,
-      "folga_minima_botas_onde": "team_pose quadro 0",
+      "folga_minima_botas_onde": "team_pose quadro 4",
       "variacao": "LV2",
       "aprovacao": "pendente (Thiago, visualizador 3D, D13)",
       "originalidade": "geometria procedural propria (SKIN, SUBSURF, metaballs, torno, bmesh, raycast sobre o proprio corpo); rig e animacoes autorais por script; texturas pintadas por formula; nenhum modelo, malha, rig, mocap, textura ou personagem-base de terceiros; nada copiado de series de TV",
-      "data": "2026-11-24",
-      "nota": "Leme v2: camisa de capitania branca de manga curta, colete salva-vidas azul (placas de espuma, gola-travesseiro em ferradura, faixas refletivas, apito), bermuda azul, meias de meio cano listradas, botinas nauticas, bone nautico de capitania, cachos com puff atras, bussola de pulso e pulseira de corda. Clipes com os mesmos nomes do leme.glb; idle, team_pose (continencia) e wave novos."
+      "data": "2026-11-25",
+      "nota": "Leme v2: camisa de capitania branca de manga curta, colete salva-vidas azul (placas de espuma, gola-travesseiro em ferradura, faixas refletivas, apito), bermuda azul, meias de meio cano listradas, botinas nauticas, bone nautico de capitania, cachos com puff atras, bussola de pulso e pulseira de corda. Clipes com os mesmos nomes do leme.glb; idle, team_pose (continencia + joinha da mao esquerda) e wave novos. Acabamento 2026-11-25: cachos legiveis, bracos mais grossos e curtos, maos relaxadas com polegar, punho/joinha por shape key, bone sem vinco, apito novo, punho da meia regular, sola sem afundar."
     }
   ]
 }

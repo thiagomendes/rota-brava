@@ -1,11 +1,11 @@
 {
-  "tris": 24674,
+  "tris": 24790,
   "tris_por_objeto": {
-    "Leme_Skin": 5325,
-    "Leme_Hair": 1513,
-    "Leme_Gear": 7376,
-    "Leme_Suit": 7912,
-    "Leme_Glass": 180,
+    "Leme_Skin": 5291,
+    "Leme_Hair": 2986,
+    "Leme_Gear": 6800,
+    "Leme_Suit": 7217,
+    "Leme_Glass": 128,
     "Leme_Face": 2368
   },
   "materials": [
@@ -131,6 +131,12 @@
     "look_right",
     "look_up"
   ],
+  "shape_keys_maos": [
+    "fist_R",
+    "thumb_up_R",
+    "fist_L",
+    "thumb_up_L"
+  ],
   "walk_speed_mps": 0.5711,
   "run_speed_mps": 1.2133,
   "pes": {
@@ -187,15 +193,15 @@
       2048
     ]
   },
-  "wheel_mid_err_m": 0.01,
+  "wheel_mid_err_m": 0.0097,
   "botas": {
     "min_m": 0.0522,
     "min_clip": "team_pose",
-    "min_frame": 0,
+    "min_frame": 4,
     "por_clipe": {
       "idle": {
         "min_m": 0.0522,
-        "quadro": 127
+        "quadro": 149
       },
       "walk": {
         "min_m": 0.0689,
@@ -207,7 +213,7 @@
       },
       "stop": {
         "min_m": 0.0522,
-        "quadro": 13
+        "quadro": 14
       },
       "idle_wheel": {
         "min_m": 0.0863,
@@ -231,7 +237,7 @@
       },
       "wave": {
         "min_m": 0.0522,
-        "quadro": 4
+        "quadro": 0
       },
       "point": {
         "min_m": 0.0522,
@@ -239,23 +245,23 @@
       },
       "team_pose": {
         "min_m": 0.0522,
-        "quadro": 0
+        "quadro": 4
       }
     },
     "deslize": {
       "walk": {
         "nominal_mps": 0.5711,
-        "pares_de_quadros_em_apoio": 30,
-        "erro_medio_mps": 0.0059,
-        "erro_max_mps": 0.0598,
-        "min_z_m": -0.0034
+        "pares_de_quadros_em_apoio": 20,
+        "erro_medio_mps": 0.0075,
+        "erro_max_mps": 0.0583,
+        "min_z_m": -0.0007
       },
       "run": {
         "nominal_mps": 1.2133,
-        "pares_de_quadros_em_apoio": 12,
-        "erro_medio_mps": 0.0039,
-        "erro_max_mps": 0.0183,
-        "min_z_m": -0.004
+        "pares_de_quadros_em_apoio": 8,
+        "erro_medio_mps": 0.0,
+        "erro_max_mps": 0.0,
+        "min_z_m": -0.0001
       }
     }
   }

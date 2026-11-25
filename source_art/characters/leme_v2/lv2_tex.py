@@ -534,8 +534,8 @@ def paint_suit(m, b):
     rb = rib(P)
     h += np.where(so, 0.00045 * rb, 0)
     zs = b.z_sock
-    for zc in (zs - 0.016, zs - 0.032):
-        stp = sel("sock") & (np.abs(z - zc) < 0.0045)
+    for zc in (zs - 0.0085, zs + 0.0010):           # duas listras azuis NO punho (faixa de zs - 0,017 a zs + 0,010)
+        stp = sel("sock_top") & (np.abs(z - zc) < 0.0024)
         col[stp] = blue
     # --- colete: nailon ripstop azul, canais costurados, faixas refletivas, vivo branco, estrela nas costas
     vest = sel("vest") | sel("collar_pillow")
@@ -692,9 +692,12 @@ def paint_skin(m, b):
 
 
 def paint_hair(m, b):
-    """Cachos: cada texel pega o cacho mais proximo e recebe fios em helice em volta de um eixo proprio do cacho."""
+    """Cachos legiveis: cada texel pega o cacho mais proximo (distancia normalizada pelo elipsoide do cacho) e recebe, no
+    referencial DESSE cacho, uma mola de dois fios em helice (sulco escuro e fundo no normal, crista clara). O verniz:
+    crista com rugosidade baixa e um brilho claro por cacho; sulcos e encontros entre cachos escurecem (AO + sulco).
+    A massa de base (entre cachos, sob o bone) fica com fios finos em volta da coroa."""
     F = b.F
-    P, N = m["P"], m["N"]
+    P = m["P"]
     n = len(P)
     hc = np.array(F.hc)
     k = F.k
@@ -703,35 +706,35 @@ def paint_hair(m, b):
     az = np.arctan2(v[:, 0], v[:, 1] + 0.001)
     strands = np.sin(az * 46 + 2.0 * np.sin(az * 5)) * 0.5 + 0.5
     fine = np.sin(az * 140 + 6 * fbm(P, 0.02, 2)) * 0.5 + 0.5
-    rng = np.random.RandomState(11)
     best = np.full(n, 9.0)
-    pat = np.zeros(n)
-    pat2 = np.zeros(n)
-    centers = [(np.array(c[:]), r) for c, r in b.curls] + [(np.array(b.puff[0][:]), b.puff[1])]
-    for c, r in centers:
-        axv = rng.normal(size=3)
-        axv /= np.linalg.norm(axv)
-        e1 = np.cross(axv, [0.3, 0.5, 0.8])
-        e1 /= np.linalg.norm(e1)
-        e2 = np.cross(axv, e1)
-        q = P - c
-        d = np.linalg.norm(q, axis=1) / r
+    ridge = np.zeros(n)
+    finec = np.zeros(n)
+    bright = np.ones(n)
+    for c, r, rot, el, tw, br in b.curls:
+        M = np.array([list(row) for row in rot])            # colunas = eixos do cacho no mundo
+        q = (P - np.array(c[:])) @ M                          # coordenadas locais
+        q = q / (np.array(el) * r)
+        d = np.linalg.norm(q, axis=1)
         closer = d < best
-        a = np.arctan2(q @ e2, q @ e1)
-        hgt = (q @ axv) / r
-        coil = np.sin(a * 3 + hgt * 9.0 + rng.uniform(0, 6)) * 0.5 + 0.5
-        fn = np.sin(a * 18 + hgt * 30.0) * 0.5 + 0.5
+        phi = np.arctan2(q[:, 1], q[:, 0])
+        t = q[:, 2]
+        hel = 2 * phi + 2 * np.pi * 1.35 * t * el[2] + tw     # mola de dois fios (~2 voltas visiveis)
+        rg = (np.cos(hel) * 0.5 + 0.5) ** 0.8
+        fn = np.sin(9 * phi + 2 * np.pi * 6.0 * t) * 0.5 + 0.5
         best = np.where(closer, d, best)
-        pat = np.where(closer, coil, pat)
-        pat2 = np.where(closer, fn, pat2)
-    w = sstep(-best, -1.5, -1.05)
-    strands = strands * (1 - w) + pat * w
-    fine = fine * (1 - w) + pat2 * w
-    h = 0.0013 * strands ** 1.4 + 0.00035 * fine
-    col = np.tile(lin(C["hair"]), (n, 1))
-    col = col * (0.80 + 0.45 * strands[:, None]) + lin(C["hair_lt"]) * (0.10 * fine * strands)[:, None]
-    col *= (0.70 + 0.30 * m["ao"] ** 0.8)[:, None]
-    rough = 0.46 - 0.10 * strands
+        ridge = np.where(closer, rg, ridge)
+        finec = np.where(closer, fn, finec)
+        bright = np.where(closer, br, bright)
+    w = sstep(-best, -1.25, -1.02)                            # 1 na superficie do cacho, 0 na massa de base
+    groove = 1.0 - ridge
+    h = (1 - w) * (0.0013 * strands ** 1.4 + 0.00035 * fine) + w * (0.0030 * ridge + 0.00030 * finec)
+    base_col = np.tile(lin(C["hair"]), (n, 1))
+    col0 = base_col * (0.80 + 0.45 * strands[:, None]) + lin(C["hair_lt"]) * (0.10 * fine * strands)[:, None]
+    col1 = base_col * (0.55 + 0.75 * ridge[:, None]) * bright[:, None] + lin(C["hair_lt"]) * (0.30 * ridge ** 3 * (0.6 + 0.4 * finec))[:, None]
+    col1 *= (1.0 - 0.35 * groove ** 2)[:, None]
+    col = col0 * (1 - w)[:, None] + col1 * w[:, None]
+    col *= (0.62 + 0.38 * m["ao"] ** 0.9)[:, None]
+    rough = (1 - w) * (0.46 - 0.10 * strands) + w * (0.52 - 0.30 * ridge)
     return col, h, rough, np.zeros(n)
 
 

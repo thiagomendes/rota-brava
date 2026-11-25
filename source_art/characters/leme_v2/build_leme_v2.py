@@ -57,19 +57,35 @@ def finish_materials(groups, b, textures=True):
             img.pack()
 
 
+def sole_points(gear):
+    """Pontos de repouso da parte de baixo das botas (sola e base), por lado, para a correcao de contato no lv2_anim."""
+    import numpy as np
+    me = gear.data
+    n = len(me.vertices)
+    pid = np.empty(n, dtype=np.float32)
+    me.attributes["rbpart"].data.foreach_get("value", pid)
+    pid = np.rint(pid * 100).astype(int)
+    co = np.empty(n * 3)
+    me.vertices.foreach_get("co", co)
+    co = co.reshape(-1, 3)
+    boot = np.isin(pid, [lv2_tex.PID[p] for p in lv2_anim.BOOT_PARTS]) & (co[:, 2] < 0.03)
+    return {"R": co[boot & (co[:, 0] > 0)], "L": co[boot & (co[:, 0] < 0)]}
+
+
 def measure(b, groups, rig):
     objs = list(groups.values())
     lo, hi = world_bbox(objs)
     head = groups["skin"]
     hz = [v.co.z for v in head.data.vertices if v.co.z > b.F.chin - 0.01]
     head_h = max(hz) - min(hz)
-    acts = {a.name: [round(a.frame_range[0]), round(a.frame_range[1])] for a in bpy.data.actions if not a.name.endswith("_key")}
+    acts = {a.name: [round(a.frame_range[0]), round(a.frame_range[1])] for a in bpy.data.actions if not a.name.endswith(("_key", "_hand"))}
     info = {"tris": tri_count(objs), "tris_por_objeto": {o.name: tri_count([o]) for o in objs},
             "materials": sorted({m.name for o in objs for m in o.data.materials if m}),
             "height_m": round(hi.z - lo.z, 4), "min_z": round(lo.z, 4), "head_h_m": round(head_h, 4),
             "head_ratio": round(head_h / (hi.z - lo.z), 4), "eye_h_ratio": round(b.eye_info["R"]["ez"] * 2 / head_h, 4),
             "objects": sorted(o.name for o in objs), "bones": [bb.name for bb in rig.data.bones], "bone_count": len(rig.data.bones),
             "animations": acts, "shape_keys": [k.name for k in groups["face"].data.shape_keys.key_blocks],
+            "shape_keys_maos": [k.name for k in groups["skin"].data.shape_keys.key_blocks][1:] if groups["skin"].data.shape_keys else [],
             "walk_speed_mps": round(lv2_anim.ha.walk_speed(b.F), 4), "run_speed_mps": round(lv2_anim.ha.run_speed(b.F), 4),
             "pes": {"hip_x_m": round(b.F.hip_x, 4), "foot_x_m": round(b.F.foot_x, 4)},
             "texturas": {img.name: list(img.size) for img in bpy.data.images if img.name.startswith("leme_v2_")}}
@@ -101,7 +117,9 @@ def build(glb=None, blend=None, textures=True, feet=True):
     print("JOIN", {g: o.name for g, o in groups.items()}, round(time.time() - t0, 1))
     finish_materials(groups, b, textures)
     print("MATERIAIS ok", round(time.time() - t0, 1))
-    rep = lv2_anim.author(rig, groups["face"], b.F)
+    hand = lv2_body.add_hand_keys(groups["skin"], b, lv2_tex.PID["hand"])
+    print("MAOS shape keys", hand)
+    rep = lv2_anim.author(rig, groups["face"], b.F, hand_ob=groups["skin"], sole=sole_points(groups["gear"]))
     bpy.context.view_layer.update()
     info = measure(b, groups, rig)
     info.update(rep)

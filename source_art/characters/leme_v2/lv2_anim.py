@@ -4,7 +4,10 @@ Novos nesta proposta: `idle` (gira a bussola de pulso e depois sorri para o mar,
 (continencia de capita: mao aberta na pala, a outra na cintura, base aberta) e `wave` (aceno aberto, braco alto, palma
 para a frente). Os demais vem de source_art/scripts/hero_anim.py. FK + IK de 2 ossos, 30 fps, sem root motion. PROVISORIO.
 
-Sem ossos de dedo: o "joinha" da biblia de estilo nao e possivel neste rig (mao inteira num osso); a continencia substitui.
+Sem ossos de dedo (28 ossos): as maos de pele tem shape keys fist_R/fist_L (punho) e thumb_up_R/thumb_up_L (joinha),
+animadas por clipe numa Action propria (<clipe>_hand): punhos no celebrate, joinha da mao esquerda no team_pose (junto da
+continencia) e pegada leve no volante (idle_wheel/steer). Contato dos pes: a sola nunca afunda no chao ao rolar o pe
+(put_foot corrigido abaixo com os pontos reais da sola).
 """
 import math
 import os
@@ -21,12 +24,50 @@ import numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
+import char_anim
 import char_lib as cl
 import hero_anim as ha
-from char_anim import blink_curve, lerp, put_foot, reach, smooth, stand_feet, torso
+from char_anim import blink_curve, foot_ankle, lerp, put_foot, reach, smooth, stand_feet, torso
 from char_lib import eul
 
 FPS = ha.FPS
+
+
+# ------------------------------------------------------------------ pes: a sola nunca afunda ao rolar o pe
+_PUT_FOOT = char_anim.put_foot
+SOLE = {}
+
+
+def put_foot_sole(R, s, heel_y, phi=0.0, pivot="heel", lift=0.0, dx=0.0, pole=None, ankle=None):
+    """put_foot do char_anim, mas se algum ponto real da sola (pontos de repouso em SOLE[s]) ficar abaixo do chao com o pe
+    rolado (pivo no osso do calcanhar ou da bola, acima da borda da sola), o tornozelo sobe o que falta."""
+    a = ankle if ankle is not None else foot_ankle(R, s, heel_y, phi, pivot, lift, dx)
+    pts = SOLE.get(s)
+    if pts is not None and len(pts):
+        a0, b0 = np.array(R.rest_head["foot." + s]), np.array(R.rest_head["toe." + s])
+        c, sn = math.cos(math.radians(phi)), math.sin(math.radians(phi))
+        rel = pts - a0
+        zf = a.z + rel[:, 1] * sn + rel[:, 2] * c                    # Rx(phi): z' = y sin + z cos
+        if phi < 0.0:
+            # dedos: o osso toe fica plano, mas a pele da ponta da sola tem peso dividido com o osso do pe (que gira para
+            # baixo) -- vale o pior dos dois (a ponta afundava ate 4 mm no impulso do walk/run)
+            tz = a.z + (b0 - a0)[1] * sn + (b0 - a0)[2] * c
+            toe = pts[:, 1] > b0[1]
+            zf = np.where(toe, np.minimum(zf, tz + (pts[:, 2] - b0[2])), zf)
+        low = float(zf.min()) - (0.0010 if abs(phi) > 0.2 else 0.0)   # folga para o peso dividido com a canela
+        if low < 0.0:
+            a = Vector((a.x, a.y, a.z - low))
+    return _PUT_FOOT(R, s, heel_y, phi, pivot, lift, dx, pole, ankle=a)
+
+
+def fix_soles(sole):
+    """Liga a correcao da sola em todos os clipes (hero_anim, char_anim e este modulo usam put_foot por nome)."""
+    global put_foot
+    SOLE.clear()
+    SOLE.update({k: np.asarray(v, dtype=float) for k, v in sole.items()})
+    char_anim.put_foot = put_foot_sole
+    ha.put_foot = put_foot_sole
+    put_foot = put_foot_sole
 
 
 def head_point(R, p_rest):
@@ -92,11 +133,35 @@ def pose_team_lv2(R, F, t, T):
     rr, rl = R.tip("hand.R"), R.tip("hand.L")
     sal = head_point(R, F.brim_r) + Vector((0.022, 0.006, 0.012))
     reach(R, "R", rr.lerp(sal, a), Vector((0.1, 0.2, -1.0)).lerp(Vector((-0.40, 0.42, 0.80)), a), pole=(1.0, -0.15, -0.25), roll=-20.0 * a)
-    hip = Vector((-F.v["belly"] - 0.045, 0.012, F.hz + 0.065))
-    reach(R, "L", rl.lerp(hip, a), Vector((-0.1, 0.2, -1.0)).lerp(Vector((0.45, 0.05, -0.9)), a), pole=(-1.0, -0.9, 0.3))
+    # mao esquerda: JOINHA a frente do peito (punho deitado, polegar para cima), cotovelo baixo
+    thumb = Vector((-0.085, F.v["belly"] + 0.17, F.sh.z - 0.11))
+    reach(R, "L", rl.lerp(thumb, a), Vector((-0.1, 0.2, -1.0)).lerp(Vector((0.25, 1.0, 0.10)), a), pole=(-0.8, -0.4, -1.0))
     for s, sx, dx, dy in (("R", 1, 0.030, 0.020), ("L", -1, -0.030, -0.020)):
         put_foot(R, s, R.rest_head["heel." + s].y + dy * a, 0.0, "heel", lift=0.025 * air, dx=dx * a, pole=(sx * 0.25, 1.0, 0.0))
-    return ha.face(alegre=smooth(t, 0.1, 0.35) * (1 - smooth(t, 1.3, 1.5)), atenta=0.4 * pre)
+    f = ha.face(alegre=smooth(t, 0.1, 0.35) * (1 - smooth(t, 1.3, 1.5)), atenta=0.4 * pre)
+    f["thumb_up_L"] = smooth(t, 0.22, 0.44) * (1 - smooth(t, 1.20, 1.42))
+    return f
+
+
+def pose_celebrate_lv2(R, F, t, T):
+    """celebrate da Leme do jogo, agora com os dois punhos FECHADOS no alto do salto (shape keys fist_R/fist_L)."""
+    f = ha.pose_celebrate(R, F, t, T)
+    f["fist_R"] = f["fist_L"] = smooth(t, 0.12, 0.32) * (1 - smooth(t, 0.95, 1.2))
+    return f
+
+
+def pose_idle_wheel_lv2(R, F, t, T):
+    f = ha.pose_idle_wheel(R, F, t, T)
+    f["fist_R"] = f["fist_L"] = 0.45             # pegada leve no aro do volante
+    return f
+
+
+def pose_steer_lv2(sign):
+    def fn(R, F, t, T):
+        f = ha.pose_steer(R, F, t, T, sign)
+        f["fist_R"] = f["fist_L"] = 0.45
+        return f
+    return fn
 
 
 def pose_wave_lv2(R, F, t, T):
@@ -119,15 +184,26 @@ def pose_wave_lv2(R, F, t, T):
 CLIPS = dict(ha.CLIPS)
 CLIPS["team_pose"] = (1.5, False, pose_team_lv2)
 CLIPS["wave"] = (1.6, False, pose_wave_lv2)
+CLIPS["celebrate"] = (CLIPS["celebrate"][0], False, pose_celebrate_lv2)
+CLIPS["idle_wheel"] = (CLIPS["idle_wheel"][0], True, pose_idle_wheel_lv2)
+CLIPS["steer_left"] = (CLIPS["steer_left"][0], False, pose_steer_lv2(+1))
+CLIPS["steer_right"] = (CLIPS["steer_right"][0], False, pose_steer_lv2(-1))
 IDLE = (5.2, pose_idle_lv2)
 CLIP_SET = ["idle", "walk", "run", "stop", "idle_wheel", "steer_left", "steer_right", "react_horn", "celebrate", "wave", "point", "team_pose"]
+HAND_KEYS = ("fist_R", "fist_L", "thumb_up_R", "thumb_up_L")
 
 
-def author(rig, face_ob, F, names=CLIP_SET):
-    """Grava cada clipe como Action + faixa NLA (corpo) e Action de shape keys (rosto), como no hero_anim.author."""
+def author(rig, face_ob, F, names=CLIP_SET, hand_ob=None, sole=None):
+    """Grava cada clipe como Action + faixa NLA (corpo), Action de shape keys (rosto) e, se houver, Action das shape keys das
+    maos (<clipe>_hand), como no Rastro v2.1. `sole`: pontos de repouso da sola por lado (ver fix_soles)."""
+    if sole is not None:
+        fix_soles(sole)
     R = cl.Rigger(rig)
     sk = face_ob.data.shape_keys
     sk.animation_data_create()
+    hk = hand_ob.data.shape_keys if hand_ob is not None and hand_ob.data.shape_keys else None
+    if hk is not None:
+        hk.animation_data_create()
     rig.animation_data_create()
     prev = {}
     report = {}
@@ -141,6 +217,11 @@ def author(rig, face_ob, F, names=CLIP_SET):
         keyact.use_fake_user = True
         rig.animation_data.action = act
         sk.animation_data.action = keyact
+        handact = None
+        if hk is not None:
+            handact = bpy.data.actions.new(name + "_hand")
+            handact.use_fake_user = True
+            hk.animation_data.action = handact
         n = int(round(dur * FPS))
         prev.clear()
         best = 9.0
@@ -156,10 +237,18 @@ def author(rig, face_ob, F, names=CLIP_SET):
                 kb = sk.key_blocks[kn]
                 kb.value = max(0.0, min(1.0, fc.get(kn, 0.0)))
                 kb.keyframe_insert("value", frame=i)
+            if hk is not None:
+                for kn in HAND_KEYS:
+                    kb = hk.key_blocks[kn]
+                    kb.value = max(0.0, min(1.0, fc.get(kn, 0.0)))
+                    kb.keyframe_insert("value", frame=i)
         if name == "idle_wheel":
             report["wheel_mid_err_m"] = round(best, 4)
         act["loop"] = loop
-        for ad, a_ in ((rig.animation_data, act), (sk.animation_data, keyact)):
+        pairs = [(rig.animation_data, act), (sk.animation_data, keyact)]
+        if hk is not None:
+            pairs.append((hk.animation_data, handact))
+        for ad, a_ in pairs:
             ad.action = None
             tr = ad.nla_tracks.new()
             tr.name = name

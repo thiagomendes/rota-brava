@@ -30,13 +30,19 @@ sc = bpy.context.scene
 rig = next(o for o in sc.objects if o.type == "ARMATURE")
 meshes = [o for o in sc.objects if o.type == "MESH"]
 face = next(o for o in meshes if o.name.endswith("_Face"))
+skin = next(o for o in meshes if o.name.endswith("_Skin"))
+HK = skin.data.shape_keys.animation_data if skin.data.shape_keys and skin.data.shape_keys.animation_data else None
+ADS = [rig.animation_data, face.data.shape_keys.animation_data] + ([HK] if HK else [])
 
 
 def rest_pose():
-    for ad in (rig.animation_data, face.data.shape_keys.animation_data):
+    for ad in ADS:
         for tr in ad.nla_tracks:
             tr.mute = True
         ad.action = None
+    if skin.data.shape_keys:
+        for kb in skin.data.shape_keys.key_blocks:
+            kb.value = 0.0
     for pb in rig.pose.bones:
         pb.rotation_quaternion = (1, 0, 0, 0)
         pb.location = (0, 0, 0)
@@ -46,11 +52,13 @@ def rest_pose():
 
 
 def set_clip(name, frame):
-    for ad in (rig.animation_data, face.data.shape_keys.animation_data):
+    for ad in ADS:
         for tr in ad.nla_tracks:
             tr.mute = True
     rig.animation_data.action = bpy.data.actions[name]
     face.data.shape_keys.animation_data.action = bpy.data.actions[name + "_key"]
+    if HK and (name + "_hand") in bpy.data.actions:
+        HK.action = bpy.data.actions[name + "_hand"]
     sc.frame_set(frame)
 
 

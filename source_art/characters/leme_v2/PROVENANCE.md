@@ -24,21 +24,23 @@ via `game/lookdev/leme_v2_model.tscn`).
 |---|---|
 | Corpo inteiriço (tronco + braços + pernas numa malha só) | grafo de pele (SKIN) + SUBSURF 3, ombro/cotovelo/joelho/panturrilha deslocados em numpy, Decimate por colapso; depois cortado por planos exatos em camisa, bermuda, pele (braço e joelho) e meia, com bordas coincidentes cobertas por vivos/barras modelados (`lv2_body.split_body`) |
 | Colete salva-vidas | superfície paramétrica (θ, z) projetada no corpo por raycast em BVH, espessura com borda arredondada e canais modelados, vivo (borda) até o corpo; gola-travesseiro por SKIN |
-| Mãos de 4 dedos (pele, relaxadas), botinas, sola, cadarço | SKIN + SUBSURF, palma achatada em numpy; sola pelo contorno medido da própria bota; cadarço/ilhoses por tubos e toros sobre a bota (raycast) |
-| Boné, cinto, fivela, emblema, bússola, pulseira, apito | torno (lathe), toros, tubos, prismas e caixas arredondadas em bmesh |
+| Mãos de 4 dedos (pele, relaxadas e levemente curvas, polegar à mostra), botinas, sola, cadarço | SKIN + SUBSURF, palma achatada em numpy; shape keys `fist_R/fist_L` (punho) e `thumb_up_R/thumb_up_L` (joinha) por rotação das falanges em numpy, pesos suaves pela distância aos esqueletos dos dedos (`lv2_body.add_hand_keys`); sola pelo contorno medido da própria bota; cadarço/ilhoses por tubos e toros sobre a bota (raycast) |
+| Boné, cinto, fivela, emblema, bússola, pulseira, apito | torno (lathe), toros, tubos, prismas e caixas arredondadas em bmesh; apito esportivo = câmara redonda + bocal + janela do som + argola do cordão |
+| Punho da meia | faixa que segue o raio real da perna (pele + meia) por ângulo e altura, medido por raios em BVH (6 por segmento, máximo da janela), com borda rolada (`_cuff`) |
 | Cabeça, rosto (olhos com dois brilhos, pálpebras, sobrancelhas, boca, visemas, olhar), esqueleto de 28 ossos | biblioteca dos heróis: `source_art/scripts/hero_lib.py`, `hero_face.py` (pernas do esqueleto em leve A) |
-| Cabelo | metaballs (calota, três anéis de cachos, puff com cachos na superfície), cabelo escondido dentro do boné removido |
-| Animações (12 clipes, os MESMOS nomes do `leme.glb`) | `source_art/scripts/hero_anim.py` + `lv2_anim.py` (idle, team_pose e wave novos), FK/IK em Python |
+| Cabelo | massa de base por metaball (o que fica dentro dos cachos ou do boné sai da malha) + 39 cachos individuais (elipsoides lisos de tamanho variado: cachos-mola pendentes nos três anéis, curtos no puff); a mola de dois fios e o verniz são pintados por cacho, no referencial do cacho (`lv2_tex.paint_hair`) |
+| Animações (12 clipes, os MESMOS nomes do `leme.glb`) | `source_art/scripts/hero_anim.py` + `lv2_anim.py` (idle, team_pose e wave novos; punhos no celebrate, joinha da mão esquerda junto da continência no team_pose, pegada leve no volante; correção de contato que impede a sola de afundar ao rolar o pé), FK/IK em Python |
 | Texturas (cor, normal, ORM) | assadas no Cycles a partir da própria malha (posição, normal, parte, AO) e pintadas em numpy: algodão, sarja, canelado, nailon ripstop, faixas refletivas, pespontos, bolsos, botões, cachos em hélice, palmas (`lv2_tex.py`). Nenhuma imagem de terceiros |
 
 Nenhum modelo, malha, textura, HDRI ou personagem-base baixado ou importado. Paleta da bíblia de estilo (`docs/style-bible.md` §3).
 
 ## Medidas (Blender, `leme_v2.info.json`)
-- 24.674 triângulos; altura 1,131 m (com o boné); cabeça 35,5% da altura; olho 29,3% da cabeça; 28 ossos; 12 clipes.
+- Acabamento (2026-11-25): 24.790 triângulos; altura 1,131 m (com o boné); cabeça 35,5% da altura; olho 29,3% da cabeça; 28 ossos; 12 clipes;
+  shape keys das mãos `fist_R`, `fist_L`, `thumb_up_R`, `thumb_up_L` (Actions `<clipe>_hand`).
 - **Botas nunca se tocam:** menor distância entre as malhas das duas botinas (sola, cano, cadarço, ilhoses), vértice→superfície
-  nos dois sentidos, em todos os quadros dos 12 clipes = **5,22 cm** (pose parada; walk 6,89 cm, run 7,36 cm).
-- Pés plantados: no walk/run, vértices da sola em contato recuam à velocidade nominal com erro médio 0,006/0,004 m/s
-  (máx. 0,060/0,018 m/s); a sola afunda no máximo 4 mm no chão ao rolar o pé.
+  nos dois sentidos, em todos os quadros dos 12 clipes = **5,22 cm** (team_pose quadro 4; walk 6,89 cm, run 7,36 cm).
+- Pés plantados: no walk/run, erro médio 0,0075 m/s no walk (máx. 0,058 m/s); a sola desce no máximo 0,7 mm abaixo do chão no
+  walk e 0,1 mm no run (antes 3,4 e 4,0 mm).
 - Mãos no volante (`idle_wheel`): ponto médio das mãos a 1,0 cm do centro do volante.
 
 ## Arquivos
