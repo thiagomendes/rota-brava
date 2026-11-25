@@ -103,16 +103,16 @@
       }
     },
     "run": {
-      "min_gap_m": 0.0648,
-      "quadro": 12,
-      "quadros": 19,
-      "media_m": 0.0991,
+      "min_gap_m": 0.0734,
+      "quadro": 11,
+      "quadros": 18,
+      "media_m": 0.1942,
       "olhos_fechados_sorriso": {
-        "alegre_gt_0_05_s": 0.633,
+        "alegre_gt_0_05_s": 0.6,
         "alegre_gt_0_5_s": 0.0
       },
       "deslize_apoio_mps_max": 0.0,
-      "quadros_apoio_medidos": 12
+      "quadros_apoio_medidos": 7
     },
     "stop": {
       "min_gap_m": 0.0469,
@@ -151,16 +151,16 @@
       "deslize_pe_plantado_m_por_quadro": 0.0
     },
     "walk": {
-      "min_gap_m": 0.0634,
-      "quadro": 23,
+      "min_gap_m": 0.0662,
+      "quadro": 21,
       "quadros": 31,
-      "media_m": 0.1015,
+      "media_m": 0.172,
       "olhos_fechados_sorriso": {
-        "alegre_gt_0_05_s": 0.0,
+        "alegre_gt_0_05_s": 1.033,
         "alegre_gt_0_5_s": 0.0
       },
-      "deslize_apoio_mps_max": 0.0007,
-      "quadros_apoio_medidos": 30
+      "deslize_apoio_mps_max": 0.0,
+      "quadros_apoio_medidos": 18
     },
     "wave": {
       "min_gap_m": 0.0469,

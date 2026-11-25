@@ -1234,10 +1234,11 @@
         "source_art/scripts/hero_anim.py",
         "source_art/scripts/char_lib.py",
         "source_art/scripts/char_anim.py",
-        "source_art/scripts/rbart.py"
+        "source_art/scripts/rbart.py",
+        "source_art/scripts/hero_gait_v2.py"
       ],
       "saida_glb": "game/assets/models/characters/rastro_v2.glb",
-      "glb_sha256": "5c86dbf1ffcbdf6c29ffa7b5c397cf4025ff933b4beea945c255f0d546de895f",
+      "glb_sha256": "70f4516a9e78423d014ca52b17393da301c7785a56f1ed2a61dd46ea074c53fc",
       "glb_bytes": 6408464,
       "triangulos": 24229,
       "materiais": [
@@ -1388,8 +1389,31 @@
       },
       "altura_m": 1.0835,
       "razao_cabeca_altura": 0.369,
-      "velocidade_walk_mps": 0.5491,
-      "velocidade_run_mps": 1.1667
+      "velocidade_walk_mps": 1.1864,
+      "velocidade_run_mps": 2.8571,
+      "ciclos_v2": {
+        "walk": {
+          "ciclo_s": 1.0,
+          "apoio_frac": 0.3877,
+          "curso_apoio_m": 0.46,
+          "avanco_ciclo_m": 1.1864,
+          "velocidade_nominal_mps": 1.1864,
+          "escala_no_jogo": 1.18,
+          "passos_por_s_no_jogo": 2.36,
+          "mps_jogo": 1.4
+        },
+        "run": {
+          "ciclo_s": 0.6,
+          "apoio_frac": 0.2683,
+          "curso_apoio_m": 0.46,
+          "avanco_ciclo_m": 1.7143,
+          "velocidade_nominal_mps": 2.8571,
+          "escala_no_jogo": 1.12,
+          "passos_por_s_no_jogo": 3.733,
+          "mps_jogo": 3.2
+        },
+        "nota": "RB-R1 ciclos v2 (2026-11-25): walk/run refeitos por source_art/scripts/hero_gait_v2.py com passada longa; escala do clipe no jogo ~1,1-1,2 a 1,4 e 3,2 m/s. PROVISORIO."
+      }
     },
     {
       "id": "pico_v2",
@@ -1421,11 +1445,12 @@
         "source_art/scripts/hero_anim.py",
         "source_art/scripts/char_lib.py",
         "source_art/scripts/char_anim.py",
-        "source_art/scripts/rbart.py"
+        "source_art/scripts/rbart.py",
+        "source_art/scripts/hero_gait_v2.py"
       ],
       "saida_glb": "game/assets/models/characters/pico_v2.glb",
-      "glb_sha256": "4b95247bfed88bfcb5a7ade7e52dc79e509418419fa4ef86339c0132cca1f0ae",
-      "glb_bytes": 6820760,
+      "glb_sha256": "baaeac377ad902d7c6a2ffd8387d2f36cb0a183151551c1044f7a10bacb84798",
+      "glb_bytes": 6812108,
       "triangulos": 24944,
       "materiais": [
         "mat_pico_v2_face_dark",
@@ -1485,7 +1510,7 @@
         "look_up": 2.0,
         "pull_rope": 1.6,
         "react_surprise": 0.9,
-        "run": 0.6,
+        "run": 0.5667,
         "stop": 0.5,
         "team_pose": 1.5,
         "walk": 1.0,
@@ -1560,8 +1585,31 @@
       },
       "altura_m": 1.0602,
       "razao_cabeca_altura": 0.3708,
-      "velocidade_walk_mps": 0.5183,
-      "velocidade_run_mps": 1.1012
+      "velocidade_walk_mps": 1.1667,
+      "velocidade_run_mps": 2.7826,
+      "ciclos_v2": {
+        "walk": {
+          "ciclo_s": 1.0,
+          "apoio_frac": 0.3771,
+          "curso_apoio_m": 0.44,
+          "avanco_ciclo_m": 1.1667,
+          "velocidade_nominal_mps": 1.1667,
+          "escala_no_jogo": 1.2,
+          "passos_por_s_no_jogo": 2.4,
+          "mps_jogo": 1.4
+        },
+        "run": {
+          "ciclo_s": 0.5667,
+          "apoio_frac": 0.279,
+          "curso_apoio_m": 0.44,
+          "avanco_ciclo_m": 1.5768,
+          "velocidade_nominal_mps": 2.7826,
+          "escala_no_jogo": 1.15,
+          "passos_por_s_no_jogo": 4.059,
+          "mps_jogo": 3.2
+        },
+        "nota": "RB-R1 ciclos v2 (2026-11-25): walk/run refeitos por source_art/scripts/hero_gait_v2.py com passada longa; escala do clipe no jogo ~1,1-1,2 a 1,4 e 3,2 m/s. PROVISORIO."
+      }
     },
     {
       "id": "leme_v2",
@@ -1590,11 +1638,12 @@
         "source_art/scripts/hero_anim.py",
         "source_art/scripts/char_lib.py",
         "source_art/scripts/char_anim.py",
-        "source_art/scripts/rbart.py"
+        "source_art/scripts/rbart.py",
+        "source_art/scripts/hero_gait_v2.py"
       ],
       "saida_glb": "game/assets/models/characters/leme_v2.glb",
-      "glb_sha256": "4c99a6cfe5e8b39f5340ff745fad63b7dff3efb6df7a8591af1482485ef89161",
-      "glb_bytes": 7707140,
+      "glb_sha256": "7c9c03025ce7a78121642ba42655c57b4973bf6e0f95b6b2c23c6bcb1f0f2305",
+      "glb_bytes": 7708724,
       "triangulos": 24531,
       "materiais": [
         "mat_leme_v2_acc_lifevest",
@@ -1655,7 +1704,7 @@
         "idle_wheel": 2.4,
         "point": 1.2,
         "react_horn": 0.9,
-        "run": 0.6,
+        "run": 0.6333,
         "steer_left": 1.0,
         "steer_right": 1.0,
         "stop": 0.5,
@@ -1744,8 +1793,8 @@
       },
       "altura_m": 1.1374,
       "razao_cabeca_altura": 0.3528,
-      "velocidade_walk_mps": 0.5711,
-      "velocidade_run_mps": 1.2133,
+      "velocidade_walk_mps": 1.2174,
+      "velocidade_run_mps": 2.7826,
       "folga_minima_botas_m": 0.0522,
       "folga_minima_botas_onde": "team_pose quadro 4",
       "variacao": "LV2",
@@ -1767,7 +1816,30 @@
         "thumb_up_R",
         "fist_L",
         "thumb_up_L"
-      ]
+      ],
+      "ciclos_v2": {
+        "walk": {
+          "ciclo_s": 1.0,
+          "apoio_frac": 0.3861,
+          "curso_apoio_m": 0.47,
+          "avanco_ciclo_m": 1.2174,
+          "velocidade_nominal_mps": 1.2174,
+          "escala_no_jogo": 1.15,
+          "passos_por_s_no_jogo": 2.3,
+          "mps_jogo": 1.4
+        },
+        "run": {
+          "ciclo_s": 0.6333,
+          "apoio_frac": 0.2667,
+          "curso_apoio_m": 0.47,
+          "avanco_ciclo_m": 1.7623,
+          "velocidade_nominal_mps": 2.7826,
+          "escala_no_jogo": 1.15,
+          "passos_por_s_no_jogo": 3.632,
+          "mps_jogo": 3.2
+        },
+        "nota": "RB-R1 ciclos v2 (2026-11-25): walk/run refeitos por source_art/scripts/hero_gait_v2.py com passada longa; escala do clipe no jogo ~1,1-1,2 a 1,4 e 3,2 m/s. PROVISORIO."
+      }
     },
     {
       "id": "world_v2_static",

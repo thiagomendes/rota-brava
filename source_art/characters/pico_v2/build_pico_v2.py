@@ -72,7 +72,8 @@ def measure(b, groups, rig):
             "animations": acts, "shape_keys": [k.name for k in groups["face"].data.shape_keys.key_blocks],
             "gear_shape_keys": [k.name for k in groups["gear"].data.shape_keys.key_blocks] if groups["gear"].data.shape_keys else [],
             "rope_gap": getattr(b, "rope_gap", None),
-            "walk_speed_mps": round(pv2_anim.ha.walk_speed(b.F), 4), "run_speed_mps": round(pv2_anim.ha.run_speed(b.F), 4),
+            "walk_speed_mps": round(pv2_anim.hg.nominal_speed(pv2_anim.WALK), 4), "run_speed_mps": round(pv2_anim.hg.nominal_speed(pv2_anim.RUN), 4),
+            "ciclos_v2": {"walk": pv2_anim.hg.summary(pv2_anim.WALK, 1.4), "run": pv2_anim.hg.summary(pv2_anim.RUN, 3.2)},
             "texturas": {img.name: list(img.size) for img in bpy.data.images if img.name.startswith("pico_v2_")}}
 
 

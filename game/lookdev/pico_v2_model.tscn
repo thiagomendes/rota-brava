@@ -15,8 +15,8 @@ metadata/proposal = "RB-R1 D13: Pico v2 so na vitrine (lookdev); o jogo segue co
 
 [node name="Model" type="Node3D" parent="."]
 script = ExtResource("2_cv")
-walk_speed_mps = 0.5183
-run_speed_mps = 1.1012
+walk_speed_mps = 1.1667
+run_speed_mps = 2.7826
 
 [node name="Rig" parent="Model" instance=ExtResource("1_glb")]
 

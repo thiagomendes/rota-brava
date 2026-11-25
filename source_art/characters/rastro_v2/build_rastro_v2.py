@@ -78,7 +78,8 @@ def measure(b, groups, rig):
             "objects": sorted(o.name for o in objs), "bones": [bb.name for bb in rig.data.bones], "bone_count": len(rig.data.bones),
             "animations": acts, "shape_keys": [k.name for k in groups["face"].data.shape_keys.key_blocks],
             "gear_shape_keys": [k.name for k in groups["gear"].data.shape_keys.key_blocks] if groups["gear"].data.shape_keys else [],
-            "walk_speed_mps": round(rv2_anim.ha.walk_speed(b.F), 4), "run_speed_mps": round(rv2_anim.ha.run_speed(b.F), 4),
+            "walk_speed_mps": round(rv2_anim.hg.nominal_speed(rv2_anim.WALK), 4), "run_speed_mps": round(rv2_anim.hg.nominal_speed(rv2_anim.RUN), 4),
+            "ciclos_v2": {"walk": rv2_anim.hg.summary(rv2_anim.WALK, 1.4), "run": rv2_anim.hg.summary(rv2_anim.RUN, 3.2)},
             "texturas": {img.name: list(img.size) for img in bpy.data.images if img.name.startswith("rastro_v2_")}}
     return info
 

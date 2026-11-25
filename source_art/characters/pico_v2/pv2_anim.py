@@ -187,6 +187,20 @@ CLIPS["wave"] = (CLIPS["wave"][0], CLIPS["wave"][1], pose_wave_pico)
 CLIPS["jump"] = (CLIPS["jump"][0], CLIPS["jump"][1], pose_jump_pico)
 GEAR_KEYS = ("fist_R", "fist_L")
 IDLE = (4.0, pose_idle_pico)
+# ciclos v2 (pedido de Thiago, 2026-11-25: "pes muito acelerados"): passada longa para escala ~1 no jogo (1,4 e 3,2 m/s).
+# Pico: energetico -- joelhos altos, quique grande, bracos com amplitude, punhos fechados e sorriso na corrida.
+import hero_gait_v2 as hg
+WALK = hg.gait_cfg(1.0, 0.44, 1.4 / 1.20, center=-0.03, lift=0.085, lift_at=0.42, lift_p=1.8, phi_land=12.0,
+                   phi_push=-30.0, phi_mid=-14.0, hip_yaw=11.0, hip_roll=3.5, base=-0.028, bob=0.012, lean=4.0,
+                   torso_yaw=8.0, head_pitch=-1.0, head_yaw=4.0, head_roll=3.0, head_bob=2.0, arm_swing=34.0,
+                   arm_bend=26.0, arm_out=9.0, blink_at=0.55, face={"alegre": 0.15})
+RUN = hg.gait_cfg(17 / 30, 0.44, 3.2 * (17 / 30) / 1.15, center=-0.025, lift=0.150, lift_at=0.45, lift_p=2.0,
+                  phi_land=6.0, phi_push=-38.0, phi_mid=-26.0, land_u=0.10, push_u=0.45, low_w=0.12, skim=0.012,
+                  hip_yaw=10.0, hip_roll=3.0, bob_mode="run", base=-0.030, bob=0.014, lean=14.0, torso_yaw=10.0,
+                  head_pitch=8.0, head_yaw=3.0, head_roll=2.5, head_bob=3.0, arm_swing=62.0, arm_bend=82.0, arm_out=11.0,
+                  arm_pump=0.3, blink_at=None, face={"alegre": 0.2, "fist_R": 0.85, "fist_L": 0.85})
+CLIPS["walk"] = hg.clip(WALK)
+CLIPS["run"] = hg.clip(RUN)
 CLIP_SET = list(ha.CLIP_SETS["pico"])     # idle, walk, run, stop, jump, pull_rope, look_up, react_surprise, celebrate, wave, team_pose
 
 
