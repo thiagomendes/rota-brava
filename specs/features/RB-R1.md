@@ -51,6 +51,16 @@ Objetivo observável: Thiago abre na Godot (Windows) uma vitrine do mundo refina
 - **D17 · Leme pilota aprovada (Thiago, 2026-11-25).** Colete salva-vidas em **amarelo da equipe** (amarelo do emblema, faixas refletivas cinza-claro), recomendação do lead: contraste com a jaqueta azul e o laranja fica reservado à Rastro. Pico v2.3 com braços na proporção do trio (pedido de Thiago: mãos chegavam ao meio da coxa).
 - Fora de escopo agora: trocar heróis/mundo do episódio, som.
 
+## Implementação do Ep01 v3 (plano, aguardando Thiago)
+Objetivo observável: Thiago joga no Windows o Ep01 com os heróis v2, a vila v2.1 e as 7 missões da v3, em 8–10 min de ritmo humano, sem tempo morto, e ouve o som atual (vozes novas ficam para a fase de som).
+- **E1 · Base no jogo (`gameplay` + `art3d`):** heróis v2 nas cenas de personagem (Leme com colete só quando a missão pede), barco v2 com colisão e luz de proa, vila v2.1 como mundo do Ep01 (colisão, limites, câmera baixa), rio/ilha/volta fora do fluxo (cenas guardadas). Prova: bot chega do M0 ao M8 provisório; capturas nas 3 proporções; desempenho medido.
+- **E2 · Sistema de missão curta (`gameplay`):** objetivo por ícone, ajuda em 3 degraus (gesto, Farol 7 no rádio, seta), emblemas por missão, salvamento por missão, troca de herói contextual. Prova: testes determinísticos.
+- **E3 · Geometria que falta (`art3d`, em paralelo a E1/E2):** escada/galeria do farol, degraus do chafariz e bacia, topo do galpão da margem e galho baixo, ícones das barracas, bote encalhado, boias de rota, lanterna giratória, estado noite de festa; pegadinhas/penas como decalques.
+- **E4 · Missões M1–M4 em terra (`gameplay` + `adventure` no texto).**
+- **E5 · Missões M5–M7 + M6 de barco + M8 festa.**
+- **E6 · Falas (`adventure` + `audio`):** ~30 chaves novas no catálogo, legenda com ícones e balbucio atual; rádio do Farol 7 com o TTS local atual. Vozes novas ficam para a fase de som.
+- **E7 · Fechamento:** bot humano mede ≥ 8 min, capturas, vídeo, `reviewer`, build Windows, pacote do Portão 2. Depois: PARAR (não iniciar RB-05).
+
 ## Barra de qualidade (mensurável e perceptual)
 **Personagens (crianças-heróis)**
 - Altura ~1,05 a 1,15 m no mundo; **cabeça 33 a 38% da altura** (~3 cabeças); olhos grandes (altura do olho ≥ 20% da altura da cabeça) com íris, pupila e dois brilhos; mãos de 4 dedos legíveis; pés grandes e arredondados.
