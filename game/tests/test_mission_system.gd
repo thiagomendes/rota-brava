@@ -18,6 +18,7 @@ func run(runner) -> void:
 	_test_help()
 	_test_help_custom_and_reduced()
 	_test_save_load()
+	_test_invalid_items()
 	_test_i18n()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE))
 
@@ -176,6 +177,7 @@ func _test_save_load() -> void:
 	ms[1].notify(&"piece_freed")
 	ms[1].find_emblem(&"emb_reeds")
 	r.check(MissionSave.save(SAVE, &"sample", ms), "save: grava em user://")
+	r.check(not FileAccess.file_exists(SAVE + ".tmp"), "save: gravacao atomica nao deixa temporario")
 	var raw: Variant = JSON.parse_string(FileAccess.get_file_as_string(SAVE))
 	r.check(raw is Dictionary and int(raw["version"]) == MissionSave.VERSION and raw["current"] == "clothesline", "save: formato versionado com missao atual")
 	var fresh := _load()
@@ -202,6 +204,11 @@ func _test_save_load() -> void:
 	for m in all:
 		m.restore({"state": Mission.State.COMPLETED})
 	r.check(MissionSave.current_id(all) == &"", "save: tudo concluido nao tem missao atual")
+
+
+func _test_invalid_items() -> void:
+	var m := Mission.from_dict({"id": "x", "heroes": "nao_lista", "steps": [42, {"id": "a", "event": "e"}], "emblems": null})
+	r.check(m.steps.size() == 1 and m.heroes.is_empty() and m.emblems.is_empty(), "mission: itens invalidos do JSON sao ignorados")
 
 
 func _test_i18n() -> void:

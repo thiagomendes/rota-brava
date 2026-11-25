@@ -369,7 +369,10 @@ func _test_hero_child(id: String) -> void:
 		var neck := vis.bone_position(&"neck")
 		head = AABB(Vector3(0, neck.y, 0), Vector3(0, box.end.y - neck.y, 0))
 	var ratio := head.size.y / box.size.y
-	r.check(ratio >= 0.33 and ratio <= 0.38 or (v2 and ratio >= 0.28 and ratio <= 0.42), "chars: cabeca de %s com %.1f%% da altura (33 a 38%%; cabeca %.3f m, altura %.3f m)" % [id, ratio * 100, head.size.y, box.size.y])
+	# v2 medido (pescoco ao topo, E1b 2026-11-25): Rastro 40,1%, Pico 41,8%, Leme 40,4% -> faixa unica 38-44% (+-2 pontos)
+	var rlo := 0.38 if v2 else 0.33
+	var rhi := 0.44 if v2 else 0.38
+	r.check(ratio >= rlo and ratio <= rhi, "chars: cabeca de %s com %.1f%% da altura (%.0f a %.0f%%%s; cabeca %.3f m, altura %.3f m)" % [id, ratio * 100, rlo * 100, rhi * 100, ", pescoco ao topo" if v2 else "", head.size.y, box.size.y])
 	var fm := vis.face_mesh()
 	var fmats: Array = []
 	for s in fm.mesh.get_surface_count():
@@ -446,8 +449,8 @@ func _test_pico() -> void:
 			pulls += 1
 		below = float(y) < thr
 	r.check(ymax - ymin > 0.12, "chars: puxoes do Pico com curso > 12 cm (%.1f cm)" % [(ymax - ymin) * 100])
-	# v2 (E1b): o clipe novo puxa mais vezes no mesmo 1,6 s; o contrato vira "pelo menos dois"
-	r.check(pulls >= 2, "chars: pull_rope do Pico tem dois ou mais puxoes (%d)" % pulls)
+	var want_pulls := 4 if CHARS["pico"].get("v2", false) else 2   # v2 medido: 4 puxoes em 1,6 s
+	r.check(pulls == want_pulls, "chars: pull_rope do Pico tem %d puxoes (%d)" % [want_pulls, pulls])
 	r.check(float(zs.min()) < -0.12, "chars: maos do Pico a frente do corpo no puxao (z %.2f)" % float(zs.min()))
 	r.check(vis.has_animation(&"jump") and not vis.is_looping(&"jump"), "chars: Pico tem jump (sem loop)")
 	var jl := vis.animation_length(&"jump")
@@ -471,9 +474,22 @@ func _test_pico() -> void:
 	vis.seek_clip(&"look_up", 0.9)
 	r.check(vis.bone_position(&"head").distance_to(l0) < 0.2, "chars: look_up mantem a cabeca no pescoco")
 	if CHARS["pico"].get("v2", false):
-		# v2: corda e emblema estao na malha unica de equipamento (Pico_Gear), que se estende as costas
-		var gear := _part(root, "Pico_Gear")
-		r.check(gear.end.z > 0.10, "chars: equipamento do Pico (corda) chega as costas (+Z ate %.2f m)" % gear.end.z)
+		# v2: corda e emblema estao na malha unica Pico_Gear com um so material (sem no/material proprio). Mede por regiao
+		# de vertices na pose de repouso, faixa do tronco (y 0,45-0,80 m): costas = rolo de corda; frente central = emblema.
+		var gear := root.find_child("Pico_Gear", true, false) as MeshInstance3D
+		r.check(gear != null, "chars: Pico v2 tem Pico_Gear (corda + emblema)")
+		if gear != null:
+			var verts: PackedVector3Array = gear.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+			var back_z := -INF
+			var chest := 0
+			for p in verts:
+				if p.y > 0.45 and p.y < 0.8:
+					back_z = maxf(back_z, p.z)
+					if absf(p.x) < 0.12 and p.z < -0.1:
+						chest += 1
+			r.check(back_z > 0.15, "chars: rolo de corda do Pico nas costas (+Z ate %.3f m)" % back_z)
+			r.check(chest > 50, "chars: Pico tem emblema/peitoral na frente do peito (%d vertices)" % chest)
+			print("  medida Pico v2: corda nas costas ate z %.3f m, %d vertices de equipamento na frente do peito" % [back_z, chest])
 	else:
 		var rope := _part(root, "Pico_RopeCoil")
 		var emb := _part(root, "Pico_Emblem")
@@ -678,6 +694,7 @@ func _test_pbr_and_accessories() -> void:
 		a.setup(member)
 		r.tree.root.add_child(a)
 		await r.frames(1)
+		r.check(a.model != null, "chars: %s montado pelo MemberActor tem modelo" % member)
 		if a.model != null:
 			var outlined := 0
 			for n in a.model.find_children("*", "MeshInstance3D", true, false):
@@ -688,6 +705,16 @@ func _test_pbr_and_accessories() -> void:
 						outlined += 1
 			r.check(outlined == 0, "chars: %s v2 montado sem Stylize/contorno (%d superficies com next_pass)" % [member, outlined])
 		a.queue_free()
+	var fig := StoryFigure.spawn(r.tree.root, "captain_model", "CaptainProbe")
+	var with_pass := 0
+	for n in fig.find_children("*", "MeshInstance3D", true, false):
+		var mi := n as MeshInstance3D
+		for i in mi.mesh.get_surface_count():
+			var ov := mi.get_surface_override_material(i)
+			if ov != null and ov.next_pass != null:
+				with_pass += 1
+	r.check(with_pass > 0, "chars: capitao antigo via StoryFigure recebe Stylize/contorno (%d superficies com next_pass)" % with_pass)
+	fig.queue_free()
 	var leme := await _spawn("leme")
 	var lv := leme.find_child("Model", false, false) as CharacterVisual
 	r.check(lv.has_accessory(&"Acc_LifeVest") and not lv.accessory_visible(&"Acc_LifeVest"), "chars: colete da Leme existe e comeca oculto")

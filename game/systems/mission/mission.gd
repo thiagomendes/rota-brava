@@ -41,11 +41,16 @@ static func from_dict(d: Dictionary) -> Mission:
 	m.id = StringName(str(d.get("id", "")))
 	m.order = int(d.get("order", 0))
 	m.title_key = StringName(str(d.get("title_key", "")))
-	for h: Variant in d.get("heroes", []):
+	var hs: Variant = d.get("heroes", [])
+	for h: Variant in (hs if hs is Array else []):
 		m.heroes.append(StringName(str(h)))
-	for e: Variant in d.get("emblems", []):
+	var es: Variant = d.get("emblems", [])
+	for e: Variant in (es if es is Array else []):
 		m.emblems.append(StringName(str(e)))
-	for s: Variant in d.get("steps", []):
+	var ss: Variant = d.get("steps", [])
+	for s: Variant in (ss if ss is Array else []):
+		if not s is Dictionary:
+			continue   # item invalido: ignorado
 		var sd := s as Dictionary
 		var step := {"count": maxi(1, int(sd.get("count", 1)))}
 		for f in STEP_FIELDS:
@@ -61,8 +66,10 @@ static func load_list(path: String) -> Array[Mission]:
 	if not parsed is Dictionary:
 		push_warning("Mission: JSON invalido: " + path)
 		return out
-	for d: Variant in (parsed as Dictionary).get("missions", []):
-		out.append(Mission.from_dict(d as Dictionary))
+	var list: Variant = (parsed as Dictionary).get("missions", [])
+	for d: Variant in (list if list is Array else []):
+		if d is Dictionary:
+			out.append(Mission.from_dict(d as Dictionary))
 	out.sort_custom(func(a: Mission, b: Mission) -> bool: return a.order < b.order)
 	return out
 

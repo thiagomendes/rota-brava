@@ -20,12 +20,14 @@ static func save(path: String, episode_id: StringName, missions: Array[Mission])
 	for m in missions:
 		list.append(m.snapshot())
 	var data := {"version": VERSION, "episode": String(episode_id), "current": String(current_id(missions)), "missions": list}
-	var f := FileAccess.open(path, FileAccess.WRITE)
+	# Gravacao atomica: escreve num temporario e renomeia (queda no meio nao corrompe o salvo anterior).
+	var tmp := path + ".tmp"
+	var f := FileAccess.open(tmp, FileAccess.WRITE)
 	if f == null:
 		return false
 	f.store_string(JSON.stringify(data, "\t"))
 	f.close()
-	return true
+	return DirAccess.rename_absolute(ProjectSettings.globalize_path(tmp), ProjectSettings.globalize_path(path)) == OK
 
 
 ## Aplica o salvo sobre `missions` (ja carregadas do JSON do episodio). Retorna o id da missao a retomar; &"" se nao
