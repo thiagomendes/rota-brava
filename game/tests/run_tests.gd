@@ -60,5 +60,15 @@ func _run() -> void:
 			continue
 		var test: Object = script.new()
 		await test.run(self)
+		_reset_shared_state()
 	print("RESULTADO: %s (%d PASS, %d FALHA(S))" % ["OK" if failures == 0 else "FALHOU", passes, failures])
 	quit(0 if failures == 0 else 1)
+
+
+## Entre arquivos de teste: tempo normal, nada pressionado, arvore sem pausa (um teste que abortou no meio nao
+## contamina os seguintes).
+func _reset_shared_state() -> void:
+	Engine.time_scale = 1.0
+	for action: StringName in InputMap.get_actions():
+		Input.action_release(action)
+	paused = false

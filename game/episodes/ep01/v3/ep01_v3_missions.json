@@ -1,34 +1,274 @@
 {
-  "version": 1,
-  "episode": "ep01",
-  "_note": "PROVISORIO (RB-R1 E1): cada missao e so 'chegar ao marcador' da vila v3. A E4/E5 troca os passos pelos reais (mesmo formato de game/systems/mission). Campos fora do formato de Mission (radius, camera_yaw, icon) sao lidos so por Ep01V3Main/Ep01V3Bot.",
-  "missions": [
-    {"id": "M0", "order": 0, "title_key": "ep01v3.mission.M0.title", "heroes": ["tracker"], "emblems": [], "icon": "notebook",
-     "steps": [{"id": "reach", "icon": "notebook", "hero": "", "event": "marker_reached", "target": "M1_BenchClue"}],
-     "radius": 2.0},
-    {"id": "M1", "order": 1, "title_key": "ep01v3.mission.M1.title", "heroes": ["tracker"], "emblems": [], "icon": "paw",
-     "steps": [{"id": "reach", "icon": "paw", "hero": "", "event": "marker_reached", "target": "M1_PawTrail_4"}],
-     "radius": 1.2},
-    {"id": "M2", "order": 2, "title_key": "ep01v3.mission.M2.title", "heroes": ["climber", "tracker"], "emblems": [], "icon": "notebook",
-     "steps": [{"id": "reach", "icon": "notebook", "hero": "", "event": "marker_reached", "target": "M2_Clothesline"}],
-     "radius": 1.2},
-    {"id": "M3", "order": 3, "title_key": "ep01v3.mission.M3.title", "heroes": ["tracker", "climber"], "emblems": [], "icon": "notebook",
-     "steps": [{"id": "reach", "icon": "notebook", "hero": "", "event": "marker_reached", "target": "M3_ChannelStart"}],
-     "radius": 1.2},
-    {"id": "M4", "order": 4, "title_key": "ep01v3.mission.M4.title", "heroes": ["pilot", "tracker"], "emblems": [], "icon": "notebook",
-     "steps": [{"id": "reach", "icon": "notebook", "hero": "", "event": "marker_reached", "target": "M4_Cart"}],
-     "radius": 1.4},
-    {"id": "M5", "order": 5, "title_key": "ep01v3.mission.M5.title", "heroes": ["tracker", "pilot", "climber"], "emblems": [], "icon": "notebook",
-     "steps": [{"id": "reach", "icon": "notebook", "hero": "", "event": "marker_reached", "target": "M5_FeatherTrail_1"}],
-     "radius": 1.2},
-    {"id": "M6", "order": 6, "title_key": "ep01v3.mission.M6.title", "heroes": ["pilot", "climber"], "emblems": [], "icon": "helm",
-     "steps": [{"id": "reach", "icon": "helm", "hero": "", "event": "marker_reached", "target": "M1_BenchClue"}],
-     "radius": 2.0},
-    {"id": "M7", "order": 7, "title_key": "ep01v3.mission.M7.title", "heroes": ["tracker", "climber", "pilot"], "emblems": [], "icon": "notebook",
-     "steps": [{"id": "reach", "icon": "notebook", "hero": "", "event": "marker_reached", "target": "M7_StairBase"}],
-     "radius": 1.6},
-    {"id": "M8", "order": 8, "title_key": "ep01v3.mission.M8.title", "heroes": ["tracker", "climber", "pilot"], "emblems": [], "icon": "notebook",
-     "steps": [{"id": "reach", "icon": "notebook", "hero": "", "event": "marker_reached", "target": "M8_FestaPlaza"}],
-     "radius": 1.6}
-  ]
+ "version": 1,
+ "episode": "ep01",
+ "_note": "RB-R1 E4: M1-M4 reais (pontos montados por Ep01V3Land; eventos via notify_mission). M0 e M5-M8 ainda PROVISORIAS ('chegar ao marcador', E5). Campos fora do formato de Mission (radius, camera_yaw, icon) sao lidos so por Ep01V3Main/Ep01V3Bot.",
+ "missions": [
+  {
+   "id": "M0",
+   "order": 0,
+   "title_key": "ep01v3.mission.M0.title",
+   "heroes": [
+    "tracker"
+   ],
+   "emblems": [],
+   "icon": "notebook",
+   "steps": [
+    {
+     "id": "reach",
+     "icon": "notebook",
+     "hero": "",
+     "event": "marker_reached",
+     "target": "M1_BenchClue"
+    }
+   ],
+   "radius": 2.0
+  },
+  {
+   "id": "M1",
+   "order": 1,
+   "title_key": "ep01v3.mission.M1.title",
+   "heroes": [
+    "tracker"
+   ],
+   "emblems": [
+    "emb_m1_mooring"
+   ],
+   "icon": "paw",
+   "steps": [
+    {
+     "id": "bench",
+     "icon": "paw",
+     "hero": "tracker",
+     "event": "paw_examined",
+     "count": 1,
+     "target": "M1_BenchClue",
+     "hint_gesture_key": "ep01v3.M1.bench.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m1.bench"
+    },
+    {
+     "id": "boot",
+     "icon": "boot",
+     "hero": "tracker",
+     "event": "boot_examined",
+     "count": 1,
+     "target": "M1_BootPrint",
+     "hint_gesture_key": "ep01v3.M1.boot.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m1.boot"
+    },
+    {
+     "id": "trail",
+     "icon": "paw",
+     "hero": "tracker",
+     "event": "paw_followed",
+     "count": 4,
+     "target": "M1_PawTrail_4",
+     "hint_gesture_key": "ep01v3.M1.trail.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m1.trail"
+    }
+   ]
+  },
+  {
+   "id": "M2",
+   "order": 2,
+   "title_key": "ep01v3.mission.M2.title",
+   "heroes": [
+    "climber",
+    "tracker"
+   ],
+   "emblems": [
+    "emb_m2_shed",
+    "emb_m2_reeds"
+   ],
+   "icon": "rope",
+   "steps": [
+    {
+     "id": "free_pieces",
+     "icon": "carabiner",
+     "hero": "climber",
+     "event": "piece_freed",
+     "count": 2,
+     "target": "M2_ShedTop",
+     "hint_gesture_key": "ep01v3.M2.free_pieces.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m2.free_pieces"
+    },
+    {
+     "id": "find_third",
+     "icon": "paw",
+     "hero": "tracker",
+     "event": "piece_found",
+     "count": 1,
+     "target": "M2_ReedsPiece",
+     "hint_gesture_key": "ep01v3.M2.find_third.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m2.find_third"
+    },
+    {
+     "id": "hang",
+     "icon": "rope",
+     "hero": "",
+     "event": "piece_hung",
+     "count": 3,
+     "target": "M2_Clothesline",
+     "hint_gesture_key": "ep01v3.M2.hang.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m2.hang"
+    }
+   ]
+  },
+  {
+   "id": "M3",
+   "order": 3,
+   "title_key": "ep01v3.mission.M3.title",
+   "heroes": [
+    "tracker",
+    "climber"
+   ],
+   "emblems": [
+    "emb_m3_basin"
+   ],
+   "icon": "leaf",
+   "steps": [
+    {
+     "id": "stream",
+     "icon": "look",
+     "hero": "tracker",
+     "event": "stream_followed",
+     "count": 2,
+     "target": "M3_Grate",
+     "hint_gesture_key": "ep01v3.M3.stream.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m3.stream"
+    },
+    {
+     "id": "leaves",
+     "icon": "leaf",
+     "hero": "climber",
+     "event": "leaves_pulled",
+     "count": 1,
+     "target": "M3_UpperBasin",
+     "hint_gesture_key": "ep01v3.M3.leaves.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m3.leaves"
+    }
+   ]
+  },
+  {
+   "id": "M4",
+   "order": 4,
+   "title_key": "ep01v3.mission.M4.title",
+   "heroes": [
+    "pilot",
+    "tracker"
+   ],
+   "emblems": [
+    "emb_m4_stall"
+   ],
+   "icon": "heart",
+   "steps": [
+    {
+     "id": "read",
+     "icon": "look",
+     "hero": "tracker",
+     "event": "icons_read",
+     "count": 1,
+     "target": "M4_Cart",
+     "hint_gesture_key": "ep01v3.M4.read.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m4.read"
+    },
+    {
+     "id": "deliver",
+     "icon": "helm",
+     "hero": "pilot",
+     "event": "cargo_delivered",
+     "count": 3,
+     "target": "M4_Stall_Apple",
+     "hint_gesture_key": "ep01v3.M4.deliver.hint_gesture",
+     "hint_spoken_key": "ep01.radio.v3_m4.deliver"
+    }
+   ]
+  },
+  {
+   "id": "M5",
+   "order": 5,
+   "title_key": "ep01v3.mission.M5.title",
+   "heroes": [
+    "tracker",
+    "pilot",
+    "climber"
+   ],
+   "emblems": [],
+   "icon": "notebook",
+   "steps": [
+    {
+     "id": "reach",
+     "icon": "notebook",
+     "hero": "",
+     "event": "marker_reached",
+     "target": "M5_FeatherTrail_1"
+    }
+   ],
+   "radius": 1.2
+  },
+  {
+   "id": "M6",
+   "order": 6,
+   "title_key": "ep01v3.mission.M6.title",
+   "heroes": [
+    "pilot",
+    "climber"
+   ],
+   "emblems": [],
+   "icon": "helm",
+   "steps": [
+    {
+     "id": "reach",
+     "icon": "helm",
+     "hero": "",
+     "event": "marker_reached",
+     "target": "M1_BenchClue"
+    }
+   ],
+   "radius": 2.0
+  },
+  {
+   "id": "M7",
+   "order": 7,
+   "title_key": "ep01v3.mission.M7.title",
+   "heroes": [
+    "tracker",
+    "climber",
+    "pilot"
+   ],
+   "emblems": [],
+   "icon": "notebook",
+   "steps": [
+    {
+     "id": "reach",
+     "icon": "notebook",
+     "hero": "",
+     "event": "marker_reached",
+     "target": "M7_StairBase"
+    }
+   ],
+   "radius": 1.6
+  },
+  {
+   "id": "M8",
+   "order": 8,
+   "title_key": "ep01v3.mission.M8.title",
+   "heroes": [
+    "tracker",
+    "climber",
+    "pilot"
+   ],
+   "emblems": [],
+   "icon": "notebook",
+   "steps": [
+    {
+     "id": "reach",
+     "icon": "notebook",
+     "hero": "",
+     "event": "marker_reached",
+     "target": "M8_FestaPlaza"
+    }
+   ],
+   "radius": 1.6
+  }
+ ]
 }
