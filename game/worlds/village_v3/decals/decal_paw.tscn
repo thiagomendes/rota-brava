@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/environment_v2/decal_paw.png" id="1_tex"]
+
+[node name="Decal_paw" type="Decal"]
+size = Vector3(0.24, 0.4, 0.24)
+texture_albedo = ExtResource("1_tex")
+upper_fade = 0.15
+lower_fade = 0.3
+metadata/provisional = true
+metadata/description = "Pegadinha do filhote (M1) · RB-R1 E3, textura procedural de wv3_world.decals()"

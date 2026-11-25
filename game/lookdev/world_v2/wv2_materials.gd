@@ -9,6 +9,8 @@ const SURFACE := preload("res://lookdev/world_v2/wv2_surface.gdshader")
 const TRIPLANAR := preload("res://lookdev/world_v2/wv2_triplanar.gdshader")
 const GRASS := preload("res://lookdev/world_v2/wv2_grass.gdshader")
 const TERRAIN := preload("res://lookdev/world_v2/wv2_terrain.gdshader")
+const PAPER := preload("res://lookdev/world_v2/wv2_paper.gdshader")
+const BEAM := preload("res://lookdev/world_v2/wv2_beam.gdshader")
 
 ## nome -> [textura, metros, parametros]. Tamanho em metros igual ao de wv2_textures.SPECS.
 const SURF := {
@@ -45,6 +47,9 @@ const LIT_DAY := 0.35
 const LIT_NIGHT := 2.4
 const LAMP_DAY := 2.6
 const LAMP_NIGHT := 7.0
+## Lanternas de papel da festa (E3, M8): apagadas (so papel colorido) ou acesas.
+const PAPER_OFF := 0.0
+const PAPER_ON := 3.2
 static var unknown: Dictionary = {}
 
 
@@ -102,6 +107,16 @@ static func _build(mat_name: String) -> Material:
 			gw.emission = Color("ff9a45")
 			gw.emission_energy_multiplier = 0.18
 			return gw
+		"wv2_paper":
+			var pp := ShaderMaterial.new()
+			pp.shader = PAPER
+			pp.set_shader_parameter("glow", PAPER_OFF)
+			return pp
+		"wv2_beam":
+			# feixe da lanterna do farol: cone aditivo, some ao longe e nas bordas (liga/desliga pelo no)
+			var bm := ShaderMaterial.new()
+			bm.shader = BEAM
+			return bm
 		"wv2_lamp":
 			var l := StandardMaterial3D.new()
 			l.albedo_color = Color("ffe6b0")
@@ -133,6 +148,12 @@ static func set_night(night: bool) -> void:
 	lit.set_shader_parameter("emission_energy", LIT_NIGHT if night else LIT_DAY)
 	var lamp := get_material("wv2_lamp") as StandardMaterial3D
 	lamp.emission_energy_multiplier = LAMP_NIGHT if night else LAMP_DAY
+
+
+## Noite de festa (E3, M8): acende as lanternas de papel penduradas e dos barquinhos (material compartilhado).
+static func set_festival(on: bool) -> void:
+	var paper := get_material("wv2_paper") as ShaderMaterial
+	paper.set_shader_parameter("glow", PAPER_ON if on else PAPER_OFF)
 
 
 ## Troca os materiais de toda malha sob `root` pelo material da biblioteca com o mesmo nome. Devolve quantas superficies.

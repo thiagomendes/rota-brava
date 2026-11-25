@@ -22,8 +22,33 @@
    "wv2_rope",
    "wv2_wood"
   ],
-  "triangulos": 14705
+  "triangulos": 12817
  },
+ "colisao": {
+  "aderecos_com_colisao": 501,
+  "contornos_agua": 2,
+  "formas_por_corpo": {
+   "Ground": 12,
+   "MapBounds": 4,
+   "Props": 501,
+   "Structures": 79,
+   "WaterLimits": 36
+  },
+  "limites_mapa": [
+   -40.5,
+   44.0,
+   -34.5,
+   24.0
+  ],
+  "marcadores": 54,
+  "paredes_beira_agua": 36
+ },
+ "decalques": [
+  "decal_feather",
+  "decal_paw",
+  "decal_paw_wet",
+  "decal_scale"
+ ],
  "estatico": {
   "wv2_back": {
    "materiais": [
@@ -40,7 +65,7 @@
     "wv2_glossy",
     "wv2_roof"
    ],
-   "triangulos": 58530
+   "triangulos": 24596
   },
   "wv2_bank": {
    "materiais": [
@@ -57,9 +82,11 @@
     "wv2_leaf",
     "wv2_lamp",
     "wv2_roof",
-    "wv2_rope"
+    "wv2_rope",
+    "wv2_deck",
+    "wv2_bark"
    ],
-   "triangulos": 5322
+   "triangulos": 4574
   },
   "wv2_dock": {
    "materiais": [
@@ -69,7 +96,25 @@
     "wv2_rope",
     "wv2_metal"
    ],
-   "triangulos": 14868
+   "triangulos": 9816
+  },
+  "wv2_lighthouse": {
+   "materiais": [
+    "wv2_stone",
+    "wv2_plaster",
+    "wv2_glass",
+    "wv2_metal",
+    "wv2_glossy",
+    "wv2_paint",
+    "wv2_lamp",
+    "wv2_interior",
+    "wv2_wood",
+    "wv2_canvas",
+    "wv2_roof",
+    "wv2_deck",
+    "wv2_leaf"
+   ],
+   "triangulos": 9056
   },
   "wv2_plaza": {
    "materiais": [
@@ -88,9 +133,10 @@
     "wv2_leaf",
     "wv2_roof",
     "wv2_burlap",
+    "wv2_rock",
     "wv2_terrain"
    ],
-   "triangulos": 51002
+   "triangulos": 40146
   },
   "wv2_quay": {
    "materiais": [
@@ -120,7 +166,7 @@
     "wv2_roof",
     "wv2_rope"
    ],
-   "triangulos": 99510
+   "triangulos": 73290
   },
   "wv2_terrain": {
    "materiais": [
@@ -156,7 +202,7 @@
     0.998,
     0.663
    ],
-   "triangulos": 1188
+   "triangulos": 1092
   },
   "bench": {
    "instancias": 6,
@@ -167,9 +213,9 @@
    "tamanho_m": [
     1.6,
     0.95,
-    0.696
+    0.699
    ],
-   "triangulos": 620
+   "triangulos": 140
   },
   "bollard": {
    "instancias": 6,
@@ -242,10 +288,10 @@
    ],
    "tamanho_m": [
     0.7,
-    0.928,
-    1.725
+    0.93,
+    1.728
    ],
-   "triangulos": 944
+   "triangulos": 560
   },
   "cart": {
    "instancias": 2,
@@ -260,7 +306,7 @@
     0.92,
     1.04
    ],
-   "triangulos": 1272
+   "triangulos": 1048
   },
   "crate": {
    "instancias": 15,
@@ -272,7 +318,7 @@
     0.6,
     0.6
    ],
-   "triangulos": 1068
+   "triangulos": 684
   },
   "crate_dark": {
    "instancias": 2,
@@ -284,7 +330,7 @@
     0.601,
     0.6
    ],
-   "triangulos": 1232
+   "triangulos": 720
   },
   "crate_fish": {
    "instancias": 7,
@@ -297,7 +343,7 @@
     0.6,
     0.6
    ],
-   "triangulos": 1800
+   "triangulos": 1416
   },
   "crate_fruit": {
    "instancias": 8,
@@ -310,7 +356,7 @@
     0.641,
     0.6
    ],
-   "triangulos": 1360
+   "triangulos": 976
   },
   "fender": {
    "instancias": 5,
@@ -568,7 +614,7 @@
     0.57,
     3.45
    ],
-   "triangulos": 1240
+   "triangulos": 1144
   },
   "rowboat_b": {
    "instancias": 1,
@@ -581,7 +627,7 @@
     0.57,
     3.45
    ],
-   "triangulos": 1240
+   "triangulos": 1144
   },
   "rowboat_flip": {
    "instancias": 1,
@@ -594,7 +640,7 @@
     0.57,
     3.45
    ],
-   "triangulos": 1240
+   "triangulos": 1144
   },
   "sack": {
    "instancias": 7,
@@ -617,10 +663,10 @@
    ],
    "tamanho_m": [
     0.6,
-    0.93,
-    0.562
+    0.935,
+    0.567
    ],
-   "triangulos": 480
+   "triangulos": 224
   },
   "stall_blue": {
    "instancias": 1,
@@ -636,7 +682,7 @@
     2.561,
     1.82
    ],
-   "triangulos": 2240
+   "triangulos": 2208
   },
   "stall_red": {
    "instancias": 1,
@@ -652,7 +698,7 @@
     2.561,
     1.82
    ],
-   "triangulos": 2240
+   "triangulos": 2208
   },
   "stall_yellow": {
    "instancias": 2,
@@ -668,7 +714,7 @@
     2.561,
     1.82
    ],
-   "triangulos": 2240
+   "triangulos": 2208
   },
   "tree_a": {
    "instancias": 141,
@@ -710,82 +756,628 @@
    "triangulos": 3672
   }
  },
- "luzes": 63,
+ "luzes": 64,
+ "props": {
+  "festa_barcos_lanternas": [
+   [
+    8.942,
+    1.2,
+    -9.66
+   ],
+   [
+    20.958,
+    1.2,
+    -4.38
+   ],
+   [
+    39.4,
+    1.2,
+    -2.22
+   ],
+   [
+    51.828,
+    1.2,
+    -14.36
+   ]
+  ],
+  "festa_lanternas": [
+   [
+    -12.0,
+    3.973,
+    -16.944
+   ],
+   [
+    -12.0,
+    3.288,
+    -16.031
+   ],
+   [
+    -12.0,
+    2.854,
+    -15.119
+   ],
+   [
+    -12.0,
+    2.744,
+    -14.206
+   ],
+   [
+    0.938,
+    3.918,
+    -16.944
+   ],
+   [
+    0.812,
+    3.289,
+    -16.031
+   ],
+   [
+    0.688,
+    2.883,
+    -15.119
+   ],
+   [
+    0.562,
+    2.723,
+    -14.206
+   ],
+   [
+    14.062,
+    3.964,
+    -16.944
+   ],
+   [
+    14.188,
+    3.285,
+    -16.031
+   ],
+   [
+    14.312,
+    2.849,
+    -15.119
+   ],
+   [
+    14.438,
+    2.745,
+    -14.206
+   ],
+   [
+    -9.417,
+    2.655,
+    -13.75
+   ],
+   [
+    -8.25,
+    2.584,
+    -13.75
+   ],
+   [
+    -7.083,
+    2.403,
+    -13.75
+   ],
+   [
+    -5.917,
+    2.324,
+    -13.75
+   ],
+   [
+    -4.75,
+    2.24,
+    -13.75
+   ],
+   [
+    -3.583,
+    2.283,
+    -13.75
+   ],
+   [
+    -2.417,
+    2.244,
+    -13.75
+   ],
+   [
+    -1.25,
+    2.312,
+    -13.75
+   ],
+   [
+    -0.083,
+    2.364,
+    -13.75
+   ],
+   [
+    1.083,
+    2.397,
+    -13.75
+   ],
+   [
+    2.25,
+    2.576,
+    -13.75
+   ],
+   [
+    3.417,
+    2.656,
+    -13.75
+   ],
+   [
+    4.583,
+    2.655,
+    -13.75
+   ],
+   [
+    5.75,
+    2.515,
+    -13.75
+   ],
+   [
+    6.917,
+    2.405,
+    -13.75
+   ],
+   [
+    8.083,
+    2.341,
+    -13.75
+   ],
+   [
+    9.25,
+    2.314,
+    -13.75
+   ],
+   [
+    10.417,
+    2.241,
+    -13.75
+   ],
+   [
+    11.583,
+    2.24,
+    -13.75
+   ],
+   [
+    12.75,
+    2.256,
+    -13.75
+   ],
+   [
+    13.917,
+    2.334,
+    -13.75
+   ],
+   [
+    15.083,
+    2.427,
+    -13.75
+   ],
+   [
+    16.25,
+    2.518,
+    -13.75
+   ],
+   [
+    17.417,
+    2.695,
+    -13.75
+   ],
+   [
+    -29.133,
+    3.992,
+    -3.444
+   ],
+   [
+    -28.2,
+    3.656,
+    -4.333
+   ],
+   [
+    -27.267,
+    3.352,
+    -5.222
+   ],
+   [
+    -26.333,
+    3.149,
+    -6.111
+   ],
+   [
+    -25.4,
+    2.91,
+    -7.0
+   ],
+   [
+    -24.467,
+    2.853,
+    -7.889
+   ],
+   [
+    -23.533,
+    2.783,
+    -8.778
+   ],
+   [
+    -22.6,
+    2.69,
+    -9.667
+   ],
+   [
+    -21.667,
+    2.768,
+    -10.556
+   ],
+   [
+    -29.075,
+    3.973,
+    5.094
+   ],
+   [
+    -28.025,
+    3.61,
+    5.281
+   ],
+   [
+    -26.975,
+    3.285,
+    5.469
+   ],
+   [
+    -25.925,
+    3.037,
+    5.656
+   ],
+   [
+    -24.875,
+    2.867,
+    5.844
+   ],
+   [
+    -23.825,
+    2.767,
+    6.031
+   ],
+   [
+    -22.775,
+    2.749,
+    6.219
+   ],
+   [
+    -21.725,
+    2.707,
+    6.406
+   ],
+   [
+    -20.829,
+    2.639,
+    5.964
+   ],
+   [
+    -20.086,
+    2.398,
+    4.893
+   ],
+   [
+    -19.343,
+    2.257,
+    3.821
+   ],
+   [
+    -18.6,
+    2.28,
+    2.75
+   ],
+   [
+    -17.857,
+    2.314,
+    1.679
+   ],
+   [
+    -17.114,
+    2.419,
+    0.607
+   ],
+   [
+    -16.371,
+    2.631,
+    -0.464
+   ],
+   [
+    -6.921,
+    2.71,
+    2.6
+   ],
+   [
+    -5.663,
+    2.564,
+    2.6
+   ],
+   [
+    -4.404,
+    2.464,
+    2.6
+   ],
+   [
+    -3.146,
+    2.349,
+    2.6
+   ],
+   [
+    -1.887,
+    2.252,
+    2.6
+   ],
+   [
+    -0.629,
+    2.274,
+    2.6
+   ],
+   [
+    0.629,
+    2.22,
+    2.6
+   ],
+   [
+    1.887,
+    2.305,
+    2.6
+   ],
+   [
+    3.146,
+    2.351,
+    2.6
+   ],
+   [
+    4.404,
+    2.444,
+    2.6
+   ],
+   [
+    5.663,
+    2.547,
+    2.6
+   ],
+   [
+    6.921,
+    2.657,
+    2.6
+   ],
+   [
+    -4.0,
+    2.637,
+    6.629
+   ],
+   [
+    -5.2,
+    2.409,
+    6.686
+   ],
+   [
+    -6.4,
+    2.261,
+    6.743
+   ],
+   [
+    -7.6,
+    2.257,
+    6.8
+   ],
+   [
+    -8.8,
+    2.287,
+    6.857
+   ],
+   [
+    -10.0,
+    2.404,
+    6.914
+   ],
+   [
+    -11.2,
+    2.593,
+    6.971
+   ]
+  ],
+  "materiais": [
+   "wv2_beam",
+   "wv2_canvas",
+   "wv2_glossy",
+   "wv2_lamp",
+   "wv2_metal",
+   "wv2_paint",
+   "wv2_paper",
+   "wv2_rope",
+   "wv2_wood"
+  ],
+  "objetos": [
+   "wv3_buoy_a",
+   "wv3_buoy_b",
+   "wv3_dinghy",
+   "wv3_festa_boat_1",
+   "wv3_festa_boat_2",
+   "wv3_festa_boat_3",
+   "wv3_festa_boat_4",
+   "wv3_festa_lanterns",
+   "wv3_lantern",
+   "wv3_lens",
+   "wv3_lantern_beam"
+  ],
+  "pos": {
+   "wv3_buoy_a": [
+    5.0,
+    -0.4,
+    -9.2,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "wv3_buoy_b": [
+    11.5,
+    -0.4,
+    -6.6,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "wv3_dinghy": [
+    26.4,
+    -0.38,
+    -9.9,
+    205.0,
+    -7.0,
+    9.0
+   ],
+   "wv3_festa_boat_1": [
+    9.0,
+    -0.42,
+    -9.0,
+    30.0,
+    0.0,
+    0.0
+   ],
+   "wv3_festa_boat_2": [
+    21.5,
+    -0.42,
+    -4.0,
+    80.0,
+    0.0,
+    0.0
+   ],
+   "wv3_festa_boat_3": [
+    40.0,
+    -0.42,
+    -2.5,
+    140.0,
+    0.0,
+    0.0
+   ],
+   "wv3_festa_boat_4": [
+    52.0,
+    -0.42,
+    -15.0,
+    190.0,
+    0.0,
+    0.0
+   ],
+   "wv3_festa_lanterns": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "wv3_lantern": [
+    31.0,
+    16.75,
+    -24.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "wv3_lens": [
+    25.8,
+    2.27,
+    -21.8,
+    30.0,
+    -6.0,
+    0.0
+   ]
+  },
+  "triangulos": 24898
+ },
  "provisorio": true,
  "texturas": {
   "bark": {
    "metros": 1.0,
-   "resolucao": 512
+   "resolucao": 512,
+   "resolucao_dados": 512
   },
   "burlap": {
    "metros": 0.5,
-   "resolucao": 512
+   "resolucao": 512,
+   "resolucao_dados": 512
   },
   "canvas": {
    "metros": 1.0,
-   "resolucao": 512
+   "resolucao": 512,
+   "resolucao_dados": 512
   },
   "cobble": {
    "metros": 1.5,
-   "resolucao": 1024
+   "resolucao": 1024,
+   "resolucao_dados": 1024
   },
   "deck": {
    "metros": 2.0,
-   "resolucao": 1024
+   "resolucao": 1024,
+   "resolucao_dados": 1024
   },
   "dirt": {
    "metros": 3.0,
-   "resolucao": 1024
+   "resolucao": 1024,
+   "resolucao_dados": 512
   },
   "grass": {
    "metros": 4.0,
-   "resolucao": 1024
+   "resolucao": 1024,
+   "resolucao_dados": 512
   },
   "leaf": {
    "metros": 1.0,
-   "resolucao": 1024
+   "resolucao": 1024,
+   "resolucao_dados": 512
   },
   "metal": {
    "metros": 0.5,
-   "resolucao": 256
+   "resolucao": 256,
+   "resolucao_dados": 256
   },
   "net": {
    "metros": 0.5,
-   "resolucao": 256
+   "resolucao": 256,
+   "resolucao_dados": 256
   },
   "paint": {
    "metros": 1.0,
-   "resolucao": 512
+   "resolucao": 512,
+   "resolucao_dados": 512
   },
   "plaster": {
    "metros": 2.0,
-   "resolucao": 1024
+   "resolucao": 1024,
+   "resolucao_dados": 512
   },
   "rock": {
    "metros": 2.0,
-   "resolucao": 512
+   "resolucao": 512,
+   "resolucao_dados": 512
   },
   "roof": {
    "metros": 1.0,
-   "resolucao": 512
+   "resolucao": 512,
+   "resolucao_dados": 512
   },
   "rope": {
    "metros": 0.25,
-   "resolucao": 256
+   "resolucao": 256,
+   "resolucao_dados": 256
   },
   "slats": {
    "metros": 0.5,
-   "resolucao": 512
+   "resolucao": 512,
+   "resolucao_dados": 512
   },
   "stone": {
    "metros": 2.0,
-   "resolucao": 1024
+   "resolucao": 1024,
+   "resolucao_dados": 512
   },
   "wood": {
    "metros": 1.0,
-   "resolucao": 512
+   "resolucao": 512,
+   "resolucao_dados": 512
   }
  },
- "triangulos_estatico": 273880,
- "triangulos_instancias": 2059318
+ "triangulos_estatico": 206126,
+ "triangulos_instancias": 2040918
 }

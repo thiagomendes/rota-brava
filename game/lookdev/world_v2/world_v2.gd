@@ -17,6 +17,7 @@ extends Node3D
 
 const STATIC_GLB := "res://assets/models/environment_v2/wv2_static.glb"
 const KIT_GLB := "res://assets/models/environment_v2/wv2_kit.glb"
+const PROPS_GLB := "res://assets/models/environment_v2/wv3_props.glb"
 const LAYOUT := "res://lookdev/world_v2/world_v2_layout.json"
 const SKY_SHADER := "res://art/sky.gdshader"
 const BOAT_OLD := "res://actors/environment/boat_v2.tscn"
@@ -87,6 +88,14 @@ func _ready() -> void:
 	add_child(st)
 	stats.surfaces = WV2Materials.apply(st)
 	_build_kit()
+	# pecas soltas do Ep01 v3 (E3): lanterna do farol (saiu do cenario fixo), bote, boias, barquinhos, lanternas de festa
+	var props := (load(PROPS_GLB) as PackedScene).instantiate() as Node3D
+	props.name = "Props"
+	add_child(props)
+	stats.surfaces += WV2Materials.apply(props)
+	var beam := props.find_child("wv3_lantern_beam", true, false) as Node3D
+	if beam != null:
+		beam.visible = false
 	_build_lights()
 	_build_boat()
 	_build_trio()
