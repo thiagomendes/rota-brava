@@ -11,11 +11,10 @@
 **Nuvem (2026-11-24):** `tools/setup-linux.sh` e `tools/test.sh` verificados no Linux: 2650 PASS em 1 min 42 s no `5f877ec`. Ambiente pessoal `rota-brava` libera `download.blender.org` (o Default bloqueava o Blender).
 
 ## 0. Agora (2026-11-25)
-- **Aprovado por Thiago:** trio v2 (integrado), direção do mundo v2 (D14), missões variadas na vila (D15), Leme pilota + equipamento por missão (D16).
-- **Prontos, aguardando Thiago** (página https://claude.ai/artifact/2WyeZqg8DNSLWegCPcCXAt): `feature/rb-r1-leme-pilota` (`a7863f6`, colete `Acc_LifeVest` oculto por padrão), `feature/rb-r1-pico-idle` (`04f40dd`, idle legível), `feature/rb-r1-mundo-v2` (`f7952ef`, vila v2.1 + barco v2 + noite), `feature/rb-r1-missoes-v2` (`f230f49`, `docs/proposals/ep01_missoes_v3.md`).
-- **Em curso:** `gameplay` estabilizando o teste de ducking (`feature/rb-r1-teste-ducking`); re-render do percurso da vila com o barco novo.
-- **Depois:** integrar essas branches (+ reviewer) na `feature/rb-r1-reorientacao`; implementar missões v3 e trocar heróis/mundo/barco do episódio; som.
-- **Dívidas:** `.blend` com texturas embutidas; tris no teto; colete da Leme confunde com a jaqueta; cabelos de trás facetados; luz de parede estoura à noite; GPU real não medida; branches `wip/*` a apagar pelo GitHub.
+- **Integrado e revisado** na `feature/rb-r1-reorientacao`: trio v2 final (Rastro v2.1, Pico v2.3, Leme pilota com colete amarelo `Acc_LifeVest`), vitrine vila v2.1 + barco v2 (`game/lookdev/world_v2/`), propostas de missões v2/v3. Jogo ainda usa os modelos e o porto antigos.
+- **Plano do Ep01 v3 (E1–E7)** no ticket, aguardando Thiago aprovar a história/7 missões e adiar vozes para a fase de som.
+- **Páginas para Thiago:** trio 3D https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (Leme antiga), mundo v2 https://claude.ai/artifact/6WpRQzYXY2hW74LxMiPVww, novidades https://claude.ai/artifact/2WyeZqg8DNSLWegCPcCXAt.
+- **Dívidas:** peso do repositório (environment_v2 ~40 MB, .blend com texturas embutidas; decidir LOD/LFS na E1); manifesto sem bytes/sha das texturas do environment_v2; tris dos heróis no teto; cabelos de trás facetados; luz de parede estoura à noite; GPU real não medida; branches `wip/*` a apagar pelo GitHub.
 
 ## 1. Onde estamos
 - **Ticket ativo:** `RB-R1 · Reorientação de qualidade (premium)`. Origem: Thiago reprovou arte/som/UI do RB-04 (“personagens nada infantis, gráfico ruim, som primitivo, mapa sem tamanho/densidade”).
