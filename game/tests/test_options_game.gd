@@ -46,9 +46,21 @@ func run(runner) -> void:
 		m.audio.duck_music(true)
 		Options.set_value("audio", "Musica", 0.5, false)
 		m.audio.duck_music(false)
-		await r.tree.create_timer(1.2).timeout
-		r.check(absf(AudioServer.get_bus_volume_db(idx) - linear_to_db(0.5)) < 0.2,
-			"volume novo da musica sobrevive ao fim do ducking (%.1f dB)" % AudioServer.get_bus_volume_db(idx))
+		r.check(absf(m.audio.music_bus_target_db() - linear_to_db(0.5)) < 0.01,
+			"fim do ducking mira o volume novo (%.1f dB)" % m.audio.music_bus_target_db())
+		# Espera o tween de ducking assentar (com limite). Uma fala do episodio pode re-abaixar a musica durante a
+		# espera; por isso o esperado inclui o ducking vigente, sem deixar de exigir a base nova (0,5).
+		var deadline := Time.get_ticks_msec() + 5000
+		while Time.get_ticks_msec() < deadline:
+			await r.frames(1)
+			var tw: Tween = m.audio._duck_tween
+			var settled := tw == null or not tw.is_valid() or not tw.is_running()
+			var want := linear_to_db(0.5) + (AudioDirector.DUCK_DB if m.audio.ducked else 0.0)
+			if settled and absf(AudioServer.get_bus_volume_db(idx) - want) < 0.2:
+				break
+		var want_db := linear_to_db(0.5) + (AudioDirector.DUCK_DB if m.audio.ducked else 0.0)
+		r.check(absf(AudioServer.get_bus_volume_db(idx) - want_db) < 0.2,
+			"volume novo da musica sobrevive ao fim do ducking (%.1f dB, esperado %.1f)" % [AudioServer.get_bus_volume_db(idx), want_db])
 
 	# Movimento reduzido muda a camera na hora.
 	Options.set_value("access", "reduced_motion", true, false)
