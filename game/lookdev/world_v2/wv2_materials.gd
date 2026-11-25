@@ -18,13 +18,18 @@ const SURF := {
 	"wv2_slats": ["slats", 0.5, {"normal_depth": 1.0, "rough_mul": 0.9}],
 	"wv2_plaster": ["plaster", 2.0, {"normal_depth": 1.0, "grime_amount": 0.35, "grime_height": 0.9, "macro_amount": 0.06}],
 	"wv2_stone": ["stone", 2.0, {"normal_depth": 1.3, "macro_amount": 0.08}],
-	"wv2_cobble": ["cobble", 1.5, {"normal_depth": 1.3, "macro_amount": 0.1}],
+	"wv2_cobble": ["cobble", 1.5, {"normal_depth": 1.0, "macro_amount": 0.06}],
 	"wv2_roof": ["roof", 1.0, {"normal_depth": 1.2, "macro_amount": 0.1, "specular_amount": 0.45}],
 	"wv2_canvas": ["canvas", 1.0, {"normal_depth": 0.8, "macro_amount": 0.03}],
 	"wv2_metal": ["metal", 0.5, {"metallic_amount": 0.35, "specular_amount": 0.6, "macro_amount": 0.03}],
 	"wv2_rope": ["rope", 0.25, {"normal_depth": 1.2, "macro_amount": 0.04}],
 	"wv2_net": ["net", 0.5, {"normal_depth": 1.0}],
 	"wv2_bark": ["bark", 1.0, {"normal_depth": 1.3}],
+	"wv2_burlap": ["burlap", 0.5, {"normal_depth": 1.2, "macro_amount": 0.05}],
+	"wv2_interior": ["plaster", 2.0, {"normal_depth": 0.4, "tint": Color(0.62, 0.58, 0.55), "macro_amount": 0.04}],
+	"wv2_interior_lit": ["plaster", 2.0, {"normal_depth": 0.4, "tint": Color(0.85, 0.72, 0.55), "emission_albedo": 1.0,
+		"emission_energy": 0.35, "macro_amount": 0.04}],
+	"wv2_paw": ["paint", 1.0, {"normal_depth": 0.3, "tint": Color(0.36, 0.23, 0.16), "rough_mul": 0.6}],
 	"wv2_glossy": ["plaster", 2.0, {"normal_depth": 0.25, "rough_mul": 0.35, "specular_amount": 0.6, "clearcoat_amount": 0.4,
 		"macro_amount": 0.03}],
 }
@@ -35,6 +40,11 @@ const TRI := {
 }
 
 static var _cache: Dictionary = {}
+## Brilho dos interiores acesos e das lanternas: dia (discreto) e noite (forte). Ver set_night().
+const LIT_DAY := 0.35
+const LIT_NIGHT := 2.4
+const LAMP_DAY := 2.6
+const LAMP_NIGHT := 7.0
 static var unknown: Dictionary = {}
 
 
@@ -71,12 +81,15 @@ static func _build(mat_name: String) -> Material:
 				t.set_shader_parameter(n + "_data", tex(n, "data"))
 			return t
 		"wv2_glass":
+			# vidro transparente: reflete o ceu e deixa ver o comodo raso atras (interior modelado no Blender)
 			var gl := StandardMaterial3D.new()
-			gl.albedo_color = Color("2c4a66")
-			gl.roughness = 0.06
-			gl.metallic_specular = 0.9
+			gl.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			gl.albedo_color = Color(0.14, 0.24, 0.32, 0.3)
+			gl.roughness = 0.04
+			gl.metallic_specular = 1.0
+			gl.metallic = 0.1
 			gl.rim_enabled = true
-			gl.rim = 0.25
+			gl.rim = 0.2
 			return gl
 		"wv2_glass_lit":
 			var gw := StandardMaterial3D.new()
@@ -112,6 +125,14 @@ static func _shader(sh: Shader, tex_name: String, meters: float, params: Diction
 	for k: String in params:
 		m.set_shader_parameter(k, params[k])
 	return m
+
+
+## Dia/noite: so muda o brilho das janelas acesas, vitrines e lanternas (os materiais sao compartilhados).
+static func set_night(night: bool) -> void:
+	var lit := get_material("wv2_interior_lit") as ShaderMaterial
+	lit.set_shader_parameter("emission_energy", LIT_NIGHT if night else LIT_DAY)
+	var lamp := get_material("wv2_lamp") as StandardMaterial3D
+	lamp.emission_energy_multiplier = LAMP_NIGHT if night else LAMP_DAY
 
 
 ## Troca os materiais de toda malha sob `root` pelo material da biblioteca com o mesmo nome. Devolve quantas superficies.

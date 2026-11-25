@@ -29,6 +29,7 @@ import bmesh  # noqa: E402
 import bpy  # noqa: E402
 from mathutils import Matrix, Vector  # noqa: E402
 
+import build_boat_wv2 as BOAT  # noqa: E402
 import wv2_houses as HS  # noqa: E402
 import wv2_kit as KIT  # noqa: E402
 import wv2_textures as TX  # noqa: E402
@@ -47,7 +48,8 @@ MAT_PREVIEW = {
     "wv2_stone": "#B4AEBF", "wv2_cobble": "#B5AEA6", "wv2_roof": "#E8E0D8", "wv2_canvas": "#FBF4E4", "wv2_metal": "#DDDDDD",
     "wv2_rope": "#D6BF85", "wv2_net": "#9C9C9C", "wv2_bark": "#7A5636", "wv2_leaf": "#5DB043", "wv2_grass": "#6DBA48",
     "wv2_rock": "#A9A3B8", "wv2_terrain": "#7CB850", "wv2_glass": "#355A78", "wv2_glass_lit": "#FFD9A0", "wv2_lamp": "#FFE3A6",
-    "wv2_glossy": "#FFFFFF",
+    "wv2_glossy": "#FFFFFF", "wv2_paw": "#5A3B2A", "wv2_burlap": "#C8A878", "wv2_interior": "#E8D8C0",
+    "wv2_interior_lit": "#FFD9A0",
 }
 
 PAL = {
@@ -306,6 +308,9 @@ def build_street():
     p0 = house_params(7.7, 3, "eave", "lilac", "terracotta", dict(door_color=PAL["teal"], shutter=PAL["navy"], chimneys=2,
                                                                   cols=4, balcony=1, balcony_col=2))
     HS.build_house(m, (-29.5, 0, -17.8), 0, p0, 99, lights)
+    # cata-vento com bussola na cumeeira da padaria (missoes v3, M5)
+    hx, hw = fronts[2][0], fronts[2][1]
+    weathervane(m, hx + hw * 0.62, 6.0 + 2.5 * math.tan(math.radians(34.0)) + 0.1, fronts[2][2] - 2.5)
     # galpao baixo de redes (subida do Pico: caixotes 0,6 -> toldo 1,6 -> laje 2,8 m, topo plano)
     build_shed(m, rng)
     # muro do quintal entre o galpao e a primeira casa, com portao
@@ -315,6 +320,24 @@ def build_street():
     m.box((-16.55, 0.95, -17.7), (1.5, 1.8, 0.05), "wv2_paint", PAL["teal"], 0.01, 1, grain="y", rng=rng)
     put("tree_c", -16.6, 0.0, -20.0, 40, 1.05)
     return m, fronts
+
+
+def weathervane(m, x, y, z):
+    iron, gold = hexc("#2B2F33"), hexc("#C9A13A")
+    m.lathe((x, y, z), [(0.12, 0.0), (0.1, 0.06), (0.03, 0.1), (0.0, 0.1)], "wv2_metal", iron, seg=10)
+    m.cyl((x, y, z), 0.018, 1.25, "wv2_metal", iron, seg=8)
+    # rosa dos ventos: quatro bracos com ponta em seta e bola no centro
+    for k in range(4):
+        a = k * 90.0
+        m.box((x, y + 0.7, z), (0.62, 0.018, 0.018), "wv2_metal", iron, 0.0, 1, rot=R(ry=a) @ T(0.31, 0, 0))
+        m.prism((x, y + 0.7, z), [(0.6, 0.05), (0.72, 0.0), (0.6, -0.05)], 0.02, "wv2_metal", gold, rot=R(ry=a, rx=90))
+    m.sphere((x, y + 0.7, z), 0.05, "wv2_metal", gold, subd=1)
+    # seta com rabo (gira com o vento) e bola no topo
+    m.box((x, y + 1.05, z), (0.8, 0.02, 0.02), "wv2_metal", iron, 0.0, 1, rot=R(ry=30))
+    m.prism((x, y + 1.05, z), [(0.38, 0.07), (0.52, 0.0), (0.38, -0.07)], 0.02, "wv2_metal", gold, rot=R(ry=30))
+    m.prism((x, y + 1.05, z), [(-0.42, 0.0), (-0.28, 0.13), (-0.2, 0.13), (-0.28, 0.0), (-0.2, -0.0)], 0.02, "wv2_metal", gold,
+            rot=R(ry=30))
+    m.sphere((x, y + 1.27, z), 0.04, "wv2_metal", gold, subd=1)
 
 
 def build_shed(m, rng):
@@ -384,6 +407,9 @@ def build_plaza():
         HS.build_house(m, (x, 0, z), 90, house_params(w, fl, roof, wall, roofc, extra), 200 + i, lights)
     # fonte (chafariz) e banco circular em volta da arvore
     fx, fz = -22.8, 3.6
+    # degrau largo em volta do chafariz (missoes v3, M3: apoio para o Pico pular) e borda larga
+    m.lathe((fx, 0, fz), [(0.0, 0.0), (2.05, 0.0), (2.08, 0.04), (2.08, 0.22), (2.02, 0.26), (0.0, 0.26)], "wv2_stone", (0.95, 0.95, 0.97),
+            seg=32)
     m.lathe((fx, 0, fz), [(0.0, 0.0), (1.55, 0.0), (1.6, 0.1), (1.6, 0.5), (1.48, 0.55), (1.38, 0.5), (1.38, 0.25), (0.0, 0.25)],
             "wv2_stone", (1, 1, 1), seg=28)
     m.cyl((fx, 0.38, fz), 1.38, 0.02, "wv2_glossy", hexc("#3FA7C9"), seg=28)
@@ -625,6 +651,8 @@ def scatter_vegetation():
         z = rng.uniform(4.0, 22)
         if dist_poly(x, z, PATH) < 1.8 or dist_poly(x, z, PATH2) < 1.5 or (abs(x) < 8.5 and z < 4.2):
             continue
+        if math.hypot(x + 10.6, z - 5.2) < 2.6:   # bote virado livre
+            continue
         put(rng.choice(["bush_a", "bush_b", "bush_c", "bush_a"]), x, bank_h(x, z), z, rng.uniform(0, 360), rng.uniform(0.8, 1.3))
     for i in range(2600):
         if i < 1500:  # mais denso perto do caminho e do cais (onde a camera baixa olha)
@@ -634,6 +662,8 @@ def scatter_vegetation():
             x = rng.uniform(-14, 30)
             z = rng.uniform(3.2, 26)
         if dist_poly(x, z, PATH) < 1.05 or dist_poly(x, z, PATH2) < 0.8:
+            continue
+        if math.hypot(x + 10.6, z - 5.2) < 1.9:
             continue
         y = bank_h(x, z)
         if y < -0.15:
@@ -689,13 +719,16 @@ def build_bank():
     p["D"] = 3.6
     p["gh"] = 2.7
     HS.build_house(m, (9.5, bank_h(11.6, 10.6) - 0.05, 9.2), 200, p, 501, lights)
-    # varal com roupas entre dois postes
-    a = Vector((13.0, 0.0, 6.2))
-    b = Vector((17.5, 0.0, 7.4))
-    for q in (a, b):
-        y0 = bank_h(q.x, q.z)
-        m.cyl((q.x, y0, q.z), 0.06, 2.15, "wv2_wood", hexc("#A07A56"), seg=8, uvrot=math.pi / 2, rng=rng)
-        m.box((q.x, y0 + 2.05, q.z), (0.5, 0.06, 0.06), "wv2_wood", hexc("#A07A56"), 0.01, 1, rot=R(ry=-15), rng=rng)
+    # varal com roupas entre o galpao do pescador e a arvore (missoes v3, M2): mao-francesa na quina do galpao,
+    # laco de corda no tronco da arvore (tree_a em (15,5; 6,5))
+    a = Vector((9.75, 0.0, 9.0))
+    b = Vector((15.32, 0.0, 6.62))
+    ya0 = bank_h(a.x, a.z)
+    m.box((a.x, ya0 + 2.0, a.z), (0.06, 0.06, 0.45), "wv2_wood", hexc("#A07A56"), 0.01, 1, rot=R(ry=-23), grain="z", rng=rng)
+    m.box((a.x, ya0 + 1.85, a.z - 0.1), (0.05, 0.32, 0.05), "wv2_wood", hexc("#A07A56"), 0.01, 1, rot=R(rx=35), grain="y", rng=rng)
+    ring = [(b.x + 0.04 + math.sin(t_) * 0.17, bank_h(b.x, b.z) + 2.0, b.z + math.cos(t_) * 0.17) for t_ in
+            [i / 14 * 6.2832 for i in range(15)]]
+    m.tube(ring, 0.012, "wv2_rope", hexc("#F2EAD8"), seg=5, caps=False)
     pts = []
     ya, yb = bank_h(a.x, a.z) + 2.0, bank_h(b.x, b.z) + 2.0
     for i in range(13):
@@ -725,7 +758,7 @@ def build_bank():
             mx, mz = (ax + bx) / 2, (az + bz) / 2
             m.box((mx, bank_h(mx, mz) + yy, mz), (L, 0.08, 0.05), "wv2_wood", hexc("#B8956C"), 0.015, 1, rot=R(ry=ang), rng=rng)
     # barco virado na margem
-    put("rowboat_b", -10.6, bank_h(-10.6, 5.2) + 0.55, 5.2, 70, 1.0)
+    put("rowboat_flip", -10.6, bank_h(-10.6, 5.2) - 0.02, 5.2, 70, 1.0)
     put("bench", -4.6, bank_h(-4.6, 5.0), 5.0, 160)
     put("lamp_post", -3.4, bank_h(-3.4, 6.6), 6.6, 0)
     put("lamp_post", -11.8, bank_h(-11.8, 7.0), 7.0, 0)
@@ -846,6 +879,9 @@ VIEWS = {
     "street": {"pos": [16.2, 1.95, -13.95], "look": [6.0, 1.95, -16.9]},
     "plaza": {"pos": [-15.6, 1.95, 4.2], "look": [-24.0, 1.95, -3.0]},
     "bank": {"pos": [-9.0, 1.95, 13.6], "look": [-3.0, 1.95, 7.0]},
+    # vistas de detalhe para aprovacao (nao sao a camera do jogo)
+    "boat": {"pos": [3.4, 1.95, -1.7], "look": [-0.4, 1.95, -5.0], "pitch": 16.0, "fov": 50.0},
+    "windows": {"pos": [-7.2, 2.4, -14.0], "look": [-9.2, 2.4, -17.8], "pitch": -12.0, "fov": 46.0},
 }
 TRIO = [
     {"id": "rastro", "pos": [-2.0, 0.0, 1.0], "ry": 160.0, "phase": 0.0},
@@ -890,7 +926,7 @@ def export_glb(objs, path):
 
 
 MANIFEST = os.path.join(REPO, "source_art", "manifest.json")
-SOURCES = ["source_art/environment_v2/build_world_v2.py", "source_art/environment_v2/wv2lib.py",
+SOURCES = ["source_art/environment_v2/build_world_v2.py", "source_art/environment_v2/build_boat_wv2.py", "source_art/environment_v2/wv2lib.py",
            "source_art/environment_v2/wv2_houses.py", "source_art/environment_v2/wv2_kit.py",
            "source_art/environment_v2/wv2_textures.py", "source_art/environment_v2/render_world_v2.py",
            "source_art/environment_v2/world_v2.blend", "source_art/environment_v2/PROVENANCE.md"]
@@ -937,6 +973,13 @@ def update_manifest(info):
              materiais=sorted({m for v in kit.values() for m in v["materiais"]}),
              objetos=sorted("kit_" + k for k in kit.keys()),
              nota="%d pecas, %d instancias no layout (game/lookdev/world_v2/world_v2_layout.json)" % (len(kit), info["instancias"])),
+        dict(id="world_v2_boat", nome="Mundo v2: barco do porto (proposta para substituir boat_v2)", processo=proc,
+             saida_glb="game/assets/models/environment_v2/wv2_boat.glb",
+             glb_sha256=_sha(os.path.join(GLB_DIR, "wv2_boat.glb")),
+             triangulos=info["barco"]["triangulos"], materiais=info["barco"]["materiais"],
+             empties=info["barco"]["empties"],
+             nota="mesmas medidas e pontos de encaixe do boat_v2 (pivo, popa z 2, proa z -3, boca 2,2, convez 0,40, banco 0,5 "
+                  "em z 0,6, WheelPoint, HornPoint, DeckPoint, BenchMark, PawMark) + pontos de corda RopeBow/RopeSternL/R"),
         dict(id="world_v2_textures", nome="Mundo v2: texturas procedurais ladrilhaveis",
              processo={"script": "source_art/environment_v2/wv2_textures.py",
                        "ferramenta": "Blender 4.5.16 (numpy embutido); JPEG pelo Blender, PNG escrito pelo script",
@@ -1000,6 +1043,15 @@ def main():
     missing = [k for k in inst if k not in kit]
     if missing:
         raise RuntimeError("kit sem malha: %s" % missing)
+    col_boat = bpy.data.collections.new("WV2_Boat")
+    bpy.context.scene.collection.children.link(col_boat)
+    boat_objs, boat_info = BOAT.build(mats, col_boat)
+    info["barco"] = boat_info
+    export_glb(boat_objs, os.path.join(GLB_DIR, "wv2_boat.glb"))
+    for ob in boat_objs:
+        if ob.parent is None:
+            ob.location = (0.0, -5.0, 0.0)   # vitrine do .blend: barco atracado (Ep01Layout.BOAT_DOCKED_POS); GLB ja exportado
+            ob.rotation_euler = (0.0, 0.0, math.pi / 2)
     export_glb(statics, os.path.join(GLB_DIR, "wv2_static.glb"))
     export_glb(kit_objs, os.path.join(GLB_DIR, "wv2_kit.glb"))
     # vitrine do .blend: kit em fila ao lado do mapa (nao afeta os GLB, ja exportados)
@@ -1026,7 +1078,7 @@ def main():
     update_manifest(info)
     if "--renders" in ARGS:
         import render_world_v2
-        render_world_v2.render_all(statics, kit_objs, os.path.join(REPO, "captures", "mundo_v2", "blender"))
+        render_world_v2.render_all(statics, kit_objs, os.path.join(REPO, "captures", "mundo_v2", "blender"), boat_objs)
     print("WV2 OK estatico=%d tris kit_inst=%d tris instancias=%d luzes=%d tempo=%.1fs" % (
         info["triangulos_estatico"], info["triangulos_instancias"], info["instancias"], len(lights), time.time() - t0))
 

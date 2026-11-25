@@ -94,13 +94,28 @@ def barrel(name="barrel", seed=2, lid=False):
 
 
 def sack(name="sack", seed=3):
+    """Saco de juta cheio: corpo largo e assentado com dobras, pescoco franzido amarrado e orelhas de pano."""
+    import bmesh as _b
     m = MB(name)
     rng = random.Random(seed)
-    m.sphere((0, 0.22, 0), 0.3, "wv2_net", hexc("#C9A876"), subd=3, scale=(1.0, 0.85, 0.8), seed=seed, amp=0.1,
-             flat_bottom=-0.2, uv="box", rng=rng)
-    m.lathe((0, 0.42, 0), [(0.16, 0.0), (0.07, 0.08), (0.06, 0.14), (0.11, 0.22), (0.0, 0.24)], "wv2_net", hexc("#C2A06E"), seg=12,
-            rng=rng)
-    m.lathe((0, 0.5, 0), [(0.065, -0.02), (0.08, 0.0), (0.065, 0.02)], ROPE, hexc("#8E6A48"), seg=10, rng=rng)
+    prof = [(0.0, 0.0), (0.24, 0.0), (0.29, 0.06), (0.3, 0.17), (0.27, 0.3), (0.2, 0.4), (0.1, 0.47), (0.075, 0.5),
+            (0.075, 0.53), (0.11, 0.58), (0.0, 0.6)]
+    from wv2lib import _bm_lathe
+    bm = _bm_lathe(prof, 18)
+    for v in bm.verts:
+        a_ = math.atan2(v.co.x, v.co.z)
+        k = 1.0 + 0.06 * math.sin(a_ * 5 + seed) * min(1.0, v.co.y * 3) + 0.04 * math.sin(a_ * 9 + v.co.y * 12)
+        v.co.x *= k * 1.08
+        v.co.z *= k * 0.86
+        if v.co.y > 0.5:
+            v.co.x += 0.03 * math.sin(a_ * 3)
+    m.add_bm(bm, T(), "wv2_burlap", hexc("#D7B888"), "cyl", "y", rng=rng)
+    for s_ in (-1, 1):
+        m.sphere((s_ * 0.07, 0.59, 0.0), 1.0, "wv2_burlap", hexc("#CFAF80"), subd=2, scale=(0.07, 0.035, 0.04),
+                 rot=R(rz=s_ * 35), rng=rng)
+    ring = [(math.sin(a_) * 0.085, 0.51 + 0.01 * math.sin(a_ * 2), math.cos(a_) * 0.085) for a_ in [i / 16 * 6.283 for i in range(17)]]
+    m.tube(ring, 0.014, ROPE, hexc("#8E6A48"), seg=6, caps=False)
+    m.tube([ring[4], (0.16, 0.42, 0.05), (0.2, 0.25, 0.08)], 0.012, ROPE, hexc("#8E6A48"), seg=5)
     return m
 
 
@@ -551,6 +566,11 @@ def rowboat(name="rowboat", seed=80, hull="#3D7DC4", trim="#FFF4E0"):
                 f = (rows[i][j], rows[i + 1][j], rows[i + 1][j + 1], rows[i][j + 1])
                 bm.faces.new(f if inset == 0 else tuple(reversed(f)))
         _b.ops.remove_doubles(bm, verts=bm.verts, dist=0.004)
+        # casco por fora com normal para baixo/fora; por dentro para cima
+        bm.normal_update()
+        low = min(bm.faces, key=lambda f: f.calc_center_median().y)
+        if (low.normal.y > 0) == (inset == 0):
+            _b.ops.reverse_faces(bm, faces=bm.faces[:])
         m.add_bm(bm, T(), mat, col, "box", "z", rng=rng)
     for i in range(ns):
         a = section(i / ns)
@@ -612,4 +632,8 @@ def build_all():
     k["rock_b"] = rock("rock_b", 71, 1.1, 0.5)
     k["rowboat_a"] = rowboat("rowboat_a", 80, "#3D7DC4", "#FFF4E0")
     k["rowboat_b"] = rowboat("rowboat_b", 81, "#E8553E", "#FFF4E0")
+    # bote virado de quilha para cima na margem (mesmo casco, girado 180 graus; borda apoiada no chao)
+    flip = MB("rowboat_flip")
+    flip.merge(rowboat("rowboat_tmp", 82, "#3D7DC4", "#FFF4E0"), T(0, 0.27, 0) @ R(rz=180))
+    k["rowboat_flip"] = flip
     return k

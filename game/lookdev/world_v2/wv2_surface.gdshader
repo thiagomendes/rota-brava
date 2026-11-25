@@ -23,6 +23,8 @@ uniform float grime_height = 0.6;
 uniform float rim_amount : hint_range(0.0, 1.0) = 0.0;
 uniform vec3 emission_color : source_color = vec3(0.0);
 uniform float emission_energy = 0.0;
+// Interior aceso: emite a propria cor do albedo (parede iluminada por dentro); o brilho muda de dia/noite.
+uniform float emission_albedo = 0.0;
 
 varying vec3 v_wpos;
 
@@ -64,5 +66,5 @@ void fragment() {
 	CLEARCOAT_ROUGHNESS = 0.25;
 	RIM = rim_amount;
 	RIM_TINT = 0.5;
-	EMISSION = emission_color * emission_energy;
+	EMISSION = (emission_color + col * emission_albedo) * emission_energy;
 }

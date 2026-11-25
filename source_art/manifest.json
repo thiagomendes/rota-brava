@@ -1707,6 +1707,7 @@
       "originalidade": "geometria e texturas 100% procedurais por script (bmesh, formulas e numpy); nenhum modelo, malha, textura, foto, HDRI ou kit de terceiros",
       "origem": [
         "source_art/environment_v2/build_world_v2.py",
+        "source_art/environment_v2/build_boat_wv2.py",
         "source_art/environment_v2/wv2lib.py",
         "source_art/environment_v2/wv2_houses.py",
         "source_art/environment_v2/wv2_kit.py",
@@ -1721,15 +1722,17 @@
         "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice (COLOR_0 linear), UV em metros, normais ponderadas por area (WeightedNormal), sem texturas embutidas"
       },
       "saida_glb": "game/assets/models/environment_v2/wv2_static.glb",
-      "glb_sha256": "0a7b1a81b5aa1fb7fabfdfccd5fbdd308866a95d7384ad2f82a9360b9b171b69",
-      "triangulos": 213832,
+      "glb_sha256": "8ae995a362170ff355c41e18f7796016d01c4c6f64df514115e3c23277ea0789",
+      "triangulos": 273880,
       "materiais": [
+        "wv2_burlap",
         "wv2_canvas",
         "wv2_cobble",
         "wv2_deck",
         "wv2_glass",
-        "wv2_glass_lit",
         "wv2_glossy",
+        "wv2_interior",
+        "wv2_interior_lit",
         "wv2_lamp",
         "wv2_leaf",
         "wv2_metal",
@@ -1765,6 +1768,7 @@
       "originalidade": "geometria e texturas 100% procedurais por script (bmesh, formulas e numpy); nenhum modelo, malha, textura, foto, HDRI ou kit de terceiros",
       "origem": [
         "source_art/environment_v2/build_world_v2.py",
+        "source_art/environment_v2/build_boat_wv2.py",
         "source_art/environment_v2/wv2lib.py",
         "source_art/environment_v2/wv2_houses.py",
         "source_art/environment_v2/wv2_kit.py",
@@ -1779,10 +1783,11 @@
         "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice (COLOR_0 linear), UV em metros, normais ponderadas por area (WeightedNormal), sem texturas embutidas"
       },
       "saida_glb": "game/assets/models/environment_v2/wv2_kit.glb",
-      "glb_sha256": "f7478328da95cc18778e5ff33705be5558053b0e4efc86621a2c0f616ff70d92",
-      "triangulos": 45612,
+      "glb_sha256": "20d296e96c94c64763b1b8fbc40aca73c3d0eef42861d642103ba5e6edf87e2a",
+      "triangulos": 47108,
       "materiais": [
         "wv2_bark",
+        "wv2_burlap",
         "wv2_canvas",
         "wv2_glossy",
         "wv2_grass",
@@ -1832,6 +1837,7 @@
         "kit_rope_coil",
         "kit_rowboat_a",
         "kit_rowboat_b",
+        "kit_rowboat_flip",
         "kit_sack",
         "kit_sign_aframe",
         "kit_stall_blue",
@@ -1841,7 +1847,59 @@
         "kit_tree_b",
         "kit_tree_c"
       ],
-      "nota": "43 pecas, 3054 instancias no layout (game/lookdev/world_v2/world_v2_layout.json)"
+      "nota": "44 pecas, 3011 instancias no layout (game/lookdev/world_v2/world_v2_layout.json)"
+    },
+    {
+      "id": "world_v2_boat",
+      "nome": "Mundo v2: barco do porto (proposta para substituir boat_v2)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "data": "2026-11-25",
+      "proposta": "RB-R1 W1: vitrine vila e cais v2; NAO substitui o porto do jogo (so game/lookdev/world_v2/)",
+      "originalidade": "geometria e texturas 100% procedurais por script (bmesh, formulas e numpy); nenhum modelo, malha, textura, foto, HDRI ou kit de terceiros",
+      "origem": [
+        "source_art/environment_v2/build_world_v2.py",
+        "source_art/environment_v2/build_boat_wv2.py",
+        "source_art/environment_v2/wv2lib.py",
+        "source_art/environment_v2/wv2_houses.py",
+        "source_art/environment_v2/wv2_kit.py",
+        "source_art/environment_v2/wv2_textures.py",
+        "source_art/environment_v2/render_world_v2.py",
+        "source_art/environment_v2/world_v2.blend",
+        "source_art/environment_v2/PROVENANCE.md"
+      ],
+      "processo": {
+        "script": "source_art/environment_v2/build_world_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless, numpy embutido)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice (COLOR_0 linear), UV em metros, normais ponderadas por area (WeightedNormal), sem texturas embutidas"
+      },
+      "saida_glb": "game/assets/models/environment_v2/wv2_boat.glb",
+      "glb_sha256": "9333ce2692937870ba437167c90ca882bb3eaee2da567ed972832374fd86f083",
+      "triangulos": 14705,
+      "materiais": [
+        "wv2_canvas",
+        "wv2_deck",
+        "wv2_glass",
+        "wv2_glossy",
+        "wv2_lamp",
+        "wv2_metal",
+        "wv2_paint",
+        "wv2_paw",
+        "wv2_rope",
+        "wv2_wood"
+      ],
+      "empties": [
+        "BenchMark",
+        "DeckPoint",
+        "HornPoint",
+        "PivotMark",
+        "RopeBow",
+        "RopeSternL",
+        "RopeSternR",
+        "WheelPoint"
+      ],
+      "nota": "mesmas medidas e pontos de encaixe do boat_v2 (pivo, popa z 2, proa z -3, boca 2,2, convez 0,40, banco 0,5 em z 0,6, WheelPoint, HornPoint, DeckPoint, BenchMark, PawMark) + pontos de corda RopeBow/RopeSternL/R"
     },
     {
       "id": "world_v2_textures",
@@ -1854,6 +1912,7 @@
       "originalidade": "geometria e texturas 100% procedurais por script (bmesh, formulas e numpy); nenhum modelo, malha, textura, foto, HDRI ou kit de terceiros",
       "origem": [
         "source_art/environment_v2/build_world_v2.py",
+        "source_art/environment_v2/build_boat_wv2.py",
         "source_art/environment_v2/wv2lib.py",
         "source_art/environment_v2/wv2_houses.py",
         "source_art/environment_v2/wv2_kit.py",
@@ -1871,9 +1930,11 @@
       "arquivos_sha256": {
         "bark_albedo.jpg": "c08b531ea8b83cced97ffd8a58c3258aefc673e345743c3d374c979ab40de308",
         "bark_data.png": "a4467c9944f1c67c46e50fba0ac3535d8c5ca7e45d89b9e088e5f45653ddc724",
+        "burlap_albedo.jpg": "1ce20bed2a62b7fc3005feb03141a1e717f630f11cf193308bc8e9d6b5d55a13",
+        "burlap_data.png": "7821e1107cfc70a2e0a3b2019a8f87e87bec06018636cd5c5b51403b1657ed1a",
         "canvas_albedo.jpg": "ac4ad864a3c0c040d0126177f362f18a65a734623f5c5e3be210c4cbe51434de",
         "canvas_data.png": "fbd8df2b2508b5e7d49026b425a60ed64169f8b1b844bbf479472a77e3fb60c1",
-        "cobble_albedo.jpg": "680b0175a69ed2a7979c1daa9c5258632ee6f20eb48158273aa0d05e48c3344e",
+        "cobble_albedo.jpg": "49f710edc6f8c350d151efe49a378adab542c1b5ff70b41bb755bb4c5c688e28",
         "cobble_data.png": "0f8c9224b4cc1dedfaf94693248d8b8ac65512a2726a24fecb8480f7bd219a54",
         "deck_albedo.jpg": "553005e171d813938bc76fd950cd865a1386fa62a071cb8179490ac69b14da02",
         "deck_data.png": "fce33e590c8ec21b9803d4ad3d8ade9c6c067f848ef81e3088d9fe392c1c8d45",
@@ -1889,7 +1950,7 @@
         "net_data.png": "b08aaef02b4b63dcfe29ce5b35fe7b4dcabada601f6c0361692acea8557b54ee",
         "paint_albedo.jpg": "7f9c0003d503cc53cf30ce2cf5a044dcc8ffc27192e9480c1d805cc2577ddf14",
         "paint_data.png": "8e39e4bbed34d10cb4e61ed0f17574655409ac74bd9cedbb76fe43794f112e4f",
-        "plaster_albedo.jpg": "81729499353d06fe897f6a296e3a798dbbf77ce12ac15859768e98b251c3ec83",
+        "plaster_albedo.jpg": "215f8c952b2a6d9aa42a11f8a4a12be17d2d17a92679adf37404840b3fbfa944",
         "plaster_data.png": "168183b65af9920ee93d0d6d942d1ae69c8d6d445a138754f8174de0fb62c70d",
         "rock_albedo.jpg": "684fb4f9c3583913b9be19117f0760a3e4c54d58f2a8ea6f8dd054e59a36b77b",
         "rock_data.png": "c4958acb5cc735b1eb84d86bc748782036a84471e4c0c1a62239f8cb54215bb5",

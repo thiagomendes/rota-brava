@@ -34,6 +34,7 @@ SPECS = {
     "rope": (0.25, 256),
     "net": (0.5, 256),
     "rock": (2.0, 512),
+    "burlap": (0.5, 512),
 }
 
 
@@ -233,7 +234,7 @@ def tex_plaster(res, m, rng):
     crack_mask = smooth(0.62, 0.72, fbm(res, 4, 4, rng, 3))
     cracks = (1 - smooth(0.0, 0.0025, f2 - f1)) * crack_mask
     col = np.ones(3)[None, None, :] * (0.90 + 0.09 * mott[..., None] + 0.03 * trowel[..., None] + 0.02 * fine[..., None])
-    col *= (1 - 0.18 * pits[..., None] - 0.35 * cracks[..., None])
+    col *= (1 - 0.06 * pits[..., None] - 0.25 * cracks[..., None])
     h = 0.5 + 0.25 * mott + 0.25 * trowel + 0.12 * fine - 0.3 * pits - 0.4 * cracks
     return col, h, 0.0025, np.ones_like(h), 0.86 + 0.06 * fine
 
@@ -289,19 +290,19 @@ def tex_cobble(res, m, rng):
     f1, f2, idx = cells(res, pts)
     edge = (f2 - f1) * 0.5
     dome = smooth(0.003, 0.022, edge)
-    tones = rng.uniform(0.82, 1.12, len(pts))
-    pal = np.array([srgb("#B8B0A6"), srgb("#A7A2AC"), srgb("#C4B69E"), srgb("#9E9A9F"), srgb("#B5A893")])
+    tones = rng.uniform(0.9, 1.07, len(pts))
+    pal = np.array([srgb("#B8B0A6"), srgb("#AFAAB2"), srgb("#BEB29E"), srgb("#AAA6AA"), srgb("#B5A893")])
     pc = pal[rng.integers(0, len(pal), len(pts))]
     surf = fbm(res, 20, 20, rng, 4)
     fine = vnoise(res, 220, 220, rng)
     col = pc[idx] * tones[idx][:, :, None] * (0.85 + 0.25 * surf[..., None])
-    gapc = srgb("#958A74")
+    gapc = srgb("#A49A86")
     moss = srgb("#6F8F45")
     mossy = smooth(0.55, 0.75, fbm(res, 5, 5, rng, 3))
-    gcol = gapc * (1 - mossy[..., None] * 0.7) + moss * mossy[..., None] * 0.7
+    gcol = gapc * (1 - mossy[..., None] * 0.4) + moss * mossy[..., None] * 0.4
     g = 1 - dome
     col = col * (1 - g[..., None]) + gcol * g[..., None] * (0.8 + 0.3 * fine[..., None])
-    col *= (0.68 + 0.32 * dome)[..., None]
+    col *= (0.82 + 0.18 * dome)[..., None]
     h = dome * (0.85 + 0.15 * surf) * (1 - 0.6 * f1 * ny) + 0.03 * fine
     h = np.clip(h, 0, 1)
     return col, h, 0.03, np.zeros_like(h), 0.8 + 0.1 * fine - 0.1 * dome
@@ -487,11 +488,29 @@ def tex_rock(res, m, rng):
     return col, h, 0.05, np.zeros_like(h), 0.85 + 0.0 * h
 
 
+def tex_burlap(res, m, rng):
+    """Juta/lona de saco: trama grossa (fios por cima e por baixo), fibras e manchas."""
+    u, v = grid(res)
+    k = 36
+    a = np.sin(u * k * 2 * math.pi)
+    b = np.sin(v * k * 2 * math.pi)
+    over = (np.floor(u * k * 2) + np.floor(v * k * 2)) % 2
+    warp = np.abs(np.sin(u * k * math.pi)) ** 0.7
+    weft = np.abs(np.sin(v * k * math.pi)) ** 0.7
+    th = np.where(over > 0, warp, weft)
+    fib = vnoise(res, 256, 32, rng) * 0.5 + vnoise(res, 32, 256, rng) * 0.5
+    blot = fbm(res, 4, 4, rng, 4)
+    c = srgb("#CDAE7E")
+    col = c[None, None, :] * (0.62 + 0.42 * th[..., None]) * (0.9 + 0.15 * fib[..., None]) * (0.92 + 0.12 * blot[..., None])
+    h = th * 0.8 + 0.2 * fib
+    return col, h, 0.004, np.full_like(h, 0.75), 0.95 + 0.0 * h + 0.0 * a * b
+
+
 FUNCS = {
     "deck": tex_deck, "wood": tex_wood, "paint": tex_paint, "slats": tex_slats, "plaster": tex_plaster,
     "stone": tex_stone, "cobble": tex_cobble, "roof": tex_roof, "canvas": tex_canvas, "metal": tex_metal,
     "grass": tex_grass, "dirt": tex_dirt, "leaf": tex_leaf, "bark": tex_bark, "rope": tex_rope, "net": tex_net,
-    "rock": tex_rock,
+    "rock": tex_rock, "burlap": tex_burlap,
 }
 
 

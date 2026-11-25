@@ -5,24 +5,28 @@ extends Node3D
 ## PROVISORIO ate aprovacao de Thiago.
 ##
 ## Teclas (Windows: ./tools/godot.ps1 --path game res://lookdev/world_v2/world_v2.tscn):
-##   1 2 3 4   camera baixa do jogo: cais com o trio, rua, praca, margem
+##   1 2 3 4   camera baixa do jogo: cais com o trio, rua, praca, margem  ·  5 barco  ·  6 janelas (close)
+##   N         dia / noite (janelas acesas, vitrines e lanternas brilham mais a noite)
 ##   F         camera livre (continua de onde esta)  ·  P  percurso fixo (recomeca)  ·  H  mostra/esconde a ajuda
 ##   camera livre: W A S D move · Q E desce/sobe · botao direito do mouse segurado gira · Shift rapido · roda: velocidade
 ##   Esc       solta o mouse; Esc de novo fecha
-## Linha de comando (provas): -- --wv2-cam=low|free|path  --wv2-view=dock|street|plaza|bank  --wv2-perf  --wv2-tour
-##   (--wv2-tour: as 4 vistas baixas em sequencia, 14 quadros cada; o ultimo quadro de cada bloco e a prova)
+## Linha de comando (provas): -- --wv2-cam=low|free|path  --wv2-view=dock|street|plaza|bank|boat|windows  --wv2-perf
+##   --wv2-tour  --wv2-night  --wv2-boat=old  --wv2-pos=x,y,z --wv2-look=x,y,z (tomada livre)
+##   (--wv2-tour: as 6 vistas em sequencia, 14 quadros cada; o penultimo quadro de cada bloco e a prova)
 ## Imprime "WV2 PERF ..." com chamadas de desenho, primitivas e objetos (vistas baixas e pior quadro do percurso).
 
 const STATIC_GLB := "res://assets/models/environment_v2/wv2_static.glb"
 const KIT_GLB := "res://assets/models/environment_v2/wv2_kit.glb"
 const LAYOUT := "res://lookdev/world_v2/world_v2_layout.json"
 const SKY_SHADER := "res://art/sky.gdshader"
-const BOAT := "res://actors/environment/boat_v2.tscn"
+const BOAT_OLD := "res://actors/environment/boat_v2.tscn"
+## Barco v2 (W4): mesmas medidas e pontos de encaixe do boat_v2; --wv2-boat=old volta o antigo (comparacao).
+const BOAT_GLB := "res://assets/models/environment_v2/wv2_boat.glb"
 const HERO_MODEL := "res://lookdev/%s_v2_model.tscn"
 ## Camera baixa da referencia (igual a vitrine lookdev_dock): ~1,95 m, 12 graus para baixo, FOV 50.
 const LOW_PITCH := 12.0
 const LOW_FOV := 50.0
-const VIEW_KEYS := ["dock", "street", "plaza", "bank"]
+const VIEW_KEYS := ["dock", "street", "plaza", "bank", "boat", "windows"]
 ## Sem sombra: pecas pequenas e numerosas (custo de sombra alto, contribuicao baixa; o SSAO assenta no chao).
 const NO_SHADOW := ["grass_tuft", "grass_tall", "flowers_a", "flowers_b", "reeds", "float_buoy", "bucket", "pot_a", "pot_b",
 	"pot_c", "rope_coil", "fender", "life_ring", "sack", "bollard"]
@@ -55,6 +59,12 @@ var pitch := 0.0
 var looking := false
 var help: Label
 var heroes: Array[Node3D] = []
+var night := false
+var env: Environment
+var sun: DirectionalLight3D
+var fill: DirectionalLight3D
+var sky_mat: ShaderMaterial
+var local_lights: Array[OmniLight3D] = []
 var stats := {"kits": 0, "instances": 0, "lights": 0, "surfaces": 0}
 
 
@@ -82,6 +92,8 @@ func _ready() -> void:
 	_build_trio()
 	_build_camera()
 	_build_help()
+	if OS.get_cmdline_user_args().has("--wv2-night"):
+		_set_night(true)
 	if not WV2Materials.unknown.is_empty():
 		push_warning("WV2 materiais sem regra: %s" % str(WV2Materials.unknown.keys()))
 	print("WV2 READY kits=%d instances=%d lights=%d surfaces=%d mode=%s view=%s" % [stats.kits, stats.instances, stats.lights,
@@ -115,6 +127,7 @@ func _register_input() -> void:
 		"wv2_forward": [KEY_W, KEY_UP], "wv2_back": [KEY_S, KEY_DOWN], "wv2_left": [KEY_A, KEY_LEFT],
 		"wv2_right": [KEY_D, KEY_RIGHT], "wv2_down": [KEY_Q], "wv2_up": [KEY_E], "wv2_fast": [KEY_SHIFT],
 		"wv2_view_1": [KEY_1], "wv2_view_2": [KEY_2], "wv2_view_3": [KEY_3], "wv2_view_4": [KEY_4],
+		"wv2_view_5": [KEY_5], "wv2_view_6": [KEY_6], "wv2_night": [KEY_N],
 		"wv2_free": [KEY_F], "wv2_path": [KEY_P], "wv2_help": [KEY_H], "wv2_escape": [KEY_ESCAPE],
 	}
 	for action: String in keys:
@@ -129,7 +142,7 @@ func _register_input() -> void:
 # ---------------------------------------------------------------- luz, ceu, ambiente
 
 func _build_environment() -> void:
-	var sky_mat := ShaderMaterial.new()
+	sky_mat = ShaderMaterial.new()
 	sky_mat.shader = load(SKY_SHADER) as Shader
 	sky_mat.set_shader_parameter("top_color", Color("2f7fdc"))
 	sky_mat.set_shader_parameter("horizon_color", Color("bfe0f6"))
@@ -143,7 +156,7 @@ func _build_environment() -> void:
 	sky.radiance_size = Sky.RADIANCE_SIZE_256
 	sky.process_mode = Sky.PROCESS_MODE_INCREMENTAL
 
-	var env := Environment.new()
+	env = Environment.new()
 	env.background_mode = Environment.BG_SKY
 	env.sky = sky
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
@@ -185,7 +198,7 @@ func _build_environment() -> void:
 	add_child(we)
 
 	# Sol de fim de manha a leste-sudeste, ~42 graus: fachadas (viradas ao sul) com luz rasante que mostra os vaos.
-	var sun := DirectionalLight3D.new()
+	sun = DirectionalLight3D.new()
 	sun.name = "Sun"
 	sun.light_color = Color("ffe3b8")
 	sun.light_energy = 2.4
@@ -202,7 +215,7 @@ func _build_environment() -> void:
 	sun.directional_shadow_blend_splits = true
 	add_child(sun)
 	sun.basis = Basis.looking_at(-Vector3(0.72, 0.68, 0.38).normalized(), Vector3.UP)
-	var fill := DirectionalLight3D.new()
+	fill = DirectionalLight3D.new()
 	fill.name = "SkyFill"
 	fill.light_color = Color("b9d3ff")
 	fill.light_energy = 0.25
@@ -267,6 +280,8 @@ func _add_light(pos: Vector3, kind: String) -> void:
 	l.distance_fade_length = 15.0
 	add_child(l)
 	l.position = pos
+	l.set_meta("day_energy", l.light_energy)
+	local_lights.append(l)
 	stats.lights += 1
 
 
@@ -279,14 +294,43 @@ func _build_lights() -> void:
 
 
 func _build_boat() -> void:
-	if not ResourceLoader.exists(BOAT):
-		return
-	var boat := (load(BOAT) as PackedScene).instantiate() as Node3D
+	var old := _arg("--wv2-boat", "v2") == "old"
+	var boat: Node3D
+	boat = (load(BOAT_OLD if old else BOAT_GLB) as PackedScene).instantiate() as Node3D
 	boat.name = "Boat"
 	add_child(boat)
 	boat.position = Ep01Layout.BOAT_DOCKED_POS
 	boat.rotation.y = Ep01Layout.BOAT_DOCKED_HEADING
-	LookdevMaterials.apply(boat, false)
+	if old:
+		LookdevMaterials.apply(boat, false)
+	else:
+		stats.surfaces += WV2Materials.apply(boat)
+	# lampiao de proa e luminaria da cabine (pontos do proprio modelo)
+	_add_light(boat.to_global(Vector3(0.0, 1.32, -2.35)), "wall_lamp")
+	if not old:
+		_add_light(boat.to_global(Vector3(0.0, 1.2, 1.45)), "window")
+
+
+## Noite: lua fria fraca, ceu azul-escuro, nevoa escura; janelas acesas, vitrines, postes e lanternas mais fortes.
+func _set_night(on: bool) -> void:
+	night = on
+	WV2Materials.set_night(on)
+	sun.light_energy = 0.32 if on else 2.4
+	sun.light_color = Color("9fb6ff") if on else Color("ffe3b8")
+	fill.light_energy = 0.08 if on else 0.25
+	env.ambient_light_energy = 0.22 if on else 0.75
+	env.fog_light_color = Color("1d2a4a") if on else Color("a9cdea")
+	env.tonemap_exposure = 1.1 if on else 1.0
+	env.glow_intensity = 0.9 if on else 0.5
+	env.ssil_intensity = 1.4 if on else 0.9
+	sky_mat.set_shader_parameter("top_color", Color("0c1838") if on else Color("2f7fdc"))
+	sky_mat.set_shader_parameter("horizon_color", Color("2c3f6e") if on else Color("bfe0f6"))
+	sky_mat.set_shader_parameter("ground_color", Color("0f2030") if on else Color("5f9fb4"))
+	sky_mat.set_shader_parameter("cloud_light", Color("5d6c99") if on else Color("ffffff"))
+	sky_mat.set_shader_parameter("cloud_shadow", Color("2a3152") if on else Color("b9c4e6"))
+	for l in local_lights:
+		l.light_energy = float(l.get_meta("day_energy")) * (2.0 if on else 1.0)
+		l.distance_fade_begin = 80.0 if on else 45.0
 
 
 func _build_trio() -> void:
@@ -345,6 +389,13 @@ func _build_camera() -> void:
 			_start_path()
 		_:
 			_set_view(view)
+	# tomada livre para provas: --wv2-pos=x,y,z --wv2-look=x,y,z
+	var ps := _arg("--wv2-pos", "")
+	if ps != "":
+		var a := ps.split_floats(",")
+		var b := _arg("--wv2-look", "0,0,0").split_floats(",")
+		cam.global_position = Vector3(a[0], a[1], a[2])
+		cam.look_at(Vector3(b[0], b[1], b[2]), Vector3.UP)
 
 
 ## Camera baixa do jogo num ponto de vista do layout: posicao e direcao horizontal, 12 graus para baixo.
@@ -357,9 +408,11 @@ func _set_view(v: String) -> void:
 	var pos := Vector3(float(p[0]), float(p[1]), float(p[2]))
 	var flat := Vector3(float(l[0]), 0.0, float(l[2])) - Vector3(pos.x, 0.0, pos.z)
 	flat = flat.normalized()
-	cam.fov = LOW_FOV
+	# vistas de detalhe (barco, janelas) podem trazer inclinacao e FOV proprios; as do jogo usam a camera baixa
+	var pitch_deg := float(vd.get("pitch", LOW_PITCH))
+	cam.fov = float(vd.get("fov", LOW_FOV))
 	cam.global_position = pos
-	var dir := Vector3(flat.x * cos(deg_to_rad(LOW_PITCH)), -sin(deg_to_rad(LOW_PITCH)), flat.z * cos(deg_to_rad(LOW_PITCH)))
+	var dir := Vector3(flat.x * cos(deg_to_rad(pitch_deg)), -sin(deg_to_rad(pitch_deg)), flat.z * cos(deg_to_rad(pitch_deg)))
 	cam.look_at(pos + dir, Vector3.UP)
 	frame = 0
 	_sync_free_angles()
@@ -440,6 +493,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		mode = "free"
 	elif event.is_action_pressed("wv2_path"):
 		_start_path()
+	elif event.is_action_pressed("wv2_night"):
+		_set_night(not night)
 	elif event.is_action_pressed("wv2_help") and help != null:
 		help.visible = not help.visible
 	elif event.is_action_pressed("wv2_escape"):

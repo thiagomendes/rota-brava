@@ -175,9 +175,10 @@ class House:
         p = self.p
         w, h = x1 - x0, y1 - y0
         cx = (x0 + x1) / 2
-        lit = (not french) and self.rng.random() < p.get("lit", 0.18)
-        # vidro recuado + caixilho
-        self.box((cx, y0 + h / 2, -0.19), (w, h, 0.02), GLASS_LIT if lit else "wv2_glass", (1, 1, 1))
+        lit = self.rng.random() < p.get("lit", 0.22)
+        # vidro recuado (transparente na Godot) + caixilho
+        self.box((cx, y0 + h / 2, -0.19), (w, h, 0.012), "wv2_glass", (1, 1, 1))
+        self.interior(x0, x1, y0, y1, lit, french)
         if lit:
             self.lights.append(("window", tuple(self.world((cx, y0 + h * 0.5, 0.25)))))
         fc = TRIM
@@ -226,6 +227,43 @@ class House:
                     self.sphere((fx, fy - 0.2, 0.28), 0.1, LEAF, hexc("#4F9F3A"), subd=1, scale=(0.8, 1.6, 0.6),
                                 seed=int(fx * 77), amp=0.2, freq=3.0)
 
+    def interior(self, x0, x1, y0, y1, lit, french=False):
+        """Comodo raso atras do vidro: paredes, teto, piso, cortinas e (as vezes) luminaria e vaso no peitoril.
+        Aceso = parede do fundo emissiva quente (forte a noite, discreta de dia; a Godot controla o brilho)."""
+        rng = self.rng
+        w, h = x1 - x0, y1 - y0
+        cx = (x0 + x1) / 2
+        d0, d1 = -0.3, -0.95
+        wall = rng.choice([hexc("#F3E3C8"), hexc("#E9D5E8"), hexc("#D6E8E0"), hexc("#F0D9B8"), hexc("#DCE3F2")])
+        mat_back = "wv2_interior_lit" if lit else "wv2_interior"
+        dm = (d0 + d1) / 2
+        dl = d0 - d1
+        self.box((cx, y0 + h / 2, d1), (w + 0.5, h + 0.5, 0.04), mat_back, wall)
+        for s_ in (-1, 1):
+            self.box((cx + s_ * (w / 2 + 0.25), y0 + h / 2, dm), (0.04, h + 0.5, dl), "wv2_interior", wall)
+        self.box((cx, y1 + 0.25, dm), (w + 0.5, 0.04, dl), "wv2_interior", tuple(c * 0.85 for c in wall))
+        self.box((cx, y0 - 0.02 if not french else y0 - 0.02, dm), (w + 0.5, 0.04, dl), "wv2_wood", hexc("#9C7552"))
+        # quadro na parede do fundo
+        if rng.random() < 0.5:
+            fx = cx + rng.uniform(-0.15, 0.15)
+            self.box((fx, y0 + h * 0.62, d1 + 0.03), (0.32, 0.24, 0.02), PAINT, hexc("#8B5E3C"))
+            self.box((fx, y0 + h * 0.62, d1 + 0.045), (0.25, 0.17, 0.01), "wv2_interior", rng.choice(
+                [hexc("#7FB8E0"), hexc("#F2B632"), hexc("#7DBA3A")]))
+        # cortinas presas dos lados (pano com dobras)
+        cc = rng.choice([hexc("#E8553E"), hexc("#3F7FD8"), hexc("#FFF6EA"), hexc("#F2B632"), hexc("#3E9A57"), hexc("#FF9EB5")])
+        cw = w * rng.uniform(0.18, 0.28)
+        for s_ in (-1, 1):
+            for k in range(3):
+                fx = cx + s_ * (w / 2 - cw / 2 + 0.02) + (k - 1) * cw * 0.3
+                self.box((fx, y0 + h * 0.5 + 0.02, -0.24 - 0.012 * (k % 2)), (cw * 0.42, h * 0.98, 0.025), "wv2_canvas", cc, 0.01, 1,
+                         uvoff=(0.13, 0))
+        self.box((cx, y1 - 0.02, -0.24), (w + 0.1, 0.03, 0.03), METAL, hexc("#C9A13A"))
+        if lit:
+            self.sphere((cx, y1 + 0.05, (d0 + d1) / 2), 0.07, LAMP, hexc("#FFE0A0"), subd=1)
+        if not french and rng.random() < 0.35:
+            self.m.lathe((0, 0, 0), [(0.0, 0.0), (0.06, 0.0), (0.08, 0.13), (0.0, 0.13)], GLOSSY, TERRA, seg=10,
+                         rot=self.xf @ T(cx + rng.uniform(-0.2, 0.2), y0 + 0.0, -0.27))
+
     def door(self, x0, x1, y0, y1):
         p = self.p
         w, h = x1 - x0, y1 - y0
@@ -258,20 +296,17 @@ class House:
         dw = 0.95
         # porta da loja (esquerda) e vitrine
         self.box((x0 + dw / 2, 1.15, -0.24), (dw, 2.3, 0.06), PAINT, sc, grain="y")
-        self.box((x0 + dw / 2, 1.45, -0.21), (dw * 0.6, 1.1, 0.02), GLASS_LIT, (1, 1, 1))
+        self.box((x0 + dw / 2, 1.45, -0.21), (dw * 0.6, 1.1, 0.012), "wv2_glass", (1, 1, 1))
+        self.box((x0 + dw / 2, 1.45, -0.29), (dw * 0.62, 1.12, 0.02), "wv2_interior_lit", hexc("#F0D9B8"))
         self.box((x0 + dw + 0.03, 1.27, -0.2), (0.06, 2.55, 0.12), PAINT, sc, grain="y")
         vx0 = x0 + dw + 0.06
         vw = x1 - vx0
         self.box((vx0 + vw / 2, 0.35, -0.12), (vw, 0.7, 0.2), PAINT, sc)
-        self.box((vx0 + vw / 2, 1.6, -0.22), (vw, 1.8, 0.02), GLASS_LIT, (1, 1, 1))
+        self.box((vx0 + vw / 2, 1.6, -0.22), (vw, 1.8, 0.012), "wv2_glass", (1, 1, 1))
+        self.shop_interior(vx0, x1, p.get("icon", "fish"))
         for k in range(1, 3):
             self.box((vx0 + vw * k / 3, 1.6, -0.19), (0.05, 1.8, 0.05), PAINT, sc, grain="y")
         self.box((cx, 2.52, -0.18), (w, 0.07, 0.1), PAINT, sc)
-        # mercadoria na vitrine (caixotes e cores)
-        for k in range(5):
-            gx = vx0 + 0.25 + k * (vw - 0.5) / 4
-            self.sphere((gx, 0.78, -0.35), 0.12, GLOSSY, hexc(["#F59A23", "#E8442E", "#F4D03F", "#7DBA3A", "#FF8FB1"][k % 5]),
-                        subd=1, scale=(1, 0.7, 1))
         self.lights.append(("shop", tuple(self.world((cx, 1.6, 0.4)))))
         # pilastras de pedra
         self.box((x0 - 0.12, 1.3, 0.03), (0.24, 2.6, 0.1), STONE, (1, 1, 1), 0.02, 1, grain="y")
@@ -298,6 +333,47 @@ class House:
             self.m.tube([self.world((cx + s * aw / 2, top - 0.05, 0.02)), self.world((cx + s * aw / 2, bot, depth))], 0.015,
                         METAL, IRON, seg=6)
         self.lights.append(("awning", tuple(self.world((cx, 2.0, 0.8)))))
+
+    def shop_interior(self, x0, x1, kind):
+        """Loja vista pela vitrine: fundo aceso, prateleiras com mercadoria do tipo da loja, balcao e luminarias."""
+        rng = self.rng
+        w = x1 - x0
+        cx = (x0 + x1) / 2
+        back = -1.25
+        self.box((cx, 1.3, back), (w + 0.2, 2.6, 0.04), "wv2_interior_lit", hexc("#F3E1C4"))
+        for s_ in (-1, 1):
+            self.box((cx + s_ * (w / 2 + 0.08), 1.3, -0.75), (0.04, 2.6, 1.0), "wv2_interior", hexc("#E8D6BC"))
+        self.box((cx, 2.55, -0.75), (w + 0.2, 0.04, 1.0), "wv2_interior", hexc("#D9C6AA"))
+        self.box((cx, 0.0, -0.75), (w + 0.2, 0.04, 1.0), "wv2_wood", hexc("#9C7552"))
+        goods = {"fish": ["#9FB8C8", "#C9A15A", "#7FA6C8"], "bread": ["#D9953E", "#C47F33", "#E8B060"],
+                 "flower": ["#FF5C8A", "#FFD23F", "#B57CFF", "#FFFFFF"], "cup": ["#FFFFFF", "#E8553E", "#3F7FD8"]}[kind]
+        for k, hy in enumerate((0.95, 1.45, 1.95)):
+            self.box((cx, hy, back + 0.14), (w - 0.1, 0.035, 0.26), WOOD, hexc("#A87D52"), 0.008, 1)
+            n = int((w - 0.2) / 0.16)
+            for j in range(n):
+                gx = x0 + 0.15 + j * (w - 0.3) / max(1, n - 1)
+                c = hexc(goods[(j + k) % len(goods)])
+                if kind == "bread":
+                    self.sphere((gx, hy + 0.06, back + 0.14), 1.0, GLOSSY, c, subd=1, scale=(0.07, 0.045, 0.1))
+                elif kind == "fish":
+                    self.sphere((gx, hy + 0.04, back + 0.14), 1.0, GLOSSY, c, subd=1, scale=(0.06, 0.03, 0.11))
+                elif kind == "flower":
+                    self.m.lathe((0, 0, 0), [(0.0, 0.0), (0.04, 0.0), (0.05, 0.08), (0.0, 0.08)], GLOSSY, TERRA, seg=8,
+                                 rot=self.xf @ T(gx, hy + 0.017, back + 0.14))
+                    self.sphere((gx, hy + 0.13, back + 0.14), 0.055, GLOSSY, c, subd=1)
+                else:
+                    self.cyl((gx, hy + 0.017, back + 0.14), 0.04, 0.08, GLOSSY, c, seg=10)
+        # balcao com mercadoria em cestos logo atras do vidro
+        self.box((cx, 0.85, -0.55), (w - 0.3, 0.06, 0.4), WOOD, hexc("#B48A60"), 0.012, 1)
+        for j in range(int(w / 0.32)):
+            gx = x0 + 0.25 + j * 0.32
+            c = hexc(goods[j % len(goods)])
+            self.cyl((gx, 0.88, -0.55), 0.13, 0.08, "wv2_burlap", hexc("#C8A878"), seg=12)
+            for q in range(3):
+                self.sphere((gx + rng.uniform(-0.06, 0.06), 0.97, -0.55 + rng.uniform(-0.06, 0.06)), 0.055, GLOSSY, c, subd=1)
+        for lx in (cx - w / 4, cx + w / 4):
+            self.cyl((lx, 2.3, -0.75), 0.008, 0.25, METAL, IRON, seg=5)
+            self.sphere((lx, 2.25, -0.75), 0.08, LAMP, hexc("#FFE0A0"), subd=1, scale=(1, 0.7, 1))
 
     def icon(self, x, y, z, kind):
         c = hexc("#FF8A3D")

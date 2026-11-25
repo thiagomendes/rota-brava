@@ -1,8 +1,8 @@
 # Procedência do Mundo v2 (RB-R1 W1, vitrine "vila e cais v2") — PROVISÓRIO
 
 Agente: `art3d`. Tudo abaixo é **provisório** até Thiago aprovar. Não substitui o porto do jogo: só a vitrine
-`game/lookdev/world_v2/world_v2.tscn` usa estes arquivos. Manifesto: entradas `world_v2_static`, `world_v2_kit` e
-`world_v2_textures` em `source_art/manifest.json` (sha256, triângulos, materiais, origem), escritas pelo próprio build.
+`game/lookdev/world_v2/world_v2.tscn` usa estes arquivos. Manifesto: entradas `world_v2_static`, `world_v2_kit`,
+`world_v2_boat` e `world_v2_textures` em `source_art/manifest.json` (sha256, triângulos, materiais, origem), escritas pelo próprio build.
 
 ## Originalidade
 - **Geometria 100% por script** (`bmesh` do Blender e fórmulas próprias): caixas chanfradas, tornos, prismas, tubos,
@@ -21,11 +21,12 @@ Agente: `art3d`. Tudo abaixo é **provisório** até Thiago aprovar. Não substi
 | `wv2lib.py` | acumulador de malha (Godot -> Blender), primitivas, UV em metros (`box`/`world`/`cyl`/`slope`), cor de vértice |
 | `wv2_houses.py` | gerador de casas (fachada com vãos reais, molduras, venezianas, floreiras, sacada, loja com toldo e placa, cunhais, cornijas, telhado com fiadas de telha modeladas, oitões, chaminés) |
 | `wv2_kit.py` | kit instanciado (caixotes, barris, rede, boias, cordas, vasos, floreiras, bancos, postes com lanterna, carrinho, placas, café, guarda-sol, barracas, árvores, arbustos, grama, flores, juncos, rochas, botes) |
-| `wv2_textures.py` | 17 texturas ladrilháveis (cor JPEG + dados PNG) e os `.import` com mipmaps |
+| `build_boat_wv2.py` | barco do porto v2 (W4): casco em seções (mesma função de casco do `build_boat_v2.py` do RB-04, reescrita com o acabamento novo), cabine com janelas de verdade e interior, convés em tábuas, console e volante, motor, âncora, defensas, cordas; mesmos pontos de encaixe do `boat_v2` |
+| `wv2_textures.py` | 18 texturas ladrilháveis (cor JPEG + dados PNG) e os `.import` com mipmaps |
 | `render_world_v2.py` | imagens da malha (Workbench, cor de vértice + aramado) em `captures/mundo_v2/blender/` (fora do Git) |
 | `world_v2.blend` | fonte salva pelo build (cenário + kit em fila) |
 
-Saídas: `game/assets/models/environment_v2/wv2_static.glb`, `wv2_kit.glb`; `game/assets/textures/environment_v2/*`;
+Saídas: `game/assets/models/environment_v2/wv2_static.glb`, `wv2_kit.glb`, `wv2_boat.glb`; `game/assets/textures/environment_v2/*`;
 `game/lookdev/world_v2/world_v2_layout.json`; `source_art/environment_v2/world_v2.info.json`.
 
 ## Reproduzir
@@ -45,7 +46,15 @@ seguidas dão GLB com o mesmo sha256 (conferido em 2026-11-25).
 - Cor de vértice linear (COLOR_0) = tinta da peça; a máscara B da textura de dados decide onde ela tinge.
 - Sem colisão (é vitrine). Sem LOD manual (a Godot gera LOD na importação).
 
+## Barco v2 (W4) — pontos de encaixe
+Pivô no eixo longitudinal a 40% da popa; popa z = +2,0, proa z = −3,0, boca 2,2 m; convés y = 0,40; banco com topo
+y = 0,5 em z = 0,6; empties `DeckPoint`, `BenchMark`, `WheelPoint` (0; 1,12; −0,37), `HornPoint`, `PivotMark` iguais aos do
+`boat_v2.glb`, mais `RopeBow`, `RopeSternL`, `RopeSternR` (pontos de corda); marca da pata é o objeto `PawMark`
+(material `wv2_paw`). Para trocar no jogo falta só a cena com colisão (`StaticBody3D`) e a luz de proa, como em
+`game/actors/environment/boat_v2.tscn` (não feito: fora de `game/lookdev/`).
+
 ## Provisório / limites conhecidos
-- Barco ainda é o `boat_v2` do RB-04 com os materiais do lookdev (não refeito nesta etapa).
-- Interiores não modelados: janelas são vidro escuro com reflexo; ~18% "acesas" com brilho quente leve.
+- Interiores rasos (0,65 m) atrás de cada janela: paredes, teto, piso de madeira, cortinas, quadro, vaso; ~22% acesos
+  (parede do fundo emissiva, forte à noite). Lojas com prateleiras e mercadoria do tipo da loja.
 - Grama em tufos de lâminas (MultiMesh) + textura; sem grama em cartão alfa.
+- Farol sem escada externa (pedida na proposta de missões v3, M7): fica para a implementação.

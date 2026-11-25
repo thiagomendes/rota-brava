@@ -30,8 +30,9 @@ func _test_layout() -> Dictionary:
 	r.check(bool(d.get("provisorio", false)), "wv2: layout marcado provisorio")
 	var views: Dictionary = d.get("vistas", {})
 	r.check(views.has("dock") and views.has("street") and views.has("plaza") and views.has("bank"), "wv2: 4 vistas baixas (cais, rua, praca, margem)")
+	r.check(views.has("boat") and views.has("windows"), "wv2: vistas de detalhe (barco, janelas)")
 	var ok_h := true
-	for v: String in views:
+	for v: String in ["dock", "street", "plaza", "bank"]:
 		ok_h = ok_h and absf(float(((views[v] as Dictionary)["pos"] as Array)[1]) - 1.95) < 0.01
 	r.check(ok_h, "wv2: vistas na altura da camera baixa (1,95 m)")
 	r.check((d.get("trio", []) as Array).size() == 3, "wv2: trio v2 no cais")

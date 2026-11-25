@@ -1,4 +1,29 @@
 {
+ "barco": {
+  "empties": [
+   "BenchMark",
+   "DeckPoint",
+   "HornPoint",
+   "PivotMark",
+   "RopeBow",
+   "RopeSternL",
+   "RopeSternR",
+   "WheelPoint"
+  ],
+  "materiais": [
+   "wv2_canvas",
+   "wv2_deck",
+   "wv2_glass",
+   "wv2_glossy",
+   "wv2_lamp",
+   "wv2_metal",
+   "wv2_paint",
+   "wv2_paw",
+   "wv2_rope",
+   "wv2_wood"
+  ],
+  "triangulos": 14705
+ },
  "estatico": {
   "wv2_back": {
    "materiais": [
@@ -8,30 +33,33 @@
     "wv2_metal",
     "wv2_lamp",
     "wv2_glass",
-    "wv2_glass_lit",
+    "wv2_interior",
     "wv2_wood",
-    "wv2_roof",
-    "wv2_glossy"
+    "wv2_canvas",
+    "wv2_interior_lit",
+    "wv2_glossy",
+    "wv2_roof"
    ],
-   "triangulos": 39090
+   "triangulos": 58530
   },
   "wv2_bank": {
    "materiais": [
     "wv2_plaster",
     "wv2_stone",
     "wv2_glass",
+    "wv2_interior",
+    "wv2_wood",
+    "wv2_canvas",
+    "wv2_metal",
+    "wv2_glossy",
     "wv2_paint",
     "wv2_slats",
     "wv2_leaf",
-    "wv2_glossy",
-    "wv2_metal",
     "wv2_lamp",
-    "wv2_wood",
     "wv2_roof",
-    "wv2_rope",
-    "wv2_canvas"
+    "wv2_rope"
    ],
-   "triangulos": 4782
+   "triangulos": 5322
   },
   "wv2_dock": {
    "materiais": [
@@ -51,16 +79,18 @@
     "wv2_metal",
     "wv2_lamp",
     "wv2_glass",
+    "wv2_interior",
+    "wv2_wood",
+    "wv2_canvas",
     "wv2_slats",
+    "wv2_interior_lit",
     "wv2_glossy",
     "wv2_leaf",
-    "wv2_wood",
     "wv2_roof",
-    "wv2_glass_lit",
-    "wv2_canvas",
+    "wv2_burlap",
     "wv2_terrain"
    ],
-   "triangulos": 36890
+   "triangulos": 51002
   },
   "wv2_quay": {
    "materiais": [
@@ -76,19 +106,21 @@
     "wv2_plaster",
     "wv2_stone",
     "wv2_paint",
-    "wv2_glass_lit",
-    "wv2_glossy",
-    "wv2_canvas",
-    "wv2_metal",
-    "wv2_slats",
     "wv2_glass",
-    "wv2_leaf",
+    "wv2_interior_lit",
+    "wv2_interior",
     "wv2_wood",
-    "wv2_roof",
+    "wv2_glossy",
+    "wv2_burlap",
+    "wv2_metal",
     "wv2_lamp",
+    "wv2_canvas",
+    "wv2_slats",
+    "wv2_leaf",
+    "wv2_roof",
     "wv2_rope"
    ],
-   "triangulos": 73554
+   "triangulos": 99510
   },
   "wv2_terrain": {
    "materiais": [
@@ -98,7 +130,7 @@
   }
  },
  "gerado_por": "source_art/environment_v2/build_world_v2.py",
- "instancias": 3054,
+ "instancias": 3011,
  "kit": {
   "barrel": {
    "instancias": 8,
@@ -164,7 +196,7 @@
    "triangulos": 298
   },
   "bush_a": {
-   "instancias": 40,
+   "instancias": 47,
    "materiais": [
     "wv2_leaf"
    ],
@@ -176,7 +208,7 @@
    "triangulos": 1040
   },
   "bush_b": {
-   "instancias": 13,
+   "instancias": 9,
    "materiais": [
     "wv2_leaf",
     "wv2_glossy"
@@ -189,7 +221,7 @@
    "triangulos": 1560
   },
   "bush_c": {
-   "instancias": 20,
+   "instancias": 18,
    "materiais": [
     "wv2_leaf",
     "wv2_glossy"
@@ -307,7 +339,7 @@
    "triangulos": 200
   },
   "flowers_a": {
-   "instancias": 273,
+   "instancias": 265,
    "materiais": [
     "wv2_grass",
     "wv2_glossy"
@@ -320,7 +352,7 @@
    "triangulos": 484
   },
   "flowers_b": {
-   "instancias": 217,
+   "instancias": 221,
    "materiais": [
     "wv2_grass",
     "wv2_glossy"
@@ -333,7 +365,7 @@
    "triangulos": 484
   },
   "grass_tall": {
-   "instancias": 688,
+   "instancias": 700,
    "materiais": [
     "wv2_grass"
    ],
@@ -345,7 +377,7 @@
    "triangulos": 208
   },
   "grass_tuft": {
-   "instancias": 1254,
+   "instancias": 1199,
    "materiais": [
     "wv2_grass"
    ],
@@ -477,7 +509,7 @@
    "triangulos": 532
   },
   "reeds": {
-   "instancias": 19,
+   "instancias": 18,
    "materiais": [
     "wv2_grass",
     "wv2_glossy"
@@ -490,7 +522,7 @@
    "triangulos": 304
   },
   "rock_a": {
-   "instancias": 19,
+   "instancias": 21,
    "materiais": [
     "wv2_rock"
    ],
@@ -502,7 +534,7 @@
    "triangulos": 320
   },
   "rock_b": {
-   "instancias": 41,
+   "instancias": 43,
    "materiais": [
     "wv2_rock"
    ],
@@ -539,7 +571,20 @@
    "triangulos": 1240
   },
   "rowboat_b": {
-   "instancias": 2,
+   "instancias": 1,
+   "materiais": [
+    "wv2_paint",
+    "wv2_wood"
+   ],
+   "tamanho_m": [
+    1.42,
+    0.57,
+    3.45
+   ],
+   "triangulos": 1240
+  },
+  "rowboat_flip": {
+   "instancias": 1,
    "materiais": [
     "wv2_paint",
     "wv2_wood"
@@ -554,15 +599,15 @@
   "sack": {
    "instancias": 7,
    "materiais": [
-    "wv2_net",
+    "wv2_burlap",
     "wv2_rope"
    ],
    "tamanho_m": [
-    0.625,
-    0.64,
-    0.48
+    0.663,
+    0.637,
+    0.527
    ],
-   "triangulos": 482
+   "triangulos": 738
   },
   "sign_aframe": {
    "instancias": 3,
@@ -665,11 +710,15 @@
    "triangulos": 3672
   }
  },
- "luzes": 52,
+ "luzes": 63,
  "provisorio": true,
  "texturas": {
   "bark": {
    "metros": 1.0,
+   "resolucao": 512
+  },
+  "burlap": {
+   "metros": 0.5,
    "resolucao": 512
   },
   "canvas": {
@@ -737,6 +786,6 @@
    "resolucao": 512
   }
  },
- "triangulos_estatico": 213832,
- "triangulos_instancias": 2068630
+ "triangulos_estatico": 273880,
+ "triangulos_instancias": 2059318
 }

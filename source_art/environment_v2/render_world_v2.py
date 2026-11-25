@@ -63,7 +63,7 @@ def G(x, y, z):
     return (x, -z, y)
 
 
-def render_all(statics, kit_objs, out_dir):
+def render_all(statics, kit_objs, out_dir, boat_objs=()):
     os.makedirs(out_dir, exist_ok=True)
     sc = bpy.context.scene
     _setup(sc, 1800, 1000)
@@ -111,4 +111,22 @@ def render_all(statics, kit_objs, out_dir):
         ob.hide_render = False
     _camera(sc, G(30.0, 55.0, 40.0), G(-4.0, 0.0, -6.0), lens=30)
     sc.render.filepath = os.path.join(out_dir, "recorte_aereo.png")
+    bpy.ops.render.render(write_still=True)
+    # 4) barco v2 com aramado (fora do mapa, na origem)
+    for o in sc.objects:
+        if o.type == "MESH":
+            o.hide_render = True
+    for ob in boat_objs:
+        if ob.type != "MESH":
+            continue
+        if ob.parent is None:
+            ob.location = (0.0, 0.0, 0.0)
+            ob.rotation_euler = (0.0, 0.0, 0.0)
+        ob.hide_render = False
+    bpy.context.view_layer.update()
+    for ob in boat_objs:
+        if ob.type == "MESH":
+            _wire_copy(ob, 0.003).hide_render = False
+    _camera(sc, G(4.2, 3.0, 3.6), G(0.0, 0.6, -0.4), lens=35)
+    sc.render.filepath = os.path.join(out_dir, "malha_barco.png")
     bpy.ops.render.render(write_still=True)
