@@ -42,6 +42,10 @@ Objetivo observável: Thiago abre na Godot (Windows) uma vitrine do mundo refina
   - Critérios: geometria 100% original por script; fontes e procedência em `source_art/`; GLB/cenas com orçamento declarado (chamadas de desenho e triângulos na vista baixa, medidos); sem regressão na suíte; capturas de 3–4 pontos de vista na câmera baixa + comparação com o porto atual; frames do percurso.
   - Prova: capturas vistas pelo lead; vídeo do percurso para a página; comando para Thiago abrir a vitrine no Windows. GPU real não medida na nuvem (dizer).
 - **W2 · Missões para ≥ 8 min (`adventure`, só documento):** proposta de conteúdo de missão do Ep01 em `docs/proposals/ep01_missoes_v2.md`: o que cada herói faz a mais, quebra-cabeças cooperativos, onde no mapa, tempo estimado por trecho, sem tempo morto; o que o mundo precisa ter para isso. Thiago aprova junto com a vitrine.
+- **D14 · Mundo v2 aprovado na direção (Thiago, 2026-11-25, pelo vídeo e fotos, sem abrir no PC):** "ficou bom, vamos seguir assim; pequenos ajustes eu vou sinalizando".
+- **D15 · Missões variadas na vila (Thiago, 2026-11-25):** a proposta W2 está focada demais em barco/navegação. Como Patrulha Canina e PJ Masks, as missões devem ser diversas e concentradas num lugar (a vila e arredores). Escolha de Thiago: refazer o Ep01 com várias missões curtas e diferentes dentro da vila; o barco vira só uma parte; rio e ilha ficam menores.
+- **W3 · Proposta v3 de missões (`adventure`):** refazer `docs/proposals/ep01_missoes_v2.md` como v3 segundo D15.
+- **W4 · Vila v2.1 e barco v2 (`art3d`):** corrigir os fracos da W1 (barco chapado, janelas sem interior, vitrines, calçamento carregado, sacos, bote virado) e refazer o barco no acabamento D11.
 - Fora de escopo agora: trocar heróis/mundo do episódio, som.
 
 ## Barra de qualidade (mensurável e perceptual)
