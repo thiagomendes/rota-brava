@@ -4,12 +4,12 @@
   "member.pilot.name": "Leme",
   "member.tracker.role": "Rastreadora",
   "member.climber.role": "Especialista em travessias",
-  "member.pilot.role": "Piloto",
+  "member.pilot.role": "Pilota",
   "member.tracker.skill": "Caderno",
   "member.climber.skill": "Linha",
   "member.pilot.skill": "Leme",
   "member.radio.name": "Farol 7",
-  "member.captain.name": "Piloto",
+  "member.captain.name": "Capitão",
   "member.pup.name": "Filhote",
   "ep01.title": "O barco sem capitão",
   "ep01.arrival.radio.horn": "Buzina no porto! Um barco amarelo está chegando.",
@@ -109,4 +109,3 @@
   "ui.control.pause": "Teclado: Esc / Controle: botão Start",
   "ui.control.move": "Teclado: WASD ou setas / Controle: analógico esquerdo"
 }
-

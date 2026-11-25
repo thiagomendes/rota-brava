@@ -241,6 +241,9 @@ func _help_tiers() -> void:
 	main.help.gesture_hint.connect(func(_t: StringName, _k: StringName) -> void: tiers.append(1))
 	main.help.radio_hint.connect(func(_k: StringName) -> void: tiers.append(2))
 	main.help.pointer_hint.connect(func(_t: StringName, _m: bool) -> void: tiers.append(3))
+	# E6: no jogo a ajuda so vem apos ~10 s parado, quando as falas da abertura ja terminaram; aqui o tempo e forcado.
+	main.hud.clear_speech()
+	await r.frames(2)
 	main.help.tick(10.5)
 	main.help.tick(10.0)
 	main.help.tick(15.0)

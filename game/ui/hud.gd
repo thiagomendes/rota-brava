@@ -886,7 +886,7 @@ func _pump() -> void:
 		if voice_hook.is_valid():
 			var voice_len := float(voice_hook.call(String(entry["key"])))
 			if voice_len > 0.0:
-				seconds = voice_len + 0.35
+				seconds = maxf(seconds, voice_len + 0.35)  # a legenda nunca some antes do tempo de leitura
 		var t := 0.0
 		while t < seconds and not _skip_current:
 			await get_tree().process_frame

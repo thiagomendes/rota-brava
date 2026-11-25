@@ -270,6 +270,8 @@ func _start_mission(index: int) -> void:
 	land.refresh()
 	if data.has("camera_yaw"):
 		camera_rig.set_low_view(deg_to_rad(float(data["camera_yaw"])))
+	for k in Ep01V3Dialogue.start_lines(current.id):
+		say(k)
 	print("[RB] v3 mission %s" % current.id)
 	mission_started.emit(current.id)
 
@@ -308,6 +310,8 @@ func _on_mission_completed(id: StringName) -> void:
 		FeedbackFx.sparkle(world, controlled_node.global_position + Vector3(0, 1.0, 0))
 	if _save != "":
 		MissionSave.save(_save, EPISODE_ID, missions)
+	for k in Ep01V3Dialogue.done_lines(id):
+		say(k)
 	mission_completed.emit(id)
 	_start_mission.call_deferred(_index_of(id) + 1)
 
@@ -475,6 +479,8 @@ func _on_handoff_confirmed() -> void:
 			break
 	FeedbackFx.sparkle(world, a.global_position + Vector3(0, 1.0, 0))
 	audio.play_music("team_call", 0.1)
+	if current != null:
+		say(Ep01V3Dialogue.switch_line(current.id, hero))
 	print("[RB] v3 control %s" % hero)
 	await get_tree().create_timer(TEAM_POSE_SECONDS).timeout
 	if not is_inside_tree():
@@ -614,9 +620,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _setup_speech() -> void:
-	# Balbucio/radio que ja existem (AudioDirector.play_line); chave sem take fica so com a legenda.
+	# E6: icones da legenda e take ja existente pela ficha ep01_v3_dialogue.json (balbucio do mesmo personagem);
+	# chave sem take na ficha tenta a propria chave (radio/balbucio que ja existem) e senao fica so com a legenda.
+	hud.emotes_hook = func(key: String) -> Array[StringName]: return Ep01V3Dialogue.emotes(key)
 	hud.voice_hook = func(key: String) -> float:
-		return float(audio.play_line(key).get("duration", 0.0))
+		var id := Ep01V3Dialogue.take(key)
+		return float(audio.play_line(id if id != "" else key).get("duration", 0.0))
 	hud.voice_stop_hook = func() -> void:
 		audio.stop_voice()
 
