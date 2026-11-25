@@ -105,3 +105,8 @@ bash tools/blender.sh --background source_art/characters/pico_v2/pico_v2.blend \
 ```
 O GLB não sai byte a byte idêntico entre exportações (JPEG e ordem interna), mas malha, materiais e medidas sim.
 O build completo leva ~8 min na nuvem (4 CPUs; o bake de AO domina).
+
+## Ciclos v2 de andar e correr (RB-R1, 2026-11-25, PROVISORIO)
+Pedido de Thiago ("os pes estao muito acelerados"): `walk` e `run` refeitos por `source_art/scripts/hero_gait_v2.py` (FK/IK em Python, do zero), configurados em `pv2_anim.py` (`WALK`, `RUN`). Passada longa (curso de apoio 0,44 m), quadril calculado quadro a quadro pelo alcance real das pernas, guinada do quadril, pe que rola do calcanhar a ponta e sai/chega rente ao chao. Os demais clipes nao mudaram.
+- ciclo / curso de apoio / avanco por ciclo / escala no jogo / passos por s: andar 1,00 s / 0,44 m / 1,167 m / x1,20 / 2,40; correr 0,567 s / 0,44 m / 1,577 m / x1,15 / 4,06 (escala = 1,4 ou 3,2 m/s dividido pela velocidade nominal do clipe).
+- Folga minima entre as botas: 6,62 cm (walk), 7,34 cm (run) (`pv2_check.py`).

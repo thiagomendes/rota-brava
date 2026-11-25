@@ -193,6 +193,20 @@ CLIPS["idle_wheel"] = (CLIPS["idle_wheel"][0], True, pose_idle_wheel_lv2)
 CLIPS["steer_left"] = (CLIPS["steer_left"][0], False, pose_steer_lv2(+1))
 CLIPS["steer_right"] = (CLIPS["steer_right"][0], False, pose_steer_lv2(-1))
 IDLE = (5.2, pose_idle_lv2)
+# ciclos v2 (pedido de Thiago, 2026-11-25: "pes muito acelerados"): passada longa para escala ~1 no jogo (1,4 e 3,2 m/s).
+# Leme: firme, pilota -- peito aberto e tronco ereto, quique pequeno, joelhos um pouco para fora, punhos firmes na corrida.
+import hero_gait_v2 as hg
+WALK = hg.gait_cfg(1.0, 0.47, 1.4 / 1.15, center=-0.035, lift=0.055, lift_at=0.46, phi_land=12.0, phi_push=-27.0,
+                   hip_yaw=10.0, hip_roll=2.0, base=-0.032, bob=0.004, lean=1.5, torso_yaw=6.0, head_pitch=-3.0,
+                   head_yaw=-2.0, head_roll=1.0, arm_swing=24.0, arm_bend=16.0, arm_out=8.0, blink_at=0.55,
+                   knee_out=0.10, face={"fist_R": 0.3, "fist_L": 0.3})
+RUN = hg.gait_cfg(19 / 30, 0.47, 3.2 * (19 / 30) / 1.15, center=-0.03, lift=0.105, lift_at=0.43, lift_p=2.0,
+                  phi_land=6.0, phi_push=-35.0, phi_mid=-22.0, land_u=0.10, push_u=0.45, low_w=0.12, skim=0.012,
+                  hip_yaw=8.0, hip_roll=2.0, bob_mode="run", base=-0.032, bob=0.007, lean=10.0, torso_yaw=8.0,
+                  head_pitch=4.0, head_yaw=-1.5, head_roll=1.0, arm_swing=52.0, arm_bend=76.0, arm_out=10.0, arm_pump=0.3,
+                  blink_at=None, knee_out=0.10, face={"atenta": 0.4, "fist_R": 0.9, "fist_L": 0.9})
+CLIPS["walk"] = hg.clip(WALK)
+CLIPS["run"] = hg.clip(RUN)
 CLIP_SET = ["idle", "walk", "run", "stop", "idle_wheel", "steer_left", "steer_right", "react_horn", "celebrate", "wave", "point", "team_pose"]
 HAND_KEYS = ("fist_R", "fist_L", "thumb_up_R", "thumb_up_L")
 
@@ -334,7 +348,7 @@ def measure_feet(rig, gear_ob, face_ob, F, part_ids, names=CLIP_SET):
         if cmin < out["min_m"]:
             out["min_m"], out["min_clip"], out["min_frame"] = round(cmin, 4), name, cfr
         if name in ("walk", "run"):
-            nominal = ha.walk_speed(F) if name == "walk" else ha.run_speed(F)
+            nominal = hg.nominal_speed(WALK if name == "walk" else RUN)   # ciclos v2
             errs = []
             for side in (0, 1):
                 for i in range(len(soles) - 1):

@@ -29,3 +29,8 @@ bash tools/blender.sh --background source_art/characters/rastro_v2/rastro_v2.ble
   --python source_art/characters/rastro_v2/render_rastro_v2.py -- captures/rastro_v2
 ```
 O GLB não sai byte a byte idêntico entre exportações (JPEG e ordem interna), mas malha, materiais e medidas sim.
+
+## Ciclos v2 de andar e correr (RB-R1, 2026-11-25, PROVISORIO)
+Pedido de Thiago ("os pes estao muito acelerados"): `walk` e `run` refeitos por `source_art/scripts/hero_gait_v2.py` (FK/IK em Python, do zero), configurados em `rv2_anim.py` (`WALK`, `RUN`). Passada longa (curso de apoio 0,46 m), quadril calculado quadro a quadro pelo alcance real das pernas, guinada do quadril, pe que rola do calcanhar a ponta e sai/chega rente ao chao. Os demais clipes nao mudaram.
+- ciclo / curso de apoio / avanco por ciclo / escala no jogo / passos por s: andar 1,00 s / 0,46 m / 1,186 m / x1,18 / 2,36; correr 0,60 s / 0,46 m / 1,714 m / x1,12 / 3,73 (escala = 1,4 ou 3,2 m/s dividido pela velocidade nominal do clipe).
+- Folga minima entre as botas: 4,04 cm (walk), 4,60 cm (run), 0 intersecoes (`measure_feet.py`).

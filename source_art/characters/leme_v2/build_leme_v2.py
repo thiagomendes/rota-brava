@@ -90,7 +90,8 @@ def measure(b, groups, rig):
             "shape_keys_luvas": [k.name for k in groups["gear"].data.shape_keys.key_blocks][1:] if groups["gear"].data.shape_keys else [],
             "acessorios": {T: {"no": lv2_tex.ACC[T], "tris": tri_count([groups[T]]), "oculto_por_padrao": True}
                            for T in lv2_tex.ACC if T in groups},
-            "walk_speed_mps": round(lv2_anim.ha.walk_speed(b.F), 4), "run_speed_mps": round(lv2_anim.ha.run_speed(b.F), 4),
+            "walk_speed_mps": round(lv2_anim.hg.nominal_speed(lv2_anim.WALK), 4), "run_speed_mps": round(lv2_anim.hg.nominal_speed(lv2_anim.RUN), 4),
+            "ciclos_v2": {"walk": lv2_anim.hg.summary(lv2_anim.WALK, 1.4), "run": lv2_anim.hg.summary(lv2_anim.RUN, 3.2)},
             "pes": {"hip_x_m": round(b.F.hip_x, 4), "foot_x_m": round(b.F.foot_x, 4)},
             "texturas": {img.name: list(img.size) for img in bpy.data.images if img.name.startswith("leme_v2_")}}
     return info

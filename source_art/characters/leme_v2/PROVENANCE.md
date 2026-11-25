@@ -84,3 +84,8 @@ bash tools/blender.sh --background source_art/characters/leme_v2/leme_v2.blend \
   --python source_art/characters/leme_v2/render_leme_v2.py -- $PWD/captures/leme_pilota
 ```
 O GLB não sai byte a byte idêntico entre exportações (JPEG e ordem interna), mas malha, materiais e medidas sim.
+
+## Ciclos v2 de andar e correr (RB-R1, 2026-11-25, PROVISORIO)
+Pedido de Thiago ("os pes estao muito acelerados"): `walk` e `run` refeitos por `source_art/scripts/hero_gait_v2.py` (FK/IK em Python, do zero), configurados em `lv2_anim.py` (`WALK`, `RUN`). Passada longa (curso de apoio 0,47 m), quadril calculado quadro a quadro pelo alcance real das pernas, guinada do quadril, pe que rola do calcanhar a ponta e sai/chega rente ao chao. Os demais clipes nao mudaram.
+- ciclo / curso de apoio / avanco por ciclo / escala no jogo / passos por s: andar 1,00 s / 0,47 m / 1,217 m / x1,15 / 2,30; correr 0,633 s / 0,47 m / 1,762 m / x1,15 / 3,63 (escala = 1,4 ou 3,2 m/s dividido pela velocidade nominal do clipe).
+- Folga minima entre as botas: 6,47 cm (walk), 7,28 cm (run) (`lv2_anim.measure_feet`).

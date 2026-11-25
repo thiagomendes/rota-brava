@@ -187,8 +187,30 @@
     "fist_R",
     "fist_L"
   ],
-  "walk_speed_mps": 0.5491,
-  "run_speed_mps": 1.1667,
+  "walk_speed_mps": 1.1864,
+  "run_speed_mps": 2.8571,
+  "ciclos_v2": {
+    "walk": {
+      "ciclo_s": 1.0,
+      "apoio_frac": 0.3877,
+      "curso_apoio_m": 0.46,
+      "avanco_ciclo_m": 1.1864,
+      "velocidade_nominal_mps": 1.1864,
+      "escala_no_jogo": 1.18,
+      "passos_por_s_no_jogo": 2.36,
+      "mps_jogo": 1.4
+    },
+    "run": {
+      "ciclo_s": 0.6,
+      "apoio_frac": 0.2683,
+      "curso_apoio_m": 0.46,
+      "avanco_ciclo_m": 1.7143,
+      "velocidade_nominal_mps": 2.8571,
+      "escala_no_jogo": 1.12,
+      "passos_por_s_no_jogo": 3.733,
+      "mps_jogo": 3.2
+    }
+  },
   "texturas": {
     "rastro_v2_gear_color": [
       2048,

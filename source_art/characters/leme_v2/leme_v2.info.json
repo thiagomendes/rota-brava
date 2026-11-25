@@ -90,7 +90,7 @@
     ],
     "run": [
       0,
-      18
+      19
     ],
     "steer_left": [
       0,
@@ -147,8 +147,30 @@
       "oculto_por_padrao": true
     }
   },
-  "walk_speed_mps": 0.5711,
-  "run_speed_mps": 1.2133,
+  "walk_speed_mps": 1.2174,
+  "run_speed_mps": 2.7826,
+  "ciclos_v2": {
+    "walk": {
+      "ciclo_s": 1.0,
+      "apoio_frac": 0.3861,
+      "curso_apoio_m": 0.47,
+      "avanco_ciclo_m": 1.2174,
+      "velocidade_nominal_mps": 1.2174,
+      "escala_no_jogo": 1.15,
+      "passos_por_s_no_jogo": 2.3,
+      "mps_jogo": 1.4
+    },
+    "run": {
+      "ciclo_s": 0.6333,
+      "apoio_frac": 0.2667,
+      "curso_apoio_m": 0.47,
+      "avanco_ciclo_m": 1.7623,
+      "velocidade_nominal_mps": 2.7826,
+      "escala_no_jogo": 1.15,
+      "passos_por_s_no_jogo": 3.632,
+      "mps_jogo": 3.2
+    }
+  },
   "pes": {
     "hip_x_m": 0.0728,
     "foot_x_m": 0.0915
@@ -226,12 +248,12 @@
         "quadro": 149
       },
       "walk": {
-        "min_m": 0.0663,
-        "quadro": 9
+        "min_m": 0.0647,
+        "quadro": 6
       },
       "run": {
-        "min_m": 0.0709,
-        "quadro": 4
+        "min_m": 0.0728,
+        "quadro": 12
       },
       "stop": {
         "min_m": 0.0522,
@@ -272,18 +294,18 @@
     },
     "deslize": {
       "walk": {
-        "nominal_mps": 0.5711,
-        "pares_de_quadros_em_apoio": 20,
-        "erro_medio_mps": 0.0075,
-        "erro_max_mps": 0.0583,
-        "min_z_m": -0.0007
+        "nominal_mps": 1.2174,
+        "pares_de_quadros_em_apoio": 14,
+        "erro_medio_mps": 0.0089,
+        "erro_max_mps": 0.0526,
+        "min_z_m": -0.0002
       },
       "run": {
-        "nominal_mps": 1.2133,
-        "pares_de_quadros_em_apoio": 8,
+        "nominal_mps": 2.7826,
+        "pares_de_quadros_em_apoio": 3,
         "erro_medio_mps": 0.0,
         "erro_max_mps": 0.0,
-        "min_z_m": -0.0001
+        "min_z_m": -0.0006
       }
     }
   }

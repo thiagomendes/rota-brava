@@ -93,7 +93,7 @@
     ],
     "run": [
       0,
-      18
+      17
     ],
     "stop": [
       0,
@@ -139,8 +139,30 @@
     "costas_media_m": 0.0058,
     "geral_min_m": 0.001
   },
-  "walk_speed_mps": 0.5183,
-  "run_speed_mps": 1.1012,
+  "walk_speed_mps": 1.1667,
+  "run_speed_mps": 2.7826,
+  "ciclos_v2": {
+    "walk": {
+      "ciclo_s": 1.0,
+      "apoio_frac": 0.3771,
+      "curso_apoio_m": 0.44,
+      "avanco_ciclo_m": 1.1667,
+      "velocidade_nominal_mps": 1.1667,
+      "escala_no_jogo": 1.2,
+      "passos_por_s_no_jogo": 2.4,
+      "mps_jogo": 1.4
+    },
+    "run": {
+      "ciclo_s": 0.5667,
+      "apoio_frac": 0.279,
+      "curso_apoio_m": 0.44,
+      "avanco_ciclo_m": 1.5768,
+      "velocidade_nominal_mps": 2.7826,
+      "escala_no_jogo": 1.15,
+      "passos_por_s_no_jogo": 4.059,
+      "mps_jogo": 3.2
+    }
+  },
   "texturas": {
     "pico_v2_gear_color": [
       2048,
