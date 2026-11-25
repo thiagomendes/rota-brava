@@ -183,6 +183,7 @@ Ele relatou: (1) o andar às vezes fica em câmera lenta e às vezes desliza sem
 - **D19a · Direção por fala (Thiago):** além da voz e do tratamento fixos por personagem, cada fala tem emoção, energia, ritmo e nota de atuação conforme o momento do jogo (`tools/voice/direction.json`). Amostras ouvidas por Thiago no chat (MP3) antes de gerar o roteiro.
 - **D19b · Legenda acompanha a voz (Thiago):** a legenda aparece junto com o áudio e não some antes de a fala terminar; depois do fim do áudio ela fica até um tempo mínimo de leitura e a criança pode fechá-la com `interact` quando quiser (não antes do áudio acabar, salvo pular explicitamente). Prova: teste de que a legenda nunca fecha sozinha antes do fim do take.
 - **D19c · Variação por situação (Thiago):** falas que se repetem (ajuda, dica do rádio, acerto, erro sem punição, chamado de troca de herói, comemoração, troca de herói recusada etc.) viram grupos de 3–5 variantes, sorteadas sem repetir a última, para não haver laço repetido. Ficha de grupos no catálogo e no `direction.json`; teste de que nenhuma variante se repete em seguida.
+- **D19d · Elenco aprovado (Thiago, 2026-11-25), versões cruas:** Rastro = Leda, Pico = Fenrir, Leme = Erinome, Capitão = Algieba, Farol 7 = Schedar (sem efeito de rádio). Tratamento só corta silêncio e normaliza volume (−16 LUFS, −1 dBTP); sem mudança de altura, formantes ou EQ. Dona Amora: candidatas a gerar.
 
 ## Barra de qualidade (mensurável e perceptual)
 **Personagens (crianças-heróis)**
