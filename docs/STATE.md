@@ -11,12 +11,11 @@
 **Nuvem (2026-11-24):** `tools/setup-linux.sh` e `tools/test.sh` verificados no Linux: 2650 PASS em 1 min 42 s no `5f877ec`. Ambiente pessoal `rota-brava` libera `download.blender.org` (o Default bloqueava o Blender).
 
 ## 0. Agora (2026-11-25)
-- **Trio v2 integrado** na `feature/rb-r1-reorientacao` (merge de `feature/rb-r1-trio-v2`, que traz também o lookdev Forward+). `reviewer`: APROVADO COM RESSALVAS (parecer no ticket). SPEC.md agora diz Forward+ (D12). Suíte na integração: 3 de 4 execuções `OK (2702 PASS)`; 1 execução com 1 falha intermitente (provável `test_options_game` ducking sob carga, já visto por dois agentes; dívida a estabilizar).
-- **Visualizador 3D:** https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (GLB em base64 `.glb.txt`).
-- **Heróis v2 ainda não substituem os do jogo** (só na vitrine `game/lookdev/`). Decidir a troca na fase do mundo.
-- **Dívidas:** `.blend` 17–22 MB com texturas embutidas (`img.pack()`); tris dos v2 a < 3% de 25k; teste de ducking intermitente; branches `wip/rb-r1-*-acabamento` a apagar pelo GitHub (o proxy recusou).
-- **Mundo v2 pronto para aprovação (2026-11-25):** W1 vitrine `feature/rb-r1-mundo-v2` (`7e56ad3`, `game/lookdev/world_v2/world_v2.tscn`, suíte do autor 2749 PASS, pior vista 876 draw calls) e W2 proposta `feature/rb-r1-missoes-v2` (`1864dab`, `docs/proposals/ep01_missoes_v2.md`, ~620 s estimados). Página: https://claude.ai/artifact/6WpRQzYXY2hW74LxMiPVww. Aguarda Thiago.
-- **Antes:** proposta de mundo como vitrine (densidade para câmera baixa, mais conteúdo de missão para ≥ 8 min), depois som. Agentes `art3d`/`ux` em medium.
+- **Aprovado por Thiago:** trio v2 (integrado), direção do mundo v2 (D14), missões variadas na vila (D15), Leme pilota + equipamento por missão (D16).
+- **Prontos, aguardando Thiago** (página https://claude.ai/artifact/2WyeZqg8DNSLWegCPcCXAt): `feature/rb-r1-leme-pilota` (`a7863f6`, colete `Acc_LifeVest` oculto por padrão), `feature/rb-r1-pico-idle` (`04f40dd`, idle legível), `feature/rb-r1-mundo-v2` (`f7952ef`, vila v2.1 + barco v2 + noite), `feature/rb-r1-missoes-v2` (`f230f49`, `docs/proposals/ep01_missoes_v3.md`).
+- **Em curso:** `gameplay` estabilizando o teste de ducking (`feature/rb-r1-teste-ducking`); re-render do percurso da vila com o barco novo.
+- **Depois:** integrar essas branches (+ reviewer) na `feature/rb-r1-reorientacao`; implementar missões v3 e trocar heróis/mundo/barco do episódio; som.
+- **Dívidas:** `.blend` com texturas embutidas; tris no teto; colete da Leme confunde com a jaqueta; cabelos de trás facetados; luz de parede estoura à noite; GPU real não medida; branches `wip/*` a apagar pelo GitHub.
 
 ## 1. Onde estamos
 - **Ticket ativo:** `RB-R1 · Reorientação de qualidade (premium)`. Origem: Thiago reprovou arte/som/UI do RB-04 (“personagens nada infantis, gráfico ruim, som primitivo, mapa sem tamanho/densidade”).
