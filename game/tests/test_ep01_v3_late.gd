@@ -131,7 +131,7 @@ func _m6_boat() -> void:
 	var boat := main.boat
 	var leme := main.actors[&"pilot"] as MemberActor
 	r.check(main.active_member == &"pilot" and _step(main) == &"board", "v3 M6: Leme comeca no cais para embarcar")
-	r.check(not leme.model.has_accessory(&"Acc_LifeVest") or leme.model.accessory_visible(&"Acc_LifeVest"),
+	r.check(leme.model.has_accessory(&"Acc_LifeVest") and leme.model.accessory_visible(&"Acc_LifeVest"),
 		"v3 M6: colete da Leme ligado na missao do barco")
 	# Folga do casco na rota (o barco NAO e barrado onde deve passar): cais -> boia A -> boia B -> aproximacao.
 	var route: Array[Vector3] = [main.world.marker(&"M6_BoatStart").global_position, main.world.marker(&"M6_BuoyA").global_position,
@@ -189,7 +189,7 @@ func _m6_boat() -> void:
 		"v3 M6: barco de volta ao cais e trio desembarcado")
 	r.check(main.controlled_node is MemberActor and (main.controlled_node as MemberActor).is_inside_tree()
 		and main.controlled_node.global_position.y > -0.2, "v3 M6: heroi em controle a pe no cais")
-	r.check(not leme.model.has_accessory(&"Acc_LifeVest") or not leme.model.accessory_visible(&"Acc_LifeVest"),
+	r.check(leme.model.has_accessory(&"Acc_LifeVest") and not leme.model.accessory_visible(&"Acc_LifeVest"),
 		"v3 M6: colete desligado fora do barco")
 	await _free(main)
 
