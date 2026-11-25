@@ -306,15 +306,17 @@ func _test_inspect_real_pawmark() -> void:
 	r.tree.root.add_child(boat)
 	boat.place(Ep01Layout.BOAT_DOCKED_POS, Ep01Layout.BOAT_DOCKED_HEADING)
 	await r.frames(2)
+	# Barco v2 do mundo (RB-R1 E1, boat_wv2): o banco faz parte do casco (sem malha Boat_Bench); o topo do banco e o
+	# encaixe BenchMark (mesma altura do boat_v2) e a area do banco e a da PawMark, que fica sobre ele, com 15 cm de folga.
 	var paw := boat.find_child("PawMark", true, false) as MeshInstance3D
-	var bench := boat.find_child("Boat_Bench", true, false) as MeshInstance3D
-	r.check(paw != null and bench != null, "chars: boat_v2 tem PawMark e Boat_Bench")
-	if paw == null or bench == null:
+	var bench_mark := boat.find_child("BenchMark", true, false) as Node3D
+	r.check(paw != null and bench_mark != null, "chars: barco v2 tem PawMark e BenchMark")
+	if paw == null or bench_mark == null:
 		boat.queue_free()
 		return
 	var center := paw.global_transform * paw.mesh.get_aabb().get_center()
-	var bench_box: AABB = bench.global_transform * bench.mesh.get_aabb()
-	var bench_top := bench_box.end.y
+	var bench_box: AABB = (paw.global_transform * paw.mesh.get_aabb()).grow(0.15)
+	var bench_top := bench_mark.global_position.y
 	var a := MemberActor.new()
 	r.tree.root.add_child(a)
 	a.setup(&"tracker")

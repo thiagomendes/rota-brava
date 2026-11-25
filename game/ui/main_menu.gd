@@ -3,7 +3,7 @@ extends TitleScreen
 ## Menu inicial = tela-titulo v2 (game/ui/title/). Jogar, Opcoes, Referencias, Sair. Foco inicial em Jogar
 ## (SPEC secao 5, Menu e retomada). Os visuais vem de TitleScreen; aqui fica o comportamento.
 
-const PLAY_SCENE := "res://episodes/ep01/ep01_main.tscn"
+const PLAY_SCENE := "res://episodes/ep01/v3/ep01_v3_main.tscn"
 const REFERENCE_SCENE := "res://episodes/reference/reference_demo.tscn"
 
 
