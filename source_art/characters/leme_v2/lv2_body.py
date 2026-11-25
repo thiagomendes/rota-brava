@@ -1,14 +1,18 @@
-"""Leme v2 (RB-R1 D11/D13): geometria da heroina piloto. PROPOSTA PROVISORIA, lado a lado com a Leme do jogo.
+"""Leme v2.2 pilota (RB-R1 D11/D13/D16): geometria da heroina PILOTA e NAVEGADORA da equipe. PROPOSTA PROVISORIA, lado a lado
+com a Leme do jogo.
 
-Traje proprio (D13: nao e o macacao do Rastro recolorido): camisa de capitania branca de manga curta, colete salva-vidas azul
-de placas de espuma (abertura na frente, laterais com tiras, gola-travesseiro em ferradura atras do pescoco, faixas refletivas),
-bermuda azul, meias de meio cano listradas, botinas nauticas com sola branca e cadarco, bone nautico de capitania, cabelo
-cacheado com volume (cachos nas laterais e um puff grande atras), bussola de pulso e pulseira de corda, apito no cordao.
+Traje proprio (D13: nao e o macacao do Rastro recolorido; D16: nada nautico fixo): jaqueta curta de pilota azul (gola alta,
+ziper, ombros brancos, laterais azul-marinho, faixas refletivas), calca de pilota azul (vivo branco), cotoveleiras e
+joelheiras leves, luvas de pilota de 4 dedos, botas de pilota com tiras de velcro, bone de pilota com fones de ouvido e
+microfone (silhueta propria, olhos e cachos livres), cabelo cacheado com volume (cachos nas laterais e um puff grande
+atras), bussola de pulso. Equipe: emblema no peito e cinto azul-marinho com fivela-bussola.
+Equipamento por missao (D16): o colete salva-vidas e um ACESSORIO separado (no `Acc_LifeVest`, oculto por padrao).
 
 Toda geometria e gerada aqui do zero: grafo de pele (modificador SKIN) + SUBSURF para o corpo inteirico (tronco, bracos e
-pernas numa malha so, cortada depois em camisa, bermuda, pele e meia), superficie parametrica sobre o corpo (raycast em BVH)
-para o colete, metaballs para o cabelo, torno (lathe), toros, tubos e bmesh para o resto. Cabeca, rosto (expressoes, visemas,
-olhar) e esqueleto de 28 ossos vem da biblioteca dos herois (source_art/scripts/hero_lib.py, hero_face.py). Nada baixado.
+pernas numa malha so, cortada depois em jaqueta e calca), superficie parametrica sobre o corpo (raycast em BVH) para o colete
+e as joelheiras/cotoveleiras, metaballs para o cabelo, torno (lathe), toros, tubos e bmesh para o resto. Cabeca, rosto
+(expressoes, visemas, olhar) e esqueleto de 28 ossos vem da biblioteca dos herois (source_art/scripts/hero_lib.py,
+hero_face.py). Nada baixado.
 
 Convencao: Blender Z-up, frente = +Y (vira -Z na Godot), direita da personagem (.R) = +X. Origem nos pes. Metros.
 Pernas em leve "A": quadril em +-hip_x, tornozelos em +-foot_x (mais largos) para as botas nunca se tocarem.
@@ -38,12 +42,17 @@ LV2 = dict(head=0.390, leg=0.392, torso=0.272, belly=0.130, sh_x=0.128, limb=0.0
            label="v2 heroina piloto")
 hero_lib.VARIANTS["LV2"] = LV2
 PAL = dict(pele="#8C5634", cabelo="#1E1410", iris="#5A3418", uniforme="#2F8CFF", creme="#F7FBFF", calca="#1F5FBF",
-           botas="#1F3A5F", chapeu="#F7FBFF", couro="#1F3A5F", emblema="#123A5E", ouro="#FFC83D", olhos="#FFFFFF",
-           escuro="#140C09", boca="#7A2E36", rubor="#B8624F", vidro="#DFF4FF")
+           botas="#2F8CFF", chapeu="#F7FBFF", couro="#1F3A5F", emblema="#123A5E", ouro="#FFC83D", olhos="#FFFFFF",
+           escuro="#140C09", boca="#7A2E36", rubor="#B8624F", vidro="#DFF4FF", luva="#F7FBFF", prata="#D2DDE6")
 hero_lib.CAST["leme_v2"] = dict(display="Leme", K=1.04, head_k=0.965, hat="cap", hair="curls", gear=(), gloves=False, pal=PAL)
 
-DECIMATE = {"body": 0.25, "hand": 0.33, "boot": 0.36, "sole": 0.8, "belt": 0.30, "collar_pillow": 0.24,
-            "cap_crown": 0.48, "cap_band": 0.6, "shirt_collar": 0.6}
+DECIMATE = {"body": 0.235, "glove": 0.29, "boot": 0.36, "sole": 0.8, "belt": 0.30, "collar_pillow": 0.24,
+            "cap_crown": 0.46, "jacket_collar": 0.6, "headset_band": 0.7}
+
+COMPASS_BACK = 0.066           # bussola de pulso: distancia do pulso, subindo pelo antebraco (o punho da luva cobre ate ~0,043)
+
+# grupo de cada acessorio por missao (objeto proprio no GLB, oculto por padrao; ver lv2_tex.ACC)
+ACC_GROUP = "acc_lifevest"
 
 GROUP_OF_PART = {}
 
@@ -173,8 +182,43 @@ class LV2B(hero_lib.Builder):
             tag(ob, "skin_head", "skin")
             keep.append((ob, mode, bone))
         self.parts = keep
+        self.headset_layout()
         self.hair_lv2()
         self.cap()
+        self.headset()
+
+    def headset_layout(self):
+        """Fones de pilota (D16): onde ficam as conchas, o arco e a haste do microfone, ANTES do cabelo, para tirar os cachos
+        que ficariam dentro deles (as conchas assentam no cabelo, sem cachos atravessando)."""
+        F, k = self.F, self.F.k
+        hc, hr = F.hc, F.hr
+        self.cup_r = 0.047 * k
+        self.cup_t = 0.030 * k
+        self.cup_x = hr[0] + 0.030 * k                  # face interna da almofada encosta na massa do cabelo
+        self.cup_c = {sx: V(sx * (self.cup_x + self.cup_t * 0.5), hc.y - 0.010 * k, hc.z - 0.024 * k) for sx in (1, -1)}
+        self.band_y = hc.y - 0.016 * k
+        F.cup_out_R = self.cup_c[1] + V(self.cup_t * 0.5, 0, 0)       # centro da face de fora da concha direita (pose de equipe)
+        # haste do microfone: sai da frente da concha esquerda, contorna a bochecha e para ao lado da boca (sem cobri-la)
+        c = self.cup_c[-1]
+        self.boom = [c + V(0.004, self.cup_r * 0.55, -self.cup_r * 0.45), V(-0.205 * k, hc.y + 0.085 * k, hc.z - 0.088 * k),
+                     V(-0.168 * k, hc.y + 0.140 * k, hc.z - 0.118 * k), V(-0.128 * k, hc.y + 0.166 * k, hc.z - 0.128 * k)]
+        caps = []
+        for sx in (1, -1):
+            cc = self.cup_c[sx]
+            caps.append((cc - V(sx * 0.030, 0, 0), cc + V(sx * 0.03, 0, 0), self.cup_r + 0.004))
+            caps.append((V(sx * (self.cup_x + 0.004), self.band_y, cc.z + self.cup_r * 0.8),
+                         V(sx * (hr[0] * 0.98), self.band_y, hc.z + 0.100 * k), 0.010))
+        for a, b in zip(self.boom[:-1], self.boom[1:]):
+            caps.append((a, b, 0.012))
+        self.keepout = caps
+
+    def _in_keepout(self, p, r):
+        for a, b, rr in self.keepout:
+            ab = b - a
+            t = min(max((p - a).dot(ab) / max(ab.dot(ab), 1e-9), 0.0), 1.0)
+            if (p - (a + ab * t)).length < rr + r * 0.75:
+                return True
+        return False
 
     def hair_lv2(self):
         """Cachos com volume (acabamento): massa de base lisa (metaball de resolucao baixa, sem Decimate: sem facetas) +
@@ -231,6 +275,7 @@ class LV2B(hero_lib.Builder):
         for sxx in (-1, 1):
             p = V(sxx * hr[0] * 0.88, hc.y + hr[1] * 0.38, hc.z + 0.012 * k)
             spots.append((p, 0.026 * k, V(sxx * 0.35, 0.15, -1.0).normalized(), (0.80, 0.80, 1.55)))
+        spots = [sp for sp in spots if not self._in_keepout(sp[0], sp[1])]       # fones: cachos fora das conchas e da haste
         head_c, head_r = Vector(hc), Vector(hr)
 
         def buried(q):
@@ -285,35 +330,28 @@ class LV2B(hero_lib.Builder):
         self.reg(tie, "single", "head")
 
     def cap(self):
-        """Bone nautico de capitania: copa branca alta e mais larga em cima (silhueta), faixa azul-marinho, pala curva
-        envernizada, cordao dourado com botoes e o emblema da equipe na frente. Inclinado para tras (rosto livre)."""
+        """Bone de pilota (D16): copa arredondada de seis gomos (sarja branca, gomo da frente azul pintado), botao no alto,
+        pala curta e curva levemente erguida (olhos livres), emblema da equipe na frente. Inclinado para tras (rosto livre).
+        Os fones vao por cima (headset)."""
         F, k = self.F, self.F.k
         hc, hr = F.hc, F.hr
         R = hr[0] * 0.95
-        tilt = math.radians(9)             # frente sobe (rotacao +X leva +Y para +Z)
+        tilt = math.radians(10)            # frente sobe (rotacao +X leva +Y para +Z)
         roll = math.radians(-4)
         pos = V(0.0, hc.y - 0.004 * k, hc.z + 0.080 * k)
         m = Matrix.Translation(pos) @ Matrix.Rotation(tilt, 4, "X") @ Matrix.Rotation(roll, 4, "Y") @ Matrix.Diagonal((1.0, 0.97, 1.0, 1.0))
         self.cap_m = m
         self.cap_R = R
-        # ponto da pala do lado direito (alvo da continencia e do toque na pala), referencial de repouso
+        # ponto da pala do lado direito (referencial de repouso; usado nas animacoes como "mao no bone")
         a = math.radians(50)
-        rr = R * 0.99 + 0.62 * 0.068 * k * (0.35 + 0.65 * math.cos(a * 0.72))
-        F.brim_r = m @ V(math.sin(a) * rr, math.cos(a) * rr, 0.004 * k - 0.012 * k)
-        # copa (tecido branco): faixa reta ate 0,036, abre para 1,16 R no alto, topo levemente abaulado
-        prof = [(0.0, 0.112), (0.20, 0.1118), (0.40, 0.111), (0.75, 0.106), (1.02, 0.096), (1.15, 0.084), (1.17, 0.074), (1.12, 0.062),
-                (1.03, 0.046), (1.00, 0.034), (0.985, 0.0), (0.0, 0.0)]
+        rr = R * 0.99 + 0.62 * 0.056 * k * (0.35 + 0.65 * math.cos(a * 0.72))
+        F.brim_r = m @ V(math.sin(a) * rr, math.cos(a) * rr, 0.004 * k - 0.010 * k)
+        # copa: cupula baixa que veste a cabeca (mais alta que o cranio + cabelo de cima, que sai da malha)
+        prof = [(0.0, 0.124), (0.30, 0.121), (0.58, 0.110), (0.80, 0.091), (0.93, 0.066), (0.985, 0.040), (1.0, 0.016),
+                (0.995, 0.0), (0.0, 0.0)]
+        self.cap_prof = prof
         bm = bmesh.new()
-
-        def deform(r, z, a):
-            # copa um pouco mais alta e mais avancada na frente (bone de capitania). O efeito cresce com o raio: no polo
-            # (r = 0) todos os pontos do torno ficam iguais e se fundem (antes o polo virava uma estrela vincada).
-            fr = (0.5 + 0.5 * math.sin(a)) * min(r / (0.6 * R), 1.0) ** 1.5
-            if z > 0.05:
-                z += 0.010 * fr * (z - 0.05) / 0.06
-            return r, z
-        cl.lathe(bm, [(r * R, z * k) for r, z in prof], 34, lambda r, z, a: deform(r, z, a))
-        # remove o fundo (abre a copa: o cabelo entra)
+        cl.lathe(bm, [(r * R, z * k) for r, z in prof], 36)
         bot = [f for f in bm.faces if all(v.co.z < 0.001 for v in f.verts)]
         bmesh.ops.delete(bm, geom=bot, context="FACES")
         cl.transform_bm(bm, m)
@@ -324,31 +362,25 @@ class LV2B(hero_lib.Builder):
         hero_lib.bake(crown)
         tag(crown, "cap_crown", "suit")
         self.reg(crown, "single", "head")
-        # faixa azul-marinho (um pouco saliente) ao redor da base
+        self.crown_ob = crown
+        # botao no alto
         bm = bmesh.new()
-        cl.torus_z(bm, R * 1.005, 0.0105 * k, 0.020 * k, sy=1.0, major=44, minor=6)
-        for vv in bm.verts:                      # achata o toro em faixa (altura maior que espessura)
-            dz = vv.co.z - 0.020 * k
-            vv.co.z = 0.020 * k + dz * 1.45
-            rr = math.hypot(vv.co.x, vv.co.y)
-            s = (R * 1.004 + (rr - R * 1.005) * 0.55) / max(rr, 1e-9)
-            vv.co.x *= s
-            vv.co.y *= s
-        cl.transform_bm(bm, m)
-        band = new_object(self.name("CapBand"), bm, self.M["couro"])
-        tag(band, "cap_band", "gear")
-        self.reg(band, "single", "head")
-        # pala curva (secao com espessura), presa na frente da faixa, inclinada para baixo
+        cl.lathe(bm, [(0.0, 0.006), (0.008, 0.005), (0.011, 0.0015), (0.010, 0.0), (0.0, 0.0)], 14)
+        cl.transform_bm(bm, m @ Matrix.Translation((0, 0, 0.124 * k + 0.001)))
+        bt = new_object(self.name("CapButton"), bm, self.M["couro"])
+        tag(bt, "cap_button", "gear")
+        self.reg(bt, "single", "head")
+        # pala curta e curva (secao com espessura), presa na frente da copa, quase reta (olhos livres)
         bm = bmesh.new()
         rows = []
         nu = 22
         for i in range(nu + 1):
-            a = math.radians(-62 + 124 * i / nu)
+            a = math.radians(-60 + 120 * i / nu)
             w = math.cos(a * 0.72)
             ring = []
-            for t, dz in ((0.0, 0.0), (0.5, -0.010), (1.0, -0.024)):
-                rr = R * 0.99 + t * 0.068 * k * (0.35 + 0.65 * w)
-                ring.append(V(math.sin(a) * rr, math.cos(a) * rr, 0.004 * k + dz * k * (0.6 + 0.4 * w)))
+            for t, dz in ((0.0, 0.0), (0.5, -0.006), (1.0, -0.014)):
+                rr = R * 0.99 + t * 0.056 * k * (0.35 + 0.65 * w)
+                ring.append(V(math.sin(a) * rr, math.cos(a) * rr, 0.006 * k + dz * k * (0.6 + 0.4 * w)))
             rows.append(ring)
         top_v = [[bm.verts.new(p + V(0, 0, 0.0035)) for p in r] for r in rows]
         bot_v = [[bm.verts.new(p - V(0, 0, 0.0035)) for p in r] for r in rows]
@@ -366,38 +398,19 @@ class LV2B(hero_lib.Builder):
         visor = new_object(self.name("CapVisor"), bm, self.M["couro"])
         tag(visor, "cap_visor", "gear")
         self.reg(visor, "single", "head")
-        # cordao dourado na frente da faixa + dois botoes
+        # emblema da equipe no gomo da frente (escudo-gota azul-marinho + rosa dos ventos dourada), seguindo a curva da copa
+        fz = 0.050 * k
+        fr = R * 0.975 + 0.0030
+        T = m @ Matrix.Translation((0, fr, fz)) @ V(0, 1.0, 0.30).normalized().to_track_quat("Y", "Z").to_matrix().to_4x4()
         bm = bmesh.new()
-        pts = []
-        for i in range(15):
-            a = math.radians(-50 + 100 * i / 14)
-            pts.append(V(math.sin(a) * (R * 1.03 + 0.004), math.cos(a) * (R * 1.03 + 0.004), 0.031 * k - 0.004 * k * math.cos(a * 1.4)))
-        cl.tube(bm, pts, 0.0034, 5, True)
-        for sxx in (-1, 1):
-            a = math.radians(sxx * 54)
-            c = V(math.sin(a) * (R * 1.03 + 0.003), math.cos(a) * (R * 1.03 + 0.003), 0.028 * k)
-            tb = bmesh.new()
-            cl.lathe(tb, [(0.0, 0.004), (0.006, 0.0035), (0.0075, 0.0), (0.0, 0.0)], 10)
-            dd = V(math.sin(a), math.cos(a), 0)
-            cl.transform_bm(tb, Matrix.Translation(c) @ dd.to_track_quat("Z", "Y").to_matrix().to_4x4())
-            hero_lib.join_bm(bm, tb)
-        cl.transform_bm(bm, m)
-        cord = new_object(self.name("CapCord"), bm, self.M["ouro"])
-        tag(cord, "cap_cord", "gear")
-        self.reg(cord, "single", "head")
-        # emblema da equipe na frente da copa (escudo-gota azul-marinho + rosa dos ventos dourada)
-        fz = 0.066 * k
-        fr = R * 1.14 + 0.002
-        T = m @ Matrix.Translation((0, fr + 0.001, fz)) @ V(0, 1.0, -0.25).normalized().to_track_quat("Y", "Z").to_matrix().to_4x4()
-        bm = bmesh.new()
-        hero_lib.prism(bm, hero_lib.emblem_outline(0.046, 0.050, 32), 0.005, (0, -0.002, 0))
+        hero_lib.prism(bm, hero_lib.emblem_outline(0.044, 0.048, 32), 0.005, (0, -0.002, 0))
         bmesh.ops.bevel(bm, geom=[e for e in bm.edges if len(e.link_faces) == 2 and e.calc_face_angle(0) > 0.6], offset=0.0012, segments=2, affect="EDGES")
         cl.transform_bm(bm, T)
         em = new_object(self.name("CapBadge"), bm, self.M["emblema"])
         tag(em, "cap_badge", "gear")
         self.reg(em, "single", "head")
         bm = bmesh.new()
-        hero_lib.prism(bm, hero_lib.star4(0.016, 0.0055), 0.003, (0, 0.003, 0.004))
+        hero_lib.prism(bm, hero_lib.star4(0.015, 0.0052), 0.003, (0, 0.003, 0.004))
         cl.transform_bm(bm, T)
         st = new_object(self.name("CapStar"), bm, self.M["ouro"])
         tag(st, "cap_star", "gear")
@@ -416,6 +429,111 @@ class LV2B(hero_lib.Builder):
             bmesh.ops.delete(bm, geom=[vv for vv in bm.verts if not vv.link_faces], context="VERTS")
             bm.to_mesh(hob.data)
             bm.free()
+
+    def headset(self):
+        """Fones de pilota com microfone (D16; liga com o radio de Farol 7): duas conchas grandes (casca azul, tampa branca,
+        almofada azul-marinho) assentadas no cabelo sobre as orelhas, arco azul-marinho que passa POR CIMA do bone (raio
+        medido na propria copa), almofada branca no alto, haste do microfone a partir da concha esquerda contornando a
+        bochecha (a boca fica livre). Tudo preso ao osso da cabeca."""
+        F, k = self.F, self.F.k
+        hc, hr = F.hc, F.hr
+        M = self.M
+        cr, ct = self.cup_r, self.cup_t
+        bm_c, bm_d, bm_p = bmesh.new(), bmesh.new(), bmesh.new()
+        for sx in (1, -1):
+            c = self.cup_c[sx]
+            q = V(sx, 0, 0).to_track_quat("Z", "Y").to_matrix().to_4x4()
+            T = Matrix.Translation(c) @ q
+            # casca: torno ao longo do eixo de fora (z local), da cabeca (h0) para fora (h1), borda arredondada
+            tb = bmesh.new()
+            h0, h1 = -ct * 0.30, ct * 0.42
+            cl.lathe(tb, [(0.0, h1), (cr * 0.80, h1), (cr * 0.95, h1 - 0.004), (cr * 1.0, h1 - 0.010), (cr * 1.0, h0 + 0.004),
+                          (cr * 0.94, h0), (0.0, h0)], 20)
+            cl.transform_bm(tb, T)
+            hero_lib.join_bm(bm_c, tb)
+            # tampa: disco branco abaulado
+            tb = bmesh.new()
+            cl.lathe(tb, [(0.0, h1 + 0.0055), (cr * 0.40, h1 + 0.0048), (cr * 0.66, h1 + 0.0028), (cr * 0.72, h1 - 0.001), (0.0, h1 - 0.001)], 18)
+            cl.transform_bm(tb, T)
+            hero_lib.join_bm(bm_d, tb)
+            # almofada (toro achatado) encostando no cabelo
+            tb = bmesh.new()
+            cl.torus_z(tb, cr * 0.78, 0.011 * k, 0.0, major=16, minor=5)
+            for vv in tb.verts:
+                vv.co.z *= 0.75
+            cl.transform_bm(tb, T @ Matrix.Translation((0, 0, -ct * 0.42)))
+            hero_lib.join_bm(bm_p, tb)
+            # garfo: articulacao no alto da concha (onde o arco desce)
+            tb = bmesh.new()
+            cl.rounded_box(tb, (0, 0, 0), (0.018 * k, 0.020 * k, 0.028 * k), 0.005)
+            cl.transform_bm(tb, Matrix.Translation(c + V(-sx * 0.002, 0.0, cr * 0.95)))
+            hero_lib.join_bm(bm_p, tb)
+        for bm_, nm, part, mk in ((bm_c, "HeadsetCups", "headset_cup", "uniforme"), (bm_d, "HeadsetCaps", "headset_disc", "creme"),
+                                  (bm_p, "HeadsetPads", "headset_pad", "couro")):
+            o = new_object(self.name(nm), bm_, M[mk])
+            tag(o, part, "gear")
+            self.reg(o, "single", "head")
+        # arco: raio por angulo medido na copa do bone (raycast de fora para dentro) + folga, suavizado; desce ate as conchas
+        dg = bpy.context.evaluated_depsgraph_get()
+        bvh = BVHTree.FromObject(self.crown_ob, dg)
+        z0 = self.cup_c[1].z + cr * 0.95
+        O = V(0.0, self.band_y, z0)
+        n = 33
+        ts = [math.radians(-90 + 180 * i / (n - 1)) for i in range(n)]
+        rho = []
+        ex, ez = hr[0] * 1.02 + 0.012, hr[2] * 0.96 + 0.012
+        zc = (hc.z + 0.022 * k) - z0
+        for t in ts:
+            d = V(math.sin(t), 0.0, math.cos(t))
+            h = bvh.ray_cast(O + d * 0.6, -d, 0.6)
+            r_cap = (h[0] - O).length + 0.0062 if h[0] is not None else 0.0
+            # massa do cabelo (elipsoide de base) por baixo da aba do bone: O + s d no elipsoide (x/ex)^2 + ((z - zc)/ez)^2 = 1
+            A = (d.x / ex) ** 2 + (d.z / ez) ** 2
+            B = -2 * zc * d.z / ez ** 2
+            Cq = (zc / ez) ** 2 - 1
+            disc = max(B * B - 4 * A * Cq, 0.0)
+            r_hair = (-B + math.sqrt(disc)) / (2 * A)
+            rho.append(max(r_cap, r_hair))
+        rho = np.array(rho)
+        end = self.cup_x + ct * 0.5
+        rho[0] = rho[-1] = end
+        for _ in range(6):
+            rho[1:-1] = np.maximum(rho[1:-1], 0.25 * rho[:-2] + 0.5 * rho[1:-1] + 0.25 * rho[2:])
+        pts = [O + V(math.sin(t), 0.0, math.cos(t)) * float(r) for t, r in zip(ts, rho)]
+        self.band_pts = pts
+        bm = bmesh.new()
+        cl.tube(bm, pts, 0.0062 * k, 8, True)
+        for vv in bm.verts:                        # secao achatada (fita): mais larga em y que funda
+            dy = vv.co.y - self.band_y
+            vv.co.y = self.band_y + dy * 1.9
+        band = new_object(self.name("HeadsetBand"), bm, M["couro"])
+        tag(band, "headset_band", "gear")
+        self.reg(band, "single", "head")
+        # almofada branca no alto do arco
+        bm = bmesh.new()
+        top = [p for p, t in zip(pts, ts) if abs(t) < math.radians(38)]
+        cl.tube(bm, [p + (p - O).normalized() * 0.0045 for p in top], 0.0060 * k, 6, True)
+        for vv in bm.verts:
+            dy = vv.co.y - self.band_y
+            vv.co.y = self.band_y + dy * 1.7
+        pad = new_object(self.name("HeadsetTopPad"), bm, M["creme"])
+        tag(pad, "headset_toppad", "gear")
+        self.reg(pad, "single", "head")
+        # haste do microfone (azul-marinho) e capsula (espuma escura)
+        bm = bmesh.new()
+        P = self.boom
+        smooth_pts = [P[0], P[0].lerp(P[1], 0.5), P[1], P[1].lerp(P[2], 0.5), P[2], P[2].lerp(P[3], 0.6), P[3]]
+        cl.tube(bm, smooth_pts, 0.0034 * k, 6, True)
+        boom = new_object(self.name("MicBoom"), bm, M["couro"])
+        tag(boom, "mic_boom", "gear")
+        self.reg(boom, "single", "head")
+        bm = bmesh.new()
+        dv = (P[3] - P[2]).normalized()
+        cl.ellipsoid(bm, (0, 0, 0), (0.0105 * k, 0.0105 * k, 0.0145 * k), 10, 6)
+        cl.transform_bm(bm, Matrix.Translation(P[3] + dv * 0.006) @ dv.to_track_quat("Z", "Y").to_matrix().to_4x4())
+        mic = new_object(self.name("Mic"), bm, M["escuro"])
+        tag(mic, "mic", "gear")
+        self.reg(mic, "single", "head")
 
     # ------------------------------------------------------------ corpo inteirico (tronco + bracos + pernas num grafo so)
     def body_lv2(self):
@@ -538,27 +656,23 @@ class LV2B(hero_lib.Builder):
         bm.to_mesh(ob.data)
         bm.free()
 
-    # ------------------------------------------------------------ regioes do corpo (camisa, bermuda, pele, meia)
+    # ------------------------------------------------------------ regioes do corpo (jaqueta, calca)
     def regions(self):
         F = self.F
-        self.z_waist = F.hz + 0.030
-        self.z_hem = F.knee_z + 0.052                 # barra da bermuda (acima do joelho)
-        self.z_sock = F.knee_z - 0.040                # meia de meio cano ate abaixo do joelho
-        self.sleeve_u = 0.46                          # manga curta: ate o meio do braco
+        self.z_waist = F.hz + 0.030                   # barra da jaqueta = linha do cinto (o cinto cobre a emenda)
 
     def classify(self, P):
-        """Regiao de cada ponto (repouso): 0 camisa, 1 bermuda, 2 pele, 3 meia."""
+        """Regiao de cada ponto (repouso): 0 jaqueta (tronco acima da cintura e bracos inteiros), 1 calca."""
         F = self.F
         segs = [("torso", None, np.array([0, 0, F.hz - 0.06]), np.array([0, 0, F.nz + 0.04]), 0.13)]
         for kind, s, a, b in self.limb_segs:
             segs.append((kind, s, np.array(a), np.array(b), {"upper_arm": 0.052, "forearm": 0.044, "thigh": 0.070, "shin": 0.050}[kind]))
-        sc, us = [], []
+        sc = []
         for kind, s, a, b, r in segs:
             u, rr, rn, dn, L = seg_frame(P, a, b)
             uu = np.clip(u, 0, 1)
             dist = np.linalg.norm(P - (a + np.outer(uu, b - a)), axis=1)
             sc.append(dist / r)
-            us.append(u)
         lab = np.argmin(np.array(sc), axis=0)
         kinds = [q[0] for q in segs]
         reg = np.zeros(len(P), int)
@@ -567,35 +681,42 @@ class LV2B(hero_lib.Builder):
             sel = lab == i
             if kind == "torso":
                 reg[sel] = np.where(z[sel] < self.z_waist, 1, 0)
-            elif kind == "upper_arm":
-                reg[sel] = np.where(us[i][sel] < self.sleeve_u, 0, 2)
-            elif kind == "forearm":
-                reg[sel] = 2
+            elif kind in ("upper_arm", "forearm"):
+                reg[sel] = 0
             else:
-                reg[sel] = np.where(z[sel] >= self.z_hem, 1, np.where(z[sel] >= self.z_sock, 2, 3))
+                reg[sel] = 1
         return reg
 
     def split_body(self):
-        """Corta o corpo inteirico (ja moldado e reduzido) em quatro objetos com as bordas coincidentes; folga de tecido na
-        manga e na barra da bermuda (as bordas sao cobertas por vivos/barras modeladas)."""
+        """Corta o corpo inteirico (ja moldado e reduzido) em jaqueta e calca, com as bordas coincidentes na cintura (o cinto
+        cobre). A calca entra na bota (o que fica dentro do cano sai da malha); a jaqueta ganha folga de tecido no antebraco
+        (o punho fica sob a luva) e a calca um pouco de folga acima da bota."""
         ob = self.body_ob
         bm = bmesh.new()
         bm.from_mesh(ob.data)
-        planes = [((0, 0, self.z_waist), (0, 0, 1)), ((0, 0, self.z_hem), (0, 0, 1)), ((0, 0, self.z_sock), (0, 0, 1))]
+        g = bm.verts[:] + bm.edges[:] + bm.faces[:]
+        bmesh.ops.bisect_plane(bm, geom=g, plane_co=(0, 0, self.z_waist), plane_no=(0, 0, 1), clear_inner=False, clear_outer=False)
+        # fim da manga no pulso (o punho largo da luva cobre): corta so a geometria perto de cada antebraco
         for kind, s, a, b in self.limb_segs:
-            if kind == "upper_arm":
-                planes.append((tuple(a.lerp(b, self.sleeve_u)), tuple((b - a).normalized())))
-        for co, no in planes:
-            g = bm.verts[:] + bm.edges[:] + bm.faces[:]
-            bmesh.ops.bisect_plane(bm, geom=g, plane_co=co, plane_no=no, clear_inner=False, clear_outer=False)
+            if kind != "forearm":
+                continue
+            ax = (b - a).normalized()
+            pc = b - ax * 0.010
+
+            def near(co):
+                t = min(max((co - a).dot(ax) / (b - a).length, 0.0), 1.4)
+                return (co - (a + (b - a) * t)).length < 0.075
+            g = [vv for vv in bm.verts if near(vv.co)]
+            g = g + [e for e in bm.edges if all(near(vv.co) for vv in e.verts)] + [f for f in bm.faces if all(near(vv.co) for vv in f.verts)]
+            bmesh.ops.bisect_plane(bm, geom=g, plane_co=pc, plane_no=ax, clear_inner=False, clear_outer=False)
+            kill = [f for f in bm.faces if near(f.calc_center_median()) and (f.calc_center_median() - pc).dot(ax) > 0]
+            bmesh.ops.delete(bm, geom=kill, context="FACES")
         bm.to_mesh(ob.data)
         bm.free()
         me = ob.data
         cen = np.array([sum((me.vertices[i].co for i in p.vertices), Vector()) / len(p.vertices) for p in me.polygons])
         reg = self.classify(cen)
-        names = [("Shirt", "shirt", "suit", "creme"), ("Shorts", "shorts", "suit", "calca"), ("LimbSkin", "skin_limb", "skin", "pele"),
-                 ("Socks", "sock", "suit", "creme")]
-        F = self.F
+        names = [("Jacket", "jacket", "suit", "uniforme"), ("Pants", "pants", "suit", "calca")]
         outs = []
         for ri, (nm, part, grp, mk) in enumerate(names):
             bm = bmesh.new()
@@ -603,194 +724,118 @@ class LV2B(hero_lib.Builder):
             bm.faces.ensure_lookup_table()
             kill = [f for f in bm.faces if reg[f.index] != ri]
             bmesh.ops.delete(bm, geom=kill, context="FACES")
-            if part == "sock":
-                hid = [f for f in bm.faces if max(vv.co.z for vv in f.verts) < self.boot_top_z - 0.012]
-                bmesh.ops.delete(bm, geom=hid, context="FACES")
-            if part == "shirt":
-                # camisa escondida sob as placas do colete: sai da malha (nao vaza pelo colete ao animar)
-                hid = [f for f in bm.faces if all(self.vest_covers(vv.co) for vv in f.verts)]
+            if part == "pants":
+                hid = [f for f in bm.faces if max(vv.co.z for vv in f.verts) < self.boot_top_z - 0.014]
                 bmesh.ops.delete(bm, geom=hid, context="FACES")
             loose = [vv for vv in bm.verts if not vv.link_faces]
             bmesh.ops.delete(bm, geom=loose, context="VERTS")
             nob = new_object(self.name(nm), bm, self.M[mk], recalc=False)
             P = verts_np(nob)
-            if part == "shirt":
-                # manga solta: folga radial crescendo ate a barra; ombro justo
+            if part == "jacket":
                 for kind, s, a, b in self.limb_segs:
-                    if kind != "upper_arm":
+                    if kind != "forearm":
                         continue
                     u, rr, rn, dn, L = seg_frame(P, a, b)
-                    w = smooth(u, 0.10, self.sleeve_u) * (u < self.sleeve_u + 0.08)
-                    P += rn * (0.0055 * w)[:, None]
-            elif part == "shorts":
+                    w = smooth(u, 0.15, 0.75) * (u > -0.05)
+                    P += rn * (0.0030 * w)[:, None]
+            else:
                 for kind, s, a, b in self.limb_segs:
-                    if kind != "thigh":
+                    if kind != "shin":
                         continue
                     u, rr, rn, dn, L = seg_frame(P, a, b)
-                    sx = 1 if s == "R" else -1
-                    on = (P[:, 0] * sx > 0.01)
-                    w = smooth(P[:, 2], self.z_hem + 0.12, self.z_hem) * on
-                    P += rn * (0.010 * w)[:, None]
-            elif part == "sock":
-                # o pe da meia fica escondido dentro da botina: sai da malha (economia de triangulos)
-                pass
+                    w = smooth(u, 0.05, 0.35) * (u > -0.02)
+                    P += rn * (0.0035 * w)[:, None]
             set_verts(nob, P)
-            if part in ("sock", "skin_limb"):
-                # acabamento: alisa a pele e a meia perto do corte (a reducao deixava um vinco atras do joelho); a borda fica
-                zb = self.z_sock
-                bm = bmesh.new()
-                bm.from_mesh(nob.data)
-                band = [vv for vv in bm.verts if not vv.is_boundary and abs(vv.co.z - zb) < 0.040 and vv.co.z < F.knee_z + 0.01]
-                for _ in range(6):
-                    bmesh.ops.smooth_vert(bm, verts=band, factor=0.5, use_axis_x=True, use_axis_y=True, use_axis_z=False)
-                bm.to_mesh(nob.data)
-                bm.free()
             tag(nob, part, grp)
             self.reg(nob, "dist")
             outs.append(nob)
         bpy.data.objects.remove(ob)
-        self.shirt_ob, self.shorts_ob, self.limbskin_ob, self.sock_ob = outs
-        # barras: vivo azul na manga, barra dobrada da bermuda, punho canelado da meia
-        bm_sl, bm_hm, bm_sk = bmesh.new(), bmesh.new(), bmesh.new()
-        for kind, s, a, b in self.limb_segs:
-            sx = 1 if s == "R" else -1
-            if kind == "upper_arm":
-                self._loop_ring(bm_sl, self.limbskin_ob, a.lerp(b, self.sleeve_u), (b - a).normalized(), 0.0045, 0.0055, 1.0)
-            if kind == "thigh":
-                self._loop_ring(bm_hm, self.limbskin_ob, V(sx * self._leg_x(self.z_hem), 0.004, self.z_hem), V(0, 0, 1), 0.0075, 0.0085, 1.25)
-            if kind == "shin":
-                self._cuff(bm_sk, (self.sock_ob, self.limbskin_ob), V(sx * self._leg_x(self.z_sock), 0.0, self.z_sock))
-        for bm_, nm, part, grp, mk in ((bm_sl, "SleeveBand", "sleeve_band", "suit", "uniforme"), (bm_hm, "ShortsHem", "shorts_hem", "suit", "calca"),
-                                       (bm_sk, "SockTop", "sock_top", "suit", "creme")):
-            o = new_object(self.name(nm), bm_, self.M[mk])
-            tag(o, part, grp)
-            self.reg(o, "dist")
+        self.jacket_ob, self.pants_ob = outs
+        self.pads()
 
-    def _leg_x(self, z):
+    # ------------------------------------------------------------ cotoveleiras e joelheiras (cascas leves sobre o tecido)
+    @staticmethod
+    def _shell(bm_o, bm_r, bvh, a, b, center_dir, ang, half_len, T, nu=12, nv=10, lift=0.0016, edge=0.008):
+        """Casca acolchoada sobre a superficie (bvh) em volta do eixo a->b: angulo +-ang (graus) em volta de center_dir,
+        comprimento +-half_len no eixo; espessura T com borda arredondada (vivo ate a superficie em bm_r)."""
+        a, b = Vector(a), Vector(b)
+        dn = (b - a).normalized()
+        mid = (a + b) * 0.5
+        c0 = (center_dir - dn * center_dir.dot(dn)).normalized()
+        grid = []
+        for i in range(nu + 1):
+            col = []
+            for j in range(nv + 1):
+                # grade quadrada levada para um disco (contorno oval da casca, sem cantos)
+                uu, vv = -1 + 2 * i / nu, -1 + 2 * j / nv
+                du, dv = uu * math.sqrt(1 - vv * vv / 2), vv * math.sqrt(1 - uu * uu / 2)
+                th = math.radians(ang) * du
+                s = half_len * dv
+                d = (c0 * math.cos(th) + dn.cross(c0) * math.sin(th)).normalized()
+                c = mid + dn * s
+                h = bvh.ray_cast(c + d * 0.15, -d, 0.2)
+                p, n = (h[0], h[1]) if h[0] is not None else (c + d * 0.05, d)
+                n = (n * 0.5 + d * 0.5).normalized()
+                r_loc = max((p - c).length, 0.02)
+                e = (1.0 - min(math.hypot(du, dv), 1.0)) * min(math.radians(ang) * r_loc, half_len)
+                prof = math.sqrt(max(0.0, 1.0 - (1.0 - min(e / edge, 1.0)) ** 2))
+                col.append((p + n * lift, p + n * (lift + 0.0015 + T * prof)))
+            grid.append(col)
+        O = [[bm_o.verts.new(c[1]) for c in col] for col in grid]
+        for i in range(nu):
+            for j in range(nv):
+                bm_o.faces.new((O[i][j], O[i + 1][j], O[i + 1][j + 1], O[i][j + 1]))
+        loop = [(i, 0) for i in range(nu + 1)] + [(nu, j) for j in range(1, nv + 1)] + \
+               [(i, nv) for i in range(nu - 1, -1, -1)] + [(0, j) for j in range(nv - 1, 0, -1)]
+        outer = [bm_r.verts.new(grid[i][j][1]) for i, j in loop]
+        inner = [bm_r.verts.new(grid[i][j][0]) for i, j in loop]
+        L_ = len(loop)
+        for q in range(L_):
+            w_ = (q + 1) % L_
+            bm_r.faces.new((outer[q], inner[q], inner[w_], outer[w_]))
+
+    def pads(self):
         F = self.F
-        if z >= F.knee_z:
-            return F.hip_x + (F.knee_x - F.hip_x) * (F.hz - z) / (F.hz - F.knee_z)
-        return F.knee_x + (F.foot_x - F.knee_x) * (F.knee_z - z) / (F.knee_z - F.ankle_z)
+        dg = bpy.context.evaluated_depsgraph_get()
+        bvh_j = BVHTree.FromObject(self.jacket_ob, dg)
+        bvh_p = BVHTree.FromObject(self.pants_ob, dg)
+        segs = {(kind, s): (a, b) for kind, s, a, b in self.limb_segs}
+        for kind, s_ob in (("elbow", self.jacket_ob), ("knee", self.pants_ob)):
+            bm_o, bm_r = bmesh.new(), bmesh.new()
+            for sx, s in ((1, "R"), (-1, "L")):
+                if kind == "elbow":
+                    a0, b0 = segs[("upper_arm", s)]
+                    a1, b1 = segs[("forearm", s)]
+                    a, b = a0.lerp(b0, 0.70), a1.lerp(b1, 0.30)
+                    dn = (b - a).normalized()
+                    fr, ou = ref_dirs(np.array(dn), sx)
+                    cd = Vector(tuple(-fr * 0.80 + ou * 0.55))
+                    self._shell(bm_o, bm_r, bvh_j, a, b, cd, 52, 0.030, 0.0085, nu=8, nv=6)
+                else:
+                    a0, b0 = segs[("thigh", s)]
+                    a1, b1 = segs[("shin", s)]
+                    a, b = a0.lerp(b0, 0.78), a1.lerp(b1, 0.30)
+                    self._shell(bm_o, bm_r, bvh_p, a, b, V(sx * 0.10, 1.0, 0.0), 58, 0.034, 0.0105, nu=10, nv=8)
+            o = new_object(self.name(kind.capitalize() + "Pads"), bm_o, self.M["couro" if kind == "elbow" else "creme"], recalc=False)
+            tag(o, kind + "_pad", "gear")
+            self.reg(o, "xfer:" + ("Jacket" if kind == "elbow" else "Pants"))
+            r = new_object(self.name(kind.capitalize() + "PadRims"), bm_r, self.M["couro"], recalc=False)
+            tag(r, kind + "_pad_rim", "gear")
+            self.reg(r, "xfer:" + ("Jacket" if kind == "elbow" else "Pants"))
 
     @staticmethod
-    def _loop_ring(bm, ob, c, ax, off, minor, zs, nseg=18, sides=4, tol=0.0025, reach=0.09):
-        """Vivo/barra que SEGUE o laco de corte real de `ob` no plano (c, ax): raio por angulo (nao um circulo medio), mais
-        `off`; secao eliptica (minor, minor*zs ao longo do eixo). Cobre a emenda por igual na frente e atras (panturrilha)."""
-        P = verts_np(ob)
-        bnd = np.zeros(len(P), bool)                 # so a BORDA do corte (vertices de aresta de fronteira): sem dentes
-        bm0 = bmesh.new()
-        bm0.from_mesh(ob.data)
-        for vv in bm0.verts:
-            bnd[vv.index] = vv.is_boundary
-        bm0.free()
-        c_, a_ = np.array(c), np.array(ax.normalized())
-        d = (P - c_) @ a_
-        rv = P - c_ - np.outer(d, a_)
-        sel = (np.abs(d) < tol) & (np.linalg.norm(rv, axis=1) < reach)
-        if (sel & bnd).sum() >= 6:
-            sel = sel & bnd
-        L = P[sel] - np.outer(d[sel], a_)
-        cen = L.mean(axis=0)
-        e1 = np.cross(a_, [0.0, 1.0, 0.0] if abs(a_[1]) < 0.9 else [1.0, 0.0, 0.0])
-        e1 /= np.linalg.norm(e1)
-        e2 = np.cross(a_, e1)
-        q = L - cen
-        ang = np.arctan2(q @ e2, q @ e1)
-        rad = np.linalg.norm(q, axis=1)
-        o = np.argsort(ang)
-        ang, rad = ang[o], rad[o]
-        angs = np.concatenate([ang - 2 * np.pi, ang, ang + 2 * np.pi])
-        rads = np.concatenate([rad, rad, rad])
-        ts = -np.pi + 2 * np.pi * np.arange(nseg) / nseg
-        rs = np.interp(ts, angs, rads)
-        rs = np.maximum(rs, 0.25 * np.roll(rs, 1) + 0.5 * rs + 0.25 * np.roll(rs, -1))   # perfil suave (sem degraus)
-        rows = []
-        for i in range(nseg):
-            t = ts[i]
-            r = float(rs[i]) + off
-            rd = np.cos(t) * e1 + np.sin(t) * e2
-            ctr = cen + rd * r
-            row = []
-            for j in range(sides):
-                w = 2 * np.pi * j / sides
-                pnt = ctr + rd * (minor * np.cos(w)) + a_ * (minor * zs * np.sin(w))
-                row.append(bm.verts.new(tuple(pnt)))
-            rows.append(row)
-        for i in range(nseg):
-            i2 = (i + 1) % nseg
-            for j in range(sides):
-                j2 = (j + 1) % sides
-                bm.faces.new((rows[i][j], rows[i2][j], rows[i2][j2], rows[i][j2]))
-        return bm
-
-    @staticmethod
-    def _cuff(bm, obs, c, nseg=18, off=0.0024):
-        """Punho canelado da meia como FAIXA (nao um toro): em cada angulo e altura, o raio real da perna (raio do centro ate
-        a malha de pele/meia) mais `off`; cobre a emenda por igual na frente e atras do joelho, com a borda de cima rolada."""
-        from mathutils.bvhtree import BVHTree as _B
-        vs, fs = [], []
-        for ob in obs:
-            base = len(vs)
-            vs += [tuple(v.co) for v in ob.data.vertices]
-            fs += [tuple(base + i for i in p.vertices) for p in ob.data.polygons]
-        tree = _B.FromPolygons(vs, fs, all_triangles=False)
-        prof = [(-0.017, -0.0016), (-0.012, 0.0), (-0.004, 0.0), (0.004, 0.0), (0.0085, -0.0006), (0.0105, -0.0018)]
-        rows = []
-        sub = 6                                          # 6 raios por segmento; cada vertice pega o maximo da sua janela
-        hw = math.pi / nseg
-        for h, dr in prof:
-            row = []
-            cc = Vector((c.x, c.y, c.z + h))
-            for i in range(nseg * sub):
-                t = 2 * math.pi * i / (nseg * sub)
-                rd = Vector((math.cos(t), math.sin(t), 0.0))
-                hit = tree.ray_cast(cc + rd * 0.12, -rd, 0.2)
-                row.append(0.12 - hit[3] if hit[0] is not None else 0.0)
-            row = np.array(row)
-            win = np.max([np.roll(row, -sh) for sh in range(-sub, sub + 1)], axis=0)[::sub]
-            rows.append(win / math.cos(hw))              # a corda entre dois vertices nao entra na perna
-        R = np.array(rows)
-        for j in range(len(prof)):
-            r = R[j]
-            R[j] = np.maximum(r, 0.25 * np.roll(r, 1) + 0.5 * r + 0.25 * np.roll(r, -1))
-        Rmax = R[1:4].max(axis=0)                       # o punho e reto: nao acompanha o vinco, passa por cima
-        verts = []
-        for j, (h, dr) in enumerate(prof):
-            row = []
-            for i in range(nseg):
-                t = 2 * math.pi * i / nseg
-                r = max(Rmax[i], R[j][i]) + off + dr     # nunca por dentro da pele (a panturrilha engrossa para cima)
-                row.append(bm.verts.new((c.x + r * math.cos(t), c.y + r * math.sin(t), c.z + h)))
-            verts.append(row)
-        for j in range(len(prof) - 1):
-            for i in range(nseg):
-                i2 = (i + 1) % nseg
-                bm.faces.new((verts[j][i], verts[j][i2], verts[j + 1][i2], verts[j + 1][i]))
-        return bm
-
-    @staticmethod
-    def _radius_loop(ob, c, ax, tol=0.0025, reach=0.09):
-        """Raio medio do laco de corte de `ob` no plano (c, ax): vertices a menos de `tol` do plano e perto de c."""
-        P = verts_np(ob)
-        c_, a_ = np.array(c), np.array(ax.normalized())
-        d = (P - c_) @ a_
-        rv = P - c_ - np.outer(d, a_)
-        r = np.linalg.norm(rv, axis=1)
-        sel = (np.abs(d) < tol) & (r < reach)
-        return float(r[sel].mean()) if sel.any() else 0.045
-
-    @staticmethod
-    def _radius_at(bvh, c, ax):
+    def _radius_from_inside(bvh, c, ax, reach=0.07):
+        """Raio medio da manga em c: raios de DENTRO para fora (o tronco ao lado nao entra na conta)."""
         ax = ax.normalized()
         ref = ax.cross(V(0, 1, 0) if abs(ax.y) < 0.9 else V(1, 0, 0)).normalized()
         rs = []
         for i in range(16):
             a = 2 * math.pi * i / 16
             d = (ref * math.cos(a) + ax.cross(ref) * math.sin(a)).normalized()
-            h = bvh.ray_cast(c + d * 0.2, -d)[0]
+            h = bvh.ray_cast(c, d, reach)[0]
             if h is not None:
                 rs.append((h - c).length)
-        return sum(rs) / len(rs) if rs else 0.045
+        return max(rs) if rs else 0.040
 
     # ------------------------------------------------------------ colete salva-vidas
     def vest(self):
@@ -828,7 +873,7 @@ class LV2B(hero_lib.Builder):
         self.vest_surf = {}
         for key, a0, a1, topf, chans in panels:
             nu = 17 if key != "B" else 28
-            nv = 12
+            nv = 10
             grid = []
             for i in range(nu + 1):
                 th_d = a0 + (a1 - a0) * i / nu
@@ -872,11 +917,11 @@ class LV2B(hero_lib.Builder):
                 w_ = (q + 1) % L_
                 bm_r.faces.new((outer[q], outer[w_], inner[w_], inner[q]))
         ob = new_object(self.name("Vest"), bm_o, self.M["uniforme"], recalc=False)
-        tag(ob, "vest", "suit")
+        tag(ob, "vest", ACC_GROUP)
         self.reg(ob, "torso")
         self.vest_ob = ob
         rim = new_object(self.name("VestRim"), bm_r, self.M["creme"], recalc=False)
-        tag(rim, "vest_rim", "suit")
+        tag(rim, "vest_rim", ACC_GROUP)
         self.reg(rim, "torso")
 
     def vest_covers(self, p, margin_deg=5.0, margin_z=0.012):
@@ -934,7 +979,7 @@ class LV2B(hero_lib.Builder):
                     f = (rows[i][q], rows[i + 1][q], rows[i + 1][q + 1], rows[i][q + 1])
                     bm.faces.new(f if side == "L" else tuple(reversed(f)))
         st = new_object(self.name("VestStraps"), bm, M["couro"])
-        tag(st, "vest_strap", "gear")
+        tag(st, "vest_strap", ACC_GROUP)
         self.reg(st, "torso")
         pR, nR = self.vest_point("R", 4.0, zs, 0.004)
         pL, nL = self.vest_point("L", -4.0, zs, 0.004)
@@ -946,7 +991,7 @@ class LV2B(hero_lib.Builder):
         hero_lib.join_bm(bm, tb)
         cl.transform_bm(bm, Matrix.Translation(c + V(0, 0.002, 0)))
         bk = new_object(self.name("VestBuckle"), bm, M["creme"])
-        tag(bk, "vest_buckle", "gear")
+        tag(bk, "vest_buckle", ACC_GROUP)
         self.reg(bk, "torso")
         # tiras laterais (sob o braco) ligando frente e costas
         bm = bmesh.new()
@@ -970,7 +1015,7 @@ class LV2B(hero_lib.Builder):
         sol.thickness = 0.0022
         sol.offset = 1.0
         hero_lib.bake(ss)
-        tag(ss, "vest_strap", "gear")
+        tag(ss, "vest_strap", ACC_GROUP)
         self.reg(ss, "torso")
         # gola-travesseiro (ferradura) atras do pescoco; as pontas descem sobre as placas da frente
         path = []
@@ -984,11 +1029,11 @@ class LV2B(hero_lib.Builder):
             if link is not None:
                 edges.append((link, len(nodes) - 1))
             return len(nodes) - 1
-        back = add((0, -0.086, nz + 0.012), 0.030)
+        back = add((0, -0.094, nz + 0.012), 0.030)          # um pouco mais afastada: passa por fora da gola alta da jaqueta
         for sx, pf in path:
-            b1 = add((sx * 0.050, -0.072, nz + 0.010), 0.030, back)
-            b2 = add((sx * 0.080, -0.030, nz + 0.000), 0.028, b1)
-            b3 = add((sx * 0.078, 0.030, nz - 0.022), 0.025, b2)
+            b1 = add((sx * 0.055, -0.080, nz + 0.010), 0.030, back)
+            b2 = add((sx * 0.088, -0.032, nz + 0.000), 0.028, b1)
+            b3 = add((sx * 0.084, 0.032, nz - 0.022), 0.025, b2)
             add(pf + V(0, 0.004, 0.006), 0.021, b3)
         col = cl.skin_obj(self.name("CollarPillow"), nodes, edges, M["uniforme"], levels=2, branch=0.8)
         P = verts_np(col)
@@ -996,7 +1041,7 @@ class LV2B(hero_lib.Builder):
         cy = np.array([0.0, 0.0])
         P[:, 2] = (nz + 0.006) + (P[:, 2] - (nz + 0.006)) * 0.92
         set_verts(col, P)
-        tag(col, "collar_pillow", "suit")
+        tag(col, "collar_pillow", ACC_GROUP)
         self.reg(col, "torso")
         # apito esportivo no cordao, pendurado na ponta direita da gola: camara redonda (de frente le como circulo), bocal
         # chato subindo pela tangente, janela do som escura e argola onde o cordao passa
@@ -1014,26 +1059,26 @@ class LV2B(hero_lib.Builder):
         hero_lib.join_bm(bm, tb)
         cl.transform_bm(bm, Tw)
         wh = new_object(self.name("Whistle"), bm, M["ouro"])
-        tag(wh, "whistle", "gear")
+        tag(wh, "whistle", ACC_GROUP)
         self.reg(wh, "torso")
         bm = bmesh.new()
         cl.rounded_box(bm, (-0.0040, 0.0108, 0.0072), (0.0066, 0.0016, 0.0050), 0.0008)
         cl.transform_bm(bm, Tw)
         sl = new_object(self.name("WhistleSlot"), bm, M["couro"])
-        tag(sl, "whistle_slot", "gear")
+        tag(sl, "whistle_slot", ACC_GROUP)
         self.reg(sl, "torso")
         bm = bmesh.new()
         cl.torus_z(bm, 0.0042, 0.0012, 0.0, major=12, minor=4)
         cl.transform_bm(bm, Tw @ Matrix.Translation((-0.0040, 0.0062, 0.0300)) @ Matrix.Rotation(math.radians(90), 4, "X"))
         rg = new_object(self.name("WhistleRing"), bm, M["ouro"])
-        tag(rg, "whistle_ring", "gear")
+        tag(rg, "whistle_ring", ACC_GROUP)
         self.reg(rg, "torso")
         ring_top = Tw @ V(-0.0040, 0.0062, 0.0342)
         bm = bmesh.new()
         p0 = path[0][1] + V(0.010, 0.012, -0.010)
         cl.tube(bm, [p0, p0.lerp(ring_top, 0.5) + yv * 0.006, ring_top], 0.0016, 5, True)
         cord = new_object(self.name("WhistleCord"), bm, M["creme"])
-        tag(cord, "whistle_cord", "gear")
+        tag(cord, "whistle_cord", ACC_GROUP)
         self.reg(cord, "torso")
         # EMBLEMA da equipe na placa esquerda do peito (lado esquerdo da personagem, -X)
         pe, ne = self.vest_point("L", -36.0, zS - 0.058, 0.0)
@@ -1044,12 +1089,12 @@ class LV2B(hero_lib.Builder):
         hero_lib.prism(bm, hero_lib.emblem_outline(w, h, 40), 0.006, (0, -0.002, 0))
         bmesh.ops.bevel(bm, geom=[e for e in bm.edges if len(e.link_faces) == 2 and e.calc_face_angle(0) > 0.6], offset=0.0018, segments=3, affect="EDGES")
         cl.transform_bm(bm, T)
-        self.reg(tag(new_object(self.name("Emblem"), bm, M["emblema"]), "emblem", "gear"), "torso")
+        self.reg(tag(new_object(self.name("VestEmblem"), bm, M["emblema"]), "emblem", ACC_GROUP), "torso")
         bm = bmesh.new()
         hero_lib.prism(bm, hero_lib.star4(0.023, 0.0075), 0.004, (0, 0.004, 0.007))
         bmesh.ops.bevel(bm, geom=bm.edges[:], offset=0.0009, segments=1, affect="EDGES")
         cl.transform_bm(bm, T)
-        self.reg(tag(new_object(self.name("EmblemStar"), bm, M["ouro"]), "emblem_star", "gear"), "torso")
+        self.reg(tag(new_object(self.name("VestEmblemStar"), bm, M["ouro"]), "emblem_star", ACC_GROUP), "torso")
         bm = bmesh.new()
         band = []
         for i in range(13):
@@ -1060,7 +1105,7 @@ class LV2B(hero_lib.Builder):
             band.append((t * w * 0.38, -0.027 + 0.007 * t * t))
         hero_lib.prism(bm, band, 0.003, (0, 0.004, 0))
         cl.transform_bm(bm, T)
-        self.reg(tag(new_object(self.name("EmblemBand"), bm, M["creme"]), "emblem_band", "gear"), "torso")
+        self.reg(tag(new_object(self.name("VestEmblemBand"), bm, M["creme"]), "emblem_band", ACC_GROUP), "torso")
 
     # ------------------------------------------------------------ cinto de equipe + fivela-bussola
     def team(self):
@@ -1103,36 +1148,81 @@ class LV2B(hero_lib.Builder):
         self.reg(stt, "single", "hips")
 
     # ------------------------------------------------------------ gola da camisa (pontas dobradas sobre o decote do colete)
-    def shirt_collar(self):
+    def jacket_collar(self):
+        """Gola alta da jaqueta de pilota (branca, aberta no ziper), puxador do ziper e EMBLEMA da equipe no peito esquerdo
+        (sobre a jaqueta; com o colete ligado, o colete leva o seu)."""
         F = self.F
         nz = F.nz
+        M = self.M
         bm = bmesh.new()
         rows = []
-        nu, nv = 30, 3
+        nu, nv = 32, 3
         for i in range(nu + 1):
-            a = math.radians(14 + (360 - 28) * i / nu)
+            a = math.radians(5 + (360 - 10) * i / nu)
             back = 0.5 - 0.5 * math.cos(a)
             frontness = 1 - back
             ring = []
             for j in range(nv + 1):
                 t = j / nv
-                # gola dobrada: sobe atras e cai para fora na frente (pontas)
-                r = 0.057 + 0.003 * back + (0.010 + 0.022 * frontness ** 3) * t
-                z = nz + 0.012 * back + (0.014 * back - 0.020 * frontness ** 2) * t
+                r = 0.058 + 0.002 * back + 0.005 * t * t
+                z = nz - 0.008 + (0.026 + 0.008 * back - 0.006 * frontness ** 3) * t
                 ring.append(bm.verts.new((r * math.sin(a) * 1.05, r * math.cos(a) * 0.98 + 0.004, z)))
             rows.append(ring)
         for i in range(nu):
             for j in range(nv):
                 bm.faces.new((rows[i][j], rows[i + 1][j], rows[i + 1][j + 1], rows[i][j + 1]))
-        ob = new_object(self.name("ShirtCollar"), bm, self.M["creme"], recalc=False)
+        ob = new_object(self.name("JacketCollar"), bm, M["creme"], recalc=False)
         sol = ob.modifiers.new("sol", "SOLIDIFY")
-        sol.thickness = 0.004
+        sol.thickness = 0.005
         sol.offset = 1.0
         hero_lib.bake(ob)
-        tag(ob, "shirt_collar", "suit")
+        tag(ob, "jacket_collar", "suit")
         self.reg(ob, "torso")
+        # puxador do ziper (prata) logo abaixo da gola
+        yf = (cl.snap_y(self.body_ob, 0.0, nz - 0.030) or 0.06)
+        bm = bmesh.new()
+        cl.rounded_box(bm, (0, yf + 0.004, nz - 0.026), (0.009, 0.005, 0.012), 0.002)
+        tb = bmesh.new()
+        cl.rounded_box(tb, (0, yf + 0.006, nz - 0.040), (0.008, 0.004, 0.016), 0.0025)
+        hero_lib.join_bm(bm, tb)
+        zp = new_object(self.name("ZipPull"), bm, M["prata"])
+        tag(zp, "zip_pull", "gear")
+        self.reg(zp, "torso")
+        # emblema no peito esquerdo (lado -X), na propria jaqueta
+        th = math.radians(-31.0)
+        ze = nz - 0.088
+        dg = bpy.context.evaluated_depsgraph_get()
+        bvh = BVHTree.FromObject(self.body_ob, dg)
+        d = V(math.sin(th), math.cos(th), 0.0)
+        h = bvh.ray_cast(V(0, 0, ze), d)
+        pe = h[0] if h[0] is not None else V(0, 0, ze) + d * 0.11
+        ne = h[1] if h[0] is not None else d
+        ne_h = V(ne.x, ne.y, ne.z * 0.4).normalized()
+        T = Matrix.Translation(pe + ne_h * 0.0055) @ ne_h.to_track_quat("Y", "Z").to_matrix().to_4x4()   # o peito curva: bordas nao afundam
+        w, hh = 0.066, 0.072
+        bm = bmesh.new()
+        hero_lib.prism(bm, hero_lib.emblem_outline(w, hh, 40), 0.005, (0, -0.0015, 0))
+        bmesh.ops.bevel(bm, geom=[e for e in bm.edges if len(e.link_faces) == 2 and e.calc_face_angle(0) > 0.6], offset=0.0016, segments=3, affect="EDGES")
+        cl.transform_bm(bm, T)
+        self.reg(tag(new_object(self.name("Emblem"), bm, M["emblema"]), "emblem", "gear"), "torso")
+        bm = bmesh.new()
+        hero_lib.prism(bm, hero_lib.star4(0.022, 0.0072), 0.004, (0, 0.0035, 0.007))
+        bmesh.ops.bevel(bm, geom=bm.edges[:], offset=0.0009, segments=1, affect="EDGES")
+        cl.transform_bm(bm, T)
+        self.reg(tag(new_object(self.name("EmblemStar"), bm, M["ouro"]), "emblem_star", "gear"), "torso")
+        bm = bmesh.new()
+        band = []
+        for i in range(13):
+            t = (i / 12) * 2 - 1
+            band.append((t * w * 0.38, -0.019 + 0.007 * t * t))
+        for i in range(12, -1, -1):
+            t = (i / 12) * 2 - 1
+            band.append((t * w * 0.38, -0.026 + 0.007 * t * t))
+        hero_lib.prism(bm, band, 0.003, (0, 0.0035, 0))
+        cl.transform_bm(bm, T)
+        self.reg(tag(new_object(self.name("EmblemBand"), bm, M["creme"]), "emblem_band", "gear"), "torso")
 
-    # ------------------------------------------------------------ maos de pele (4 dedos, relaxadas)
+    # ------------------------------------------------------------ luvas de pilota (4 dedos, relaxadas) + punho largo
     def hands(self):
         F, v = self.F, self.v
         self.hand_skel = {}
@@ -1168,7 +1258,8 @@ class LV2B(hero_lib.Builder):
                 fing.append((b0, b1, b2))
             self.hand_skel[sd] = dict(W=W, d=d, f=f, n=n, k=k, thumb=tp, fingers=fing,
                                       palm=[W - d * 0.034 * k, W + d * 0.002 * k, W + d * 0.034 * k])
-            ob = cl.skin_obj(self.name("Hand" + sd), nn, ee, self.M["pele"], levels=2, branch=0.6)
+            nn = [(co, r * 1.05) for co, r in nn]          # luva: um pouco mais cheia que a mao
+            ob = cl.skin_obj(self.name("Glove" + sd), nn, ee, self.M["luva"], levels=2, branch=0.6)
             P = verts_np(ob)
             Wn = np.array(W)
             loc = P - Wn
@@ -1179,21 +1270,31 @@ class LV2B(hero_lib.Builder):
             sq = 1 - 0.36 * palm_w * (~thumb)
             P2 = Wn + np.outer(ad, dd) + np.outer(af * (1 + 0.10 * palm_w * (~thumb)), ff) + np.outer(an * sq, nnv)
             set_verts(ob, P2)
-            tag(ob, "hand", "skin")
+            tag(ob, "glove", "gear")
             self.reg(ob, "single", "hand." + sd)
+            # punho largo da luva (azul, borda branca pintada): cobre o fim da manga; preso ao antebraco
+            bm = bmesh.new()
+            kk = k
+            cl.lathe(bm, [(0.0262 * kk, 0.004 * kk), (0.0290 * kk, -0.006 * kk), (0.0316 * kk, -0.020 * kk), (0.0336 * kk, -0.031 * kk),
+                          (0.0314 * kk, -0.034 * kk), (0.0290 * kk, -0.024 * kk), (0.0262 * kk, -0.008 * kk), (0.0236 * kk, 0.002 * kk)], 14)
+            cl.transform_bm(bm, Matrix.Translation(W) @ d.to_track_quat("Z", "Y").to_matrix().to_4x4())
+            cf = new_object(self.name("GloveCuff" + sd), bm, self.M["uniforme"])
+            tag(cf, "glove_cuff", "gear")
+            self.reg(cf, "single", "forearm." + sd)
 
     # ------------------------------------------------------------ bussola de pulso (esquerda) e pulseira de corda (direita)
     def wrist_gear(self):
         F, v = self.F, self.v
         L = v["limb"]
-        for sx, sd in ((-1, "L"), (1, "R")):
+        for sx, sd in ((-1, "L"),):            # so a bussola (esquerda); a pulseira de corda (nautica) saiu (D16)
             el = V(sx * F.elbow.x, F.elbow.y, F.elbow.z)
             W = V(sx * F.wrist.x, F.wrist.y, F.wrist.z)
             ax = (W - el).normalized()
             q = ax.to_track_quat("Z", "Y").to_matrix().to_4x4()
-            c = W - ax * 0.024
-            bvh = BVHTree.FromObject(self.limbskin_ob, bpy.context.evaluated_depsgraph_get())
-            r = self._radius_at(bvh, c, ax)
+            c = W - ax * COMPASS_BACK         # acima do punho largo da luva, sobre a manga
+            self.compass_back = self.F.compass_back = COMPASS_BACK
+            bvh = BVHTree.FromObject(self.jacket_ob, bpy.context.evaluated_depsgraph_get())
+            r = self._radius_from_inside(bvh, c, ax)
             bm = bmesh.new()
             if sd == "L":
                 cl.torus_z(bm, r + 0.0030, 0.0055, 0.0, major=18, minor=4)
@@ -1323,49 +1424,73 @@ class LV2B(hero_lib.Builder):
             bm = bmesh.new()
             cl.torus_z(bm, rr - 0.002, 0.0085, z_top + 0.0015, sy=0.97, major=18, minor=5)
             cl.transform_bm(bm, Matrix.Translation((rc.x, rc.y, 0)))
-            top = new_object(self.name("BootCollar" + sd), bm, self.M["uniforme"])
+            top = new_object(self.name("BootCollar" + sd), bm, self.M["creme"])
             tag(top, "boot_collar", "gear")
             self.reg(top, "dist")
-            # cadarco branco em X no peito do pe (3 cruzamentos) + ilhoses dourados
+            # botas de pilota (D16): duas tiras de velcro azul-marinho (uma sobre o peito do pe, outra em volta do cano), cada
+            # uma com a ponta dobrada e um passador prata do lado de fora; aba refletiva no calcanhar
             bvh = BVHTree.FromObject(boot, bpy.context.evaluated_depsgraph_get())
             bm = bmesh.new()
-            bme = bmesh.new()
-            eys = []
-            for i, yy in enumerate((0.040, 0.066, 0.092)):
-                yy = yy * bk
-                for side in (-1, 1):
-                    xx = x + side * 0.019
-                    h = bvh.ray_cast(V(xx, yy, 0.30), V(0, 0, -1))[0]
-                    if h is None:
-                        continue
-                    eys.append((i, side, h))
-                    tb = bmesh.new()
-                    cl.torus_z(tb, 0.0040, 0.0013, 0.0, major=6, minor=3)
-                    cl.transform_bm(tb, Matrix.Translation(h + V(0, 0, 0.0006)))
-                    hero_lib.join_bm(bme, tb)
-            for i in range(2):
-                a = [e for e in eys if e[0] == i]
-                b_ = [e for e in eys if e[0] == i + 1]
-                for e1 in a:
-                    for e2 in b_:
-                        if e1[1] != e2[1]:
-                            mid = (e1[2] + e2[2]) * 0.5 + V(0, 0, 0.004)
-                            cl.tube(bm, [e1[2] + V(0, 0, 0.002), mid, e2[2] + V(0, 0, 0.002)], 0.0021, 5, True)
-            # laco por cima
-            a = [e for e in eys if e[0] == 2]
-            if len(a) == 2:
-                cpt = (a[0][2] + a[1][2]) * 0.5 + V(0, 0, 0.004)
-                for side in (-1, 1):
-                    pts = [cpt + V(side * 0.003, 0, 0), cpt + V(side * 0.013, -0.006, 0.006), cpt + V(side * 0.016, 0.004, 0.003),
-                           cpt + V(side * 0.004, 0.002, 0.001)]
-                    cl.tube(bm, pts, 0.0021, 5, True)
-            lc = new_object(self.name("Laces" + sd), bm, self.M["creme"])
-            tag(lc, "laces", "gear")
-            self.reg(lc, "dist")
-            ey = new_object(self.name("Eyelets" + sd), bme, self.M["ouro"])
-            tag(ey, "eyelets", "gear")
-            self.reg(ey, "dist")
-            self.boot_objs[sd] = [boot, sole, top, lc, ey]
+            bmt = bmesh.new()
+            # (a) peito do pe: arco de dentro para fora por cima, no plano inclinado (frente sobe)
+            yy = F.ball_y * 0.30 * bk
+            c0 = V(x, yy, 0.032)
+            tilt = math.radians(-18)
+            pts = []
+            for i in range(13):
+                ph = math.radians(-78 + 156 * i / 12)
+                d = V(sx * math.sin(ph), math.sin(tilt) * math.cos(ph), math.cos(tilt) * math.cos(ph)).normalized()
+                h = bvh.ray_cast(c0 + d * 0.2, -d, 0.25)
+                if h[0] is not None:
+                    pts.append((h[0], h[1]))
+            ax_w = V(0, math.cos(tilt), -math.sin(tilt))
+            rows = []
+            for p, nrm in pts:
+                rows.append([bm.verts.new(p + nrm * o + ax_w * dz) for dz, o in ((-0.0095, 0.0008), (-0.0085, 0.0036), (0.0085, 0.0036), (0.0095, 0.0008))])
+            for i in range(len(rows) - 1):
+                for q_ in range(3):
+                    f = (rows[i][q_], rows[i + 1][q_], rows[i + 1][q_ + 1], rows[i][q_ + 1])
+                    bm.faces.new(f if sx > 0 else tuple(reversed(f)))
+            if pts:
+                po, no = pts[-1] if sx > 0 else pts[0]
+                tb = bmesh.new()
+                cl.rounded_box(tb, (0, 0, 0), (0.008, 0.024, 0.020), 0.0025)
+                cl.transform_bm(tb, Matrix.Translation(po + no * 0.004 + V(0, 0, 0.004)))
+                hero_lib.join_bm(bmt, tb)
+            # (b) cano: anel em volta do tornozelo
+            zr = F.ankle_z + 0.032 * bk
+            rows = []
+            for i in range(20):
+                ph = 2 * math.pi * i / 20
+                d = V(math.cos(ph), math.sin(ph), 0.0)
+                h = bvh.ray_cast(V(x, -0.012, zr) + d * 0.2, -d, 0.25)
+                p, nrm = (h[0], h[1]) if h[0] is not None else (V(x, -0.012, zr) + d * 0.05, d)
+                nrm = V(nrm.x, nrm.y, 0.0).normalized() if abs(nrm.z) < 0.95 else d
+                rows.append([bm.verts.new(p + nrm * o + V(0, 0, dz)) for dz, o in ((-0.0095, 0.0008), (-0.0085, 0.0036), (0.0085, 0.0036), (0.0095, 0.0008))])
+            for i in range(20):
+                j = (i + 1) % 20
+                for q_ in range(3):
+                    bm.faces.new((rows[i][q_ + 1], rows[j][q_ + 1], rows[j][q_], rows[i][q_]))
+            h = bvh.ray_cast(V(x, -0.012, zr) + V(sx, 0, 0) * 0.2, V(-sx, 0, 0), 0.25)
+            if h[0] is not None:
+                tb = bmesh.new()
+                cl.rounded_box(tb, (0, 0, 0), (0.008, 0.022, 0.022), 0.0025)
+                cl.transform_bm(tb, Matrix.Translation(h[0] + V(sx * 0.004, 0.0, 0.0)))
+                hero_lib.join_bm(bmt, tb)
+            st = new_object(self.name("BootStraps" + sd), bm, self.M["couro"])
+            tag(st, "boot_strap", "gear")
+            self.reg(st, "dist")
+            # aba refletiva do calcanhar (puxador)
+            h = bvh.ray_cast(V(x, -0.30, F.ankle_z + 0.060 * bk), V(0, 1, 0), 0.5)
+            if h[0] is not None:
+                tb = bmesh.new()
+                cl.rounded_box(tb, (0, 0, 0), (0.022, 0.008, 0.034), 0.003)
+                cl.transform_bm(tb, Matrix.Translation(h[0] + V(0, -0.003, 0.0)) @ Matrix.Rotation(math.radians(-12), 4, "X"))
+                hero_lib.join_bm(bmt, tb)
+            tabs = new_object(self.name("BootTabs" + sd), bmt, self.M["prata"])
+            tag(tabs, "boot_tab", "gear")
+            self.reg(tabs, "dist")
+            self.boot_objs[sd] = [boot, sole, top, st, tabs]
             self.boot_top_z = z_top
 
     # ------------------------------------------------------------ pescoco (pele)
@@ -1391,10 +1516,10 @@ class LV2B(hero_lib.Builder):
         self.head_parts()
         self.neck()
         self.body_lv2()
-        self.vest()
+        self.vest()                 # acessorio por missao (Acc_LifeVest), sobre a jaqueta
         self.vest_details()
         self.team()
-        self.shirt_collar()
+        self.jacket_collar()
         self.boots()
         self.split_body()
         self.hands()

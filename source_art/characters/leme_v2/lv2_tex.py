@@ -5,8 +5,9 @@ importar de la, para que mudancas no Rastro nao quebrem a Leme), com pintura pro
  1. junta as partes por grupo de material (traje = tecidos, equipamento = vinil/plastico/metal, pele, cabelo; vidro e rosto a parte);
  2. UV por Smart UV Project + empacotamento;
  3. assa no Cycles (CPU) mapas de GEOMETRIA por texel: posicao, normal, parte (atributo rbpart) e oclusao (AO);
- 4. pinta em numpy, por texel e em coordenadas 3D: algodao (camisa), sarja (bermuda), canelado (meia), nailon ripstop
-    (colete) com canais costurados e faixas refletivas, pespontos, bolsos, botoes, palma mais clara, cachos em helice;
+ 4. pinta em numpy, por texel e em coordenadas 3D: sarja tecnica (jaqueta e calca de pilota) com recortes, ziper, faixas
+    refletivas e pespontos; luvas com protetor nos nos dos dedos; velcro; nailon ripstop (colete, acessorio) com canais
+    costurados; gomos do bone; cachos em helice;
  5. assa a normal map em espaco tangente (MikkTSpace) a partir da altura no Cycles;
  6. Principled BSDF com base color, normal, ORM (R oclusao, G rugosidade, B metalico) e verniz (Coat -> KHR_materials_clearcoat).
 Nenhuma imagem de terceiros.
@@ -28,29 +29,38 @@ from rbart import hex_to_linear
 
 # ------------------------------------------------------------------ paleta (sRGB hex) e ids das partes
 C = dict(white="#F7FBFF", blue="#2F8CFF", deep="#1F5FBF", navy="#1F3A5F", navy_lt="#2B5285", navy_emb="#123A5E", navy_dk="#142B4A",
-         gold="#FFC83D", silver="#D2DDE6", skin="#8C5634", blush="#B8624F", palm="#C08A68", hair="#1E1410", hair_lt="#5A3826",
+         gold="#FFC83D", silver="#B9C7D4", skin="#8C5634", blush="#B8624F", palm="#C08A68", hair="#1E1410", hair_lt="#5A3826",
          red="#E2473B", whistle="#FFB020", cyan="#7FE3FF")
 
-PARTS = ["none", "shirt", "shorts", "skin_limb", "sock", "sleeve_band", "shorts_hem", "sock_top", "vest", "vest_rim", "collar_pillow",
-         "cap_crown", "shirt_collar", "skin_head", "skin_neck", "hand", "hair", "hair_tie", "cap_band", "cap_visor", "cap_cord",
-         "cap_badge", "cap_star", "vest_strap", "vest_buckle", "whistle", "whistle_cord", "whistle_slot", "whistle_ring", "emblem", "emblem_star", "emblem_band",
-         "belt", "buckle", "buckle_star", "boot", "sole", "boot_collar", "laces", "eyelets", "compass_strap", "compass",
-         "compass_dial", "compass_needle", "compass_glass", "bracelet_a", "bracelet_b", "face"]
+PARTS = ["none", "jacket", "pants", "jacket_collar", "zip_pull", "elbow_pad", "elbow_pad_rim", "knee_pad", "knee_pad_rim",
+         "vest", "vest_rim", "collar_pillow", "cap_crown", "skin_head", "skin_neck", "glove", "glove_cuff", "hair", "hair_tie",
+         "cap_button", "cap_visor", "cap_badge", "cap_star", "headset_cup", "headset_disc", "headset_pad", "headset_band",
+         "headset_toppad", "mic_boom", "mic", "vest_strap", "vest_buckle", "whistle", "whistle_cord", "whistle_slot", "whistle_ring",
+         "emblem", "emblem_star", "emblem_band", "belt", "buckle", "buckle_star", "boot", "sole", "boot_collar", "boot_strap",
+         "boot_tab", "compass_strap", "compass", "compass_dial", "compass_needle", "compass_glass", "face"]
 PID = {n: i for i, n in enumerate(PARTS)}
 
-# cor base, rugosidade, metalico por parte do grupo "gear" (vinil/plastico macio/metal dourado)
+# cor base, rugosidade, metalico por parte do grupo "gear" (vinil/plastico macio/metal) -- e das pecas de vinil do colete
 GEAR = {
-    "hair_tie": ("blue", 0.40, 0.0), "cap_band": ("navy", 0.42, 0.0), "cap_visor": ("navy_dk", 0.20, 0.0), "cap_cord": ("gold", 0.30, 0.6),
-    "cap_badge": ("navy_emb", 0.32, 0.0), "cap_star": ("gold", 0.28, 0.55), "vest_strap": ("navy", 0.50, 0.0),
+    "hair_tie": ("blue", 0.40, 0.0), "cap_button": ("navy", 0.40, 0.0), "cap_visor": ("navy_dk", 0.22, 0.0),
+    "cap_badge": ("navy_emb", 0.32, 0.0), "cap_star": ("gold", 0.28, 0.55),
+    "headset_cup": ("blue", 0.30, 0.0), "headset_disc": ("white", 0.28, 0.0), "headset_pad": ("navy", 0.55, 0.0),
+    "headset_band": ("navy", 0.34, 0.0), "headset_toppad": ("white", 0.50, 0.0), "mic_boom": ("navy", 0.32, 0.0),
+    "mic": ("navy_dk", 0.85, 0.0), "zip_pull": ("silver", 0.26, 0.75),
+    "elbow_pad": ("navy", 0.42, 0.0), "elbow_pad_rim": ("navy_dk", 0.50, 0.0), "knee_pad": ("white", 0.36, 0.0),
+    "knee_pad_rim": ("navy", 0.46, 0.0), "glove": ("white", 0.44, 0.0), "glove_cuff": ("blue", 0.40, 0.0),
+    "vest_strap": ("navy", 0.50, 0.0),
     "vest_buckle": ("white", 0.40, 0.0), "whistle": ("whistle", 0.30, 0.0), "whistle_cord": ("white", 0.55, 0.0), "whistle_slot": ("navy_dk", 0.6, 0.0), "whistle_ring": ("gold", 0.28, 0.6),
     "emblem": ("navy_emb", 0.34, 0.0), "emblem_star": ("gold", 0.28, 0.55), "emblem_band": ("white", 0.36, 0.0),
     "belt": ("navy", 0.44, 0.0), "buckle": ("gold", 0.30, 0.55), "buckle_star": ("navy_emb", 0.32, 0.0),
-    "boot": ("navy", 0.40, 0.0), "sole": ("white", 0.58, 0.0), "boot_collar": ("blue", 0.46, 0.0), "laces": ("white", 0.60, 0.0),
-    "eyelets": ("gold", 0.30, 0.6), "compass_strap": ("navy", 0.46, 0.0), "compass": ("gold", 0.26, 0.65),
-    "compass_dial": ("white", 0.35, 0.0), "compass_needle": ("white", 0.35, 0.0), "bracelet_a": ("blue", 0.55, 0.0),
-    "bracelet_b": ("white", 0.55, 0.0),
+    "boot": ("blue", 0.36, 0.0), "sole": ("white", 0.58, 0.0), "boot_collar": ("white", 0.46, 0.0), "boot_strap": ("navy", 0.55, 0.0),
+    "boot_tab": ("silver", 0.30, 0.0), "compass_strap": ("navy", 0.46, 0.0), "compass": ("gold", 0.26, 0.65),
+    "compass_dial": ("white", 0.35, 0.0), "compass_needle": ("white", 0.35, 0.0),
 }
-TEX_RES = {"suit": 2048, "gear": 2048, "skin": 2048, "hair": 1024}
+# acessorios por missao (D16): grupo -> nome do no no GLB (objeto proprio, oculto por padrao na Godot pelo prefixo Acc_)
+ACC = {"acc_lifevest": "Acc_LifeVest"}
+ACC_SUIT_PARTS = ("vest", "vest_rim", "collar_pillow")
+TEX_RES = {"suit": 2048, "gear": 2048, "skin": 1024, "hair": 1024, "acc_lifevest": 1024}
 
 
 def lin(hexcol):
@@ -80,7 +90,7 @@ def join_groups(objs, prefix="Leme"):
             bpy.context.view_layer.objects.active = obs[0]
             bpy.ops.object.join()
         ob = bpy.context.view_layer.objects.active if len(obs) > 1 else obs[0]
-        ob.name = "%s_%s" % (prefix, g.capitalize()) if g != "face" else prefix + "_Face"
+        ob.name = ACC[g] if g in ACC else ("%s_%s" % (prefix, g.capitalize()) if g != "face" else prefix + "_Face")
         ob.data.name = ob.name
         ob["rbgroup"] = g
         out[g] = ob
@@ -470,7 +480,20 @@ def rib(P, period=0.0030):
     return 0.5 + 0.5 * np.sin(2 * np.pi * (th * r) / period)
 
 
+def _seg_uv(P, a, b):
+    a, b = np.asarray(a, float), np.asarray(b, float)
+    d = b - a
+    L = np.linalg.norm(d)
+    dn = d / L
+    u = (P - a) @ dn / L
+    proj = a + np.outer(np.clip(u, 0, 1), d)
+    return u, np.linalg.norm(P - proj, axis=1)
+
+
 def paint_suit(m, b):
+    """Tecidos (D16): jaqueta de pilota em sarja tecnica azul (ombros brancos, laterais azul-marinho, ziper, faixas
+    refletivas no peito e nos bracos, pespontos nos recortes), calca em sarja azul (vivo branco lateral, bolsos), gola alta
+    branca com friso, copa do bone em gomos. As pecas do colete (acessorio) pintadas como antes."""
     F = b.F
     P, N, part = m["P"], m["N"], m["part"]
     n = len(P)
@@ -482,114 +505,152 @@ def paint_suit(m, b):
     white, blue, deep, navy, silver = lin(C["white"]), lin(C["blue"]), lin(C["deep"]), lin(C["navy"]), lin(C["silver"])
     th, r_t = _cyl(P)
     sel = lambda nm: part == PID[nm]
-    # --- camisa (algodao branco, trama fina), costuras laterais, carcela com botoes no decote em V, costura do ombro
-    shirt = sel("shirt") | sel("shirt_collar")
-    col[shirt] = white
     wv = triplanar(P, N, weave2d, 0.0022)
-    h += np.where(shirt, 0.00016 * wv, 0)
-    torso = sel("shirt") & (np.abs(x) < 0.12)
-    for c0 in (math.pi / 2, -math.pi / 2):
-        dd = r_t * np.angle(np.exp(1j * (th - c0)))
-        h -= np.where(torso, 0.0003 * line(dd, 0.0012), 0)
-        h += np.where(torso, 0.0002 * stitches(dd, z, 0.0030, 0.0042), 0)
-    plk = sel("shirt") & (y > 0) & (np.abs(x) < 0.03)
-    h -= np.where(plk, 0.00035 * (line(x - 0.009, 0.0010) + line(x + 0.009, 0.0010)), 0)
-    for bz in (F.nz - 0.040, F.nz - 0.075):
-        d_b = np.hypot(x, z - bz)
-        btn = plk & (d_b < 0.0042)
-        col[btn] = lin(C["deep"])
-        h += np.where(plk, 0.0006 * line(d_b, 0.0042), 0)
-    yoke = sel("shirt") & (y < 0) & (z > F.nz - 0.06)
-    h -= np.where(sel("shirt"), 0.0003 * line(z - (F.nz - 0.035), 0.0012) * (y < 0), 0)
-    # --- vivo azul da manga e barra/punho das meias
-    col[sel("sleeve_band")] = blue
-    # --- bermuda (sarja azul), faixa lateral branca fina, bolsos com pesponto, barra dobrada
-    sh_ = sel("shorts") | sel("shorts_hem")
-    col[sh_] = deep
     tw = triplanar(P, N, twill2d, 0.0018)
-    h += np.where(sh_, 0.00020 * tw, 0)
+    # --- jaqueta: sarja tecnica azul
+    jk = sel("jacket")
+    col[jk] = blue
+    h += np.where(jk, 0.00018 * tw, 0)
+    segs = {(kind, s): (np.array(a), np.array(bb)) for kind, s, a, bb in b.limb_segs}
+    on_arm = np.zeros(n, bool)
+    for s in ("R", "L"):
+        a, bb = segs[("upper_arm", s)]
+        u, d = _seg_uv(P, a, bb)
+        a2, b2 = segs[("forearm", s)]
+        u2, d2 = _seg_uv(P, a2, b2)
+        arm = jk & (((u > 0.12) & (d < 0.075)) | ((u2 > -0.1) & (d2 < 0.07))) & (np.abs(x) > F.sh.x * 0.88)   # so o braco, nao o peito
+        on_arm |= arm
+        # faixa refletiva no braco (acima da cotoveleira) com pesponto dos dois lados
+        band = arm & (np.abs(u - 0.46) * np.linalg.norm(bb - a) < 0.0075) & (d < 0.075)
+        col[band] = silver
+        rough = np.where(band, 0.30, rough)
+        dd = np.abs(u - 0.46) * np.linalg.norm(bb - a) - 0.0075
+        h += np.where(arm & (u > 0.3) & (u < 0.62), 0.00045 * line(dd, 0.0011) + 0.0002 * stitches(dd - 0.0018, th * r_t, 0.0, 0.0042), 0)
+    torso = jk & ~on_arm
+    # ombros (canesu) brancos: recorte acima da linha do ombro, frente e costas, descendo um pouco pelo alto da manga
+    zy = F.sh.z + 0.004 - 0.010 * sstep(np.abs(x), 0.10, 0.17)
+    yoke = torso & (z > zy)
+    col[yoke] = white
+    dy_ = z - zy
+    h -= np.where(torso, 0.00035 * line(dy_, 0.0012), 0)
+    h += np.where(torso, 0.00022 * stitches(dy_ - 0.0028, x + y, 0.0, 0.0042), 0)
+    # laterais azul-marinho (recortes sob os bracos)
+    ang = np.degrees(np.abs(th))
+    side = torso & (ang > 68) & (ang < 112) & (z < F.sh.z - 0.045)
+    col[side] = navy
+    for c0 in (68.0, 112.0):
+        dc = np.radians(ang - c0) * np.maximum(r_t, 0.05)
+        h -= np.where(torso & (z < F.sh.z - 0.045), 0.00035 * line(dc, 0.0012), 0)
+        h += np.where(torso & (z < F.sh.z - 0.045), 0.00022 * stitches(np.abs(dc) - 0.0028, z, 0.0, 0.0042), 0)
+    # faixa refletiva do peito (volta inteira no tronco), com vivos
+    zc = F.hz + 0.120
+    rb = torso & (np.abs(z - zc) < 0.0075)
+    col[rb] = silver
+    rough = np.where(rb, 0.30, rough)
+    bead = value_noise(P, 0.0006)
+    col[rb] *= (0.88 + 0.22 * bead[rb])[:, None]
+    h += np.where(torso, 0.00045 * line(np.abs(z - zc) - 0.0075, 0.0011), 0)
+    h += np.where(torso, 0.00020 * stitches(np.abs(z - zc) - 0.0092, th * r_t, 0.0, 0.0042), 0)
+    # ziper central: fita azul-marinho e dentes prata
+    zp = torso & (y > 0.02) & (np.abs(x) < 0.0070)
+    col[zp] = navy
+    teeth = zp & (np.abs(x) < 0.0032)
+    tz = ((z / 0.0030) % 1.0)
+    col[teeth & (tz < 0.6)] = silver
+    rough = np.where(teeth, 0.30, rough)
+    metal = np.where(teeth & (tz < 0.6), 0.6, metal)
+    h += np.where(teeth, 0.0004 * (tz < 0.6), 0)
+    h -= np.where(torso & (y > 0.02), 0.0003 * line(np.abs(x) - 0.0072, 0.0010), 0)
+    # barra da jaqueta (canelado) logo acima do cinto
+    hem = jk & (z < b.z_waist + 0.016) & ~on_arm
+    h += np.where(hem, 0.0004 * (0.5 + 0.5 * np.sin(2 * np.pi * th * r_t / 0.0034)), 0)
+    # --- gola alta branca com friso azul-marinho perto da borda
+    gc = sel("jacket_collar")
+    col[gc] = white
+    h += np.where(gc, 0.00016 * wv, 0)
+    gtop = gc & (z > F.nz + 0.010)
+    h += np.where(gc, 0.0002 * stitches(z - (F.nz + 0.006), th * 0.06, 0.0, 0.0042), 0)
+    col[gtop & (z < F.nz + 0.016)] = blue
+    # --- calca: sarja azul, vivo branco lateral, bolsos com pesponto
+    pt = sel("pants")
+    col[pt] = deep
+    h += np.where(pt, 0.00020 * tw, 0)
     for sx in (1, -1):
-        hx = sx * F.hip_x
-        side = sel("shorts") & (x * sx > 0.02)
-        ang = np.arctan2(y - 0.0, (x - hx) * sx)          # 0 = lado de fora
-        arc = np.hypot(x - hx, y) * np.abs(ang)
-        stripe = side & (arc < 0.0045) & (z < F.hz + 0.02)
+        legx = np.where(z > F.knee_z, F.hip_x + (F.knee_x - F.hip_x) * (F.hz - z) / (F.hz - F.knee_z), F.knee_x)
+        out = pt & (x * sx > 0.02)
+        ang_l = np.arctan2(y, (x - sx * legx) * sx)
+        arc = np.hypot(x - sx * legx, y) * np.abs(ang_l)
+        stripe = out & (arc < 0.0042) & (z < F.hz + 0.02)
         col[stripe] = white
-        h += np.where(side & (z < F.hz + 0.02), 0.0005 * line(arc - 0.0045, 0.0012), 0)
-        # bolso da frente (corte inclinado)
+        h += np.where(out & (z < F.hz + 0.02), 0.0005 * line(arc - 0.0042, 0.0012), 0)
         pk = (z - (F.hz + 0.02)) + 0.9 * ((x * sx) - (F.hip_x + 0.040))
-        front = sel("shorts") & (y > 0.02) & (x * sx > 0.03) & (z > F.hz - 0.08)
+        front = pt & (y > 0.02) & (x * sx > 0.03) & (z > F.hz - 0.08)
         h -= np.where(front, 0.0005 * line(pk, 0.0014), 0)
         h += np.where(front, 0.00025 * stitches(pk, z, 0.0035, 0.0042), 0)
-        # bolso de tras (retangulo com pesponto)
         bx, bz0 = sx * 0.055, F.hz - 0.035
-        back = sel("shorts") & (y < -0.02)
+        back = pt & (y < -0.02) & (z > F.hz - 0.09)
         dr = np.maximum(np.abs(x - bx) - 0.030, np.abs(z - bz0) - 0.032)
         h -= np.where(back, 0.0004 * line(dr, 0.0012), 0)
         h += np.where(back, 0.00022 * stitches(dr, x + z, 0.0030, 0.0042), 0)
-    h -= np.where(sel("shorts"), 0.0003 * line(z - (F.hz + 0.045), 0.0015), 0)          # cos da cintura
-    # --- meias brancas, canelado, duas listras azuis perto do punho
-    so = sel("sock") | sel("sock_top")
-    col[so] = white
-    rb = rib(P)
-    h += np.where(so, 0.00045 * rb, 0)
-    zs = b.z_sock
-    for zc in (zs - 0.0085, zs + 0.0010):           # duas listras azuis NO punho (faixa de zs - 0,017 a zs + 0,010)
-        stp = sel("sock_top") & (np.abs(z - zc) < 0.0024)
-        col[stp] = blue
-    # --- colete: nailon ripstop azul, canais costurados, faixas refletivas, vivo branco, estrela nas costas
+    h -= np.where(pt, 0.0003 * line(z - (F.hz + 0.045), 0.0015), 0)          # cos da cintura
+    # --- colete (acessorio): nailon ripstop azul, canais costurados, faixas refletivas, vivo branco, estrela nas costas
     vest = sel("vest") | sel("collar_pillow")
-    col[vest] = blue
+    col[vest] = deep                     # um tom abaixo da jaqueta: o colete se le por cima dela
     rp = ripstop(P, N)
     h += np.where(vest, 0.00012 * rp, 0)
     rough = np.where(vest, 0.52 - 0.06 * rp, rough)
-    vz = b.vest_z
-    isv = sel("vest")
-    ang_d = np.degrees(th)
-    rr_ = np.maximum(r_t, 0.05)
-    for c0 in (20.0, 40.0, -20.0, -40.0, 158.0, -158.0):
-        dc = np.radians(np.angle(np.exp(1j * np.radians(ang_d - c0)), deg=True)) * rr_
-        h += np.where(isv, 0.00022 * (stitches(dc - 0.0040, z, 0.0, 0.0042) + stitches(dc + 0.0040, z, 0.0, 0.0042)), 0)
-    for zb in b.reflect_z:
-        band = isv & (np.abs(z - zb) < 0.0062)
-        col[band] = silver
-        rough = np.where(band, 0.30, rough)
-        bead = value_noise(P, 0.0006)
-        col[band] *= (0.88 + 0.22 * bead[band])[:, None]
-        h += np.where(isv, 0.00045 * line(np.abs(z - zb) - 0.0062, 0.0011), 0)
-        h += np.where(isv, 0.00020 * stitches(np.abs(z - zb) - 0.0075, th * rr_, 0.0, 0.0042), 0)
-    # estrela de 4 pontas branca com borda azul-marinho no centro das costas (identidade de equipe de costas)
-    back_c = np.array([0.0, (vz[0] + vz[4]) * 0.5 + 0.030])
-    q2 = np.stack([x - back_c[0], z - back_c[1]], axis=1)
-    rho = np.linalg.norm(q2, axis=1)
-    th2 = np.arctan2(q2[:, 1], q2[:, 0])
-    delta = np.abs(((th2 + np.pi / 4) % (np.pi / 2)) - np.pi / 4)
-    r_star = 0.010 + 0.032 * (1 - delta / (np.pi / 4)) ** 2.0
-    onb = isv & (y < -0.03)
-    col[onb & (rho < r_star + 0.0035)] = navy
-    col[onb & (rho < r_star)] = white
-    h += np.where(onb, 0.0003 * line(rho - r_star - 0.0035, 0.0012), 0)
-    # gola-travesseiro: costura ao longo do alto
+    if hasattr(b, "vest_z"):
+        vz = b.vest_z
+        isv = sel("vest")
+        ang_d = np.degrees(th)
+        rr_ = np.maximum(r_t, 0.05)
+        for c0 in (20.0, 40.0, -20.0, -40.0, 158.0, -158.0):
+            dc = np.radians(np.angle(np.exp(1j * np.radians(ang_d - c0)), deg=True)) * rr_
+            h += np.where(isv, 0.00022 * (stitches(dc - 0.0040, z, 0.0, 0.0042) + stitches(dc + 0.0040, z, 0.0, 0.0042)), 0)
+        for zb in b.reflect_z:
+            band = isv & (np.abs(z - zb) < 0.0062)
+            col[band] = silver
+            rough = np.where(band, 0.30, rough)
+            col[band] *= (0.88 + 0.22 * bead[band])[:, None]
+            h += np.where(isv, 0.00045 * line(np.abs(z - zb) - 0.0062, 0.0011), 0)
+            h += np.where(isv, 0.00020 * stitches(np.abs(z - zb) - 0.0075, th * rr_, 0.0, 0.0042), 0)
+        back_c = np.array([0.0, (vz[0] + vz[4]) * 0.5 + 0.030])
+        q2 = np.stack([x - back_c[0], z - back_c[1]], axis=1)
+        rho = np.linalg.norm(q2, axis=1)
+        th2 = np.arctan2(q2[:, 1], q2[:, 0])
+        delta = np.abs(((th2 + np.pi / 4) % (np.pi / 2)) - np.pi / 4)
+        r_star = 0.010 + 0.032 * (1 - delta / (np.pi / 4)) ** 2.0
+        onb = isv & (y < -0.03)
+        col[onb & (rho < r_star + 0.0035)] = navy
+        col[onb & (rho < r_star)] = white
+        h += np.where(onb, 0.0003 * line(rho - r_star - 0.0035, 0.0012), 0)
     cp = sel("collar_pillow")
     h += np.where(cp, 0.0002 * fbm(P, 0.01, 2), 0)
-    # vivo branco
     col[sel("vest_rim")] = white
     rough = np.where(sel("vest_rim"), 0.55, rough)
-    # --- copa do bone (sarja branca) com vivo na borda mais larga
+    # --- copa do bone: sarja branca em seis gomos (o da frente azul), costuras com pesponto e vivo azul-marinho na base
     cc = sel("cap_crown")
     col[cc] = white
     h += np.where(cc, 0.00016 * wv, 0)
     loc = (P - np.array(b.cap_m.translation)) @ np.array(b.cap_m.to_3x3())   # coordenadas do bone (aprox. sem escala)
-    zc_ = loc[:, 2]
     k = F.k
-    h += np.where(cc, 0.0005 * line(zc_ - 0.072 * k, 0.0020), 0)
-    h += np.where(cc, 0.00022 * stitches(zc_ - 0.064 * k, np.arctan2(loc[:, 0], loc[:, 1]) * 0.2, 0.0, 0.0042), 0)
+    az = np.degrees(np.arctan2(loc[:, 0], loc[:, 1]))
+    rl = np.hypot(loc[:, 0], loc[:, 1])
+    front_g = cc & (np.abs(az) < 30) & (loc[:, 2] > 0.008 * k)
+    col[front_g] = blue
+    for c0 in (30.0, 90.0, 150.0, -30.0, -90.0, -150.0):
+        dc = np.radians(np.angle(np.exp(1j * np.radians(az - c0)), deg=True)) * np.maximum(rl, 0.02)
+        h -= np.where(cc & (loc[:, 2] > 0.01 * k), 0.00035 * line(dc, 0.0011), 0)
+        h += np.where(cc & (loc[:, 2] > 0.01 * k), 0.0002 * (stitches(dc - 0.0024, loc[:, 2], 0.0, 0.0042) + stitches(dc + 0.0024, loc[:, 2], 0.0, 0.0042)), 0)
+    baseb = cc & (loc[:, 2] < 0.010 * k)
+    col[baseb] = navy
+    h += np.where(cc, 0.0004 * line(loc[:, 2] - 0.010 * k, 0.0012), 0)
     # tecido: variacao baixa e oclusao leve na cor
     mott = fbm(P, 0.05, 3)
     col *= (0.96 + 0.06 * mott)[:, None]
-    fab = shirt | sh_ | so | cc
-    col *= np.where(fab, 0.95 + 0.05 * wv, 1.0)[:, None]
-    rough = np.where(fab, 0.84 - 0.08 * wv + 0.04 * mott, rough)
+    fab = jk | pt | gc | cc
+    col *= np.where(fab, 0.95 + 0.05 * tw, 1.0)[:, None]
+    rough = np.where(fab & (rough > 0.5), 0.74 - 0.08 * tw + 0.04 * mott, rough)
     col *= (0.82 + 0.18 * m["ao"] ** 0.8)[:, None]
     return col, h, rough, metal
 
@@ -608,43 +669,105 @@ def paint_gear(m, b):
         rough[sel] = r
         metal[sel] = mt
     x, y, z = P[:, 0], P[:, 1], P[:, 2]
-    # botina: biqueira mais clara com pesponto, costura do calcanhar
+    # bota de pilota: biqueira branca com pesponto, costura do calcanhar, faixa branca no alto do cano
     boot = part == PID["boot"]
     ax_ = np.abs(x)
-    toe_line = F.ball_y - 0.010 + 0.010 * np.cos(np.clip((ax_ - F.foot_x) / 0.05, -1.5, 1.5))
+    toe_line = F.ball_y - 0.004 + 0.010 * np.cos(np.clip((ax_ - F.foot_x) / 0.05, -1.5, 1.5))
     d_toe = y - toe_line
-    col[boot & (d_toe > 0)] = lin(C["navy_lt"])
+    col[boot & (d_toe > 0)] = lin(C["white"])
     h -= np.where(boot, 0.0005 * line(d_toe, 0.0018), 0)
     h += np.where(boot, 0.00025 * stitches(d_toe - 0.003, x, 0.0, 0.0045), 0)
     h -= np.where(boot & (y < F.heel_y + 0.02), 0.0004 * line(ax_ - F.foot_x, 0.0012), 0)
-    # sola: frisos horizontais e um friso azul (botina nautica)
+    zt = b.boot_top_z
+    col[boot & (z > zt - 0.020)] = lin(C["white"])
+    h -= np.where(boot, 0.0004 * line(z - (zt - 0.020), 0.0012), 0)
+    # sola: frisos horizontais e um friso azul-marinho
     sole = part == PID["sole"]
     h -= np.where(sole, 0.0004 * line(((z / 0.0065) % 1.0) - 0.5, 0.12), 0)
-    col[sole & (np.abs(z - 0.0135) < 0.0022)] = lin(C["blue"])
-    # tiras (webbing): trama em sarja
+    col[sole & (np.abs(z - 0.0135) < 0.0022)] = lin(C["navy"])
+    # velcro das tiras (felpa) e trama das fitas
+    vel = part == PID["boot_strap"]
+    h += np.where(vel, 0.00030 * fbm(P, 0.0012, 2), 0)
     web = (part == PID["vest_strap"]) | (part == PID["belt"]) | (part == PID["compass_strap"])
     h += np.where(web, 0.00018 * triplanar(P, N, twill2d, 0.0012), 0)
-    dzb = z - b.belt_z
-    h += np.where(part == PID["belt"], 0.0002 * (stitches(dzb - 0.012, np.arctan2(x, y) * 0.13, 0.0, 0.0040) +
-                                                stitches(dzb + 0.012, np.arctan2(x, y) * 0.13, 0.0, 0.0040)), 0)
+    if hasattr(b, "belt_z"):
+        dzb = z - b.belt_z
+        h += np.where(part == PID["belt"], 0.0002 * (stitches(dzb - 0.012, np.arctan2(x, y) * 0.13, 0.0, 0.0040) +
+                                                    stitches(dzb + 0.012, np.arctan2(x, y) * 0.13, 0.0, 0.0040)), 0)
+    # aba do calcanhar: refletiva
+    tab = part == PID["boot_tab"]
+    col[tab] *= (0.88 + 0.22 * value_noise(P, 0.0006)[tab])[:, None]
+    # luvas: dorso com protetor azul-marinho nos nos dos dedos (acolchoado), costuras entre os dedos, palma lisa
+    glove = part == PID["glove"]
+    if hasattr(b, "hand_skel") and glove.any():
+        for sx, s in ((1, "R"), (-1, "L")):
+            H = b.hand_skel[s]
+            W, d, f, nn, k = (np.array(H["W"]), np.array(H["d"]), np.array(H["f"]), np.array(H["n"]), H["k"])
+            near = glove & (np.sign(x) == sx) & (np.linalg.norm(P - W, axis=1) < 0.16)
+            loc = P - W
+            ad, af, an = loc @ d, loc @ f, loc @ nn
+            dorsal = near & (an < -0.004 * k)
+            knuck = dorsal & (np.abs(ad - 0.050 * k) < 0.012 * k) & (np.abs(af) < 0.028 * k)
+            col[knuck] = lin(C["navy_lt"])
+            rough = np.where(knuck, 0.50, rough)
+            dk = np.maximum(np.abs(ad - 0.050 * k) - 0.012 * k, np.abs(af) - 0.028 * k)
+            h += np.where(dorsal, 0.0006 * sstep(-dk, -0.0015, 0.0015), 0)
+            h += np.where(knuck, 0.0003 * line(((af / (0.0093 * k)) % 1.0) - 0.5, 0.18), 0)
+            # punho branco com vivo azul (transicao para o punho largo)
+            h += np.where(near, 0.0002 * stitches(ad - 0.008 * k, af + an, 0.0, 0.0042), 0)
+            palm = near & (an > 0.004 * k)
+            rough = np.where(palm, 0.62, rough)
+            h += np.where(palm, 0.00012 * fbm(P, 0.0016, 2), 0)
+    # punho largo da luva: borda branca na abertura
+    cuff = part == PID["glove_cuff"]
+    if hasattr(b, "hand_skel") and cuff.any():
+        for sx, s in ((1, "R"), (-1, "L")):
+            H = b.hand_skel[s]
+            W, d, k = np.array(H["W"]), np.array(H["d"]), H["k"]
+            near = cuff & (np.sign(x) == sx)
+            ad = (P - W) @ d
+            col[near & (ad < -0.025 * k)] = lin(C["white"])
+            h -= np.where(near, 0.0004 * line(ad + 0.025 * k, 0.0012), 0)
+    # cotoveleiras e joelheiras: gomos acolchoados (vincos em grade)
+    for nm in ("elbow_pad", "knee_pad"):
+        pd = part == PID[nm]
+        g1 = line(((x + z) / 0.016) % 1.0 - 0.5, 0.08) + line(((y - z) / 0.016) % 1.0 - 0.5, 0.08)
+        h -= np.where(pd, 0.0006 * np.clip(g1, 0, 1), 0)
+    kp = part == PID["knee_pad"]
+    col[kp & (np.abs(z - (F.knee_z - 0.006)) < 0.0045)] = lin(C["silver"])          # filete refletivo na joelheira
+    # fones: tampa com estrela de 4 pontas azul-marinho (equipe), casca com aro
+    disc = part == PID["headset_disc"]
+    if hasattr(b, "cup_c") and disc.any():
+        for sx in (1, -1):
+            c = np.array(b.cup_c[sx])
+            near = disc & (np.sign(x) == sx)
+            q2 = np.stack([y - c[1], z - c[2]], axis=1)
+            rho = np.linalg.norm(q2, axis=1)
+            th2 = np.arctan2(q2[:, 1], q2[:, 0])
+            delta = np.abs(((th2 + np.pi / 4) % (np.pi / 2)) - np.pi / 4)
+            r_star = 0.004 + 0.016 * (1 - delta / (np.pi / 4)) ** 2.2
+            col[near & (rho < r_star)] = lin(C["navy"])
+            h += np.where(near, 0.0003 * line(rho - r_star, 0.0010), 0)
+    mic = part == PID["mic"]
+    h += np.where(mic, 0.0004 * fbm(P, 0.0010, 2), 0)
     # bussola: mostrador com marcas e rosa dos ventos azul-marinho
-    c0, nrm = np.array(b.compass_c), np.array(b.compass_n)
-    dial = part == PID["compass_dial"]
-    v = P - c0
-    vt = v - np.outer(v @ nrm, nrm)
-    rr = np.linalg.norm(vt, axis=1)
-    e1 = np.cross(nrm, [0.0, 0.0, 1.0])
-    e1 /= max(np.linalg.norm(e1), 1e-9)
-    e2 = np.cross(nrm, e1)
-    an = np.arctan2(vt @ e2, vt @ e1)
-    ticks = (np.abs(((an / (2 * np.pi / 16)) + 0.5) % 1.0 - 0.5) < 0.10) & (rr > 0.0150) & (rr < 0.0185)
-    col[dial & ticks] = lin(C["navy"])
-    delta = np.abs(((an + np.pi / 4) % (np.pi / 2)) - np.pi / 4)
-    rs = 0.003 + 0.010 * (1 - delta / (np.pi / 4)) ** 2.4
-    col[dial & (rr < rs)] = lin(C["navy_lt"])
-    # agulha: metade vermelha
-    ndl = part == PID["compass_needle"]
-    col[ndl & ((vt @ e2) > 0)] = lin(C["red"])
+    if hasattr(b, "compass_c"):
+        c0, nrm = np.array(b.compass_c), np.array(b.compass_n)
+        dial = part == PID["compass_dial"]
+        v = P - c0
+        vt = v - np.outer(v @ nrm, nrm)
+        rr = np.linalg.norm(vt, axis=1)
+        e1 = np.cross(nrm, [0.0, 0.0, 1.0])
+        e1 /= max(np.linalg.norm(e1), 1e-9)
+        e2 = np.cross(nrm, e1)
+        an = np.arctan2(vt @ e2, vt @ e1)
+        ticks = (np.abs(((an / (2 * np.pi / 16)) + 0.5) % 1.0 - 0.5) < 0.10) & (rr > 0.0150) & (rr < 0.0185)
+        col[dial & ticks] = lin(C["navy"])
+        delta = np.abs(((an + np.pi / 4) % (np.pi / 2)) - np.pi / 4)
+        rs = 0.003 + 0.010 * (1 - delta / (np.pi / 4)) ** 2.4
+        col[dial & (rr < rs)] = lin(C["navy_lt"])
+        ndl = part == PID["compass_needle"]
+        col[ndl & ((vt @ e2) > 0)] = lin(C["red"])
     # vinil: micro variacao suave
     nz_ = fbm(P, 0.03, 2)
     h += 0.00004 * fbm(P, 0.004, 2)
@@ -652,6 +775,14 @@ def paint_gear(m, b):
     col *= (0.97 + 0.05 * nz_)[:, None]
     col *= (0.85 + 0.15 * m["ao"] ** 0.8)[:, None]
     return col, h, rough, metal
+
+
+def paint_acc(m, b):
+    """Acessorio por missao (colete salva-vidas): tecido do colete pela pintura do traje, vinil/metal pela do equipamento."""
+    cs, hs, rs, ms = paint_suit(m, b)
+    cg, hg, rg, mg = paint_gear(m, b)
+    suit = np.isin(m["part"], [PID[p] for p in ACC_SUIT_PARTS])
+    return (np.where(suit[:, None], cs, cg), np.where(suit, hs, hg), np.where(suit, rs, rg), np.where(suit, ms, mg))
 
 
 def paint_skin(m, b):
@@ -671,18 +802,6 @@ def paint_skin(m, b):
         d = np.linalg.norm(P - (hc + np.array(c)), axis=1) / s
         w = np.exp(-d ** 2) * a
         col = col * (1 - w[:, None]) + lin(C["blush"]) * w[:, None]
-    # palmas e planta dos dedos mais claras (pele negra); joelhos e cotovelos levemente mais quentes
-    hand = part == PID["hand"]
-    for sx in (1, -1):
-        W, d, f, nn = F.hand_frame(sx)
-        near = hand & (np.linalg.norm(P - np.array(W), axis=1) < 0.16) & (P[:, 0] * sx > 0)
-        palm = np.clip((N @ np.array(nn)) * 1.4, 0, 1) ** 1.3
-        col[near] = col[near] * (1 - 0.55 * palm[near, None]) + lin(C["palm"]) * 0.55 * palm[near, None]
-    for kind, s, a, b_ in b.limb_segs:
-        if kind in ("forearm", "shin"):
-            c = np.array(a)
-            w = np.exp(-np.sum((P - c) ** 2, axis=1) / 0.0009) * (part == PID["skin_limb"])
-            col = col * (1 - 0.25 * w[:, None]) + lin(C["blush"]) * 0.25 * w[:, None]
     mott = fbm(P, 0.03, 3)
     col *= (0.97 + 0.05 * mott)[:, None]
     col *= (0.86 + 0.14 * m["ao"] ** 0.7)[:, None]
@@ -745,7 +864,7 @@ def texture_group(ob, group, res, builder, tex_dir):
     uv_unwrap(ob, margin=0.003 if res >= 2048 else 0.005)
     m = bake_geometry(ob, res)
     t1 = time.time()
-    fn = {"suit": paint_suit, "gear": paint_gear, "skin": paint_skin, "hair": paint_hair}[group]
+    fn = {"suit": paint_suit, "gear": paint_gear, "skin": paint_skin, "hair": paint_hair, "acc_lifevest": paint_acc}[group]
     col, h, rough, metal = fn(m, builder)
     t2 = time.time()
     name = "leme_v2_" + group
@@ -759,6 +878,6 @@ def texture_group(ob, group, res, builder, tex_dir):
         img.filepath_raw = p
         img.file_format = "PNG"
         img.save()
-    coat = {"suit": 0.0, "gear": 0.55, "skin": 0.30, "hair": 0.45}[group]
-    coat_r = {"suit": 0.5, "gear": 0.28, "skin": 0.35, "hair": 0.30}[group]
+    coat = {"suit": 0.0, "gear": 0.55, "skin": 0.30, "hair": 0.45, "acc_lifevest": 0.25}[group]
+    coat_r = {"suit": 0.5, "gear": 0.28, "skin": 0.35, "hair": 0.30, "acc_lifevest": 0.35}[group]
     return pbr_material("mat_" + name, cimg, nimg, oimg, coat=coat, coat_rough=coat_r)

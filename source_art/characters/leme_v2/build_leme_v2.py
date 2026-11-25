@@ -1,4 +1,5 @@
-"""Leme v2 (RB-R1 D11/D13): constroi a heroina piloto do zero, texturas assadas, PBR padrao do glTF, rig de 28 ossos,
+"""Leme v2.2 pilota (RB-R1 D11/D13/D16): constroi a heroina pilota e navegadora do zero (colete salva-vidas como acessorio
+separado `Acc_LifeVest`, oculto por padrao), texturas assadas, PBR padrao do glTF, rig de 28 ossos,
 rosto com expressoes/visemas/olhar, 12 clipes (mesmos nomes do leme.glb), .blend e GLB (metros, +Y up).
 PROPOSTA PROVISORIA, lado a lado: NAO substitui a Leme do jogo (game/assets/models/characters/leme.glb).
 
@@ -31,14 +32,15 @@ TEX_DIR = os.path.join(REPO, "captures", "leme_v2", "build_textures")   # interm
 
 def finish_materials(groups, b, textures=True):
     T = lv2_tex
+    tex_groups = ("suit", "gear", "skin", "hair") + tuple(g for g in T.ACC if g in groups)
     if textures:
-        for g in ("suit", "gear", "skin", "hair"):
+        for g in tex_groups:
             ob = groups[g]
             m = T.texture_group(ob, g, T.TEX_RES[g], b, TEX_DIR)
             ob.data.materials.clear()
             ob.data.materials.append(m)
     else:
-        for g in ("suit", "gear", "skin", "hair"):
+        for g in tex_groups:
             for p in groups[g].data.polygons:
                 p.material_index = 0
     glass = T.factor_material("mat_leme_v2_glass", T.C["cyan"], 0.05, coat=1.0, coat_rough=0.04, alpha=0.35)
@@ -85,7 +87,9 @@ def measure(b, groups, rig):
             "head_ratio": round(head_h / (hi.z - lo.z), 4), "eye_h_ratio": round(b.eye_info["R"]["ez"] * 2 / head_h, 4),
             "objects": sorted(o.name for o in objs), "bones": [bb.name for bb in rig.data.bones], "bone_count": len(rig.data.bones),
             "animations": acts, "shape_keys": [k.name for k in groups["face"].data.shape_keys.key_blocks],
-            "shape_keys_maos": [k.name for k in groups["skin"].data.shape_keys.key_blocks][1:] if groups["skin"].data.shape_keys else [],
+            "shape_keys_luvas": [k.name for k in groups["gear"].data.shape_keys.key_blocks][1:] if groups["gear"].data.shape_keys else [],
+            "acessorios": {T: {"no": lv2_tex.ACC[T], "tris": tri_count([groups[T]]), "oculto_por_padrao": True}
+                           for T in lv2_tex.ACC if T in groups},
             "walk_speed_mps": round(lv2_anim.ha.walk_speed(b.F), 4), "run_speed_mps": round(lv2_anim.ha.run_speed(b.F), 4),
             "pes": {"hip_x_m": round(b.F.hip_x, 4), "foot_x_m": round(b.F.foot_x, 4)},
             "texturas": {img.name: list(img.size) for img in bpy.data.images if img.name.startswith("leme_v2_")}}
@@ -117,9 +121,9 @@ def build(glb=None, blend=None, textures=True, feet=True):
     print("JOIN", {g: o.name for g, o in groups.items()}, round(time.time() - t0, 1))
     finish_materials(groups, b, textures)
     print("MATERIAIS ok", round(time.time() - t0, 1))
-    hand = lv2_body.add_hand_keys(groups["skin"], b, lv2_tex.PID["hand"])
-    print("MAOS shape keys", hand)
-    rep = lv2_anim.author(rig, groups["face"], b.F, hand_ob=groups["skin"], sole=sole_points(groups["gear"]))
+    hand = lv2_body.add_hand_keys(groups["gear"], b, lv2_tex.PID["glove"])
+    print("LUVAS shape keys", hand)
+    rep = lv2_anim.author(rig, groups["face"], b.F, hand_ob=groups["gear"], sole=sole_points(groups["gear"]))
     bpy.context.view_layer.update()
     info = measure(b, groups, rig)
     info.update(rep)
