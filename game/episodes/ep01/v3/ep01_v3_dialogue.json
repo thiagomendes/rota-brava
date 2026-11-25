@@ -1,0 +1,880 @@
+{
+ "version": 1,
+ "_note": "Ep01 v3 (RB-R1 E6): quem fala, icones da legenda e take de voz JA EXISTENTE (balbucio do mesmo personagem; null = so legenda). Texto so no catalogo i18n.",
+ "speakers": {
+  "tracker": {
+   "voice": "babble"
+  },
+  "climber": {
+   "voice": "babble"
+  },
+  "pilot": {
+   "voice": "babble"
+  },
+  "captain": {
+   "voice": "babble"
+  },
+  "pup": {
+   "voice": "babble"
+  },
+  "vendor": {
+   "voice": "none",
+   "icon": "leaf"
+  },
+  "radio": {
+   "voice": "radio_tts"
+  }
+ },
+ "mission_start": {
+  "M0": [
+   "ep01.arrival.radio.festival",
+   "ep01.arrival.pilot.no_captain",
+   "ep01.arrival.tracker.look_dock"
+  ],
+  "M2": [
+   "ep01.bank.pilot.pup_clothes"
+  ],
+  "M3": [
+   "ep01.plaza.tracker.no_water"
+  ],
+  "M4": [
+   "ep01.market.vendor.mess",
+   "ep01.market.vendor.pup_crates"
+  ],
+  "M5": [
+   "ep01.street.climber.gull_fish"
+  ],
+  "M6": [
+   "ep01.bay.tracker.go_boat"
+  ],
+  "M7": [
+   "ep01.lighthouse.pilot.lamp_off"
+  ],
+  "M8": [
+   "ep01.festival.radio.night"
+  ]
+ },
+ "mission_done": {
+  "M2": [
+   "ep01.bank.pilot.m2_done"
+  ],
+  "M3": [
+   "ep01.plaza.climber.m3_done"
+  ],
+  "M7": [
+   "ep01.lighthouse.radio.lights_on"
+  ],
+  "M8": [
+   "ep01.festival.tracker.cheer"
+  ]
+ },
+ "switch": {
+  "M2:climber": "ep01.bank.tracker.call_climber",
+  "M2:tracker": "ep01.bank.climber.call_tracker",
+  "M3:climber": "ep01.plaza.tracker.call_climber",
+  "M4:pilot": "ep01.market.tracker.call_pilot",
+  "M5:pilot": "ep01.street.tracker.call_pilot",
+  "M5:climber": "ep01.street.pilot.call_climber",
+  "M6:climber": "ep01.bay.pilot.call_climber",
+  "M7:climber": "ep01.lighthouse.tracker.call_climber",
+  "M7:pilot": "ep01.lighthouse.climber.call_pilot"
+ },
+ "script": [
+  "ep01.arrival.radio.festival",
+  "ep01.arrival.pilot.no_captain",
+  "ep01.arrival.tracker.look_dock",
+  "ep01.dock.tracker.small_print",
+  "ep01.dock.tracker.boot_observation",
+  "ep01.dock.tracker.two_trails",
+  "ep01.bank.tracker.pup_village",
+  "ep01.bank.pilot.pup_clothes",
+  "ep01.bank.tracker.call_climber",
+  "ep01.bank.climber.sock_high",
+  "ep01.bank.climber.call_tracker",
+  "ep01.bank.tracker.wet_paw",
+  "ep01.bank.tracker.next_clue",
+  "ep01.bank.pilot.m2_done",
+  "ep01.plaza.tracker.no_water",
+  "ep01.plaza.tracker.dry_stream",
+  "ep01.plaza.tracker.ball_stuck",
+  "ep01.plaza.tracker.call_climber",
+  "ep01.plaza.climber.top_basin",
+  "ep01.plaza.radio.water_back",
+  "ep01.plaza.climber.m3_done",
+  "ep01.market.vendor.mess",
+  "ep01.market.vendor.pup_crates",
+  "ep01.market.tracker.read_icon",
+  "ep01.market.tracker.call_pilot",
+  "ep01.market.pilot.cart_go",
+  "ep01.market.vendor.wrong_stall",
+  "ep01.market.vendor.gull_hint",
+  "ep01.street.climber.gull_fish",
+  "ep01.street.tracker.feathers",
+  "ep01.street.tracker.call_pilot",
+  "ep01.street.pilot.compass_west",
+  "ep01.street.pilot.call_climber",
+  "ep01.street.climber.fish_got",
+  "ep01.street.climber.sees_boat",
+  "ep01.bay.tracker.go_boat",
+  "ep01.bay.pilot.start",
+  "ep01.bay.pilot.slow",
+  "ep01.bay.pilot.call_climber",
+  "ep01.bay.climber.throw_rope",
+  "ep01.bay.captain.thanks_tow",
+  "ep01.bay.captain.pup_lighthouse",
+  "ep01.lighthouse.pilot.lamp_off",
+  "ep01.lighthouse.tracker.lens",
+  "ep01.lighthouse.tracker.call_climber",
+  "ep01.lighthouse.climber.pup_safe",
+  "ep01.lighthouse.climber.call_pilot",
+  "ep01.lighthouse.pilot.aim",
+  "ep01.lighthouse.pup.horn",
+  "ep01.lighthouse.radio.lights_on",
+  "ep01.festival.radio.night",
+  "ep01.festival.captain.thanks",
+  "ep01.festival.tracker.cheer"
+ ],
+ "lines": {
+  "ep01.arrival.radio.festival": {
+   "speaker": "radio",
+   "emotes": [
+    "star",
+    "music"
+   ],
+   "take": null,
+   "mission": "M0",
+   "when": "start"
+  },
+  "ep01.arrival.pilot.no_captain": {
+   "speaker": "pilot",
+   "emotes": [
+    "boat",
+    "question"
+   ],
+   "take": "ep01.arrival.pilot.react",
+   "mission": "M0",
+   "when": "start"
+  },
+  "ep01.arrival.tracker.look_dock": {
+   "speaker": "tracker",
+   "emotes": [
+    "magnifier",
+    "look"
+   ],
+   "take": "ep01.arrival.tracker.take_over",
+   "mission": "M0",
+   "when": "start"
+  },
+  "ep01.dock.tracker.small_print": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "exclamation"
+   ],
+   "take": "ep01.dock.tracker.small_print",
+   "mission": "M1",
+   "when": "paw_examined"
+  },
+  "ep01.dock.tracker.boot_observation": {
+   "speaker": "tracker",
+   "emotes": [
+    "boot",
+    "look"
+   ],
+   "take": "ep01.dock.tracker.boot_observation",
+   "mission": "M1",
+   "when": "boot_examined"
+  },
+  "ep01.dock.tracker.two_trails": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "boot",
+    "idea"
+   ],
+   "take": "ep01.dock.tracker.deduction",
+   "mission": "M1",
+   "when": "boot_examined"
+  },
+  "ep01.bank.tracker.pup_village": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "look"
+   ],
+   "take": "ep01.dock.tracker.ask_destination",
+   "mission": "M1",
+   "when": "paw_followed"
+  },
+  "ep01.bank.pilot.pup_clothes": {
+   "speaker": "pilot",
+   "emotes": [
+    "rope",
+    "exclamation"
+   ],
+   "take": "ep01.arrival.pilot.react",
+   "mission": "M2",
+   "when": "start"
+  },
+  "ep01.bank.tracker.call_climber": {
+   "speaker": "tracker",
+   "emotes": [
+    "rope",
+    "look"
+   ],
+   "take": "ep01.arrival.tracker.take_over",
+   "mission": "M2",
+   "when": "switch:climber"
+  },
+  "ep01.bank.climber.sock_high": {
+   "speaker": "climber",
+   "emotes": [
+    "leaf",
+    "thumbs_up"
+   ],
+   "take": "ep01.island.climber.line_ready",
+   "mission": "M2",
+   "when": "piece_freed"
+  },
+  "ep01.bank.climber.call_tracker": {
+   "speaker": "climber",
+   "emotes": [
+    "question",
+    "paw"
+   ],
+   "take": "ep01.island.climber.start",
+   "mission": "M2",
+   "when": "switch:tracker"
+  },
+  "ep01.bank.tracker.wet_paw": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "leaf"
+   ],
+   "take": "ep01.dock.tracker.small_print",
+   "mission": "M2",
+   "when": "piece_found"
+  },
+  "ep01.bank.tracker.next_clue": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "idea"
+   ],
+   "take": "ep01.dock.tracker.deduction",
+   "mission": "M2",
+   "when": "piece_hung"
+  },
+  "ep01.bank.pilot.m2_done": {
+   "speaker": "pilot",
+   "emotes": [
+    "thumbs_up",
+    "star"
+   ],
+   "take": "ep01.docking.pilot.aligned",
+   "mission": "M2",
+   "when": "done"
+  },
+  "ep01.plaza.tracker.no_water": {
+   "speaker": "tracker",
+   "emotes": [
+    "question",
+    "wave"
+   ],
+   "take": "ep01.dock.tracker.ask_destination",
+   "mission": "M3",
+   "when": "start"
+  },
+  "ep01.plaza.tracker.dry_stream": {
+   "speaker": "tracker",
+   "emotes": [
+    "wave",
+    "look"
+   ],
+   "take": "ep01.dock.tracker.boot_observation",
+   "mission": "M3",
+   "when": "stream_followed"
+  },
+  "ep01.plaza.tracker.ball_stuck": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "exclamation"
+   ],
+   "take": "ep01.dock.tracker.small_print",
+   "mission": "M3",
+   "when": "stream_followed"
+  },
+  "ep01.plaza.tracker.call_climber": {
+   "speaker": "tracker",
+   "emotes": [
+    "leaf",
+    "look"
+   ],
+   "take": "ep01.arrival.tracker.take_over",
+   "mission": "M3",
+   "when": "switch:climber"
+  },
+  "ep01.plaza.climber.top_basin": {
+   "speaker": "climber",
+   "emotes": [
+    "leaf",
+    "thumbs_up"
+   ],
+   "take": "ep01.island.climber.tug_2",
+   "mission": "M3",
+   "when": "leaves_pulled"
+  },
+  "ep01.plaza.radio.water_back": {
+   "speaker": "radio",
+   "emotes": [
+    "wave",
+    "star"
+   ],
+   "take": null,
+   "mission": "M3",
+   "when": "leaves_pulled"
+  },
+  "ep01.plaza.climber.m3_done": {
+   "speaker": "climber",
+   "emotes": [
+    "star",
+    "thumbs_up"
+   ],
+   "take": "ep01.island.climber.foothold",
+   "mission": "M3",
+   "when": "done"
+  },
+  "ep01.market.vendor.mess": {
+   "speaker": "vendor",
+   "emotes": [
+    "leaf",
+    "sweat"
+   ],
+   "take": null,
+   "mission": "M4",
+   "when": "start"
+  },
+  "ep01.market.vendor.pup_crates": {
+   "speaker": "vendor",
+   "emotes": [
+    "paw",
+    "exclamation"
+   ],
+   "take": null,
+   "mission": "M4",
+   "when": "start"
+  },
+  "ep01.market.tracker.read_icon": {
+   "speaker": "tracker",
+   "emotes": [
+    "look",
+    "idea"
+   ],
+   "take": "ep01.dock.tracker.deduction",
+   "mission": "M4",
+   "when": "icons_read"
+  },
+  "ep01.market.tracker.call_pilot": {
+   "speaker": "tracker",
+   "emotes": [
+    "helm",
+    "thumbs_up"
+   ],
+   "take": "ep01.arrival.tracker.take_over",
+   "mission": "M4",
+   "when": "switch:pilot"
+  },
+  "ep01.market.pilot.cart_go": {
+   "speaker": "pilot",
+   "emotes": [
+    "helm",
+    "thumbs_up"
+   ],
+   "take": "ep01.docking.pilot.start",
+   "mission": "M4",
+   "when": "take_cart"
+  },
+  "ep01.market.vendor.wrong_stall": {
+   "speaker": "vendor",
+   "emotes": [
+    "look",
+    "heart"
+   ],
+   "take": null,
+   "mission": "M4",
+   "when": "wrong_stall"
+  },
+  "ep01.market.vendor.gull_hint": {
+   "speaker": "vendor",
+   "emotes": [
+    "heart",
+    "look"
+   ],
+   "take": null,
+   "mission": "M4",
+   "when": "cargo_delivered:3"
+  },
+  "ep01.street.climber.gull_fish": {
+   "speaker": "climber",
+   "emotes": [
+    "exclamation",
+    "look"
+   ],
+   "take": "ep01.island.climber.missed",
+   "mission": "M5",
+   "when": "start"
+  },
+  "ep01.street.tracker.feathers": {
+   "speaker": "tracker",
+   "emotes": [
+    "look",
+    "idea"
+   ],
+   "take": "ep01.dock.tracker.small_print",
+   "mission": "M5",
+   "when": "feather_followed"
+  },
+  "ep01.street.tracker.call_pilot": {
+   "speaker": "tracker",
+   "emotes": [
+    "helm",
+    "question"
+   ],
+   "take": "ep01.dock.tracker.ask_destination",
+   "mission": "M5",
+   "when": "switch:pilot"
+  },
+  "ep01.street.pilot.compass_west": {
+   "speaker": "pilot",
+   "emotes": [
+    "helm",
+    "idea"
+   ],
+   "take": "ep01.river.pilot.spot_captain",
+   "mission": "M5",
+   "when": "compass_read"
+  },
+  "ep01.street.pilot.call_climber": {
+   "speaker": "pilot",
+   "emotes": [
+    "rope",
+    "look"
+   ],
+   "take": "ep01.docking.pilot.start",
+   "mission": "M5",
+   "when": "switch:climber"
+  },
+  "ep01.street.climber.fish_got": {
+   "speaker": "climber",
+   "emotes": [
+    "rope",
+    "thumbs_up"
+   ],
+   "take": "ep01.island.climber.tug_2",
+   "mission": "M5",
+   "when": "fish_recovered"
+  },
+  "ep01.street.climber.sees_boat": {
+   "speaker": "climber",
+   "emotes": [
+    "look",
+    "boat"
+   ],
+   "take": "ep01.island.climber.foothold",
+   "mission": "M5",
+   "when": "fish_recovered:end"
+  },
+  "ep01.bay.tracker.go_boat": {
+   "speaker": "tracker",
+   "emotes": [
+    "boat",
+    "heart"
+   ],
+   "take": "ep01.arrival.tracker.take_over",
+   "mission": "M6",
+   "when": "start"
+  },
+  "ep01.bay.pilot.start": {
+   "speaker": "pilot",
+   "emotes": [
+    "boat",
+    "thumbs_up"
+   ],
+   "take": "ep01.river.pilot.start",
+   "mission": "M6",
+   "when": "boat_boarded"
+  },
+  "ep01.bay.pilot.slow": {
+   "speaker": "pilot",
+   "emotes": [
+    "buoy",
+    "sweat"
+   ],
+   "take": "ep01.river.pilot.slow_down",
+   "mission": "M6",
+   "when": "buoy_passed"
+  },
+  "ep01.bay.pilot.call_climber": {
+   "speaker": "pilot",
+   "emotes": [
+    "rope",
+    "look"
+   ],
+   "take": "ep01.docking.pilot.assist",
+   "mission": "M6",
+   "when": "switch:climber"
+  },
+  "ep01.bay.climber.throw_rope": {
+   "speaker": "climber",
+   "emotes": [
+    "rope",
+    "star"
+   ],
+   "take": "ep01.island.climber.line_ready",
+   "mission": "M6",
+   "when": "rope_thrown"
+  },
+  "ep01.bay.captain.thanks_tow": {
+   "speaker": "captain",
+   "emotes": [
+    "heart",
+    "boat"
+   ],
+   "take": "ep01.return.captain.thanks",
+   "mission": "M6",
+   "when": "rope_thrown"
+  },
+  "ep01.bay.captain.pup_lighthouse": {
+   "speaker": "captain",
+   "emotes": [
+    "paw",
+    "exclamation"
+   ],
+   "take": "ep01.river.captain.wave",
+   "mission": "M6",
+   "when": "rope_thrown:end"
+  },
+  "ep01.lighthouse.pilot.lamp_off": {
+   "speaker": "pilot",
+   "emotes": [
+    "idea",
+    "sweat"
+   ],
+   "take": "ep01.arrival.pilot.ask_captain",
+   "mission": "M7",
+   "when": "start"
+  },
+  "ep01.lighthouse.tracker.lens": {
+   "speaker": "tracker",
+   "emotes": [
+    "magnifier",
+    "exclamation"
+   ],
+   "take": "ep01.dock.tracker.small_print",
+   "mission": "M7",
+   "when": "lens_found"
+  },
+  "ep01.lighthouse.tracker.call_climber": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "look"
+   ],
+   "take": "ep01.arrival.tracker.take_over",
+   "mission": "M7",
+   "when": "switch:climber"
+  },
+  "ep01.lighthouse.climber.pup_safe": {
+   "speaker": "climber",
+   "emotes": [
+    "paw",
+    "heart"
+   ],
+   "take": "ep01.island.climber.tug_2",
+   "mission": "M7",
+   "when": "pup_rescued"
+  },
+  "ep01.lighthouse.climber.call_pilot": {
+   "speaker": "climber",
+   "emotes": [
+    "helm",
+    "idea"
+   ],
+   "take": "ep01.island.climber.start",
+   "mission": "M7",
+   "when": "switch:pilot"
+  },
+  "ep01.lighthouse.pilot.aim": {
+   "speaker": "pilot",
+   "emotes": [
+    "helm",
+    "star"
+   ],
+   "take": "ep01.docking.pilot.start",
+   "mission": "M7",
+   "when": "boat_lit"
+  },
+  "ep01.lighthouse.pup.horn": {
+   "speaker": "pup",
+   "emotes": [
+    "horn",
+    "music"
+   ],
+   "take": "ep01.return.pup.horn",
+   "mission": "M7",
+   "when": "boat_lit"
+  },
+  "ep01.lighthouse.radio.lights_on": {
+   "speaker": "radio",
+   "emotes": [
+    "boat",
+    "star"
+   ],
+   "take": null,
+   "mission": "M7",
+   "when": "done"
+  },
+  "ep01.festival.radio.night": {
+   "speaker": "radio",
+   "emotes": [
+    "music",
+    "star"
+   ],
+   "take": null,
+   "mission": "M8",
+   "when": "start"
+  },
+  "ep01.festival.captain.thanks": {
+   "speaker": "captain",
+   "emotes": [
+    "heart",
+    "music"
+   ],
+   "take": "ep01.return.captain.thanks",
+   "mission": "M8",
+   "when": "captain_thanked"
+  },
+  "ep01.festival.tracker.cheer": {
+   "speaker": "tracker",
+   "emotes": [
+    "star",
+    "heart"
+   ],
+   "take": "ep01.arrival.tracker.take_over",
+   "mission": "M8",
+   "when": "done"
+  },
+  "ep01.radio.v3_m1.bench": {
+   "speaker": "radio",
+   "emotes": [
+    "look",
+    "paw"
+   ],
+   "take": null,
+   "mission": "M1",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m1.boot": {
+   "speaker": "radio",
+   "emotes": [
+    "look",
+    "boot"
+   ],
+   "take": null,
+   "mission": "M1",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m1.trail": {
+   "speaker": "radio",
+   "emotes": [
+    "paw",
+    "look"
+   ],
+   "take": null,
+   "mission": "M1",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m2.free_pieces": {
+   "speaker": "radio",
+   "emotes": [
+    "rope",
+    "look"
+   ],
+   "take": null,
+   "mission": "M2",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m2.find_third": {
+   "speaker": "radio",
+   "emotes": [
+    "paw",
+    "leaf"
+   ],
+   "take": null,
+   "mission": "M2",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m2.hang": {
+   "speaker": "radio",
+   "emotes": [
+    "rope",
+    "star"
+   ],
+   "take": null,
+   "mission": "M2",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m3.stream": {
+   "speaker": "radio",
+   "emotes": [
+    "wave",
+    "look"
+   ],
+   "take": null,
+   "mission": "M3",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m3.leaves": {
+   "speaker": "radio",
+   "emotes": [
+    "leaf",
+    "rope"
+   ],
+   "take": null,
+   "mission": "M3",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m4.read": {
+   "speaker": "radio",
+   "emotes": [
+    "look",
+    "idea"
+   ],
+   "take": null,
+   "mission": "M4",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m4.deliver": {
+   "speaker": "radio",
+   "emotes": [
+    "helm",
+    "look"
+   ],
+   "take": null,
+   "mission": "M4",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m5.feathers": {
+   "speaker": "radio",
+   "emotes": [
+    "look",
+    "paw"
+   ],
+   "take": null,
+   "mission": "M5",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m5.compass": {
+   "speaker": "radio",
+   "emotes": [
+    "helm",
+    "look"
+   ],
+   "take": null,
+   "mission": "M5",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m5.fish": {
+   "speaker": "radio",
+   "emotes": [
+    "rope",
+    "look"
+   ],
+   "take": null,
+   "mission": "M5",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m6.board": {
+   "speaker": "radio",
+   "emotes": [
+    "boat",
+    "helm"
+   ],
+   "take": null,
+   "mission": "M6",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m6.buoys": {
+   "speaker": "radio",
+   "emotes": [
+    "buoy",
+    "helm"
+   ],
+   "take": null,
+   "mission": "M6",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m6.approach": {
+   "speaker": "radio",
+   "emotes": [
+    "boat",
+    "look"
+   ],
+   "take": null,
+   "mission": "M6",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m6.rope": {
+   "speaker": "radio",
+   "emotes": [
+    "rope",
+    "boat"
+   ],
+   "take": null,
+   "mission": "M6",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m7.lens": {
+   "speaker": "radio",
+   "emotes": [
+    "magnifier",
+    "look"
+   ],
+   "take": null,
+   "mission": "M7",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m7.climb": {
+   "speaker": "radio",
+   "emotes": [
+    "rope",
+    "paw"
+   ],
+   "take": null,
+   "mission": "M7",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m7.aim": {
+   "speaker": "radio",
+   "emotes": [
+    "helm",
+    "boat"
+   ],
+   "take": null,
+   "mission": "M7",
+   "when": "hint"
+  },
+  "ep01.radio.v3_m8.thanks": {
+   "speaker": "radio",
+   "emotes": [
+    "heart",
+    "look"
+   ],
+   "take": null,
+   "mission": "M8",
+   "when": "hint"
+  }
+ }
+}

@@ -498,7 +498,6 @@ func _on_spot(id: StringName, actor: Node3D) -> void:
 			for st: StringName in CARGO_ORDER:
 				FeedbackFx.ring(world, _mk(st) + Vector3(0, 2.1, 0), STALL_COLORS[st])
 			if main.notify_mission(&"icons_read"):
-				main.say("ep01.market.vendor.mess")
 				main.say("ep01.market.tracker.read_icon")
 		&"take_cart":
 			_attach_cart(actor as MemberActor)

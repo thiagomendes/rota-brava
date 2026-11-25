@@ -101,6 +101,66 @@ Objetivo observável: Thiago joga no Windows o Ep01 com os heróis v2, a vila v2
 
 - **Revisão E5 + C1 (`reviewer`, 2026-11-25):** APROVADO COM RESSALVAS, suíte `OK (3351 PASS)` após juntar a base com props v3 (o lead ajustou o teste das peças para os modelos finais: 7 finais, demais provisórias). Achado médio corrigido pelo lead: as checagens do colete passavam sem o acessório no modelo; agora exigem `has_accessory`. Baixas: leste e sul do barco sem teste; raios de folga em 8 direções; no barco o mouse capturado só solta pela pausa. Não verificado: travas no corte para o cais e no M8, câmera no pitch mínimo perto do chão/água (inspeção humana). Visto pelo lead: M5 com o Pico no telhado, a gaivota final e o emblema do mosquetão (lê como "0"). Integrado; suíte após o merge `OK (3351 PASS)`.
 
+- **E6 · Falas (`adventure`, 2026-11-25, `feature/rb-r1-e6-falas`):** 53 falas no roteiro M0–M8 (23 novas, 18 reescritas, 12 mantidas) + 21 dicas do Farol 7 (16 encurtadas), todas com até 44 caracteres e 8 palavras. Ficha `game/episodes/ep01/v3/ep01_v3_dialogue.json` (falante, ícones da legenda de `res://ui/brand/icons`, take de balbucio JÁ existente do mesmo personagem; nenhum áudio novo) lida por `ep01_v3_dialogue.gd` (`Ep01V3Dialogue`). Ligação em `ep01_v3_main.gd`: `emotes_hook` e `voice_hook` pela ficha, falas de abertura (`mission_start`), conclusão (`mission_done`) e chamada de cooperação em cada troca de herói (`switch`, 9 trocas). `ep01_v3_land.gd`: a reclamação da feirante passa para a abertura do M4. Feirante: **Dona Amora** (`member.vendor.name`), ícone `leaf`; `member.captain.name` passou de "Piloto" para "Capitão". `small_print` mantém o texto da SPEC. 45 de 53 falas tocam balbucio reaproveitado; Farol 7 (4 falas do roteiro + 21 dicas) e Dona Amora (4) ficam só com legenda (TTS só na produção; feirante sem perfil de balbucio). Fala total estimada 119 s, sem travar o jogo (fila da legenda). Bot M0→M8: 251,6 s antes, 266,7 s depois (+15,1 s, +6%). Teste novo `game/tests/test_ep01_v3_dialogue.gd`; em `test_ep01_v3.gd` a ajuda limpa a legenda antes de forçar o tempo (no jogo a ajuda só vem após ~10 s). Capturas: `captures/e6/m0_leme_abertura.png`, `captures/e6/m4_dona_amora.png`. Fraco: retrato da legenda de capitão, filhote, feirante e Farol 7 cai no ícone `notebook` (o HUD só tem ícone para os 3 heróis); falta para o `ux`: ícones lua, peixe e flor dos barquinhos (hoje `wave`, `heart`, `leaf` no lugar) e retrato/ícone da Dona Amora.
+
+  Roteiro em ordem de jogo:
+
+  | Missão | Quando | Quem | Chave | Texto |
+  |---|---|---|---|---|
+  | M0 | abertura | Farol 7 | `ep01.arrival.radio.festival` | Hoje é a Festa das Lanternas! |
+  | M0 | abertura | Leme | `ep01.arrival.pilot.no_captain` | O barco chegou sem o capitão! |
+  | M0 | abertura | Rastro | `ep01.arrival.tracker.look_dock` | Vou procurar pistas no cais. |
+  | M1 | paw_examined | Rastro | `ep01.dock.tracker.small_print` | Essa pegada cabe na palma da minha mão. |
+  | M1 | boot_examined | Rastro | `ep01.dock.tracker.boot_observation` | Esta bota grande é do capitão. |
+  | M1 | boot_examined | Rastro | `ep01.dock.tracker.two_trails` | Duas trilhas! A pata é do filhote. |
+  | M1 | paw_followed | Rastro | `ep01.bank.tracker.pup_village` | As pegadinhas vão para a margem! |
+  | M2 | abertura | Leme | `ep01.bank.pilot.pup_clothes` | Ih! O filhote derrubou o varal! |
+  | M2 | troca → Pico | Rastro | `ep01.bank.tracker.call_climber` | Pico, as roupas estão lá no alto! |
+  | M2 | piece_freed | Pico | `ep01.bank.climber.sock_high` | Peguei! Agora a da árvore. |
+  | M2 | troca → Rastro | Pico | `ep01.bank.climber.call_tracker` | Rastro, falta uma roupa. Cadê? |
+  | M2 | piece_found | Rastro | `ep01.bank.tracker.wet_paw` | Pegadinha molhada! A roupa está nos juncos. |
+  | M2 | piece_hung | Rastro | `ep01.bank.tracker.next_clue` | Meia com pelo! O filhote foi à praça. |
+  | M2 | conclusão | Leme | `ep01.bank.pilot.m2_done` | Varal arrumado! Que time! |
+  | M3 | abertura | Rastro | `ep01.plaza.tracker.no_water` | O chafariz parou. Cadê a água? |
+  | M3 | stream_followed | Rastro | `ep01.plaza.tracker.dry_stream` | O filete está seco. Vou seguir. |
+  | M3 | stream_followed | Rastro | `ep01.plaza.tracker.ball_stuck` | A bola do filhote travou a grade! |
+  | M3 | troca → Pico | Rastro | `ep01.plaza.tracker.call_climber` | Pico, as folhas estão lá em cima! |
+  | M3 | leaves_pulled | Pico | `ep01.plaza.climber.top_basin` | Tirei as folhas! |
+  | M3 | leaves_pulled | Farol 7 | `ep01.plaza.radio.water_back` | A água voltou! Olhem a bola rolar. |
+  | M3 | conclusão | Pico | `ep01.plaza.climber.m3_done` | Chafariz de volta! Viva! |
+  | M4 | abertura | Dona Amora | `ep01.market.vendor.mess` | Ai, minhas frutas! Que bagunça! |
+  | M4 | abertura | Dona Amora | `ep01.market.vendor.pup_crates` | O filhote derrubou meus caixotes. |
+  | M4 | icons_read | Rastro | `ep01.market.tracker.read_icon` | Cada caixote vai na barraca da cor. |
+  | M4 | troca → Leme | Rastro | `ep01.market.tracker.call_pilot` | Leme, você empurra o carrinho! |
+  | M4 | take_cart | Leme | `ep01.market.pilot.cart_go` | Deixa comigo! Vamos levar. |
+  | M4 | wrong_stall | Dona Amora | `ep01.market.vendor.wrong_stall` | Esta não. Procure a mesma cor! |
+  | M4 | cargo_delivered:3 | Dona Amora | `ep01.market.vendor.gull_hint` | Obrigada! O filhote correu atrás da gaivota. |
+  | M5 | abertura | Pico | `ep01.street.climber.gull_fish` | A gaivota pegou um peixe da feira! |
+  | M5 | feather_followed | Rastro | `ep01.street.tracker.feathers` | Penas! A gaivota passou por aqui. |
+  | M5 | troca → Leme | Rastro | `ep01.street.tracker.call_pilot` | Leme, para onde ela voou? |
+  | M5 | compass_read | Leme | `ep01.street.pilot.compass_west` | A bússola diz oeste: o galpão de redes! |
+  | M5 | troca → Pico | Leme | `ep01.street.pilot.call_climber` | Pico, suba no telhado! |
+  | M5 | fish_recovered | Pico | `ep01.street.climber.fish_got` | Peguei o peixe! Lá vai na corda. |
+  | M5 | fish_recovered:end | Pico | `ep01.street.climber.sees_boat` | Daqui de cima vejo o bote do capitão! |
+  | M6 | abertura | Rastro | `ep01.bay.tracker.go_boat` | O capitão precisa de ajuda. Ao barco! |
+  | M6 | boat_boarded | Leme | `ep01.bay.pilot.start` | Todos a bordo! Coletes postos. |
+  | M6 | buoy_passed | Leme | `ep01.bay.pilot.slow` | Devagar entre os barquinhos. |
+  | M6 | troca → Pico | Leme | `ep01.bay.pilot.call_climber` | Pico, jogue a corda! |
+  | M6 | rope_thrown | Pico | `ep01.bay.climber.throw_rope` | Corda lançada! |
+  | M6 | rope_thrown | Capitão | `ep01.bay.captain.thanks_tow` | Obrigado, equipe! Meu bote encalhou. |
+  | M6 | rope_thrown:end | Capitão | `ep01.bay.captain.pup_lighthouse` | O filhote subiu no farol! |
+  | M7 | abertura | Leme | `ep01.lighthouse.pilot.lamp_off` | A lanterna do farol está apagada! |
+  | M7 | lens_found | Rastro | `ep01.lighthouse.tracker.lens` | A lente do farol caiu na grama! |
+  | M7 | troca → Pico | Rastro | `ep01.lighthouse.tracker.call_climber` | Pico, o filhote está lá no alto! |
+  | M7 | pup_rescued | Pico | `ep01.lighthouse.climber.pup_safe` | Peguei o filhote! A lente voltou. |
+  | M7 | troca → Leme | Pico | `ep01.lighthouse.climber.call_pilot` | Leme, gire a luz! |
+  | M7 | boat_lit | Leme | `ep01.lighthouse.pilot.aim` | Vou girar a luz para cada barquinho. |
+  | M7 | boat_lit | Filhote | `ep01.lighthouse.pup.horn` | Au! Au! |
+  | M7 | conclusão | Farol 7 | `ep01.lighthouse.radio.lights_on` | Os barquinhos acenderam! Venham à festa. |
+  | M8 | abertura | Farol 7 | `ep01.festival.radio.night` | A Festa das Lanternas começou! |
+  | M8 | captain_thanked | Capitão | `ep01.festival.captain.thanks` | Obrigado, equipe! A festa é de vocês! |
+  | M8 | conclusão | Rastro | `ep01.festival.tracker.cheer` | Viva! Cada um ajudou do seu jeito. |
+
 ## Controles e movimento (Thiago jogou M0–M1 no Windows, 2026-11-25)
 Pedidos de Thiago após jogar: câmera solta pelo mouse para olhar o mundo sem depender de andar; corrida com pés acelerados e estranhos; seguidores se sobrepõem quando param; falta pular; andar por padrão e correr segurando Shift.
 - **C1 · Câmera orbital (`gameplay`, junto da E5, que já mexe em `camera_rig.gd`):** mouse move a câmera em volta do herói (guinada e inclinação limitadas), alavanca direita do controle faz o mesmo; a câmera baixa aprovada continua sendo o ponto de partida; desvio de obstáculos da E5 vale também com a órbita; movimento do herói relativo à câmera. Prova: teste determinístico da órbita por ação da Input Map.

@@ -1,0 +1,61 @@
+class_name Ep01V3Dialogue
+extends RefCounted
+## Falas do Ep01 v3 (RB-R1 E6): ficha em ep01_v3_dialogue.json com quem fala, icones da legenda (res://ui/brand/icons)
+## e o take de voz JA EXISTENTE em res://audio/voice_catalog.json (balbucio do mesmo personagem). Texto so no catalogo
+## i18n. Momentos: abertura de cada missao (`mission_start`), conclusao (`mission_done`) e chamada de cooperacao na
+## troca de heroi (`switch`, chave "Mx:heroi"). As demais falas sao ditas pelo codigo das missoes nos acontecimentos.
+
+const PATH := "res://episodes/ep01/v3/ep01_v3_dialogue.json"
+
+static var _sheet: Dictionary = {}
+
+
+static func sheet() -> Dictionary:
+	if _sheet.is_empty():
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(PATH)) if FileAccess.file_exists(PATH) else null
+		_sheet = parsed if parsed is Dictionary else {"lines": {}}
+	return _sheet
+
+
+static func line(key: String) -> Dictionary:
+	return (sheet().get("lines", {}) as Dictionary).get(key, {})
+
+
+static func emotes(key: String) -> Array[StringName]:
+	var out: Array[StringName] = []
+	for e: Variant in line(key).get("emotes", []):
+		out.append(StringName(str(e)))
+	return out
+
+
+## Id do take ja gravado para tocar com esta fala, ou "" (so legenda).
+static func take(key: String) -> String:
+	var v: Variant = line(key).get("take", null)
+	return "" if v == null else str(v)
+
+
+static func _keys(section: String, id: String) -> Array[String]:
+	var out: Array[String] = []
+	for k: Variant in (sheet().get(section, {}) as Dictionary).get(id, []):
+		out.append(str(k))
+	return out
+
+
+static func start_lines(mission: StringName) -> Array[String]:
+	return _keys("mission_start", String(mission))
+
+
+static func done_lines(mission: StringName) -> Array[String]:
+	return _keys("mission_done", String(mission))
+
+
+static func switch_line(mission: StringName, hero: StringName) -> String:
+	return str((sheet().get("switch", {}) as Dictionary).get("%s:%s" % [mission, hero], ""))
+
+
+## Todas as chaves da ficha, em ordem de jogo (roteiro) e depois as dicas do radio.
+static func all_keys() -> Array[String]:
+	var out: Array[String] = []
+	for k: Variant in (sheet().get("lines", {}) as Dictionary).keys():
+		out.append(str(k))
+	return out

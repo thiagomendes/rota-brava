@@ -9,7 +9,7 @@
   "member.climber.skill": "Linha",
   "member.pilot.skill": "Leme",
   "member.radio.name": "Farol 7",
-  "member.captain.name": "Piloto",
+  "member.captain.name": "Capitão",
   "member.pup.name": "Filhote",
   "ep01.title": "O barco sem capitão",
   "ep01.arrival.radio.horn": "Buzina no porto! Um barco amarelo está chegando.",
@@ -18,7 +18,7 @@
   "ep01.arrival.pilot.ask_captain": "Cadê o piloto? Alguém viu o piloto?",
   "ep01.arrival.tracker.take_over": "Tem algo estranho no banco. Vou olhar de perto.",
   "ep01.dock.tracker.small_print": "Essa pegada cabe na palma da minha mão.",
-  "ep01.dock.tracker.boot_observation": "Essa bota é grande. Ela termina na margem do rio.",
+  "ep01.dock.tracker.boot_observation": "Esta bota grande é do capitão.",
   "ep01.dock.tracker.paw_not_enough": "Uma pegada pequena. Agora olha a marca na margem.",
   "ep01.dock.tracker.boot_not_enough": "Uma bota na lama. Agora olha o banco do barco.",
   "ep01.dock.tracker.wrong_bank_hint": "No cais não há marca nova. Olha a lama perto da água.",
@@ -109,4 +109,3 @@
   "ui.control.pause": "Teclado: Esc / Controle: botão Start",
   "ui.control.move": "Teclado: WASD ou setas / Controle: analógico esquerdo"
 }
-
