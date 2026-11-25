@@ -889,6 +889,74 @@ def export_glb(objs, path):
                               export_texcoords=True, export_image_format="NONE")
 
 
+MANIFEST = os.path.join(REPO, "source_art", "manifest.json")
+SOURCES = ["source_art/environment_v2/build_world_v2.py", "source_art/environment_v2/wv2lib.py",
+           "source_art/environment_v2/wv2_houses.py", "source_art/environment_v2/wv2_kit.py",
+           "source_art/environment_v2/wv2_textures.py", "source_art/environment_v2/render_world_v2.py",
+           "source_art/environment_v2/world_v2.blend", "source_art/environment_v2/PROVENANCE.md"]
+
+
+def _sha(path):
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        h.update(f.read())
+    return h.hexdigest()
+
+
+def update_manifest(info):
+    """Entradas do mundo v2 no source_art/manifest.json (mesmo padrao dos ativos do RB-R1: sha256, triangulos, origem)."""
+    with open(MANIFEST, encoding="utf-8") as f:
+        man = json.load(f)
+    common = {
+        "agente": "art3d", "status": "provisorio", "aprovacao": "pendente (Thiago)", "data": "2026-11-25",
+        "proposta": "RB-R1 W1: vitrine vila e cais v2; NAO substitui o porto do jogo (so game/lookdev/world_v2/)",
+        "originalidade": "geometria e texturas 100% procedurais por script (bmesh, formulas e numpy); nenhum modelo, malha, "
+                         "textura, foto, HDRI ou kit de terceiros",
+        "origem": SOURCES,
+    }
+    proc = {"script": "source_art/environment_v2/build_world_v2.py",
+            "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless, numpy embutido)",
+            "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice (COLOR_0 linear), UV em metros, "
+                          "normais ponderadas por area (WeightedNormal), sem texturas embutidas"}
+    st = info["estatico"]
+    kit = info["kit"]
+    entries = [
+        dict(id="world_v2_static", nome="Mundo v2: cenario fixo do recorte do porto", processo=proc,
+             saida_glb="game/assets/models/environment_v2/wv2_static.glb",
+             glb_sha256=_sha(os.path.join(GLB_DIR, "wv2_static.glb")),
+             triangulos=info["triangulos_estatico"],
+             materiais=sorted({m for v in st.values() for m in v["materiais"]}),
+             objetos=sorted(st.keys()),
+             nota="cais de madeira, cais de pedra, ruas e praca calcadas, 20 casas (vaos recuados, venezianas, floreiras, "
+                  "sacadas, toldos, telhas modeladas), galpao, chafariz, farol, margem, morros e fundo do porto"),
+        dict(id="world_v2_kit", nome="Mundo v2: kit de aderecos e vegetacao (MultiMesh)", processo=proc,
+             saida_glb="game/assets/models/environment_v2/wv2_kit.glb",
+             glb_sha256=_sha(os.path.join(GLB_DIR, "wv2_kit.glb")),
+             triangulos=sum(v["triangulos"] for v in kit.values()),
+             materiais=sorted({m for v in kit.values() for m in v["materiais"]}),
+             objetos=sorted("kit_" + k for k in kit.keys()),
+             nota="%d pecas, %d instancias no layout (game/lookdev/world_v2/world_v2_layout.json)" % (len(kit), info["instancias"])),
+        dict(id="world_v2_textures", nome="Mundo v2: texturas procedurais ladrilhaveis",
+             processo={"script": "source_art/environment_v2/wv2_textures.py",
+                       "ferramenta": "Blender 4.5.16 (numpy embutido); JPEG pelo Blender, PNG escrito pelo script",
+                       "exportador": "cor em JPEG (sRGB); dados em PNG RGBA (normal OpenGL, mascara de tinta, rugosidade)"},
+             saida="game/assets/textures/environment_v2",
+             arquivos_sha256={f: _sha(os.path.join(TEX_DIR, f)) for f in sorted(os.listdir(TEX_DIR))
+                              if f.endswith((".jpg", ".png"))},
+             nota="ruido de valor, Voronoi e formas analiticas; mipmaps e sem compressao com perda no .import"),
+    ]
+    ids = {e["id"] for e in entries}
+    man["ativos"] = [a for a in man["ativos"] if a.get("id") not in ids]
+    for e in entries:
+        full = {"id": e.pop("id"), "nome": e.pop("nome")}
+        full.update(common)
+        full.update(e)
+        man["ativos"].append(full)
+    with open(MANIFEST, "w", encoding="utf-8") as f:
+        f.write(json.dumps(man, indent=2, ensure_ascii=False) + "\n")
+
+
 def main():
     t0 = time.time()
     random.seed(20261125)  # deslocamentos de UV sem rng explicito: reprodutivel
@@ -955,6 +1023,7 @@ def main():
     bpy.ops.wm.save_as_mainfile(filepath=BLEND, compress=True)
     if os.path.exists(BLEND + "1"):
         os.remove(BLEND + "1")
+    update_manifest(info)
     if "--renders" in ARGS:
         import render_world_v2
         render_world_v2.render_all(statics, kit_objs, os.path.join(REPO, "captures", "mundo_v2", "blender"))
