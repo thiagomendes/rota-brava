@@ -69,10 +69,21 @@ func _pieces() -> void:
 		Ep01V3Pieces.crate(holder, "k", Color.BLUE), Ep01V3Pieces.stall_sign(holder, "s", Color.GREEN), Ep01V3Pieces.emblem(holder),
 		Ep01V3Pieces.help_arrow(holder), Ep01V3Pieces.gull_with_fish(holder), Ep01V3Pieces.fish(holder), Ep01V3Pieces.rope(holder),
 		Ep01V3Pieces.boat_icon(holder, "i", &"star"), Ep01V3Pieces.compass(holder)]
+	# Com props_v3 na base, folhas, bola, emblema, seta, gaivota, peixe e corda
+	# saem do modelo final (meta piece_id, sem `provisional`); placa, icone do barquinho e bussola
+	# continuam blocos marcados provisorios (roupa sem indice e caixote sem barraca tambem).
 	var ok := true
+	var finals := 0
 	for n in all:
-		ok = ok and n != null and n.get_meta(Ep01V3Pieces.PROVISIONAL, false)
-	r.check(ok, "v3 E5: %d pecas saem do ponto unico de troca (Ep01V3Pieces), marcadas provisorias" % all.size())
+		if n == null:
+			ok = false
+			continue
+		var is_final := n.has_meta(&"piece_id")
+		if is_final:
+			finals += 1
+		ok = ok and (is_final != bool(n.get_meta(Ep01V3Pieces.PROVISIONAL, false)))
+	r.check(ok, "v3 E5: %d pecas saem do ponto unico de troca (Ep01V3Pieces); final xor provisoria" % all.size())
+	r.check(finals == 7, "v3 E5: 7 pecas usam o modelo final do props_v3 (achou %d)" % finals)
 	r.check(all[7].get_node_or_null("Fish") != null, "v3 E5: gaivota traz o peixe como filho (soltar = reparent)")
 	holder.free()
 
