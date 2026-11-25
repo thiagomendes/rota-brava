@@ -58,6 +58,13 @@ FESTA_BOATS = [  # (x, z, ry, cor do casco, icone)  4 direcoes vistas do farol
     (52.0, -15.0, 190.0, "#F2B632", "flower"),
 ]
 LENS = (25.8, -21.8)
+# E3b (2026-11-25): caixotes do Pico (M5, primeiro degrau de 0,6 m ao lado do toldo) recuados 1,55 m para o norte, para
+# a passagem praca -> rua do mercado (entre os caixotes e a beira d'agua) ficar com >= 1,6 m livres.
+PICO_CRATES = [(-15.05, -15.55, 5.0), (-15.05, -16.15, -4.0), (-14.45, -15.85, 12.0)]   # (x, z, ry)
+# E3b: caminho da rua ate a base da escada do farol (e o ramal ate a lente): pedras do promontorio saem deste corredor
+HEAD_PATH = [(18.6, -15.0), (22.8, -17.3), (26.6, -19.5), (29.5, -20.6)]
+HEAD_PATH_LENS = [(24.4, -18.3), (25.8, -21.8)]
+HEAD_PATH_HALF = 1.3   # meia largura livre do corredor (m): capsula de raio 0,35 com folga
 PAPER_COLS = ["#FF5A4E", "#FFC93C", "#FF8A3D", "#FF8FB1", "#7FD07A", "#FFFFFF"]
 
 lantern_points = []   # posicoes das lanternas de festa (para as luzes da noite na Godot)

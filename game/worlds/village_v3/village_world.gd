@@ -7,7 +7,7 @@ extends Node3D
 ## lente), agua, ceu, sol, luzes quentes locais e ambiente. A colisao, os limites e os marcadores M0-M8 ja estao na cena
 ## (village_world.tscn, gerada por source_art/environment_v2/wv3_collision.py).
 ## Uso no episodio: instanciar village_world.tscn; ler marcadores com marker(&"M3_Grate") ou markers_for("M3");
-## set_night(), set_festival() (noite de festa), lantern (Node3D: gire em Y), set_beam().
+## set_night(), set_festival() (noite de festa), lantern (Node3D: gire em Y), set_beam(); set_access_ramps() (E3b).
 
 const STATIC_GLB := "res://assets/models/environment_v2/wv2_static.glb"
 const KIT_GLB := "res://assets/models/environment_v2/wv2_kit.glb"
@@ -87,6 +87,26 @@ func markers_for(mission: String) -> Array[Marker3D]:
 		if n is Marker3D and String(n.get_meta("mission", "")) == mission:
 			out.append(n as Marker3D)
 	return out
+
+
+# ---------------------------------------------------------------- rampas de acesso (E3b)
+
+## Camada da fisica (valor de bit) das rampas invisiveis sobre degraus de missao (Collision/AccessRamps).
+const ACCESS_RAMPS_LAYER := 16
+
+
+## Rampas invisiveis sobre os degraus que um heroi sem step-up nao sobe (farol, chafariz). Desligadas
+## por padrao: ficam so na camada 5 (fora da mascara 1 do heroi). Ligadas, entram tambem na camada 1 (mundo).
+## Alternativa sem chamar isto: por a camada 5 na mascara do heroi. Cada forma tem metadata mission/covers/to_marker.
+func set_access_ramps(on: bool) -> void:
+	var body := get_node_or_null("Collision/AccessRamps") as StaticBody3D
+	if body != null:
+		body.collision_layer = ACCESS_RAMPS_LAYER | (1 if on else 0)
+
+
+func access_ramps_enabled() -> bool:
+	var body := get_node_or_null("Collision/AccessRamps") as StaticBody3D
+	return body != null and (body.collision_layer & 1) != 0
 
 
 # ---------------------------------------------------------------- estados

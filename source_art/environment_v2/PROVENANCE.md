@@ -91,3 +91,24 @@ teclas; `set_night`, `set_festival`, `set_beam`, `lantern`, `marker()`, `markers
 
 Limites conhecidos: `wv2_boat.glb` não é bit a bit reprodutível (mesmo tamanho, sha muda; já era assim antes da E3); demais
 saídas conferidas iguais em 2 execuções seguidas. Colisão do terreno em mapa de altura de 1 m (o visual usa 0,5 m).
+
+## E3b · ajustes para a E4 (RB-R1, art3d, 2026-11-25) — PROVISORIO
+Mesmas regras de originalidade (tudo por script). Mudancas, todas no mesmo build (`build_world_v2.py -- --no-tex`):
+- **Passagem praca -> rua do mercado (~(-15; -14)):** os 3 caixotes do Pico (M5) recuaram 1,55 m para o norte, encostados no
+  lado leste do toldo (`W3.PICO_CRATES`); entre eles e a beira d'agua ficam ~2,0 m livres (antes ~0,4 m). Subida do M5 mantida
+  (caixote 0,6 -> toldo 1,6 -> telhado 2,92; do marcador `M5_Crates` ao `M5_Awning` agora 1,57 m, antes 2,4 m).
+- **Subida do promontorio (~(20; -16)):** (a) `head_h` nasce 2 cm abaixo da rua em x = 20 e sobe no maximo 0,55 m/m: antes o
+  retalho do promontorio comecava solto ate 0,55 m acima do calcamento (chapa no ar escondida pelo cafe e degrau que travava o
+  heroi); muda o terreno visual (`wv2_static.glb`) e a colisao do mesmo jeito; o muro baixo da escadaria do beco (x 22,3) agora
+  aparece ~0,5 m acima da grama. (b) pedras do promontorio saem do corredor `W3.HEAD_PATH` (+ ramal ate a lente), empurradas
+  para o lado (meia largura 1,3 m + raio da pedra); a mesma ordem de sorteio mantem o resto da dispersao. Medido no layout:
+  `rock_b` 43 -> 41 (3 empurradas, 2 sairam porque o lugar empurrado caia na rua ou na casa do faroleiro, 4 desceram com o
+  terreno novo perto de x 20-22); fora do promontorio so mudou a altura de 6 tufos de grama/flor no mesmo trecho.
+- **Rampas de acesso (colisao, invisiveis):** corpo `AccessRamps` na camada 5 (valor 16), fora da mascara do heroi, desligado
+  por padrao: `Ramp_LighthouseStep` (terreno -> embasamento do farol, 1,2 m de largura) e `Ramp_FountainEast` (rua -> borda da
+  bacia 0,50, 1,0 m). `VillageWorld.set_access_ramps(true)` liga (camada 1 tambem). Metadata em cada forma: `mission`, `covers`,
+  `to_marker`.
+- **Pesos:** `wv2_kit.glb`, `wv3_props.glb` e `wv2_boat.glb` sem mudanca (o barco foi restaurado do Git: o build nao o refaz bit a
+  bit); `wv2_static.glb` regravado (mesmo numero de triangulos, so o terreno do promontorio muda).
+- **Ferramentas de prova:** `tools/probe_walkmap.gd` (mapa de caminhabilidade da colisao) e `tools/probe_profile.gd` (perfil de
+  altura e degraus ao longo de uma linha). Capturas em `captures/e3b/` (fora do Git).

@@ -7,6 +7,8 @@ Gera, a partir dos MESMOS numeros do build (funcoes de terreno, caixas do calcam
     Props       aderecos grandes do kit (caixotes, barris, barracas, bancos, postes, carrinho, arvores, rochas...)
     WaterLimits paredes invisiveis na beira d'agua (contorno do nivel -0,3 m, marching squares + simplificacao)
     MapBounds   paredes do limite do mapa
+    AccessRamps rampas invisiveis sobre degraus de missao (camada 5 = valor 16, fora da mascara do heroi): o gameplay liga
+                com VillageWorld.set_access_ramps(true) ou pondo a camada 5 na mascara do heroi (E3b)
   game/worlds/village_v3/village_world.tscn       (raiz com village_world.gd + colisao + Markers M0-M8)
 Formas simples (caixa, cilindro, mapa de altura). Camada 1 (mundo), mascara 0, como as cenas do Ep01.
 """
@@ -51,7 +53,7 @@ PAVING = [
 ]
 TERRAIN = [  # nome, funcao, x0, x1, z0, z1 (regioes de build_terrain(), recortadas ao mapa jogavel)
     ("bank", "bank_h", -42.0, 34.0, 1.0, 25.0),
-    ("headland", "head_h", 20.0, 46.0, -36.0, -8.0),
+    ("headland", "head_h", 20.0, 46.0, -36.0, -8.0),   # E3b: head_h nasce abaixo da rua em x = 20 (sem degrau na borda)
     ("hill", "hill_h", -42.0, 46.0, -40.0, -31.0),
     ("west", "west_h", -44.0, -38.0, -40.0, 25.0),
 ]
@@ -63,10 +65,14 @@ def rot_y(deg):
     return Matrix.Rotation(math.radians(deg), 3, "Y")
 
 
+ACCESS_RAMPS_LAYER = 16   # camada 5 da fisica
+
+
 class Shapes:
     def __init__(self):
         self.res = []     # sub_resources: (id, type, props)
         self.nodes = []   # (body, name, res_id, basis(3x3), origin)
+        self.meta = {}    # (body, name) -> {chave: valor} (metadata do CollisionShape3D)
         self._cache = {}
 
     def _res(self, kind, props):
@@ -81,6 +87,19 @@ class Shapes:
     def box(self, body, name, size, center, ry=0.0, basis=None):
         rid = self._res("BoxShape3D", {"size": "Vector3(%.3f, %.3f, %.3f)" % tuple(size)})
         self.nodes.append((body, name, rid, basis if basis is not None else rot_y(ry), tuple(center)))
+
+    def ramp(self, body, name, low, high, width, meta, thick=0.3):
+        """Caixa inclinada cujo topo vai de `low` a `high` (pontos (x, y, z) no eixo central do topo)."""
+        a, b = Vector(low), Vector(high)
+        f = (b - a).normalized()
+        r = f.cross(Vector((0.0, 1.0, 0.0))).normalized()
+        u = r.cross(f).normalized()
+        if u.y < 0:
+            r, u = -r, -u
+        basis = Matrix((r, u, f)).transposed()
+        c = (a + b) / 2 - u * (thick / 2)
+        self.box(body, name, (width, thick, (b - a).length), c, basis=basis)
+        self.meta[(body, name)] = meta
 
     def cyl(self, body, name, r, h, base):
         rid = self._res("CylinderShape3D", {"radius": "%.3f" % r, "height": "%.3f" % h})
@@ -235,7 +254,8 @@ def markers(ground, props, bank_info):
     for i, (x, z) in enumerate(((-6.0, -15.0), (-9.5, -15.3), (-12.6, -15.0), (-14.0, -13.9))):
         add("M5_FeatherTrail_%d" % (i + 1), "M5", x, z)
     add("M5_Weathervane", "M5", -4.6, -15.6)
-    add("M5_Crates", "M5", -15.05, -14.3, y=0.6)
+    (c1x, c1z, _), (c2x, c2z, _) = W3.PICO_CRATES[0], W3.PICO_CRATES[1]
+    add("M5_Crates", "M5", (c1x + c2x) / 2, (c1z + c2z) / 2, y=0.6)
     add("M5_Awning", "M5", -16.6, -16.1, y=1.6)
     add("M5_ShedRoof", "M5", -19.6, -18.6, y=2.92)
     # M6: barco na bacia
@@ -371,6 +391,22 @@ def build(inst, houses, terr, bank_info):
                 else:
                     S.cyl("Props", "%s_%d_%d" % (kind, i, j), sh[1] * s, sh[2] * s, (x, y + sh[3], z))
                 n_props += 1
+    # --- rampas de acesso (E3b): so para heroi sem step-up; camada propria, desligadas por padrao
+    def polar_pt(ang, rr, y):
+        px, _, pz = W3.polar(ang, rr, 0)
+        return (px, y, pz)
+    lo = W3.polar(W3.STAIR_STEP_ANG, 5.0, 0)
+    S.ramp("AccessRamps", "Ramp_LighthouseStep", (lo[0], terr["head_h"](lo[0], lo[2]) - 0.02, lo[2]),
+           polar_pt(W3.STAIR_STEP_ANG, 3.05, 3.0), 1.2,
+           {"mission": "M7", "covers": "degrau 0,37 m (terreno -> LighthouseStep 2,70) + 0,30 m (-> embasamento 3,00)",
+            "to_marker": "M7_StairBase"})
+    fx, fz = W3.FOUNTAIN
+    fa = math.radians(W3.FOUNTAIN_STEP_ANG)
+    S.ramp("AccessRamps", "Ramp_FountainEast", (fx + math.cos(fa) * 3.3, -0.005, fz + math.sin(fa) * 3.3),
+           (fx + math.cos(fa) * 1.45, 0.52, fz + math.sin(fa) * 1.45), 1.0,
+           {"mission": "M3", "covers": "degraus 0,26 m (FountainStep) + 0,24 m (borda da bacia 0,50)",
+            "to_marker": "M3_FountainStep_1"})
+    # borda sul do cais (margem -0,12 -> cais 0,00): a capsula sobe sem rampa (medido no teste), entao sem rampa aqui
     # --- beira d'agua
     chains = water_contours(ground)
     n_w = 0
@@ -395,7 +431,7 @@ def write_scenes(repo, inst, houses, lights, props_info, bank_info, terr):
     S, ground, n_props, n_w, n_chains = build(inst, houses, terr, bank_info)
     out_dir = os.path.join(repo, "game", "worlds", "village_v3")
     os.makedirs(out_dir, exist_ok=True)
-    bodies = ["Ground", "Structures", "Props", "WaterLimits", "MapBounds"]
+    bodies = ["Ground", "Structures", "Props", "WaterLimits", "MapBounds", "AccessRamps"]
     lines = ["[gd_scene format=3]", ""]
     for rid, kind, props in S.res:
         lines.append('[sub_resource type="%s" id="%s"]' % (kind, rid))
@@ -405,7 +441,10 @@ def write_scenes(repo, inst, houses, lights, props_info, bank_info, terr):
     lines += ['[node name="VillageCollision" type="Node3D"]', "metadata/provisional = true",
               'metadata/generated_by = "source_art/environment_v2/wv3_collision.py"', ""]
     for b in bodies:
-        lines += ['[node name="%s" type="StaticBody3D" parent="."]' % b, "collision_mask = 0", ""]
+        lines += ['[node name="%s" type="StaticBody3D" parent="."]' % b]
+        if b == "AccessRamps":
+            lines += ["collision_layer = %d" % ACCESS_RAMPS_LAYER, "metadata/access_ramps = true"]
+        lines += ["collision_mask = 0", ""]
     used = set()
     for body, name, rid, basis, origin in S.nodes:
         nm = name
@@ -415,7 +454,10 @@ def write_scenes(repo, inst, houses, lights, props_info, bank_info, terr):
             k += 1
         used.add((body, nm))
         lines += ['[node name="%s" type="CollisionShape3D" parent="%s"]' % (nm, body), "transform = " + _xf(basis, origin),
-                  'shape = SubResource("%s")' % rid, ""]
+                  'shape = SubResource("%s")' % rid]
+        for k, v in S.meta.get((body, name), {}).items():
+            lines.append('metadata/%s = "%s"' % (k, v))
+        lines.append("")
     with open(os.path.join(out_dir, "village_collision.tscn"), "w") as f:
         f.write("\n".join(lines))
     mk = markers(ground, props_info["pos"], bank_info)

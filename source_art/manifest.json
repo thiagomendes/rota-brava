@@ -1146,24 +1146,66 @@
         "captain_alegre.png": "c5132981e0e3824f472628221250d5be69c5ce9746abfc7af1fc1ddfbe1c26bd",
         "captain_neutra.png": "4c16703fa3879dc8eb29a6e949792211093b3c8ba52d736672325887ba88b317",
         "captain_surpresa.png": "0465046690367f4c64ff7ae43975b163189c9bd8727d2876d47f8a27906bcc0d",
-        "leme_alegre.png": "c0aba04e620a7c59dc36935b7fed43af05f58be62d98fb13ffc7429a76f5f4e9",
-        "leme_neutra.png": "2bd6c37df08469fb00cca4ad794f88435a3845cfac898eac8ea695a13541a868",
-        "leme_surpresa.png": "fecea942111a333a26964fbe8053840a67cd62a7e069522c9b4a18d03524bddd",
-        "pico_alegre.png": "751cbd3a59c6797655fefd5c16db2e0134c3ce70633ed508e18557d13f476090",
-        "pico_neutra.png": "1551d02b67432288dc57f0a0d58f32ef46fda97ed7536017edc229e0e8c83252",
-        "pico_surpresa.png": "e9ef9eba426b46ec5e2c625c73fbca6939ebf89565cec8abb15090e6be8a8255",
         "pup_alegre.png": "04cba7ab4d301ea7789a64b22bda2c15a924f57aee0ce93a3d6c8b3826726d3b",
         "pup_neutra.png": "08804e42abb700aa356f5f172ecc86927741cea37000138a3794fea50927c6aa",
-        "pup_surpresa.png": "3a74b5510fbf8a589dfc69f2603238c3e9abd44687a61593dd67bd9a3060f983",
-        "rastro_alegre.png": "ec11ef488132fb17c231feac5ac39175561fa7e875e967dec8ec46e020fe9868",
-        "rastro_neutra.png": "b18c03e047956a5caeb8bbe7a7542f533942f9dce4ee7f3ea7b7f905c8d3197c",
-        "rastro_surpresa.png": "6f1eb6bed93c2997d63c8b0b8a886068e87f09743b48eb0a042d6092db7a9248"
+        "pup_surpresa.png": "3a74b5510fbf8a589dfc69f2603238c3e9abd44687a61593dd67bd9a3060f983"
       },
       "status": "provisorio",
       "aprovacao": "pendente (Thiago)",
       "originalidade": "renders dos personagens procedurais do projeto; nada de terceiros",
       "data": "2026-11-23",
-      "nota": "rastro, pico, leme, captain, pup x neutra, alegre, surpresa. Uso: Hud.set_portrait_texture(member, tex)."
+      "nota": "captain e pup x neutra, alegre, surpresa (retratos da primeira geracao). Os de rastro, pico e leme foram substituidos pelos dos herois v2 em 2026-11-25 (entrada portraits_v2). Uso: Hud.set_portrait_texture(member, tex)."
+    },
+    {
+      "id": "portraits_v2",
+      "nome": "Retratos do HUD dos herois v2 (Rastro v2.1, Pico v2, Leme v2)",
+      "agente": "art3d",
+      "processo": {
+        "script": "source_art/scripts/hero_portraits_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless), Cycles CPU 96 amostras + OpenImageDenoise",
+        "exportador": "PNG RGBA 512x512, fundo transparente (mesmo tamanho, formato e caminho dos retratos antigos)",
+        "comando": "bash tools/blender.sh --background source_art/characters/<id>_v2/<id>_v2.blend --python source_art/scripts/hero_portraits_v2.py -- <id>"
+      },
+      "origem": [
+        "source_art/characters/rastro_v2/rastro_v2.blend",
+        "source_art/characters/pico_v2/pico_v2.blend",
+        "source_art/characters/leme_v2/leme_v2.blend",
+        "source_art/characters/rastro_v2/rv2_render.py",
+        "source_art/characters/pico_v2/pv2_render.py",
+        "source_art/characters/leme_v2/lv2_render.py",
+        "source_art/scripts/hero_portraits_v2.py"
+      ],
+      "saida": "game/ui/portraits",
+      "arquivos_sha256": {
+        "rastro_neutra.png": "a5a14a20982dacbfffee81461637a69a064360f6f153062b174813f2480f24d9",
+        "rastro_alegre.png": "5a2e4a65ac3f644496e6bee730dd316e0105ad620e0f3455a691ec631c83704f",
+        "rastro_surpresa.png": "b26d33062c985136e06760871d3025149653444939d35a7ea4e3f6cfcd59f719",
+        "pico_neutra.png": "17a31cf7f1d9c8b6087aa8016255207009169192ab08c81f34ee2956329aaa54",
+        "pico_alegre.png": "8212ba3c6c81e3c732679e9b801afbc7337f77740eaacacad64b6ac478fb2cef",
+        "pico_surpresa.png": "48e894175f76d4d6d0ffd3f06f46be7f7234aad1be43635ba4aef2d885e818eb",
+        "leme_neutra.png": "4ba3f71108fee4d5d108a16e9dee18863fd4de07c5290448e98cab677c660e80",
+        "leme_alegre.png": "33775c0548de929bae1dced92d98a8519e1f081d3c7621a557159d8fef6d7b6e",
+        "leme_surpresa.png": "b45e6f8e3f18638b601a693328fc73f33e11f9622c4c2369480ebdbdb1dbba1d"
+      },
+      "arquivos_bytes": {
+        "rastro_neutra.png": 312019,
+        "rastro_alegre.png": 305562,
+        "rastro_surpresa.png": 313033,
+        "pico_neutra.png": 344199,
+        "pico_alegre.png": 337884,
+        "pico_surpresa.png": 344631,
+        "leme_neutra.png": 332619,
+        "leme_alegre.png": 326575,
+        "leme_surpresa.png": 333903
+      },
+      "enquadramento": "busto; camera 1,60 m do meio do osso head menos 7 cm, elevacao 6 graus, giro -20 graus, lente 85 mm (calibrado lado a lado com os antigos: 1,70 m e -3 cm na cabeca da primeira geracao)",
+      "pose": "clipe idle quadro 0; rosto por shape key (neutra, alegre, surpresa); acessorios Acc_* ocultos (colete da Leme so quando a missao pede)",
+      "luz": "luz de cena das provas v2 (sol quente, contraluz, preenchimento frio, rebatido quente), sem o chao de prova",
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "renders dos herois v2 procedurais do projeto; nada de terceiros; sem modelo de imagem",
+      "data": "2026-11-25",
+      "nota": "RB-R1 E3b. O HUD carrega <id>_neutra.png (game/episodes/ep01/ep01_main.gd, _setup_portraits); alegre e surpresa no mesmo padrao. Comparacao: captures/e3b/retratos_antes_depois.png (fora do Git)."
     },
     {
       "id": "rastro_v2",
@@ -1756,7 +1798,7 @@
         "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice (COLOR_0 linear), UV em metros, normais ponderadas por area (WeightedNormal), sem texturas embutidas"
       },
       "saida_glb": "game/assets/models/environment_v2/wv2_static.glb",
-      "glb_sha256": "4924e78ef8060b3396439536bd1a05677054da854b01d2bd585fe1a95e3db7ec",
+      "glb_sha256": "c15635730629467a7fb11cdeaa0374307778b18987bb3736d069d64f0884d3a4",
       "glb_bytes": 10579376,
       "triangulos": 206126,
       "materiais": [
@@ -1888,7 +1930,7 @@
         "kit_tree_b",
         "kit_tree_c"
       ],
-      "nota": "44 pecas, 3011 instancias no layout (game/lookdev/world_v2/world_v2_layout.json)"
+      "nota": "44 pecas, 3009 instancias no layout (game/lookdev/world_v2/world_v2_layout.json)"
     },
     {
       "id": "world_v2_boat",
@@ -2150,22 +2192,23 @@
       },
       "saida": "game/worlds/village_v3",
       "arquivos_sha256": {
-        "village_collision.tscn": "4ea93e5d547a25483c4dbd2563bd30a14bf25c90564229bb055dbb86eed96e9e",
-        "village_world.tscn": "9e96b662d078c8c67105b3778390907affc494e0b38e33e0e8ebe0075a11b151"
+        "village_collision.tscn": "8f5fd910b7b85cd2c893c49ff8cf7bc73cd25e3d1b0984408bce0873631631a9",
+        "village_world.tscn": "d1e81aa1d18d6fc39ea8d5cae25904e5a5213e34be9485e2421b87da350cf8b3"
       },
       "arquivos_bytes": {
-        "village_collision.tscn": 193047,
-        "village_world.tscn": 9084
+        "village_collision.tscn": 193517,
+        "village_world.tscn": 9085
       },
       "colisao": {
         "formas_por_corpo": {
           "Ground": 12,
           "Structures": 79,
-          "Props": 501,
+          "Props": 499,
+          "AccessRamps": 2,
           "WaterLimits": 36,
           "MapBounds": 4
         },
-        "aderecos_com_colisao": 501,
+        "aderecos_com_colisao": 499,
         "paredes_beira_agua": 36,
         "contornos_agua": 2,
         "marcadores": 54,
