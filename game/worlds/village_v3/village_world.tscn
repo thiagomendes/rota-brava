@@ -1,0 +1,240 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://worlds/village_v3/village_world.gd" id="1_world"]
+[ext_resource type="PackedScene" path="res://worlds/village_v3/village_collision.tscn" id="2_col"]
+
+[node name="VillageWorld" type="Node3D"]
+script = ExtResource("1_world")
+metadata/provisional = true
+metadata/generated_by = "source_art/environment_v2/wv3_collision.py"
+
+[node name="Collision" parent="." instance=ExtResource("2_col")]
+
+[node name="Markers" type="Node3D" parent="."]
+
+[node name="M0_RastroStart" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 1.5)
+metadata/mission = "M0"
+
+[node name="M0_BoatDocked" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, -5)
+metadata/mission = "M0"
+metadata/water = true
+
+[node name="M0_BoatArrival" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, -0.4, -5)
+metadata/mission = "M0"
+metadata/water = true
+
+[node name="M1_BenchClue" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.4)
+metadata/mission = "M1"
+
+[node name="M1_EmptyMooring" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.3, 0, -2.7)
+metadata/mission = "M1"
+
+[node name="M1_BootPrint" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.008, 10)
+metadata/mission = "M1"
+
+[node name="M1_PawTrail_1" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.012, 3.9)
+metadata/mission = "M1"
+
+[node name="M1_PawTrail_2" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9, 0.005, 5.9)
+metadata/mission = "M1"
+
+[node name="M1_PawTrail_3" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, -0.002, 7.4)
+metadata/mission = "M1"
+
+[node name="M1_PawTrail_4" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6, -0.008, 8.3)
+metadata/mission = "M1"
+
+[node name="M2_ShedStep_2" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.012, 0.95, 8.969)
+metadata/mission = "M2"
+
+[node name="M2_ShedStep_1" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.854, 0.451, 8.388)
+metadata/mission = "M2"
+
+[node name="M2_ShedTop" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.043, 1.534, 10.66)
+metadata/mission = "M2"
+
+[node name="M2_TreeBranch" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.396, 1.669, 7.142)
+metadata/mission = "M2"
+
+[node name="M2_Clothesline" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, -0.006, 7.85)
+metadata/mission = "M2"
+
+[node name="M2_ReedsPiece" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.4, -0.012, 3.6)
+metadata/mission = "M2"
+
+[node name="M3_FountainStep_1" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.39, 0.5, 4.113)
+metadata/mission = "M3"
+
+[node name="M3_FountainStep_2" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.907, 1, 3.925)
+metadata/mission = "M3"
+
+[node name="M3_FountainStep_3" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.17, 1.5, 3.829)
+metadata/mission = "M3"
+
+[node name="M3_UpperBasin" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.424, 1.5, 3.737)
+metadata/mission = "M3"
+
+[node name="M3_ChannelStart" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.28, 0, 2.12)
+metadata/mission = "M3"
+
+[node name="M3_Grate" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.95, 0, 0.45)
+metadata/mission = "M3"
+
+[node name="M3_BallStop" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.6, 0, -0.4)
+metadata/mission = "M3"
+
+[node name="M4_Cart" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.5, 0, 1.2)
+metadata/mission = "M4"
+
+[node name="M4_Stall_Apple" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.6, 0, -9.6)
+metadata/mission = "M4"
+
+[node name="M4_Stall_Lemon" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.6, 0, -1.2)
+metadata/mission = "M4"
+
+[node name="M4_Stall_Grapes" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.6, 0, -6.4)
+metadata/mission = "M4"
+
+[node name="M5_FeatherTrail_1" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -15)
+metadata/mission = "M5"
+
+[node name="M5_FeatherTrail_2" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0, -15.3)
+metadata/mission = "M5"
+
+[node name="M5_FeatherTrail_3" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.6, 0, -15)
+metadata/mission = "M5"
+
+[node name="M5_FeatherTrail_4" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, -13.9)
+metadata/mission = "M5"
+
+[node name="M5_Weathervane" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 0, -15.6)
+metadata/mission = "M5"
+
+[node name="M5_Crates" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.05, 0.6, -14.3)
+metadata/mission = "M5"
+
+[node name="M5_Awning" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.6, 1.6, -16.1)
+metadata/mission = "M5"
+
+[node name="M5_ShedRoof" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.6, 2.92, -18.6)
+metadata/mission = "M5"
+
+[node name="M6_BoatStart" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, -5)
+metadata/mission = "M6"
+metadata/water = true
+
+[node name="M6_BuoyA" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, -0.4, -9.2)
+metadata/mission = "M6"
+metadata/water = true
+
+[node name="M6_BuoyB" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.5, -0.4, -6.6)
+metadata/mission = "M6"
+metadata/water = true
+
+[node name="M6_Dinghy" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.4, -0.4, -9.9)
+metadata/mission = "M6"
+metadata/water = true
+
+[node name="M6_DinghyApproach" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.5, -0.4, -8.5)
+metadata/mission = "M6"
+metadata/water = true
+
+[node name="M7_Lens" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.8, 2.29, -21.8)
+metadata/mission = "M7"
+
+[node name="M7_StairStep" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.745, 2.7, -20.894)
+metadata/mission = "M7"
+
+[node name="M7_StairBase" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.082, 3, -21.728)
+metadata/mission = "M7"
+
+[node name="M7_Landing_1" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.785, 4.2, -21.545)
+metadata/mission = "M7"
+
+[node name="M7_Landing_2" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.382, 5.4, -22.026)
+metadata/mission = "M7"
+
+[node name="M7_Landing_3" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.274, 6.6, -23.391)
+metadata/mission = "M7"
+
+[node name="M7_Gallery" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.278, 7.8, -24)
+metadata/mission = "M7"
+
+[node name="M7_LanternPivot" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 16.75, -24)
+metadata/mission = "M7"
+
+[node name="M7_FestaBoat_1_star" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, -0.4, -9)
+metadata/mission = "M7"
+metadata/water = true
+
+[node name="M7_FestaBoat_2_moon" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.5, -0.4, -4)
+metadata/mission = "M7"
+metadata/water = true
+
+[node name="M7_FestaBoat_3_fish" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, -0.4, -2.5)
+metadata/mission = "M7"
+metadata/water = true
+
+[node name="M7_FestaBoat_4_flower" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, -0.4, -15)
+metadata/mission = "M7"
+metadata/water = true
+
+[node name="M8_FestaPlaza" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.5, 0, 3.4)
+metadata/mission = "M8"
+
+[node name="M8_CaptainDock" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 0.5)
+metadata/mission = "M8"
