@@ -29,6 +29,7 @@ sc = bpy.context.scene
 rig = next(o for o in sc.objects if o.type == "ARMATURE")
 gear = next(o for o in sc.objects if o.type == "MESH" and o.name.endswith("_Gear"))
 face = next(o for o in sc.objects if o.type == "MESH" and o.name.endswith("_Face"))
+head_obs = [o for o in sc.objects if o.type == "MESH" and o.name.endswith(("_Skin", "_Hair"))]
 me = gear.data
 nv = len(me.vertices)
 pid = np.empty(nv, dtype=np.float32)
@@ -88,6 +89,51 @@ def deformed():
     return (np.array(gear.matrix_world) [:3, :3] @ a.reshape(-1, 3).T).T + np.array(gear.matrix_world)[:3, 3]
 
 
+def deformed_ob(ob):
+    dg = bpy.context.evaluated_depsgraph_get()
+    ev = ob.evaluated_get(dg)
+    m = ev.to_mesh()
+    a = np.empty(len(m.vertices) * 3)
+    m.vertices.foreach_get("co", a)
+    ev.to_mesh_clear()
+    return (np.array(ob.matrix_world)[:3, :3] @ a.reshape(-1, 3).T).T + np.array(ob.matrix_world)[:3, 3]
+
+
+CELL = 0.01
+
+
+def front_overlap(P):
+    """Leitura de frente (v2.2): fracao dos vertices de cada luva que caem, na projecao frontal (plano XZ, celulas de 1 cm),
+    sobre a silhueta da cabeca (pele + cabelo + capacete). 0 = a luva nunca fica por cima/atras da cabeca vista de frente."""
+    H = np.vstack([deformed_ob(o) for o in head_obs] + [P[is_helmet]])
+    occ = set(map(tuple, np.floor(H[:, [0, 2]] / CELL).astype(int)))
+    out = {}
+    for sd, msk in (("R", gloveR), ("L", gloveL)):
+        cells = np.floor(P[msk][:, [0, 2]] / CELL).astype(int)
+        out[sd] = float(np.mean([tuple(c) in occ for c in cells]))
+    return out
+
+
+def happy_runs(name):
+    """Maior trecho continuo (s) com 'alegre' (sorriso de olhos fechados) > 0,05 e > 0,5 no clipe, lido da Action do rosto."""
+    act = bpy.data.actions.get(name + "_key")
+    if act is None:
+        return None
+    fc = next((c for c in act.fcurves if 'key_blocks["alegre"]' in c.data_path), None)
+    if fc is None:
+        return {"alegre_gt_0_05_s": 0.0, "alegre_gt_0_5_s": 0.0}
+    f0, f1 = int(act.frame_range[0]), int(act.frame_range[1])
+    vals = [fc.evaluate(f) for f in range(f0, f1 + 1)]
+    res = {}
+    for thr, key in ((0.05, "alegre_gt_0_05_s"), (0.5, "alegre_gt_0_5_s")):
+        best = run = 0
+        for v in vals:
+            run = run + 1 if v > thr else 0
+            best = max(best, run)
+        res[key] = round(best / FPS, 3)
+    return res
+
+
 def min_gap(P):
     PR, PL = P[iR], P[iL]
     bR = BVHTree.FromPolygons([tuple(p) for p in PR], fR)
@@ -135,6 +181,7 @@ for name in names:
     balls = {"R": [], "L": []}
     hand_over = {}
     toes = {"R": [], "L": []}
+    ovl = {"R": [], "L": []}
     for fr in range(f0, f1 + 1):
         sc.frame_set(fr)
         P = deformed()
@@ -144,6 +191,9 @@ for name in names:
             top = float(P[is_helmet, 2].max())
             for sd, msk in (("R", gloveR), ("L", gloveL)):
                 hand_over[sd] = max(hand_over.get(sd, -9.0), float(P[msk, 2].max()) - top)
+        if name in ("idle", "team_pose", "celebrate", "wave", "jump"):
+            for sd, v in front_overlap(P).items():
+                ovl[sd].append(v)
         for s in ("R", "L"):
             balls[s].append(bone_head("toe." + s))
             toes[s].append(bone_head("toe_tip." + s))
@@ -152,6 +202,12 @@ for name in names:
     rec = {"min_gap_m": round(float(gaps[i]), 4), "quadro": f0 + i, "quadros": f1 - f0 + 1, "media_m": round(float(gaps.mean()), 4)}
     if hand_over:
         rec["mao_acima_do_capacete_max_m"] = {k: round(v, 4) for k, v in hand_over.items()}
+    if ovl["R"]:
+        rec["luva_sobre_cabeca_de_frente"] = {sd: {"max_fracao": round(max(v), 3), "quadros_com_sobreposicao": int(sum(x > 0 for x in v))}
+                                             for sd, v in ovl.items()}
+    hr = happy_runs(name)
+    if hr is not None:
+        rec["olhos_fechados_sorriso"] = hr
     if name in ("idle", "team_pose", "pull_rope", "look_up", "wave", "stop"):
         # pe plantado: maior deslocamento horizontal da bola do pe entre dois quadros seguidos com ela no chao (z < 5 mm);
         # trocar de lugar NO AR (pulinho da team_pose) nao conta como patinar

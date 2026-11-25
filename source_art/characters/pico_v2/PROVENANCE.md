@@ -42,9 +42,28 @@ mãos de 4 dedos, olhos com dois brilhos), com traje, silhueta, cabelo e acessó
 Nenhum modelo, malha, textura, HDRI ou personagem-base baixado ou importado. Paleta da bíblia de estilo (`docs/style-bible.md` §3).
 Scripts copiados e adaptados do Rastro v2 (`source_art/characters/rastro_v2/`), sem editar os originais.
 
+## v2.2 · leitura de frente (2026-11-25)
+Thiago viu no cais (câmera baixa, de frente) o Pico "sem braços e sem olhos": no alongamento do `idle` as duas mãos iam
+para trás/acima da cabeça (as luvas viravam duas "orelhas" no capacete) enquanto o rosto estava no sorriso de olhos
+fechados. Correção só em `pv2_anim.py` (malha, texturas, rig e nomes de clipe iguais):
+- `idle` (4,0 s): alongamento curto (sobe 1,50–1,82 s, desce 2,28–2,58 s) com os braços em **V largo** (mão a ~0,40 m do
+  eixo e ~0,33 m acima do ombro; cabelo e capacete vão até 0,26 m); o resto do ciclo é quique com os braços soltos ao lado
+  do corpo (abertura 12–26°). Olhos abertos com duas piscadas; sorriso de olhos fechados só num pulso de 3,12 a 3,68 s.
+- `team_pose`: punho ao alto **ao lado** do capacete (não mais por cima/atrás), cabeça menos inclinada; olhos abertos
+  (atentos) e sorriso fechado só nos puxões da corda (0,42–0,82 s), nunca no punho ao alto.
+- `celebrate`: punhos em V aberto, fora da silhueta da cabeça; surpresa no impulso, sorriso fechado só no alto do salto.
+- `wave`: sorriso fechado só num pulso de 0,55 a 1,10 s, olhos abertos e piscada no resto. `jump`: olhos abertos (atento no
+  impulso, surpresa no ar) em vez do sorriso parcial.
+- `pv2_check.py` mede agora a leitura: fração dos vértices de cada luva que, na projeção frontal (células de 1 cm), cai sobre
+  a silhueta da cabeça (pele + cabelo + capacete), e o maior trecho contínuo com `alegre` > 0,5 (`pico_v2.check.json`).
+  Antes → depois: `idle` 75% / 39 quadros → **0% / 0**; `team_pose` 66% / 20 → 1,2% / 5 (transição do braço); olhos
+  fechados `idle` 1,23 s → **0,43 s**, `team_pose` 1,17 → 0,30 s, `celebrate` 0,90 → 0,47 s, `wave` 1,23 → 0,43 s.
+  Folga mínima entre as botas **4,69 cm** em todos os quadros dos 11 clipes; pés plantados (deslize 0,0 mm/quadro).
+- `render_pico_leitura.py`: prancha de frente na distância da câmera baixa da vitrine (herói a 4,1 m, ~265 px de altura).
+
 ## Arquivos
 - Fonte: `build_pico_v2.py` (entrada), `pv2_body.py`, `pv2_tex.py`, `pv2_anim.py`, `pv2_render.py`, `render_pico_v2.py`,
-  `pv2_check.py` (medições dos pés); `pico_v2.blend` (texturas empacotadas); `pico_v2.info.json` (medidas);
+  `pv2_check.py` (medições dos pés e da leitura de frente), `render_pico_leitura.py` (prancha de leitura); `pico_v2.blend` (texturas empacotadas); `pico_v2.info.json` (medidas);
   `pico_v2.check.json` (folga entre as botas por clipe/quadro, deriva e deslize dos pés).
 - Saída: `game/assets/models/characters/pico_v2.glb` (glTF 2.0 binário, metros, +Y para cima, PBR metallic-roughness,
   `KHR_materials_clearcoat`, texturas JPEG embutidas).

@@ -1370,6 +1370,7 @@
         "source_art/characters/pico_v2/pv2_render.py",
         "source_art/characters/pico_v2/render_pico_v2.py",
         "source_art/characters/pico_v2/pv2_check.py",
+        "source_art/characters/pico_v2/render_pico_leitura.py",
         "source_art/characters/pico_v2/PROVENANCE.md",
         "source_art/characters/pico_v2/pico_v2.blend",
         "source_art/scripts/hero_lib.py",
@@ -1380,8 +1381,8 @@
         "source_art/scripts/rbart.py"
       ],
       "saida_glb": "game/assets/models/characters/pico_v2.glb",
-      "glb_sha256": "7a891963046ce5f2ed3a554f6c25232246a21375e409c5533146ad701dff0350",
-      "glb_bytes": 6995068,
+      "glb_sha256": "9acf6768f335e9c8a2c83a8340163cef15391bd5e7f1cdf6afb521a02effafdd",
+      "glb_bytes": 6994508,
       "triangulos": 24944,
       "materiais": [
         "mat_pico_v2_face_dark",
