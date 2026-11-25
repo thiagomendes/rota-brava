@@ -53,7 +53,8 @@ Objetivo observável: Thiago abre na Godot (Windows) uma vitrine do mundo refina
 
 - **Revisão do pacote integra v2 (`reviewer`, 2026-11-25):** APROVADO COM RESSALVAS. Jogo intacto (nada fora de `game/lookdev/` e testes usa os v2); GDScript tipado; entrada por ações `wv2_*` só na cena; texto no catálogo; só leitura de disco; `Acc_*` só existe na Leme; SHA-256 dos 6 GLB v2 confere; suíte `OK (2756 PASS)`. Ressalvas: bytes ausentes nos 3 GLB do environment_v2 e texturas sem SHA-256 no manifesto (art3d na E3); peso no repositório (~40 MB do environment_v2 + .blend dos heróis regravados; `wv2_static.glb` 13,9 MB/274k tris precisa de LOD/corte ou Git LFS antes do jogo, decidir na E1). Integrado na `feature/rb-r1-reorientacao`.
 
-## Implementação do Ep01 v3 (plano, aguardando Thiago)
+## Implementação do Ep01 v3 (aprovado por Thiago em 2026-11-25: D18)
+- **D18:** história e 7 missões da v3 aprovadas; som (vozes novas) fica para depois. Repositório sem Git LFS por ora (decisão do lead, reversível): reduzir o peso do `wv2_static` em vez de exigir LFS no Windows.
 Objetivo observável: Thiago joga no Windows o Ep01 com os heróis v2, a vila v2.1 e as 7 missões da v3, em 8–10 min de ritmo humano, sem tempo morto, e ouve o som atual (vozes novas ficam para a fase de som).
 - **E1 · Base no jogo (`gameplay` + `art3d`):** heróis v2 nas cenas de personagem (Leme com colete só quando a missão pede), barco v2 com colisão e luz de proa, vila v2.1 como mundo do Ep01 (colisão, limites, câmera baixa), rio/ilha/volta fora do fluxo (cenas guardadas). Prova: bot chega do M0 ao M8 provisório; capturas nas 3 proporções; desempenho medido.
 - **E2 · Sistema de missão curta (`gameplay`):** objetivo por ícone, ajuda em 3 degraus (gesto, Farol 7 no rádio, seta), emblemas por missão, salvamento por missão, troca de herói contextual. Prova: testes determinísticos.
