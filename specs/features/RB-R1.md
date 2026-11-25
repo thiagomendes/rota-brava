@@ -36,6 +36,14 @@ Thiago viu as capturas do jogo (render por software na nuvem) e reprovou a dire�
 - **D13 · Aprovação em 3D e trio distinto (Thiago, 2026-11-24):** propostas de personagem são aprovadas num visualizador 3D interativo (girar, aproximar, ver animação), não em print. Ordem: primeiro o traje dos heróis; um herói antes, focado em acabamento; aprovado, os outros dois na mesma pegada. Os três devem ser DISTINTOS entre si (silhueta, traje, cabelo, acessórios), não o mesmo traje recolorido; a identidade de equipe vem do emblema e de detalhes comuns.
 - Seguem em paralelo as tarefas que não dependem do visual (contador de emblemas, opções no jogo, duração em modo humano).
 
+## Mundo v2 (D8 passo 2; Thiago, 2026-11-25: "manda ver")
+Objetivo observável: Thiago abre na Godot (Windows) uma vitrine do mundo refinado, anda com câmera livre e na câmera baixa do jogo, com o trio v2, e aprova ou pede mudanças antes de qualquer troca no episódio.
+- **W1 · Vitrine "vila e cais v2" (`art3d`, branch `feature/rb-r1-mundo-v2`):** recorte do porto (cais, rua da frente, praça/mercado, começo da margem) refeito no acabamento D11: formas chanfradas e coesas, madeira/pedra/telha/pintura com textura de verdade (sem cintilar), densidade de adereços para a câmera baixa (caixas, redes, barris, vasos, flores, varais, placas, bancos, postes, árvores e arbustos com volume), céu de sol (sem cinza lavado), sol + luzes quentes locais, sombra de contato, oclusão, névoa de profundidade. Cena nova em `game/lookdev/` (não altera `game/episodes/`). Câmera livre + câmera baixa do jogo + percurso fixo para vídeo. Trio v2 no cais.
+  - Critérios: geometria 100% original por script; fontes e procedência em `source_art/`; GLB/cenas com orçamento declarado (chamadas de desenho e triângulos na vista baixa, medidos); sem regressão na suíte; capturas de 3–4 pontos de vista na câmera baixa + comparação com o porto atual; frames do percurso.
+  - Prova: capturas vistas pelo lead; vídeo do percurso para a página; comando para Thiago abrir a vitrine no Windows. GPU real não medida na nuvem (dizer).
+- **W2 · Missões para ≥ 8 min (`adventure`, só documento):** proposta de conteúdo de missão do Ep01 em `docs/proposals/ep01_missoes_v2.md`: o que cada herói faz a mais, quebra-cabeças cooperativos, onde no mapa, tempo estimado por trecho, sem tempo morto; o que o mundo precisa ter para isso. Thiago aprova junto com a vitrine.
+- Fora de escopo agora: trocar heróis/mundo do episódio, som.
+
 ## Barra de qualidade (mensurável e perceptual)
 **Personagens (crianças-heróis)**
 - Altura ~1,05 a 1,15 m no mundo; **cabeça 33 a 38% da altura** (~3 cabeças); olhos grandes (altura do olho ≥ 20% da altura da cabeça) com íris, pupila e dois brilhos; mãos de 4 dedos legíveis; pés grandes e arredondados.
