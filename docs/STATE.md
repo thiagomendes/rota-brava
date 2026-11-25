@@ -11,7 +11,7 @@
 **Nuvem (2026-11-24):** `tools/setup-linux.sh` e `tools/test.sh` verificados no Linux: 2650 PASS em 1 min 42 s no `5f877ec`. Ambiente pessoal `rota-brava` libera `download.blender.org` (o Default bloqueava o Blender).
 
 ## 0. Agora (2026-11-25)
-- **Trio v2 aprovado e acabado:** `feature/rb-r1-trio-v2` (= `feature/rb-r1-rastro-v2` + `pico-v2` 49b888d + `leme-v2` 49249b7; base `feature/rb-r1-lookdev`), suíte `OK (2702 PASS)`. Visualizador 3D: https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (GLB em base64 `.glb.txt`; o servidor de artefatos não serve `.glb`). Branches wip apagadas (absorvidas).
+- **Trio v2 aprovado e acabado:** `feature/rb-r1-trio-v2` (= `feature/rb-r1-rastro-v2` + `pico-v2` 49b888d + `leme-v2` 49249b7; base `feature/rb-r1-lookdev`), suíte `OK (2702 PASS)`. Visualizador 3D: https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (GLB em base64 `.glb.txt`; o servidor de artefatos não serve `.glb`). Branches `wip/rb-r1-*-acabamento` já absorvidas; apagar o remoto foi recusado pelo proxy (403), podem ser apagadas pelo GitHub.
 - **Em curso:** revisão do `reviewer` na `feature/rb-r1-trio-v2`.
 - **Depois:** aplicar achados; integrar `feature/rb-r1-trio-v2` (traz lookdev/Forward+) na `feature/rb-r1-reorientacao`; atualizar SPEC.md (renderizador); proposta de mundo como vitrine antes; som. Heróis v2 ainda **não** substituem os do jogo (decidir na fase do mundo).
 - **Agentes:** `art3d` e `ux` em esforço medium (Thiago, retomada).
