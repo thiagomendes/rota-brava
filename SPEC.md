@@ -15,7 +15,7 @@ Uma buzina soa no porto. Um barco amarelo encosta sozinho, uma caixa de pêssego
 | Primeira entrega | Um episódio completo para Windows, jogável offline por uma pessoa. Android e iOS entram no desenho de entrada, interface e desempenho desde o início. |
 | Idiomas | Vozes, textos e legendas em português brasileiro no piloto. Novos idiomas entram por dados, inclusive nas sequências dirigidas. |
 | Produção | Thiago dirige e aprova. Agentes executam roteiro, código, arte, animação, som, integração e revisão. O jogo distribuído roda localmente, sem chamadas a modelos de IA. |
-| Direção técnica | Godot 4 estável, GDScript tipado, renderizador Mobile também no Windows e Blender para autoria. Fixar as versões efetivamente testadas no primeiro build. |
+| Direção técnica | Godot 4 estável, GDScript tipado, renderizador Forward+ (completo) no Windows, decisão D12 de Thiago em 2026-11-24 (mobile fica para depois) e Blender para autoria. Fixar as versões efetivamente testadas no primeiro build. |
 | Escopo do piloto | Três protagonistas, um cais, um trecho de rio, uma ilha, um piloto e um filhote. Farol 7 participa pelo rádio. |
 | Expansão | Avaliar outros episódios, uma base explorável e novos personagens após comprovar a qualidade e o custo de produção do primeiro episódio. |
 

@@ -1164,6 +1164,537 @@
       "originalidade": "renders dos personagens procedurais do projeto; nada de terceiros",
       "data": "2026-11-23",
       "nota": "rastro, pico, leme, captain, pup x neutra, alegre, surpresa. Uso: Hud.set_portrait_texture(member, tex)."
+    },
+    {
+      "id": "rastro_v2",
+      "nome": "Rastro v2 (proposta)",
+      "papel": "tracker",
+      "agente": "art3d",
+      "status": "provisorio",
+      "proposta": "RB-R1 D11/D13: heroi investigador lado a lado; NAO substitui rastro.glb no jogo (so na vitrine game/lookdev/)",
+      "processo": {
+        "script": "source_art/characters/rastro_v2/build_rastro_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless) + Cycles CPU para assar mapas",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, PBR metallic-roughness, KHR_materials_clearcoat, JPEG embutido",
+        "tecnicas": "traje inteirico por SKIN+SUBSURF com articulacoes e dobras deslocadas em numpy; metaballs (cabelo); torno, toros, tubos e prismas (equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (trama, frisos, pespontos, vincos); normal map assada por Bump; FK/IK em Python"
+      },
+      "origem": [
+        "source_art/characters/rastro_v2/build_rastro_v2.py",
+        "source_art/characters/rastro_v2/rv2_body.py",
+        "source_art/characters/rastro_v2/rv2_tex.py",
+        "source_art/characters/rastro_v2/rv2_anim.py",
+        "source_art/characters/rastro_v2/rv2_render.py",
+        "source_art/characters/rastro_v2/render_rastro_v2.py",
+        "source_art/characters/rastro_v2/PROVENANCE.md",
+        "source_art/characters/rastro_v2/rastro_v2.blend",
+        "source_art/scripts/hero_lib.py",
+        "source_art/scripts/hero_face.py",
+        "source_art/scripts/hero_anim.py",
+        "source_art/scripts/char_lib.py",
+        "source_art/scripts/char_anim.py",
+        "source_art/scripts/rbart.py"
+      ],
+      "saida_glb": "game/assets/models/characters/rastro_v2.glb",
+      "glb_sha256": "5c86dbf1ffcbdf6c29ffa7b5c397cf4025ff933b4beea945c255f0d546de895f",
+      "glb_bytes": 6408464,
+      "triangulos": 24229,
+      "materiais": [
+        "mat_rastro_v2_face_dark",
+        "mat_rastro_v2_face_eye",
+        "mat_rastro_v2_face_iris",
+        "mat_rastro_v2_face_mouth",
+        "mat_rastro_v2_face_skin",
+        "mat_rastro_v2_gear",
+        "mat_rastro_v2_glass",
+        "mat_rastro_v2_hair",
+        "mat_rastro_v2_screen",
+        "mat_rastro_v2_skin",
+        "mat_rastro_v2_suit"
+      ],
+      "objetos": [
+        "Rastro_Face",
+        "Rastro_Gear",
+        "Rastro_Glass",
+        "Rastro_Hair",
+        "Rastro_Screen",
+        "Rastro_Skin",
+        "Rastro_Suit"
+      ],
+      "ossos": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "neck",
+        "head",
+        "shoulder.R",
+        "upper_arm.R",
+        "forearm.R",
+        "hand.R",
+        "hand_tip.R",
+        "shoulder.L",
+        "upper_arm.L",
+        "forearm.L",
+        "hand.L",
+        "hand_tip.L",
+        "thigh.R",
+        "shin.R",
+        "foot.R",
+        "toe.R",
+        "toe_tip.R",
+        "heel.R",
+        "thigh.L",
+        "shin.L",
+        "foot.L",
+        "toe.L",
+        "toe_tip.L",
+        "heel.L"
+      ],
+      "quantidade_ossos": 28,
+      "animacoes_duracao_s": {
+        "celebrate": 1.2,
+        "celebrate_gear": 1.2,
+        "crouch": 1.0,
+        "crouch_gear": 1.0,
+        "idle": 4.4,
+        "idle_gear": 4.4,
+        "inspect_touch": 3.0,
+        "inspect_touch_gear": 3.0,
+        "look_to_leme": 2.4,
+        "look_to_leme_gear": 2.4,
+        "point": 1.2,
+        "point_gear": 1.2,
+        "react_surprise": 0.9,
+        "react_surprise_gear": 0.9,
+        "run": 0.6,
+        "run_gear": 0.6,
+        "stop": 0.5,
+        "stop_gear": 0.5,
+        "team_pose": 1.5,
+        "team_pose_gear": 1.5,
+        "walk": 1.0,
+        "walk_gear": 1.0,
+        "wave": 1.6,
+        "wave_gear": 1.6
+      },
+      "shape_keys": [
+        "Basis",
+        "neutra",
+        "atenta",
+        "surpresa",
+        "alegre",
+        "triste",
+        "brava_leve",
+        "blink",
+        "mouth_A",
+        "mouth_E",
+        "mouth_O",
+        "mouth_M",
+        "look_left",
+        "look_right",
+        "look_up"
+      ],
+      "texturas": {
+        "rastro_v2_gear_color": [
+          2048,
+          2048
+        ],
+        "rastro_v2_gear_normal": [
+          2048,
+          2048
+        ],
+        "rastro_v2_gear_orm": [
+          2048,
+          2048
+        ],
+        "rastro_v2_hair_color": [
+          1024,
+          1024
+        ],
+        "rastro_v2_hair_normal": [
+          1024,
+          1024
+        ],
+        "rastro_v2_hair_orm": [
+          1024,
+          1024
+        ],
+        "rastro_v2_skin_color": [
+          1024,
+          1024
+        ],
+        "rastro_v2_skin_normal": [
+          1024,
+          1024
+        ],
+        "rastro_v2_skin_orm": [
+          1024,
+          1024
+        ],
+        "rastro_v2_suit_color": [
+          2048,
+          2048
+        ],
+        "rastro_v2_suit_normal": [
+          2048,
+          2048
+        ],
+        "rastro_v2_suit_orm": [
+          2048,
+          2048
+        ]
+      },
+      "altura_m": 1.0835,
+      "razao_cabeca_altura": 0.369,
+      "velocidade_walk_mps": 0.5491,
+      "velocidade_run_mps": 1.1667
+    },
+    {
+      "id": "pico_v2",
+      "nome": "Pico v2 (proposta)",
+      "papel": "climber",
+      "agente": "art3d",
+      "status": "provisorio",
+      "proposta": "RB-R1 D11/D13: heroi escalador lado a lado; NAO substitui pico.glb no jogo (so na vitrine game/lookdev/)",
+      "processo": {
+        "script": "source_art/characters/pico_v2/build_pico_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless) + Cycles CPU para assar mapas",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, PBR metallic-roughness, KHR_materials_clearcoat, JPEG embutido",
+        "tecnicas": "corpo inteirico por SKIN+SUBSURF com gomos acolchoados, articulacoes e bolso deslocados em numpy; capacete parametrico + Solidify; metaballs e mechas por tubos achatados em tres camadas (cabelo); shape keys fist_R/fist_L nas luvas (punho); corda por laco em raycast no corpo; torno, toros, tubos e prismas (equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (ripstop, lona, pespontos, helice da corda, sardas); normal map assada por Bump; FK/IK em Python"
+      },
+      "origem": [
+        "source_art/characters/pico_v2/build_pico_v2.py",
+        "source_art/characters/pico_v2/pv2_body.py",
+        "source_art/characters/pico_v2/pv2_tex.py",
+        "source_art/characters/pico_v2/pv2_anim.py",
+        "source_art/characters/pico_v2/pv2_render.py",
+        "source_art/characters/pico_v2/render_pico_v2.py",
+        "source_art/characters/pico_v2/pv2_check.py",
+        "source_art/characters/pico_v2/PROVENANCE.md",
+        "source_art/characters/pico_v2/pico_v2.blend",
+        "source_art/scripts/hero_lib.py",
+        "source_art/scripts/hero_face.py",
+        "source_art/scripts/hero_anim.py",
+        "source_art/scripts/char_lib.py",
+        "source_art/scripts/char_anim.py",
+        "source_art/scripts/rbart.py"
+      ],
+      "saida_glb": "game/assets/models/characters/pico_v2.glb",
+      "glb_sha256": "7a891963046ce5f2ed3a554f6c25232246a21375e409c5533146ad701dff0350",
+      "glb_bytes": 6995068,
+      "triangulos": 24944,
+      "materiais": [
+        "mat_pico_v2_face_dark",
+        "mat_pico_v2_face_eye",
+        "mat_pico_v2_face_iris",
+        "mat_pico_v2_face_mouth",
+        "mat_pico_v2_face_skin",
+        "mat_pico_v2_gear",
+        "mat_pico_v2_hair",
+        "mat_pico_v2_lamp",
+        "mat_pico_v2_skin",
+        "mat_pico_v2_suit"
+      ],
+      "objetos": [
+        "Pico_Face",
+        "Pico_Gear",
+        "Pico_Hair",
+        "Pico_Screen",
+        "Pico_Skin",
+        "Pico_Suit"
+      ],
+      "ossos": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "neck",
+        "head",
+        "shoulder.R",
+        "upper_arm.R",
+        "forearm.R",
+        "hand.R",
+        "hand_tip.R",
+        "shoulder.L",
+        "upper_arm.L",
+        "forearm.L",
+        "hand.L",
+        "hand_tip.L",
+        "thigh.R",
+        "shin.R",
+        "foot.R",
+        "toe.R",
+        "toe_tip.R",
+        "heel.R",
+        "thigh.L",
+        "shin.L",
+        "foot.L",
+        "toe.L",
+        "toe_tip.L",
+        "heel.L"
+      ],
+      "quantidade_ossos": 28,
+      "animacoes_duracao_s": {
+        "celebrate": 1.2,
+        "idle": 4.0,
+        "jump": 1.0,
+        "look_up": 2.0,
+        "pull_rope": 1.6,
+        "react_surprise": 0.9,
+        "run": 0.6,
+        "stop": 0.5,
+        "team_pose": 1.5,
+        "walk": 1.0,
+        "wave": 1.6
+      },
+      "shape_keys": [
+        "Basis",
+        "neutra",
+        "atenta",
+        "surpresa",
+        "alegre",
+        "triste",
+        "brava_leve",
+        "blink",
+        "mouth_A",
+        "mouth_E",
+        "mouth_O",
+        "mouth_M",
+        "look_left",
+        "look_right",
+        "look_up"
+      ],
+      "texturas": {
+        "pico_v2_gear_color": [
+          2048,
+          2048
+        ],
+        "pico_v2_gear_normal": [
+          2048,
+          2048
+        ],
+        "pico_v2_gear_orm": [
+          2048,
+          2048
+        ],
+        "pico_v2_hair_color": [
+          1024,
+          1024
+        ],
+        "pico_v2_hair_normal": [
+          1024,
+          1024
+        ],
+        "pico_v2_hair_orm": [
+          1024,
+          1024
+        ],
+        "pico_v2_skin_color": [
+          1024,
+          1024
+        ],
+        "pico_v2_skin_normal": [
+          1024,
+          1024
+        ],
+        "pico_v2_skin_orm": [
+          1024,
+          1024
+        ],
+        "pico_v2_suit_color": [
+          2048,
+          2048
+        ],
+        "pico_v2_suit_normal": [
+          2048,
+          2048
+        ],
+        "pico_v2_suit_orm": [
+          2048,
+          2048
+        ]
+      },
+      "altura_m": 1.0602,
+      "razao_cabeca_altura": 0.3708,
+      "velocidade_walk_mps": 0.5183,
+      "velocidade_run_mps": 1.1012
+    },
+    {
+      "id": "leme_v2",
+      "nome": "Leme v2 (proposta)",
+      "papel": "pilot",
+      "agente": "art3d",
+      "status": "provisorio",
+      "proposta": "RB-R1 D11/D13: heroina piloto lado a lado; NAO substitui leme.glb no jogo (so na vitrine game/lookdev/)",
+      "processo": {
+        "script": "source_art/characters/leme_v2/build_leme_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless) + Cycles CPU para assar mapas",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, PBR metallic-roughness, KHR_materials_clearcoat, JPEG embutido",
+        "tecnicas": "corpo inteirico por SKIN+SUBSURF com articulacoes deslocadas em numpy, cortado por planos em camisa/bermuda/pele/meia; colete por superficie parametrica projetada no corpo (raycast BVH); metaballs (base do cabelo) + cachos individuais com mola e verniz pintados por cacho; shape keys de punho e joinha nas maos; torno, toros, tubos e prismas (bone, equipamento); UV Smart Project; mapas de posicao/normal/parte/AO assados e pintados em numpy (algodao, sarja, canelado, ripstop, refletivo, pespontos, cachos); normal map assada por Bump; FK/IK em Python"
+      },
+      "origem": [
+        "source_art/characters/leme_v2/build_leme_v2.py",
+        "source_art/characters/leme_v2/lv2_body.py",
+        "source_art/characters/leme_v2/lv2_tex.py",
+        "source_art/characters/leme_v2/lv2_anim.py",
+        "source_art/characters/leme_v2/lv2_render.py",
+        "source_art/characters/leme_v2/render_leme_v2.py",
+        "source_art/characters/leme_v2/PROVENANCE.md",
+        "source_art/characters/leme_v2/leme_v2.blend",
+        "source_art/scripts/hero_lib.py",
+        "source_art/scripts/hero_face.py",
+        "source_art/scripts/hero_anim.py",
+        "source_art/scripts/char_lib.py",
+        "source_art/scripts/char_anim.py",
+        "source_art/scripts/rbart.py"
+      ],
+      "saida_glb": "game/assets/models/characters/leme_v2.glb",
+      "glb_sha256": "963089b7a7407ca0f7474c1c98692914b652036712d2e6de94bd2233f646c16f",
+      "glb_bytes": 7406064,
+      "triangulos": 24790,
+      "materiais": [
+        "mat_leme_v2_face_dark",
+        "mat_leme_v2_face_eye",
+        "mat_leme_v2_face_iris",
+        "mat_leme_v2_face_mouth",
+        "mat_leme_v2_face_skin",
+        "mat_leme_v2_gear",
+        "mat_leme_v2_glass",
+        "mat_leme_v2_hair",
+        "mat_leme_v2_skin",
+        "mat_leme_v2_suit"
+      ],
+      "objetos": [
+        "Leme_Face",
+        "Leme_Gear",
+        "Leme_Glass",
+        "Leme_Hair",
+        "Leme_Skin",
+        "Leme_Suit"
+      ],
+      "ossos": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "neck",
+        "head",
+        "shoulder.R",
+        "upper_arm.R",
+        "forearm.R",
+        "hand.R",
+        "hand_tip.R",
+        "shoulder.L",
+        "upper_arm.L",
+        "forearm.L",
+        "hand.L",
+        "hand_tip.L",
+        "thigh.R",
+        "shin.R",
+        "foot.R",
+        "toe.R",
+        "toe_tip.R",
+        "heel.R",
+        "thigh.L",
+        "shin.L",
+        "foot.L",
+        "toe.L",
+        "toe_tip.L",
+        "heel.L"
+      ],
+      "quantidade_ossos": 28,
+      "animacoes_duracao_s": {
+        "celebrate": 1.2,
+        "idle": 5.2,
+        "idle_wheel": 2.4,
+        "point": 1.2,
+        "react_horn": 0.9,
+        "run": 0.6,
+        "steer_left": 1.0,
+        "steer_right": 1.0,
+        "stop": 0.5,
+        "team_pose": 1.5,
+        "walk": 1.0,
+        "wave": 1.6
+      },
+      "shape_keys": [
+        "Basis",
+        "neutra",
+        "atenta",
+        "surpresa",
+        "alegre",
+        "triste",
+        "brava_leve",
+        "blink",
+        "mouth_A",
+        "mouth_E",
+        "mouth_O",
+        "mouth_M",
+        "look_left",
+        "look_right",
+        "look_up"
+      ],
+      "texturas": {
+        "leme_v2_gear_color": [
+          2048,
+          2048
+        ],
+        "leme_v2_gear_normal": [
+          2048,
+          2048
+        ],
+        "leme_v2_gear_orm": [
+          2048,
+          2048
+        ],
+        "leme_v2_hair_color": [
+          1024,
+          1024
+        ],
+        "leme_v2_hair_normal": [
+          1024,
+          1024
+        ],
+        "leme_v2_hair_orm": [
+          1024,
+          1024
+        ],
+        "leme_v2_skin_color": [
+          2048,
+          2048
+        ],
+        "leme_v2_skin_normal": [
+          2048,
+          2048
+        ],
+        "leme_v2_skin_orm": [
+          2048,
+          2048
+        ],
+        "leme_v2_suit_color": [
+          2048,
+          2048
+        ],
+        "leme_v2_suit_normal": [
+          2048,
+          2048
+        ],
+        "leme_v2_suit_orm": [
+          2048,
+          2048
+        ]
+      },
+      "altura_m": 1.1307,
+      "razao_cabeca_altura": 0.3549,
+      "velocidade_walk_mps": 0.5711,
+      "velocidade_run_mps": 1.2133,
+      "folga_minima_botas_m": 0.0522,
+      "folga_minima_botas_onde": "team_pose quadro 4",
+      "variacao": "LV2",
+      "aprovacao": "pendente (Thiago, visualizador 3D, D13)",
+      "originalidade": "geometria procedural propria (SKIN, SUBSURF, metaballs, torno, bmesh, raycast sobre o proprio corpo); rig e animacoes autorais por script; texturas pintadas por formula; nenhum modelo, malha, rig, mocap, textura ou personagem-base de terceiros; nada copiado de series de TV",
+      "data": "2026-11-25",
+      "nota": "Leme v2: camisa de capitania branca de manga curta, colete salva-vidas azul (placas de espuma, gola-travesseiro em ferradura, faixas refletivas, apito), bermuda azul, meias de meio cano listradas, botinas nauticas, bone nautico de capitania, cachos com puff atras, bussola de pulso e pulseira de corda. Clipes com os mesmos nomes do leme.glb; idle, team_pose (continencia + joinha da mao esquerda) e wave novos. Acabamento 2026-11-25: cachos legiveis, bracos mais grossos e curtos, maos relaxadas com polegar, punho/joinha por shape key, bone sem vinco, apito novo, punho da meia regular, sola sem afundar."
     }
   ]
 }

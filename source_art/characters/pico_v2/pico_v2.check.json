@@ -1,0 +1,98 @@
+{
+  "criterio": "menor distancia entre as malhas das duas botas (bota+sola+colarinho) >= 0,02 m em todos os quadros",
+  "clipes": {
+    "celebrate": {
+      "min_gap_m": 0.0469,
+      "quadro": 0,
+      "quadros": 37,
+      "media_m": 0.0469,
+      "mao_acima_do_capacete_max_m": {
+        "R": -0.24,
+        "L": -0.2396
+      }
+    },
+    "idle": {
+      "min_gap_m": 0.0469,
+      "quadro": 68,
+      "quadros": 121,
+      "media_m": 0.0469,
+      "mao_acima_do_capacete_max_m": {
+        "R": 0.036,
+        "L": 0.0256
+      },
+      "deslize_pe_plantado_m_por_quadro": 0.0
+    },
+    "jump": {
+      "min_gap_m": 0.0469,
+      "quadro": 0,
+      "quadros": 31,
+      "media_m": 0.0469
+    },
+    "look_up": {
+      "min_gap_m": 0.0469,
+      "quadro": 0,
+      "quadros": 61,
+      "media_m": 0.0469,
+      "deslize_pe_plantado_m_por_quadro": 0.0
+    },
+    "pull_rope": {
+      "min_gap_m": 0.101,
+      "quadro": 21,
+      "quadros": 49,
+      "media_m": 0.101,
+      "deslize_pe_plantado_m_por_quadro": 0.0
+    },
+    "react_surprise": {
+      "min_gap_m": 0.0469,
+      "quadro": 3,
+      "quadros": 28,
+      "media_m": 0.0469
+    },
+    "run": {
+      "min_gap_m": 0.0648,
+      "quadro": 12,
+      "quadros": 19,
+      "media_m": 0.0991,
+      "deslize_apoio_mps_max": 0.0,
+      "quadros_apoio_medidos": 12
+    },
+    "stop": {
+      "min_gap_m": 0.0469,
+      "quadro": 7,
+      "quadros": 16,
+      "media_m": 0.0469,
+      "deslize_pe_plantado_m_por_quadro": 0.0
+    },
+    "team_pose": {
+      "min_gap_m": 0.0469,
+      "quadro": 44,
+      "quadros": 46,
+      "media_m": 0.0949,
+      "mao_acima_do_capacete_max_m": {
+        "R": 0.027,
+        "L": -0.453
+      },
+      "deslize_pe_plantado_m_por_quadro": 0.0
+    },
+    "walk": {
+      "min_gap_m": 0.0634,
+      "quadro": 23,
+      "quadros": 31,
+      "media_m": 0.1015,
+      "deslize_apoio_mps_max": 0.0007,
+      "quadros_apoio_medidos": 30
+    },
+    "wave": {
+      "min_gap_m": 0.0469,
+      "quadro": 0,
+      "quadros": 49,
+      "media_m": 0.0469,
+      "deslize_pe_plantado_m_por_quadro": 0.0
+    }
+  },
+  "vao_repouso_m": 0.0469,
+  "minimo_global_m": 0.0469,
+  "minimo_global_clipe": "idle",
+  "minimo_global_quadro": 68,
+  "aprovado": true
+}

@@ -47,3 +47,13 @@
 - **Idle dos figurantes/Pico:** pes quase juntos (calcanhares ~12 cm), tronco < 2 graus; `CharacterVisual.play` agora troca de clipe na hora quando o no nao esta processando (evita congelar a ultima pose da caminhada).
 - **Polimento:** cabelo sem o bloco lateral, mangas mais finas com punho, colete e peso da camisa mais suaves, `walk` com passo de 0,34 m (velocidade nominal 0,586 m/s, `CharacterVisual.WALK_SPEED_MPS`), agachada com tronco a 24 graus.
 - **Triangulos (antes -> depois):** Rastro 22.588 -> 14.944; Leme 20.208 -> 14.076; figurantes 11.448/11.920/10.696 -> 8.420/9.212/7.844; Pico 16.568 (novo).
+
+
+## RB-R1 lookdev (D11/D12): materiais procedurais e vitrine de luz (PROVISORIO)
+- **Agente:** `art3d`. **Status:** `provisorio`, so vitrine; aprovacao de Thiago pendente. Nada do jogo foi alterado alem do renderizador.
+- **Originalidade:** sem geometria nova e sem imagem. Os materiais sao sombreadores Godot escritos para o projeto em
+  `game/lookdev/materials/` (`ld_*.gdshader` + presets `mat_ld_*.tres`): ruido de valor, celulas (Voronoi), aneis de madeira e
+  tramas de tecido calculados no sombreador, relevo pelo gradiente numerico da altura. Nenhuma textura, material ou sombreador de terceiros.
+  O jogo citado por Thiago como referencia de qualidade nao foi copiado (nenhum elemento, cor-assinatura ou forma).
+- **Uso:** `game/lookdev/lookdev_materials.gd` (`LookdevMaterials.make/apply`) troca os materiais em tempo de execucao, sem editar os recursos
+  importados. Vitrine: `game/lookdev/lookdev_dock.tscn` (`--lookdev=before|after`, `--lookdev-cam=low|close|high`).

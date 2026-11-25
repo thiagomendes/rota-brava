@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://lookdev/materials/ld_fabric.gdshader" id="1_sh"]
+
+[resource]
+resource_name = "mat_ld_fabric_canvas"
+render_priority = 0
+shader = ExtResource("1_sh")
+shader_parameter/pattern = 0
+shader_parameter/scale = 38.0
+shader_parameter/bump_strength = 0.8
+shader_parameter/groove_dark = 0.82
+shader_parameter/sheen = 0.15
+shader_parameter/world_space = true
+shader_parameter/use_vertex_color = true

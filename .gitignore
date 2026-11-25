@@ -5,7 +5,7 @@ game/*.translation
 export_credentials.cfg
 
 # Ferramentas e artefatos locais (reproduziveis por tools/*.ps1)
-.tools/
+.tools
 build/
 captures/
 logs/

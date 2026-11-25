@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://lookdev/materials/ld_vinyl.gdshader" id="1_sh"]
+
+[resource]
+resource_name = "mat_ld_vinyl_eye"
+render_priority = 0
+shader = ExtResource("1_sh")
+shader_parameter/roughness = 0.08
+shader_parameter/specular = 0.6
+shader_parameter/clearcoat = 1.0
+shader_parameter/clearcoat_roughness = 0.04
+shader_parameter/rim = 0.0
+shader_parameter/micro_bump = 0.0
+shader_parameter/grad_strength = 0.0
+shader_parameter/tint_variation = 0.0

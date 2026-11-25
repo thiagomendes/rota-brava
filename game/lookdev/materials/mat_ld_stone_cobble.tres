@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://lookdev/materials/ld_stone.gdshader" id="1_sh"]
+
+[resource]
+resource_name = "mat_ld_stone_cobble"
+render_priority = 0
+shader = ExtResource("1_sh")
+shader_parameter/cell_scale = 5.5
+shader_parameter/joint_width = 0.12
+shader_parameter/moss_amount = 0.35
+shader_parameter/stone_variation = 0.14

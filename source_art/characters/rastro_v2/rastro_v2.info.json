@@ -1,0 +1,243 @@
+{
+  "tris": 24229,
+  "tris_por_objeto": {
+    "Rastro_Skin": 2068,
+    "Rastro_Hair": 3428,
+    "Rastro_Suit": 6484,
+    "Rastro_Gear": 9317,
+    "Rastro_Screen": 60,
+    "Rastro_Glass": 504,
+    "Rastro_Face": 2368
+  },
+  "materials": [
+    "mat_rastro_v2_face_dark",
+    "mat_rastro_v2_face_eye",
+    "mat_rastro_v2_face_iris",
+    "mat_rastro_v2_face_mouth",
+    "mat_rastro_v2_face_skin",
+    "mat_rastro_v2_gear",
+    "mat_rastro_v2_glass",
+    "mat_rastro_v2_hair",
+    "mat_rastro_v2_screen",
+    "mat_rastro_v2_skin",
+    "mat_rastro_v2_suit"
+  ],
+  "height_m": 1.0835,
+  "min_z": -0.0002,
+  "head_h_m": 0.3998,
+  "head_ratio": 0.369,
+  "eye_h_ratio": 0.2981,
+  "objects": [
+    "Rastro_Face",
+    "Rastro_Gear",
+    "Rastro_Glass",
+    "Rastro_Hair",
+    "Rastro_Screen",
+    "Rastro_Skin",
+    "Rastro_Suit"
+  ],
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "hand_tip.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "hand_tip.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R",
+    "toe.R",
+    "toe_tip.R",
+    "heel.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "toe.L",
+    "toe_tip.L",
+    "heel.L"
+  ],
+  "bone_count": 28,
+  "animations": {
+    "celebrate": [
+      0,
+      36
+    ],
+    "celebrate_gear": [
+      0,
+      36
+    ],
+    "crouch": [
+      0,
+      30
+    ],
+    "crouch_gear": [
+      0,
+      30
+    ],
+    "idle": [
+      0,
+      132
+    ],
+    "idle_gear": [
+      0,
+      132
+    ],
+    "inspect_touch": [
+      0,
+      90
+    ],
+    "inspect_touch_gear": [
+      0,
+      90
+    ],
+    "look_to_leme": [
+      0,
+      72
+    ],
+    "look_to_leme_gear": [
+      0,
+      72
+    ],
+    "point": [
+      0,
+      36
+    ],
+    "point_gear": [
+      0,
+      36
+    ],
+    "react_surprise": [
+      0,
+      27
+    ],
+    "react_surprise_gear": [
+      0,
+      27
+    ],
+    "run": [
+      0,
+      18
+    ],
+    "run_gear": [
+      0,
+      18
+    ],
+    "stop": [
+      0,
+      15
+    ],
+    "stop_gear": [
+      0,
+      15
+    ],
+    "team_pose": [
+      0,
+      45
+    ],
+    "team_pose_gear": [
+      0,
+      45
+    ],
+    "walk": [
+      0,
+      30
+    ],
+    "walk_gear": [
+      0,
+      30
+    ],
+    "wave": [
+      0,
+      48
+    ],
+    "wave_gear": [
+      0,
+      48
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "triste",
+    "brava_leve",
+    "blink",
+    "mouth_A",
+    "mouth_E",
+    "mouth_O",
+    "mouth_M",
+    "look_left",
+    "look_right",
+    "look_up"
+  ],
+  "gear_shape_keys": [
+    "Basis",
+    "fist_R",
+    "fist_L"
+  ],
+  "walk_speed_mps": 0.5491,
+  "run_speed_mps": 1.1667,
+  "texturas": {
+    "rastro_v2_gear_color": [
+      2048,
+      2048
+    ],
+    "rastro_v2_gear_normal": [
+      2048,
+      2048
+    ],
+    "rastro_v2_gear_orm": [
+      2048,
+      2048
+    ],
+    "rastro_v2_hair_color": [
+      1024,
+      1024
+    ],
+    "rastro_v2_hair_normal": [
+      1024,
+      1024
+    ],
+    "rastro_v2_hair_orm": [
+      1024,
+      1024
+    ],
+    "rastro_v2_skin_color": [
+      1024,
+      1024
+    ],
+    "rastro_v2_skin_normal": [
+      1024,
+      1024
+    ],
+    "rastro_v2_skin_orm": [
+      1024,
+      1024
+    ],
+    "rastro_v2_suit_color": [
+      2048,
+      2048
+    ],
+    "rastro_v2_suit_normal": [
+      2048,
+      2048
+    ],
+    "rastro_v2_suit_orm": [
+      2048,
+      2048
+    ]
+  },
+  "inspect_tip_err_m": 0.0296
+}

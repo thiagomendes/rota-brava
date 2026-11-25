@@ -1,0 +1,194 @@
+{
+  "tris": 24944,
+  "tris_por_objeto": {
+    "Pico_Skin": 1320,
+    "Pico_Gear": 12921,
+    "Pico_Screen": 180,
+    "Pico_Hair": 2971,
+    "Pico_Suit": 5184,
+    "Pico_Face": 2368
+  },
+  "materials": [
+    "mat_pico_v2_face_dark",
+    "mat_pico_v2_face_eye",
+    "mat_pico_v2_face_iris",
+    "mat_pico_v2_face_mouth",
+    "mat_pico_v2_face_skin",
+    "mat_pico_v2_gear",
+    "mat_pico_v2_hair",
+    "mat_pico_v2_lamp",
+    "mat_pico_v2_skin",
+    "mat_pico_v2_suit"
+  ],
+  "height_m": 1.0602,
+  "min_z": -0.0001,
+  "head_h_m": 0.3931,
+  "head_ratio": 0.3708,
+  "head_with_helmet_ratio": 0.3936,
+  "eye_h_ratio": 0.3102,
+  "hip_x_m": 0.088,
+  "objects": [
+    "Pico_Face",
+    "Pico_Gear",
+    "Pico_Hair",
+    "Pico_Screen",
+    "Pico_Skin",
+    "Pico_Suit"
+  ],
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "hand_tip.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "hand_tip.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R",
+    "toe.R",
+    "toe_tip.R",
+    "heel.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "toe.L",
+    "toe_tip.L",
+    "heel.L"
+  ],
+  "bone_count": 28,
+  "animations": {
+    "celebrate": [
+      0,
+      36
+    ],
+    "idle": [
+      0,
+      120
+    ],
+    "jump": [
+      0,
+      30
+    ],
+    "look_up": [
+      0,
+      60
+    ],
+    "pull_rope": [
+      0,
+      48
+    ],
+    "react_surprise": [
+      0,
+      27
+    ],
+    "run": [
+      0,
+      18
+    ],
+    "stop": [
+      0,
+      15
+    ],
+    "team_pose": [
+      0,
+      45
+    ],
+    "walk": [
+      0,
+      30
+    ],
+    "wave": [
+      0,
+      48
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "triste",
+    "brava_leve",
+    "blink",
+    "mouth_A",
+    "mouth_E",
+    "mouth_O",
+    "mouth_M",
+    "look_left",
+    "look_right",
+    "look_up"
+  ],
+  "gear_shape_keys": [
+    "Basis",
+    "fist_R",
+    "fist_L"
+  ],
+  "rope_gap": {
+    "costas_max_m": 0.0113,
+    "costas_media_m": 0.0057,
+    "geral_min_m": 0.0011
+  },
+  "walk_speed_mps": 0.5183,
+  "run_speed_mps": 1.1012,
+  "texturas": {
+    "pico_v2_gear_color": [
+      2048,
+      2048
+    ],
+    "pico_v2_gear_normal": [
+      2048,
+      2048
+    ],
+    "pico_v2_gear_orm": [
+      2048,
+      2048
+    ],
+    "pico_v2_hair_color": [
+      1024,
+      1024
+    ],
+    "pico_v2_hair_normal": [
+      1024,
+      1024
+    ],
+    "pico_v2_hair_orm": [
+      1024,
+      1024
+    ],
+    "pico_v2_skin_color": [
+      1024,
+      1024
+    ],
+    "pico_v2_skin_normal": [
+      1024,
+      1024
+    ],
+    "pico_v2_skin_orm": [
+      1024,
+      1024
+    ],
+    "pico_v2_suit_color": [
+      2048,
+      2048
+    ],
+    "pico_v2_suit_normal": [
+      2048,
+      2048
+    ],
+    "pico_v2_suit_orm": [
+      2048,
+      2048
+    ]
+  }
+}
