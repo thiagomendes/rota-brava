@@ -14,7 +14,8 @@
 - **Ep01 v3 aprovado (D18):** história e 7 missões na vila; som/vozes novas ficam para depois. Plano E1–E7 no ticket.
 - **Integrado e revisado** na `feature/rb-r1-reorientacao` (suíte `OK (2877 PASS)`): heróis v2 nas cenas do jogo (E1b), sistema de missão curta em `game/systems/mission/` ainda não ligado (E2), mundo jogável `game/worlds/village_v3/village_world.tscn` com colisão, limites e 54 marcadores M0–M8, barco `boat_wv2.tscn` e geometria das missões (E1a/E3).
 - **E1 integrado** (`698d64d`, `OK (2900 PASS)`): Jogar abre `game/episodes/ep01/v3/ep01_v3_main.tscn` na vila v3, câmera baixa, barco v2, M0–M8 provisórias (chegar ao marcador), bot M0→M8 em 123,9 s.
-- **Em curso:** `art3d` em `feature/rb-r1-e3b-ajustes` (passagem praça→rua, pedras do promontório, lista de degraus, retratos v2 do HUD).
+- **E3b integrado** (suíte `OK (2914 PASS)`): passagem praça→rua ~2 m, subida do promontório lisa, rampas `AccessRamps` (camada 5, desligadas), retratos v2 do HUD.
+- **Em curso:** `gameplay` na E4 (`feature/rb-r1-e4-terra`, base c700f38; juntar a base atual antes de integrar).
 - **Próximo:** E4 (M1–M4 em terra) com retomada pelo menu (`save_path` real), step-up ou rampas, troca de herói, ajuda e emblemas; decidir varal (3 peças num marcador), carrinho dirigível, `WaterLimits` na camada 1.
 - **Páginas para Thiago:** trio 3D https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (Leme antiga), mundo v2 https://claude.ai/artifact/6WpRQzYXY2hW74LxMiPVww, novidades https://claude.ai/artifact/2WyeZqg8DNSLWegCPcCXAt.
 - **Dívidas:** `wv2_static.glb` ainda 10,6 MB e `world_v2.blend` 5,2 MB; materiais do mundo em `game/lookdev/world_v2/`; tris dos heróis no teto; cabelos de trás facetados; luz de parede estoura à noite; GPU real não medida; retratos do HUD antigos; branches `wip/*` a apagar pelo GitHub.
