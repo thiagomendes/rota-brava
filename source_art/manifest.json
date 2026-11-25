@@ -2220,6 +2220,831 @@
         ]
       },
       "nota": "formas simples; camada 1, mascara 0; beira d'agua por contorno do nivel -0,3 m"
+    },
+    {
+      "id": "props_v3_ball",
+      "nome": "Ep01 v3 · bola do filhote presa na grade; rola ate as barracas",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M3",
+      "saida_glb": "game/assets/models/props_v3/ball.glb",
+      "glb_sha256": "fb024b91f5c501582eed81023b6faeaf992aa9111ab2742f417e8e49009ca2bb",
+      "glb_bytes": 32924,
+      "cena": "game/assets/models/props_v3/ball.tscn",
+      "cena_sha256": "88b7719b3de3c13e3cff4fc88d62df441ca0020e44dfc30045a7bfa0d08058be",
+      "cena_bytes": 2159,
+      "triangulos": 920,
+      "orcamento_tris": 1500,
+      "materiais": [
+        "wv2_glossy"
+      ],
+      "pivo": "centro da bola (a cena poe o centro a 0,16 m do chao)",
+      "animacoes": [
+        "roll",
+        "bounce"
+      ]
+    },
+    {
+      "id": "props_v3_basket",
+      "nome": "Ep01 v3 · cesto de vime ao pe do varal (cenario)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M2",
+      "saida_glb": "game/assets/models/props_v3/basket.glb",
+      "glb_sha256": "2a1bc4d2aa7260beab21926394d86216fcb3347f32da2922531fc91b3aea6129",
+      "glb_bytes": 168676,
+      "cena": "game/assets/models/props_v3/basket.tscn",
+      "cena_sha256": "1b6981a3f8e6c614be43787d7dc2cf7c341fe71fd60918bcfd5c25d842bf386c",
+      "cena_bytes": 750,
+      "triangulos": 3260,
+      "orcamento_tris": 4000,
+      "materiais": [
+        "pv3_cloth",
+        "wv2_burlap",
+        "wv2_rope",
+        "wv2_wood"
+      ],
+      "pivo": "centro do fundo, no chao",
+      "animacoes": []
+    },
+    {
+      "id": "props_v3_cloth_scarf",
+      "nome": "Ep01 v3 · lenco azul de bolinhas (preso no galho)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M2",
+      "saida_glb": "game/assets/models/props_v3/cloth_scarf.glb",
+      "glb_sha256": "dc96a0fd0fa7c73960027536c1263f969cbafd517b784c073e13fc6d7e67f8f1",
+      "glb_bytes": 94644,
+      "cena": "game/assets/models/props_v3/cloth_scarf.tscn",
+      "cena_sha256": "dc4382d0c5cc4963756adbdc6fccef390326c4c84706f09e73617b42a982cda8",
+      "cena_bytes": 2624,
+      "triangulos": 1956,
+      "orcamento_tris": 2500,
+      "materiais": [
+        "pv3_cloth",
+        "wv2_metal",
+        "wv2_wood"
+      ],
+      "pivo": "meio da dobra, na linha do varal",
+      "animacoes": [
+        "sway",
+        "shake"
+      ]
+    },
+    {
+      "id": "props_v3_cloth_sock",
+      "nome": "Ep01 v3 · meia amarela com pelo do filhote (nos juncos; a pista)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M2",
+      "saida_glb": "game/assets/models/props_v3/cloth_sock.glb",
+      "glb_sha256": "296c561b48a82dfd9fd9deb6e2b057750c934d692e5b1fbe4f7d4192b3ab98c3",
+      "glb_bytes": 71308,
+      "cena": "game/assets/models/props_v3/cloth_sock.tscn",
+      "cena_sha256": "3b3dd186ab8850892869df0359ea10092787d7de5c85bb034f789aafa90987df",
+      "cena_bytes": 2630,
+      "triangulos": 1300,
+      "orcamento_tris": 2500,
+      "materiais": [
+        "pv3_cloth",
+        "pv3_vinyl",
+        "wv2_metal",
+        "wv2_wood"
+      ],
+      "pivo": "meio do punho, na linha do varal",
+      "animacoes": [
+        "sway",
+        "shake"
+      ]
+    },
+    {
+      "id": "props_v3_cloth_tshirt",
+      "nome": "Ep01 v3 · camiseta rosa (presa no telhado do galpao)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M2",
+      "saida_glb": "game/assets/models/props_v3/cloth_tshirt.glb",
+      "glb_sha256": "b78694edd8a4cd10b57064e17a152017939c7a5508d8acaa0b781ec37e182d4c",
+      "glb_bytes": 79356,
+      "cena": "game/assets/models/props_v3/cloth_tshirt.tscn",
+      "cena_sha256": "b6034f6002ecd9e65bfaa8cd633ad65de57336a6da0f5ef5ee9befa114645f97",
+      "cena_bytes": 2576,
+      "triangulos": 1840,
+      "orcamento_tris": 2500,
+      "materiais": [
+        "pv3_cloth",
+        "pv3_vinyl",
+        "wv2_metal",
+        "wv2_wood"
+      ],
+      "pivo": "meio da gola, na linha do varal",
+      "animacoes": [
+        "sway",
+        "shake"
+      ]
+    },
+    {
+      "id": "props_v3_crate_apple",
+      "nome": "Ep01 v3 · entrega na barraca vermelha (M4_Stall_Apple)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M4",
+      "saida_glb": "game/assets/models/props_v3/crate_apple.glb",
+      "glb_sha256": "61c81308eab50292efa8b5afbbf1c4d90cf18f56bf129b11df80b21d6b3e834f",
+      "glb_bytes": 74176,
+      "cena": "game/assets/models/props_v3/crate_apple.tscn",
+      "cena_sha256": "ace5fe985905042788ebe0f50282103fc8000b04210d467b510e903b47b71d05",
+      "cena_bytes": 863,
+      "triangulos": 1404,
+      "orcamento_tris": 4500,
+      "materiais": [
+        "wv2_glossy",
+        "wv2_paint",
+        "wv2_wood"
+      ],
+      "pivo": "centro do fundo",
+      "animacoes": []
+    },
+    {
+      "id": "props_v3_crate_grapes",
+      "nome": "Ep01 v3 · entrega na barraca azul (M4_Stall_Grapes)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M4",
+      "saida_glb": "game/assets/models/props_v3/crate_grapes.glb",
+      "glb_sha256": "5d05fe36b1afa3ff82984bb235ebcdd4b2e86e719e8f6d7d98958407d25aca5b",
+      "glb_bytes": 92964,
+      "cena": "game/assets/models/props_v3/crate_grapes.tscn",
+      "cena_sha256": "418412de697c6f486f936d2bcb7b5dbd724e81271ec3b7721e37eec3e2ec2e56",
+      "cena_bytes": 865,
+      "triangulos": 1948,
+      "orcamento_tris": 4500,
+      "materiais": [
+        "wv2_glossy",
+        "wv2_paint",
+        "wv2_wood"
+      ],
+      "pivo": "centro do fundo",
+      "animacoes": []
+    },
+    {
+      "id": "props_v3_crate_lemon",
+      "nome": "Ep01 v3 · entrega na barraca amarela (M4_Stall_Lemon)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M4",
+      "saida_glb": "game/assets/models/props_v3/crate_lemon.glb",
+      "glb_sha256": "1f1505d0022187ab5ebc2b58dd2d1d4758861753e39fdcc5aa8542183171a39a",
+      "glb_bytes": 75032,
+      "cena": "game/assets/models/props_v3/crate_lemon.tscn",
+      "cena_sha256": "8967f4bcd2b078dc79e625f66b54a8817f20eb48ec00428e95feef0fb1f26ab9",
+      "cena_bytes": 862,
+      "triangulos": 1708,
+      "orcamento_tris": 4500,
+      "materiais": [
+        "wv2_glossy",
+        "wv2_paint",
+        "wv2_wood"
+      ],
+      "pivo": "centro do fundo",
+      "animacoes": []
+    },
+    {
+      "id": "props_v3_emblem_carabiner",
+      "nome": "Ep01 v3 · emblema de missao (moeda-brasao) com icone carabiner",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "geral",
+      "saida_glb": "game/assets/models/props_v3/emblem_carabiner.glb",
+      "glb_sha256": "cbec595289ddf4afafef24c8c442b5b1c0083b5853b69d3d06a1425ada75dbcd",
+      "glb_bytes": 140592,
+      "cena": "game/assets/models/props_v3/emblem_carabiner.tscn",
+      "cena_sha256": "2e8c8b1500184db83dacff56a60ff954bb686df80569cf73ba206dcadc65cedb",
+      "cena_bytes": 3660,
+      "triangulos": 2840,
+      "orcamento_tris": 3000,
+      "materiais": [
+        "wv2_glossy",
+        "wv2_metal"
+      ],
+      "pivo": "centro da moeda",
+      "animacoes": [
+        "spin",
+        "collect"
+      ]
+    },
+    {
+      "id": "props_v3_emblem_compass",
+      "nome": "Ep01 v3 · emblema de missao (moeda-brasao) com icone compass",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "geral",
+      "saida_glb": "game/assets/models/props_v3/emblem_compass.glb",
+      "glb_sha256": "976eda8f1123218b1c77236806bce818531f344bad361399e0cbf12bfd34f441",
+      "glb_bytes": 112092,
+      "cena": "game/assets/models/props_v3/emblem_compass.tscn",
+      "cena_sha256": "dc45439456961bdbc9e411a1388cb6398f7902085c5301c268484c51b938474e",
+      "cena_bytes": 3643,
+      "triangulos": 2064,
+      "orcamento_tris": 3000,
+      "materiais": [
+        "wv2_glossy",
+        "wv2_metal"
+      ],
+      "pivo": "centro da moeda",
+      "animacoes": [
+        "spin",
+        "collect"
+      ]
+    },
+    {
+      "id": "props_v3_emblem_helm",
+      "nome": "Ep01 v3 · emblema de missao (moeda-brasao) com icone helm",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "geral",
+      "saida_glb": "game/assets/models/props_v3/emblem_helm.glb",
+      "glb_sha256": "2e3638c15ba1c40afa627c6734502a29e92d2d13622370893a00755ef54a832b",
+      "glb_bytes": 154664,
+      "cena": "game/assets/models/props_v3/emblem_helm.tscn",
+      "cena_sha256": "12808d987f75df5d4ddce502cc942d5ec709bcafd7d4730d6e294f7c23115e9c",
+      "cena_bytes": 3633,
+      "triangulos": 2920,
+      "orcamento_tris": 3000,
+      "materiais": [
+        "wv2_glossy",
+        "wv2_metal"
+      ],
+      "pivo": "centro da moeda",
+      "animacoes": [
+        "spin",
+        "collect"
+      ]
+    },
+    {
+      "id": "props_v3_emblem_paw",
+      "nome": "Ep01 v3 · emblema de missao (moeda-brasao) com icone paw",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "geral",
+      "saida_glb": "game/assets/models/props_v3/emblem_paw.glb",
+      "glb_sha256": "90b3fa7d4b01cf5e2b71841288d4d0bc7f49569a82dc30370cfeb7d0e8aac5ec",
+      "glb_bytes": 114576,
+      "cena": "game/assets/models/props_v3/emblem_paw.tscn",
+      "cena_sha256": "ac1c5a80a9d362ddac599fc31356ec90ac5b7987b8e7de8b14815c2f34fc722f",
+      "cena_bytes": 3630,
+      "triangulos": 2240,
+      "orcamento_tris": 3000,
+      "materiais": [
+        "wv2_glossy",
+        "wv2_metal"
+      ],
+      "pivo": "centro da moeda",
+      "animacoes": [
+        "spin",
+        "collect"
+      ]
+    },
+    {
+      "id": "props_v3_emblem_star",
+      "nome": "Ep01 v3 · emblema de missao (moeda-brasao) com icone star",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "geral",
+      "saida_glb": "game/assets/models/props_v3/emblem_star.glb",
+      "glb_sha256": "37f6172d9654a10bbddf7ae67d2db5f310dfd7dbe5867478d9365630d9dbb74b",
+      "glb_bytes": 108608,
+      "cena": "game/assets/models/props_v3/emblem_star.tscn",
+      "cena_sha256": "9458646748607b0f74faae79edf7335d71281c4f74bf97d824d4a2f9aec245f6",
+      "cena_bytes": 3628,
+      "triangulos": 1992,
+      "orcamento_tris": 3000,
+      "materiais": [
+        "wv2_glossy",
+        "wv2_metal"
+      ],
+      "pivo": "centro da moeda",
+      "animacoes": [
+        "spin",
+        "collect"
+      ]
+    },
+    {
+      "id": "props_v3_fish",
+      "nome": "Ep01 v3 · peixe roubado (no bico da gaivota ou solto no telhado)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M5",
+      "saida_glb": "game/assets/models/props_v3/fish.glb",
+      "glb_sha256": "02ae7e07d9d0743e042e4c9aada572369d860d96b2c61fda0ff2924483dbf42d",
+      "glb_bytes": 29232,
+      "cena": "game/assets/models/props_v3/fish.tscn",
+      "cena_sha256": "3fb123cbd38c2cbd83c31119f6623655b051fc2f51edffc16fe538cde1932ab9",
+      "cena_bytes": 1789,
+      "triangulos": 564,
+      "orcamento_tris": 1500,
+      "materiais": [
+        "wv2_glossy"
+      ],
+      "pivo": "meio do corpo (pega do bico)",
+      "animacoes": [
+        "flop"
+      ]
+    },
+    {
+      "id": "props_v3_fountain_leaves",
+      "nome": "Ep01 v3 · tufo removivel na bacia de cima do chafariz",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M3",
+      "saida_glb": "game/assets/models/props_v3/fountain_leaves.glb",
+      "glb_sha256": "618a01d2c53a4455fe499f48cc00bf5f4c926fc34bb66122f308bdf137dd7eb5",
+      "glb_bytes": 74484,
+      "cena": "game/assets/models/props_v3/fountain_leaves.tscn",
+      "cena_sha256": "9b82a914998a2a78ffa6309bc616a72508b289e96856a3bbfba589eb9b65b574",
+      "cena_bytes": 4687,
+      "triangulos": 1172,
+      "orcamento_tris": 3000,
+      "materiais": [
+        "wv2_bark",
+        "wv2_leaf"
+      ],
+      "pivo": "centro da base (assenta na agua da bacia de cima)",
+      "animacoes": [
+        "rustle",
+        "pull_out",
+        "reset"
+      ]
+    },
+    {
+      "id": "props_v3_gull",
+      "nome": "Ep01 v3 · gaivota: pousa, foge e voa; leva o peixe no bico",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros, esqueleto + acoes NLA"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M5",
+      "saida_glb": "game/assets/models/props_v3/gull.glb",
+      "glb_sha256": "3c09e8264bae4a91c21a197d170684f0945348302680322412f7779876e53fa0",
+      "glb_bytes": 284624,
+      "cena": "game/assets/models/props_v3/gull.tscn",
+      "cena_sha256": "cc68e1b2fbb4090e86ebc4792553568cd3703bbf910c3913eb804c189f58fad4",
+      "cena_bytes": 1214,
+      "triangulos": 3564,
+      "orcamento_tris": 6000,
+      "materiais": [
+        "pv3_vinyl",
+        "wv2_glossy"
+      ],
+      "pivo": "entre os pes, no chao; frente = +Z",
+      "animacoes": [
+        "flee",
+        "fly",
+        "glide",
+        "land",
+        "perch_idle"
+      ],
+      "ossos": [
+        "root",
+        "body",
+        "head",
+        "tail",
+        "wing_in_R",
+        "wing_out_R",
+        "wing_in_L",
+        "wing_out_L",
+        "leg_R",
+        "leg_L"
+      ],
+      "animacoes_detalhe": {
+        "flee": {
+          "frames": [
+            0,
+            30
+          ],
+          "loop": false,
+          "seconds": 1.0
+        },
+        "fly": {
+          "frames": [
+            0,
+            24
+          ],
+          "loop": true,
+          "seconds": 0.8
+        },
+        "glide": {
+          "frames": [
+            0,
+            60
+          ],
+          "loop": true,
+          "seconds": 2.0
+        },
+        "land": {
+          "frames": [
+            0,
+            36
+          ],
+          "loop": false,
+          "seconds": 1.2
+        },
+        "perch_idle": {
+          "frames": [
+            0,
+            60
+          ],
+          "loop": true,
+          "seconds": 2.0
+        }
+      }
+    },
+    {
+      "id": "props_v3_help_arrow",
+      "nome": "Ep01 v3 · seta de ajuda (degrau 3), ponta na origem",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "geral",
+      "saida_glb": "game/assets/models/props_v3/help_arrow.glb",
+      "glb_sha256": "295ac3dcc79a85fdd50150c1637f1b41b53f1325bcd11ba382e2784a7fa4c460",
+      "glb_bytes": 12904,
+      "cena": "game/assets/models/props_v3/help_arrow.tscn",
+      "cena_sha256": "2b1ff2f7e05b4a9d8a04cc7451bb13d3460c3948980e762377ed82dbbb5f9881",
+      "cena_bytes": 2610,
+      "triangulos": 232,
+      "orcamento_tris": 600,
+      "materiais": [
+        "pv3_glow",
+        "pv3_glow_rim"
+      ],
+      "pivo": "ponta da seta",
+      "animacoes": [
+        "point",
+        "appear"
+      ]
+    },
+    {
+      "id": "props_v3_target_ring",
+      "nome": "Ep01 v3 · pulso de destaque do alvo (anel no chao)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "geral",
+      "saida_glb": "game/assets/models/props_v3/target_ring.glb",
+      "glb_sha256": "1ef86137a6d216d86f5028beebfc563a79d03f00bfe15f605fd765b7ce05f45b",
+      "glb_bytes": 10308,
+      "cena": "game/assets/models/props_v3/target_ring.tscn",
+      "cena_sha256": "201fe74ff60550cac273f421262c47dae54151fcc93d6d71debc4a1093e7a115",
+      "cena_bytes": 2659,
+      "triangulos": 176,
+      "orcamento_tris": 400,
+      "materiais": [
+        "pv3_ring"
+      ],
+      "pivo": "centro, no chao",
+      "animacoes": [
+        "pulse"
+      ]
+    },
+    {
+      "id": "props_v3_tow_rope",
+      "nome": "Ep01 v3 · corda de reboque (rolo ou trecho esticado de comprimento variavel)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M6",
+      "saida_glb": "game/assets/models/props_v3/tow_rope.glb",
+      "glb_sha256": "c17f2a618caa2785405eb5fef0765ddc538ae83020250929785cf9fa261552e4",
+      "glb_bytes": 110172,
+      "cena": "game/assets/models/props_v3/tow_rope.tscn",
+      "cena_sha256": "3b849f220c2f584434fac058a1e26c8841a52f8116f4eef353d0e1f129c9ba60",
+      "cena_bytes": 924,
+      "triangulos": 2144,
+      "orcamento_tris": 2500,
+      "materiais": [
+        "wv2_rope"
+      ],
+      "pivo": "inicio da corda (o Span vai de z 0 a z 1)",
+      "animacoes": []
+    },
+    {
+      "id": "props_v3_scripts",
+      "nome": "Ep01 v3 · scripts das cenas das pecas",
+      "agente": "art3d",
+      "status": "provisorio",
+      "data": "2026-11-25",
+      "saida": "game/assets/models/props_v3",
+      "arquivos_sha256": {
+        "props_v3_piece.gd": "4e72b821459ea86986d2850ce2052c161d018d7ed0fbd8f6b1885d5fd2292064",
+        "gull.gd": "45df2d291e5186431e74a7079a78678df66bc1b78efa9f566b6e81df65415467",
+        "tow_rope.gd": "74d4309f18143c4d3f4137cf57bdeaf9a0a7a56bfe6a4cfc4e8695c23d006675"
+      },
+      "arquivos_bytes": {
+        "props_v3_piece.gd": 5248,
+        "gull.gd": 2080,
+        "tow_rope.gd": 1283
+      }
     }
   ]
 }
