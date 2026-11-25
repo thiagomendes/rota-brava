@@ -19,8 +19,11 @@
 - **E5 + C1 integrados** (`OK (3351 PASS)`): M5–M8 (gaivota, barco com colete, farol, festa), 10 emblemas, câmera orbital pelo mouse/alavanca e desvio de obstáculos, peças finais do props v3 pelo ponto de troca. Bot M0→M8 ~226 s; ritmo humano estimado ~11 min (acima da meta, medir na E7).
 - **C2 integrado** (`OK (3409 PASS)`): andar por padrão, Shift corre, pulo (Espaço/A) bloqueado em zonas de subida das missões, interact E/X, seguidores em formação.
 - **Ciclos v2 integrados:** passada longa em `walk`/`run` (2,3–4,1 passos/s). Aguardando Thiago jogar (movimento, câmera, pulo, duração).
-- **E6 integrado** (`OK (3425 PASS)`): 53 falas + 21 dicas do Farol 7, legenda com ícones no tempo de leitura, Dona Amora.
-- **Próximo:** aguardar o retorno de Thiago jogando; E7 (ícones/retratos que faltam pelo `ux`, bot humano ≥ 8 min, capturas 3 proporções, vídeo, build Windows, Portão 2) e PARAR.
+- **E6 integrado** (`OK (3425 PASS)`): 53 falas + 21 dicas do Farol 7, legenda no tempo de leitura, Dona Amora.
+- **E7 ícones integrados** (`OK (3442 PASS)`, 8 min 16 s): retratos de capitão, filhote, Dona Amora e Farol 7; ícones lua, peixe, flor e mosquetão novo.
+- **Thiago jogou (2026-11-25):** F1 (andar em câmera lenta/deslizando, seguidores tremendo/aparecendo) com `gameplay` em `feature/rb-r1-f1-movimento`; F2 roteiro intuitivo: auditoria em `docs/proposals/ep01_v3_roteiro_intuitivo.md` (padrão "Ver, ouvir, seguir"), arte das pistas com `art3d` em `feature/rb-r1-f2-arte`.
+- **Som (D19–D21):** vozes Gemini TTS aprovadas (Leda, Fenrir, Erinome, Algieba, Schedar, Vindemiatrix; cruas); cadeia em `feature/rb-r1-d19-vozes` (`tools/voice/`); trilhas Lyria com bíblia musical (D20) e candidatas de narrador para as cutscenes (D21) com `audio`. Chave via segredo de rede do ambiente (`x-goog-api-key`), nunca no repositório.
+- **Próximo:** F1 → F2 gameplay (olhar dirigido, anel, rastros, retomada do M5) + falas que apontam e roteiro das cutscenes (`adventure`) → sistema de cutscene → gerar vozes do roteiro final → E7 (acelerar a suíte, bot humano, build, Portão 2) e PARAR.
 - **Páginas para Thiago:** trio 3D https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (Leme antiga), mundo v2 https://claude.ai/artifact/6WpRQzYXY2hW74LxMiPVww, novidades https://claude.ai/artifact/2WyeZqg8DNSLWegCPcCXAt.
 - **Dívidas:** `wv2_static.glb` ainda 10,6 MB e `world_v2.blend` 5,2 MB; materiais do mundo em `game/lookdev/world_v2/`; tris dos heróis no teto; cabelos de trás facetados; luz de parede estoura à noite; GPU real não medida; retratos do HUD antigos; branches `wip/*` a apagar pelo GitHub.
 
