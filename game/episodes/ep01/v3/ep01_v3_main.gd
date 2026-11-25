@@ -88,11 +88,35 @@ func _ready() -> void:
 		if resumed != &"" and first == &"":
 			first = resumed
 	_start_mission(_index_of(first) if first != &"" else 0)
+	_apply_dev_args()
 	if _has_flag("--ep01-demo") or _has_flag("--ep01-demo-human"):
 		var bot := Ep01V3Bot.new()
 		bot.main = self
 		bot.finished.connect(func(ok: bool) -> void: get_tree().quit(0 if ok else 1))
 		add_child(bot)
+
+
+## Dev/captura: --ep01v3-at=<marcador> poe o trio junto do marcador; --ep01v3-yaw=<graus> gira a camera baixa.
+func _apply_dev_args() -> void:
+	var at := _user_arg("--ep01v3-at")
+	if at != "" and world.marker(StringName(at)) != null:
+		var p := world.marker(StringName(at)).global_position
+		for m: StringName in HEROES:
+			(actors[m] as MemberActor).teleport(p + (TRIO_OFFSETS[m] as Vector3) + Vector3(0, 0.05, 0))
+	var yaw := _user_arg("--ep01v3-yaw")
+	if yaw != "":
+		camera_rig.set_low_view(deg_to_rad(float(yaw)))
+		for m: StringName in HEROES:
+			var a := actors[m] as MemberActor
+			a.face_now(a.global_position + Basis(Vector3.UP, camera_rig.yaw) * Vector3(0, 0, 3))
+	camera_rig.follow(controlled_node, true)
+
+
+func _user_arg(flag: String) -> String:
+	for arg in OS.get_cmdline_user_args() + OS.get_cmdline_args():
+		if arg.begins_with(flag + "="):
+			return arg.trim_prefix(flag + "=")
+	return ""
 
 
 func _has_flag(flag: String) -> bool:
