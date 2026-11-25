@@ -1,6 +1,6 @@
 @tool
 extends EditorScenePostImport
-## Pos-importacao dos GLB PBR dos herois v2 (RB-R1 D11/D13, PROPOSTA PROVISORIA; hoje so o rastro_v2.glb usa).
+## Pos-importacao dos GLB PBR dos herois v2 (RB-R1 D11/D13, PROPOSTA PROVISORIA; usado pelos rastro_v2, pico_v2 e leme_v2).
 ## A Godot 4.7 importa base color, normal, ORM (oclusao/rugosidade/metalico) e alpha do glTF, mas:
 ##  1) texturas EMBUTIDAS no GLB chegam sem mipmap (cintilam a distancia) -> aqui geramos os mipmaps;
 ##  2) ignora KHR_materials_clearcoat -> aqui lemos o verniz do proprio GLB e ligamos clearcoat no StandardMaterial3D;
@@ -34,7 +34,7 @@ func _post_import(scene: Node) -> Object:
 ## Gera mipmaps nas texturas do material e aplica o verniz lido do glTF (pelo nome do material).
 static func finish_material(m: StandardMaterial3D, coats: Dictionary) -> void:
 	var cache := {}
-	for prop in ["albedo_texture", "normal_texture", "roughness_texture", "metallic_texture", "ao_texture", "emission_texture"]:
+	for prop: String in ["albedo_texture", "normal_texture", "roughness_texture", "metallic_texture", "ao_texture", "emission_texture"]:
 		var t := m.get(prop) as Texture2D
 		if t == null:
 			continue
