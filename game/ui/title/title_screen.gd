@@ -174,8 +174,7 @@ func _mount_hero_models() -> bool:
 		holder.rotation.y = PI - (spots[m] as Vector3).x * 0.28
 		hero_root.add_child(holder)
 		holder.add_child(visual)
-		Stylize.apply(visual)
-		Stylize.add_outline(visual, 0.006)
+		CharacterVisual.stylize_if_toon(visual, 0.006)
 		hero_models.append(visual)
 		var first := &"team_pose" if visual.has_animation(&"team_pose") else &"idle"
 		visual.play(first)

@@ -258,3 +258,43 @@ func seek_clip(anim: StringName, t: float) -> bool:
 	return true
 
 
+
+
+## Modelos PBR com verniz (herois v2, RB-R1 E1b) marcam `metadata/pbr = true` no no `Model`: quem monta nao aplica
+## Stylize nem contorno neles.
+func is_pbr() -> bool:
+	return bool(get_meta(&"pbr", false))
+
+
+## Aplica o estilo toon + contorno so em modelos antigos (nao PBR). `node` pode ser qualquer Node3D de personagem.
+static func stylize_if_toon(node: Node, outline: float) -> void:
+	if node == null or bool(node.get_meta(&"pbr", false)):
+		return
+	Stylize.apply(node)
+	Stylize.add_outline(node, outline)
+
+
+## Liga/desliga um acessorio do GLB pelo nome do no (ex.: `set_accessory(&"Acc_LifeVest", true)`). False se nao existe.
+func set_accessory(acc_name: StringName, on: bool) -> bool:
+	var n := find_child(String(acc_name), true, false) as Node3D
+	if n == null:
+		return false
+	n.visible = on
+	return true
+
+
+func has_accessory(acc_name: StringName) -> bool:
+	return find_child(String(acc_name), true, false) is Node3D
+
+
+func accessory_visible(acc_name: StringName) -> bool:
+	var n := find_child(String(acc_name), true, false) as Node3D
+	return n != null and n.visible
+
+
+## Nomes dos acessorios (`Acc_*`) que este modelo tem.
+func accessory_names() -> PackedStringArray:
+	var out := PackedStringArray()
+	for n in find_children("Acc_*", "Node3D", true, false):
+		out.append(String(n.name))
+	return out

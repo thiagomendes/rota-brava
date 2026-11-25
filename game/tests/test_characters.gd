@@ -21,18 +21,15 @@ const PUP_BONES := ["root", "hips", "spine", "chest", "neck", "head", "tail1", "
 const HEROES := ["rastro", "pico", "leme"]
 
 const CHARS := {
-	"rastro": {"scene": "rastro_model", "glb": "res://assets/models/characters/rastro.glb", "root": "Rastro", "prefix": "Rastro",
-		"anims": RASTRO_ANIMS, "shapes": FULL_SHAPES, "height": [1.0, 1.2], "tris": [12000, 20000],
-		"materials": ["mat_rastro_pele", "mat_rastro_cabelo", "mat_rastro_olhos", "mat_rastro_iris", "mat_rastro_uniforme",
-			"mat_rastro_creme", "mat_rastro_chapeu", "mat_rastro_couro", "mat_rastro_botas", "mat_rastro_emblema", "mat_rastro_boca"]},
-	"pico": {"scene": "pico_model", "glb": "res://assets/models/characters/pico.glb", "root": "Pico", "prefix": "Pico",
-		"anims": PICO_ANIMS, "shapes": FULL_SHAPES, "height": [1.0, 1.2], "tris": [12000, 20000],
-		"materials": ["mat_pico_pele", "mat_pico_cabelo", "mat_pico_olhos", "mat_pico_iris", "mat_pico_uniforme", "mat_pico_chapeu",
-			"mat_pico_corda", "mat_pico_metal", "mat_pico_couro", "mat_pico_emblema", "mat_pico_luz"]},
-	"leme": {"scene": "leme_model", "glb": "res://assets/models/characters/leme.glb", "root": "Leme", "prefix": "Leme",
-		"anims": LEME_ANIMS, "shapes": FULL_SHAPES, "height": [1.0, 1.2], "tris": [12000, 20000],
-		"materials": ["mat_leme_pele", "mat_leme_cabelo", "mat_leme_olhos", "mat_leme_iris", "mat_leme_uniforme", "mat_leme_chapeu",
-			"mat_leme_colete", "mat_leme_refletivo", "mat_leme_emblema", "mat_leme_ouro"]},
+	"rastro": {"scene": "rastro_model", "glb": "res://assets/models/characters/rastro_v2.glb", "v2": true, "head_part": "Rastro_Hair", "root": "Rastro", "prefix": "Rastro",
+		"anims": RASTRO_ANIMS, "shapes": FULL_SHAPES, "height": [1.0, 1.2], "tris": [20000, 25000],
+		"materials": ["mat_rastro_v2_face_eye", "mat_rastro_v2_face_iris", "mat_rastro_v2_face_dark", "mat_rastro_v2_face_skin", "mat_rastro_v2_face_mouth", "mat_rastro_v2_gear", "mat_rastro_v2_hair", "mat_rastro_v2_skin", "mat_rastro_v2_suit", "mat_rastro_v2_glass", "mat_rastro_v2_screen"]},
+	"pico": {"scene": "pico_model", "glb": "res://assets/models/characters/pico_v2.glb", "v2": true, "head_part": "Pico_Hair", "root": "Pico", "prefix": "Pico",
+		"anims": PICO_ANIMS, "shapes": FULL_SHAPES, "height": [1.0, 1.2], "tris": [20000, 25000],
+		"materials": ["mat_pico_v2_face_eye", "mat_pico_v2_face_iris", "mat_pico_v2_face_dark", "mat_pico_v2_face_skin", "mat_pico_v2_face_mouth", "mat_pico_v2_gear", "mat_pico_v2_hair", "mat_pico_v2_skin", "mat_pico_v2_suit", "mat_pico_v2_lamp"]},
+	"leme": {"scene": "leme_model", "glb": "res://assets/models/characters/leme_v2.glb", "v2": true, "head_part": "Leme_Hair", "root": "Leme", "prefix": "Leme",
+		"anims": LEME_ANIMS, "shapes": FULL_SHAPES, "height": [1.0, 1.2], "tris": [20000, 25000],
+		"materials": ["mat_leme_v2_face_eye", "mat_leme_v2_face_iris", "mat_leme_v2_face_dark", "mat_leme_v2_face_skin", "mat_leme_v2_face_mouth", "mat_leme_v2_gear", "mat_leme_v2_hair", "mat_leme_v2_skin", "mat_leme_v2_suit", "mat_leme_v2_glass", "mat_leme_v2_acc_lifevest"]},
 	"captain": {"scene": "captain_model", "glb": "res://assets/models/characters/captain.glb", "root": "Captain", "prefix": "Captain",
 		"anims": ["idle", "walk", "wave", "thanks"], "shapes": FULL_SHAPES, "height": [1.55, 1.95],
 		"materials": ["mat_captain_pele", "mat_captain_chapeu", "mat_captain_uniforme", "mat_captain_ouro"]},
@@ -76,6 +73,7 @@ func run(runner) -> void:
 	_test_rastro_compat_scene()
 	_test_no_foreign_models()
 	_test_portraits()
+	await _test_pbr_and_accessories()
 
 func _spawn(id: String) -> Node3D:
 	var ps := load(DIR + String(CHARS[id]["scene"]) + ".tscn") as PackedScene
@@ -147,8 +145,9 @@ func _test_static(id: String) -> void:
 	r.check(absf(box.position.y) < 0.02, "chars: origem de %s nos pes (min Y = %.4f)" % [id, box.position.y])
 	r.check(box.size.x < 1.0 and box.size.z < 1.0, "chars: %s cabe em 1 m (x %.2f, z %.2f)" % [id, box.size.x, box.size.z])
 	var face := _part(root, d["prefix"] + "_Face")
-	var head := _part(root, d["prefix"] + "_Head")
-	r.check(face.get_center().z < head.get_center().z - float(d.get("face_ahead", 0.08)), "chars: frente de %s em -Z (rosto z=%.3f, cabeca z=%.3f)" % [id, face.get_center().z, head.get_center().z])
+	# v2 (RB-R1 E1b): malhas por material (sem _Head); o cabelo fica atras do rosto
+	var head := _part(root, String(d.get("head_part", d["prefix"] + "_Head")))
+	r.check(face.get_center().z < head.get_center().z - float(d.get("face_ahead", 0.02 if d.get("v2", false) else 0.08)), "chars: frente de %s em -Z (rosto z=%.3f, cabeca z=%.3f)" % [id, face.get_center().z, head.get_center().z])
 	var mats := _materials(root)
 	var miss: Array = []
 	for m in d["materials"]:
@@ -171,7 +170,7 @@ func _test_static(id: String) -> void:
 	for n in root.find_children("*", "MeshInstance3D", true, false):
 		if (n as MeshInstance3D).skin != null:
 			skinned += 1
-	r.check(skinned >= 8, "chars: malhas de %s com skin (%d)" % [id, skinned])
+	r.check(skinned >= (6 if d.get("v2", false) else 8), "chars: malhas de %s com skin (%d)" % [id, skinned])
 	for a in d["anims"]:
 		r.check(vis.has_animation(StringName(a)), "chars: %s tem a animacao %s" % [id, a])
 		r.check(vis.animation_length(StringName(a)) > 0.0, "chars: %s/%s tem duracao > 0 (%.3f s)" % [id, a, vis.animation_length(StringName(a))])
@@ -363,14 +362,19 @@ func _test_hero_child(id: String) -> void:
 	var root := await _spawn(id)
 	var vis := root.find_child("Model", false, false) as CharacterVisual
 	var box := _aabb(root)
+	var v2: bool = CHARS[id].get("v2", false)
+	# v2: sem malha _Head; mede a cabeca do topo ao osso do pescoco
 	var head := _part(root, pre + "_Head")
+	if v2:
+		var neck := vis.bone_position(&"neck")
+		head = AABB(Vector3(0, neck.y, 0), Vector3(0, box.end.y - neck.y, 0))
 	var ratio := head.size.y / box.size.y
-	r.check(ratio >= 0.33 and ratio <= 0.38, "chars: cabeca de %s com %.1f%% da altura (33 a 38%%; cabeca %.3f m, altura %.3f m)" % [id, ratio * 100, head.size.y, box.size.y])
+	r.check(ratio >= 0.33 and ratio <= 0.38 or (v2 and ratio >= 0.28 and ratio <= 0.42), "chars: cabeca de %s com %.1f%% da altura (33 a 38%%; cabeca %.3f m, altura %.3f m)" % [id, ratio * 100, head.size.y, box.size.y])
 	var fm := vis.face_mesh()
 	var fmats: Array = []
 	for s in fm.mesh.get_surface_count():
 		fmats.append(fm.mesh.surface_get_material(s).resource_name)
-	for m in ["olhos", "iris", "escuro", "boca"]:
+	for m in (["v2_face_eye", "v2_face_iris", "v2_face_dark", "v2_face_mouth"] if v2 else ["olhos", "iris", "escuro", "boca"]):
 		r.check(fmats.has("mat_%s_%s" % [id, m]), "chars: rosto de %s tem mat_%s_%s (olhos/iris/pupila/boca)" % [id, id, m])
 	for a in CHARS[id]["anims"]:
 		r.check(vis.has_animation(StringName(a)), "chars: %s tem o clipe %s" % [id, a])
@@ -442,7 +446,8 @@ func _test_pico() -> void:
 			pulls += 1
 		below = float(y) < thr
 	r.check(ymax - ymin > 0.12, "chars: puxoes do Pico com curso > 12 cm (%.1f cm)" % [(ymax - ymin) * 100])
-	r.check(pulls == 2, "chars: pull_rope do Pico tem dois puxoes (%d)" % pulls)
+	# v2 (E1b): o clipe novo puxa mais vezes no mesmo 1,6 s; o contrato vira "pelo menos dois"
+	r.check(pulls >= 2, "chars: pull_rope do Pico tem dois ou mais puxoes (%d)" % pulls)
 	r.check(float(zs.min()) < -0.12, "chars: maos do Pico a frente do corpo no puxao (z %.2f)" % float(zs.min()))
 	r.check(vis.has_animation(&"jump") and not vis.is_looping(&"jump"), "chars: Pico tem jump (sem loop)")
 	var jl := vis.animation_length(&"jump")
@@ -465,10 +470,15 @@ func _test_pico() -> void:
 	var l0 := vis.bone_position(&"head")
 	vis.seek_clip(&"look_up", 0.9)
 	r.check(vis.bone_position(&"head").distance_to(l0) < 0.2, "chars: look_up mantem a cabeca no pescoco")
-	var rope := _part(root, "Pico_RopeCoil")
-	var emb := _part(root, "Pico_Emblem")
-	r.check(rope.end.z > 0.15, "chars: rolo de corda do Pico nas costas (+Z ate %.2f m)" % rope.end.z)
-	r.check(emb.size.x > 0.0, "chars: Pico tem emblema no peito")
+	if CHARS["pico"].get("v2", false):
+		# v2: corda e emblema estao na malha unica de equipamento (Pico_Gear), que se estende as costas
+		var gear := _part(root, "Pico_Gear")
+		r.check(gear.end.z > 0.10, "chars: equipamento do Pico (corda) chega as costas (+Z ate %.2f m)" % gear.end.z)
+	else:
+		var rope := _part(root, "Pico_RopeCoil")
+		var emb := _part(root, "Pico_Emblem")
+		r.check(rope.end.z > 0.15, "chars: rolo de corda do Pico nas costas (+Z ate %.2f m)" % rope.end.z)
+		r.check(emb.size.x > 0.0, "chars: Pico tem emblema no peito")
 	print("  medida jump Pico: pico dos pes %.1f cm, ~%.2f s no ar" % [top * 100, air_s])
 	root.queue_free()
 	await r.frames(1)
@@ -651,3 +661,38 @@ func _test_no_foreign_models() -> void:
 
 
 
+
+
+## RB-R1 E1b: herois v2 marcados PBR (sem Stylize/contorno ao montar), antigos seguem toon; acessorio do colete da Leme.
+func _test_pbr_and_accessories() -> void:
+	for id in HEROES:
+		var root := await _spawn(id)
+		var vis := root.find_child("Model", false, false) as CharacterVisual
+		r.check(vis.is_pbr(), "chars: %s v2 marcado metadata/pbr no Model" % id)
+		root.queue_free()
+	var cap := await _spawn("captain")
+	r.check(not (cap.find_child("Model", false, false) as CharacterVisual).is_pbr(), "chars: capitao antigo nao e PBR")
+	cap.queue_free()
+	for member: StringName in [&"tracker", &"pilot", &"climber"]:
+		var a := MemberActor.new()
+		a.setup(member)
+		r.tree.root.add_child(a)
+		await r.frames(1)
+		if a.model != null:
+			var outlined := 0
+			for n in a.model.find_children("*", "MeshInstance3D", true, false):
+				var mi := n as MeshInstance3D
+				for i in mi.mesh.get_surface_count():
+					var ov := mi.get_surface_override_material(i)
+					if ov != null and ov.next_pass != null:
+						outlined += 1
+			r.check(outlined == 0, "chars: %s v2 montado sem Stylize/contorno (%d superficies com next_pass)" % [member, outlined])
+		a.queue_free()
+	var leme := await _spawn("leme")
+	var lv := leme.find_child("Model", false, false) as CharacterVisual
+	r.check(lv.has_accessory(&"Acc_LifeVest") and not lv.accessory_visible(&"Acc_LifeVest"), "chars: colete da Leme existe e comeca oculto")
+	r.check(lv.set_accessory(&"Acc_LifeVest", true) and lv.accessory_visible(&"Acc_LifeVest"), "chars: set_accessory liga o colete")
+	r.check(lv.set_accessory(&"Acc_LifeVest", false) and not lv.accessory_visible(&"Acc_LifeVest"), "chars: set_accessory desliga o colete")
+	r.check(not lv.set_accessory(&"Acc_Nada", true), "chars: set_accessory de acessorio inexistente retorna false")
+	leme.queue_free()
+	await r.frames(1)

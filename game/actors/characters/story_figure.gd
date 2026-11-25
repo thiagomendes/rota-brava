@@ -23,8 +23,7 @@ static func spawn(parent: Node, id: String, node_name: String) -> Node3D:
 	m.owner = null
 	inst.free()
 	root.add_child(m)
-	Stylize.apply(m)
-	Stylize.add_outline(m, 0.008)
+	CharacterVisual.stylize_if_toon(m, 0.008)
 	var cv := visual(root)
 	if cv != null:
 		cv.play(&"idle")

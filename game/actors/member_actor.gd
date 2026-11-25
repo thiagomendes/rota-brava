@@ -84,8 +84,7 @@ func _mount_model(member_id: StringName) -> void:
 	inst.queue_free()
 	_visual.add_child(m)
 	model = m as CharacterVisual
-	Stylize.apply(m)
-	Stylize.add_outline(m, 0.008)
+	CharacterVisual.stylize_if_toon(m, 0.008)
 	if model != null:
 		model.play(&"idle")
 
@@ -98,6 +97,11 @@ func play_action(anim: StringName, speed: float = 1.0) -> float:
 	_action_until = Time.get_ticks_msec() / 1000.0 + length
 	model.play(anim, speed)
 	return length
+
+
+## Liga/desliga um acessorio do modelo (ex.: `set_accessory(&"Acc_LifeVest", true)` na missao de barco). False se nao existe.
+func set_accessory(acc_name: StringName, on: bool) -> bool:
+	return model != null and model.set_accessory(acc_name, on)
 
 
 func set_expression(expr: StringName, weight: float = 1.0) -> void:

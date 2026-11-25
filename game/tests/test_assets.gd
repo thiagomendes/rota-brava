@@ -5,16 +5,15 @@ extends RefCounted
 
 const RASTRO_SCENE := "res://actors/rastro/rastro.tscn"   # herda actors/characters/rastro_model.tscn
 const BOAT_SCENE := "res://actors/boat_model/boat_model.tscn"
-const RASTRO_GLB := "res://assets/models/characters/rastro.glb"
+const RASTRO_GLB := "res://assets/models/characters/rastro_v2.glb"   # RB-R1 E1b
 const BOAT_GLB := "res://assets/models/boat.glb"
 
 ## RB-R1: Rastro refeito como crianca-heroi (hero_build.py).
-const RASTRO_NODES := ["Rastro_Head", "Rastro_Face", "Rastro_Hat", "Rastro_HatBand", "Rastro_Hair", "Rastro_Jacket", "Rastro_Collar",
-	"Rastro_Emblem", "Rastro_EmblemStar", "Rastro_Pants", "Rastro_BootL", "Rastro_BootR", "Rastro_SoleL", "Rastro_SoleR", "Rastro_HandL",
-	"Rastro_HandR", "Rastro_Notebook", "Rastro_Bag", "Rastro_Belt", "Rastro_Buckle", "Rastro_Lupa", "Skeleton3D", "AnimationPlayer"]
-const RASTRO_MATERIALS := ["mat_rastro_pele", "mat_rastro_cabelo", "mat_rastro_olhos", "mat_rastro_iris", "mat_rastro_escuro",
-	"mat_rastro_boca", "mat_rastro_uniforme", "mat_rastro_creme", "mat_rastro_calca", "mat_rastro_chapeu", "mat_rastro_couro",
-	"mat_rastro_botas", "mat_rastro_emblema", "mat_rastro_ouro", "mat_rastro_rubor", "mat_rastro_vidro"]
+const RASTRO_NODES := ["Rastro_Face", "Rastro_Gear", "Rastro_Glass", "Rastro_Hair", "Rastro_Screen", "Rastro_Skin", "Rastro_Suit",
+	"Skeleton3D", "AnimationPlayer"]
+const RASTRO_MATERIALS := ["mat_rastro_v2_face_eye", "mat_rastro_v2_face_iris", "mat_rastro_v2_face_dark", "mat_rastro_v2_face_skin",
+	"mat_rastro_v2_face_mouth", "mat_rastro_v2_gear", "mat_rastro_v2_glass", "mat_rastro_v2_hair", "mat_rastro_v2_screen", "mat_rastro_v2_skin",
+	"mat_rastro_v2_suit"]
 const BOAT_NODES := ["Boat_Hull", "Boat_Deck", "Boat_Cabin", "Boat_CabinRoof", "Boat_Bench", "Boat_Helm", "Boat_Windows",
 	"DeckPoint", "BenchMark"]
 const BOAT_MATERIALS := ["mat_boat_hull", "mat_boat_deck", "mat_boat_cabin", "mat_boat_bench", "mat_boat_wheel", "mat_boat_glass"]
@@ -145,8 +144,8 @@ func _test_rastro() -> void:
 	r.check(box.size.y >= 1.0 and box.size.y <= 1.2, "assets: altura do Rastro (crianca-heroi) entre 1,0 e 1,2 m (%.3f)" % box.size.y)
 	r.check(absf(box.position.y) < 0.02, "assets: origem do Rastro nos pes (min Y = %.4f)" % box.position.y)
 	var face := part_aabb(root, "Rastro_Face")
-	var head := part_aabb(root, "Rastro_Head")
-	r.check(face.get_center().z < head.get_center().z - 0.08, "assets: frente do Rastro em -Z (rosto z=%.3f, cabeca z=%.3f)" % [face.get_center().z, head.get_center().z])
+	var head := part_aabb(root, "Rastro_Hair")   # v2: sem _Head; cabelo atras do rosto
+	r.check(face.get_center().z < head.get_center().z - 0.02, "assets: frente do Rastro em -Z (rosto z=%.3f, cabeca z=%.3f)" % [face.get_center().z, head.get_center().z])
 	var mats := material_names(model)
 	var miss_m: Array = []
 	for m in RASTRO_MATERIALS:
