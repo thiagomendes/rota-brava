@@ -72,6 +72,10 @@ mostra só o rolo.
 **M7 (lente):** não refeita. A `wv3_lens` da E3 (aro de latão, vidro, alça) serve; na captura `m7_lente_e3.png` ela aparece
 meio tapada pelos arbustos do promontório (posição do mundo, não da peça).
 
+## G6 (RB-R1, 2026-11-26)
+- Caixotes do M4 (`crate_*`): fundo falso de palha a 5 cm da borda; as frutas pousam nele (antes ficavam 21 cm acima do
+  fundo, soltas). Mesma medida externa. Achado por `bash tools/prop-overlap.sh`.
+
 ## Limites conhecidos
 - Tecidos são chapas rígidas (balançam inteiros no `sway`, sem simulação de pano).
 - Asa recolhida da gaivota é rotação rígida: a face de baixo (cinza-claro) fica para fora.

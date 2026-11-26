@@ -5,6 +5,7 @@ frente para +Z. Cores em sRGB (convertidas para linear na cor de vertice).
 import math
 import random
 
+import bmesh
 from mathutils import Vector
 
 from wv2lib import MB, R, T, hexc
@@ -141,7 +142,11 @@ def net_pile(name="net_pile", seed=5):
              freq=3.0, flat_bottom=-0.12, uv="box", rng=rng)
     for k in range(9):
         a = k / 9 * 6.28 + rng.uniform(-0.2, 0.2)
-        m.sphere((math.cos(a) * 0.55, 0.08 + rng.uniform(0, 0.1), math.sin(a) * 0.42), 0.055, GLOSSY,
+        # G6: boia pousada na rede (meio afundada no monte, que tem relevo de ruido; antes ate 6 cm no ar)
+        x, z = math.cos(a) * 0.55, math.sin(a) * 0.42
+        rng.uniform(0, 0.1)
+        q = max(0.0, 1.0 - (x / 0.66) ** 2 - (z / 0.48) ** 2)
+        m.sphere((x, max(0.044, 0.252 * math.sqrt(q) - 0.01), z), 0.055, GLOSSY,
                  hexc("#F07A2E") if k % 2 else hexc("#F4D35E"), subd=1, scale=(1, 0.8, 1), rng=rng)
     return m
 
@@ -176,9 +181,11 @@ def lobster_trap(name="lobster_trap", seed=8):
     for x in (-0.36, -0.12, 0.12, 0.36):
         pts = [(x, 0.06 + math.sin(t / 8 * math.pi) * 0.3, -0.24 * math.cos(t / 8 * math.pi)) for t in range(9)]
         m.tube(pts, 0.014, WOOD, hexc("#A07A52"), seg=5)
-    # rede: casca cilindrica deitada ao longo de x (sem tampas)
+    # rede: meia casca cilindrica deitada ao longo de x (sem tampas). G6: so a metade de cima; a de baixo descia 0,18 m
+    # abaixo do fundo e atravessava o cais (e o covo de baixo, quando empilhado). Com R(rz=-90), y do mundo = 0,06 - x local.
     from wv2lib import _bm_cyl
     bm = _bm_cyl(0.235, 0.235, 0.74, 14, False)
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if v.co.x > 1e-4], context="VERTS")
     xf = T(-0.37, 0.06, 0) @ R(rz=-90)
     m.add_bm(bm, xf, NET, hexc("#6A9A8A"), "cyl", "y", rng=rng)
     return m
@@ -215,13 +222,23 @@ def planter(name="planter", seed=11, flower=("#FF6F91", "#FFFFFF", "#FFC93C")):
     rng = random.Random(seed)
     m.box((0, 0.2, 0), (1.3, 0.4, 0.45), PAINT, hexc("#3E8C8C"), 0.025, 2, rng=rng)
     m.box((0, 0.395, 0), (1.22, 0.02, 0.37), "wv2_terrain", hexc("#5A4532"), 0.0, 1, rng=rng)
+    leaves = []
     for k in range(4):
-        m.sphere((-0.45 + k * 0.3, 0.48, rng.uniform(-0.04, 0.04)), 0.22, LEAF, hexc("#5FB044"), subd=2, scale=(1, 0.7, 0.9),
+        c = (-0.45 + k * 0.3, 0.48, rng.uniform(-0.04, 0.04))
+        leaves.append(c)
+        m.sphere(c, 0.22, LEAF, hexc("#5FB044"), subd=2, scale=(1, 0.7, 0.9),
                  seed=seed + k, amp=0.2, freq=3.0, rng=rng,
                  shade=lambda p, w: 0.65 + 0.45 * max(0.0, min(1.0, (p.y / 0.15 + 1) * 0.5)))
     for k in range(18):
-        m.sphere((rng.uniform(-0.58, 0.58), 0.58 + rng.uniform(0, 0.08), rng.uniform(-0.16, 0.16)), 0.04, GLOSSY,
-                 hexc(flower[k % len(flower)]), subd=1, scale=(1, 0.6, 1), rng=rng)
+        x, _, z = rng.uniform(-0.58, 0.58), rng.uniform(0, 0.08), rng.uniform(-0.16, 0.16)
+        # G6: flor pousada na folhagem (altura do elipsoide da moita mais alta ali, 2 cm para dentro) ou na terra;
+        # antes ficava a 0,58-0,66 m, ate 10 cm acima das folhas.
+        y = 0.405 + 0.012
+        for cx, cy, cz in leaves:
+            q = 1.0 - ((x - cx) / 0.22) ** 2 - ((z - cz) / 0.198) ** 2
+            if q > 0.0:
+                y = max(y, cy + 0.154 * math.sqrt(q) - 0.02)
+        m.sphere((x, y, z), 0.04, GLOSSY, hexc(flower[k % len(flower)]), subd=1, scale=(1, 0.6, 1), rng=rng)
     return m
 
 
@@ -231,7 +248,9 @@ def bench(name="bench", seed=12):
     for k in range(3):
         m.box((0, 0.45, -0.16 + k * 0.13), (1.6, 0.04, 0.11), WOOD, hexc("#C08A55"), 0.012, 2, rng=rng)
     for k in range(2):
-        m.box((0, 0.68 + k * 0.16, -0.28 - k * 0.03), (1.6, 0.11, 0.035), WOOD, hexc("#C08A55"), 0.012, 2, rot=R(rx=-12), rng=rng)
+        # G6: ripas do encosto do lado dos montantes das pernas (o perfil da perna gira ry=90: u -> -z, montante em
+        # z +0,26..+0,36) e inclinadas como eles; antes ficavam em z -0,28 inclinadas para o outro lado, soltas no ar.
+        m.box((0, 0.68 + k * 0.16, 0.265 + k * 0.013), (1.6, 0.11, 0.035), WOOD, hexc("#C08A55"), 0.012, 2, rot=R(rx=12), rng=rng)
     for x in (-0.68, 0.68):
         leg = [(-0.22, 0.0), (-0.16, 0.0), (-0.1, 0.43), (0.18, 0.43), (0.12, 0.0), (0.2, 0.0), (0.24, 0.47), (-0.32, 0.47),
                (-0.36, 0.95), (-0.3, 0.95), (-0.26, 0.47)]
@@ -292,10 +311,12 @@ def cart(name="cart", seed=16):
             a = k / 6 * math.pi
             m.box((0.2, 0.36, z), (0.03, 0.66, 0.03), WOOD, hexc("#8E6A48"), 0.0, 1, rot=R(rz=math.degrees(a)), grain="y", rng=rng)
         m.cyl((0.2, 0.36, z - 0.05), 0.07, 0.1, METAL, hexc("#3B3F44"), seg=10, rot=R(rx=90))
-    m.box((0.85, 0.3, 0), (0.05, 0.6, 0.05), WOOD, hexc("#A87D52"), 0.01, 1, grain="y", rng=rng)
-    for k in range(5):
-        m.sphere((rng.uniform(-0.4, 0.5), 0.75 + rng.uniform(0, 0.08), rng.uniform(-0.25, 0.25)), 0.075, GLOSSY,
-                 hexc("#F59A23") if k % 2 else hexc("#E8442E"), subd=1, rng=rng)
+    # G6: pe de apoio embaixo do fundo (antes a 0,85 m, fora do fundo e sem tocar nada) e calcos do eixo ao fundo
+    # (o fundo flutuava 0,2 m sobre o eixo). As 5 frutas soltas sobre o fundo sairam: flutuavam 2,5-10 cm e o fundo e
+    # onde o M4 poe os 3 caixotes de entrega (Ep01V3Land.CARGO_SLOTS).
+    m.box((0.58, 0.295, 0), (0.05, 0.59, 0.05), WOOD, hexc("#A87D52"), 0.01, 1, grain="y", rng=rng)
+    for z in (-0.3, 0.3):
+        m.box((0.2, 0.49, z), (0.12, 0.21, 0.06), WOOD, hexc("#8E6A48"), 0.008, 1, grain="y", rng=random.Random(161))
     return m
 
 
@@ -325,7 +346,7 @@ def cafe_set(name="cafe_set", seed=18):
                 p = rot @ Vector((dx, 0, dz))
                 m.cyl((cx + p.x, 0, cz + p.z), 0.018, 0.45, METAL, IRON, seg=6)
         m.box((cx, 0.46, cz), (0.42, 0.04, 0.42), PAINT, hexc("#E8553E"), 0.012, 2, rot=rot)
-        p = rot @ Vector((0, 0.72, 0.2))
+        p = rot @ Vector((0, 0.69, 0.2))   # G6: encosto encostado no assento (antes 3 cm acima)
         m.box((cx + p.x, p.y, cz + p.z), (0.42, 0.42, 0.03), PAINT, hexc("#E8553E"), 0.012, 2, rot=rot @ R(rx=8))
     return m
 
@@ -333,7 +354,7 @@ def cafe_set(name="cafe_set", seed=18):
 def parasol(name="parasol", seed=19):
     m = MB(name)
     m.cyl((0, 0, 0), 0.2, 0.05, METAL, IRON, seg=12)
-    m.cyl((0, 0, 0), 0.025, 2.35, WOOD, hexc("#C8A27A"), seg=8)
+    m.cyl((0, 0, 0), 0.025, 2.4, WOOD, hexc("#C8A27A"), seg=8)   # G6: mastro ate o topo da lona (antes 5 cm abaixo)
     n = 8
     for k in range(n):
         a0 = k / n * 2 * math.pi
