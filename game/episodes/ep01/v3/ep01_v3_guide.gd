@@ -90,6 +90,7 @@ func on_mission_started(id: StringName) -> void:
 	_prev_mission = id
 	if TRAILS.has(id):
 		_build_trail(id)
+		_travel_music.call_deferred(true, id)
 
 
 ## Passo novo: fala que aponta (com gesto) e olhar dirigido. Diferido: as falas de abertura da missao vem antes.
@@ -106,15 +107,20 @@ func on_step_done(mission: StringName, index: int, step: StringName) -> void:
 		point_line(k)
 	if index == 0 and trail_mission == mission:
 		_clear_trail()
+		_travel_music(false, mission)
 
 
-## A pista da missao se resolveu e o trio vai se deslocar: volta a musica da vila.
 func on_mission_completed(_id: StringName) -> void:
 	_clear_trail()
-	if main.audio != null and main.audio.has_method(&"play_scene_music"):
-		main.audio.call(&"play_scene_music", &"village")
-	# TODO(F2/audio): sem `play_scene_music` nesta base (a cadeia D19/D20 do `audio` traz `bind_episode_music`); quando
-	# integrar, a chamada acima passa a valer sem mudar nada aqui.
+
+
+## Musica (F2): no deslocamento longo (rastro ate o 1o alvo) toca a musica da vila; ao chegar (1o passo feito), a musica
+## da missao. Diferido: a AudioDirector troca para a musica da missao no `mission_started`, que vem depois.
+func _travel_music(on: bool, mission: StringName) -> void:
+	var a := main.audio
+	if a == null or not a.has_method(&"play_scene_music"):
+		return
+	a.play_scene_music(&"v3_village" if on else a.scene_music_for(mission))
 
 
 ## Diz a fala e faz o gesto do falante (heroi do trio) para o alvo da ficha; clipe que falta cai no fallback.

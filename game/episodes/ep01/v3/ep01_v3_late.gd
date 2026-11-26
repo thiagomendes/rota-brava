@@ -280,7 +280,7 @@ func _build_m8() -> void:
 	_spot(&"captain", captain.global_position, &"heart", "ui.action.talk", &"", 1.9)
 	# Corte para a praca (o farol fica a ~55 m): o trio chega junto para a festa.
 	if main.controlled_node != null and main.controlled_node.global_position.distance_to(plaza) > 8.0:
-		_cut(func() -> void: main._place_trio_at(plaza + Vector3(-1.0, 0, 1.2)))
+		_cut(func() -> void: main._place_trio_at(plaza + Vector3(1.0, 0, 1.2)))   # F2: longe da borda do chafariz
 
 
 func _dinghy_docked() -> void:
