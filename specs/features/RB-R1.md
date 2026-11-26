@@ -467,3 +467,28 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 - Correções: carrinho do M4, bola do M3, covos, vaso e canteiro, barril, moitas e rosa dos ventos do M7 (−0,6 m em z, com o `aim` junto). Saíram 17 pedras escondidas em casas e 10 que se fundiam com outras.
 - Revisão (`reviewer`, 3 rodadas): 1ª REPROVADA (exceções largas), 2ª APROVADA, 3ª APROVADA (`prop_overlap` falha nas bases antigas, marcadores intactos, colisão bate com o manifesto). O lead olhou as capturas `g6/after_cart` e `g6/r4/after_cluster_a`.
 - Ressalvas: a ferramenta não julga estética; as pedras continuam do mesmo modelo arredondado; lajes baixas contam como chão sem auditoria. `ep01_v3` falhou uma vez em 3 checagens de salvamento e passou ao repetir. Suspeita, não verificada: agentes rodando testes em paralelo dividem o mesmo `user://`.
+### G4 · secundários v2 (`art3d`, branch `feature/rb-r1-g-secundarios`, 2026-11-26) — aguardando revisão
+- **Inventário (Ep01 v3):** em cena só capitão (`captain_model`, `Ep01V3Late` M6/M8 e cutscenes), filhote (`pup_model`, M7/M8 e cutscenes) e Dona Amora (`amora_model`, cutscene `m4_intro`). Os moradores `villager_a/b/c` só aparecem nos estágios antigos (`harbor_slice`/`dock_stage`), não no v3: ficaram como estão.
+- **O que separava o trio:** malha inteiriça SKIN + SUBSURF 3 com forma modelada (secundários: peças separadas por torno, tubos, anel de cinto solto); atlas assada e pintada com tecido, pespontos, AO e normal map (secundários: cor chapada por material); PBR com verniz e sem contorno (secundários: toon + contorno); proporção e olhos do trio (adultos com cabeça de 27%, cara de criança); rig e clipes iguais em todos.
+- **Feito:** capitão, filhote e Dona Amora refeitos em `source_art/characters/secondary_v2/` sobre o pipeline do trio (`rv2_tex`, só leitura), GLB `{captain,pup,amora}_v2.glb` (24 414 / 16 892 / 23 510 tris; 4,26 / 2,57 / 4,20 MB), cenas antigas apontando para eles com `metadata/pbr`. Mesmos ossos, nós `Model`/`HeadAnchor`, clipes e velocidades (capitão recalculadas pela proporção nova). Capitão e Dona Amora com cabeça a 21% da altura. Manifesto (`captain_v2`, `pup_v2`, `amora_v2`) e PROVENANCE.
+- **Provas:** `bash tools/test.sh characters` OK (775), `assets` OK (276), `ep01_v3` OK (193), `cutscenes` OK (134; uma 1ª rodada com captura em paralelo falhou 1 checagem do bot com cenas puladas, a 2ª passou). Capturas antes/depois ao lado do trio na câmera do jogo e de perto em `captures/g4/` (fora do Git, `game/tests/capture_g4.tscn`), provas do Blender em `captures/g4/blender/`.
+- **Fraco / pendente:** retratos do HUD do capitão e do filhote ainda são da geração anterior; rosto da Dona Amora ainda redondo (lê melhor como adulta pelo corpo do que pelo rosto); pose `idle` dos adultos em A rígido (clipe antigo); pelo do filhote quase liso (vinil, como o trio); moradores antigos sem refazer.
+- **G4 rodada 2 (`art3d`, 2026-11-26):** mãos encaixadas na manga (vão manga-mão no idle: capitão +18,8 → −59,4 mm,
+  Dona Amora +15,4 → −53,3 mm, medido separando as ilhas de `*_Skin` e `*_Cloth` no .blend; idem `wave`), idle adulto
+  relaxado (braços soltos, respiração), rosto de senhora da Dona Amora, pelo curto no filhote, retratos do HUD do capitão e do
+  filhote regerados dos modelos v2. Capturas antes/depois em `captures/g4/r2/`.
+
+### G4 integrado (`feature/rb-r1-g-secundarios`, autor `art3d`)
+- Capitão, filhote e Dona Amora foram refeitos no pipeline do trio: SKIN + SUBSURF, atlas assada em PBR e sem contorno (`source_art/characters/secondary_v2/`).
+- Rodada 2, depois do retorno de Thiago:
+  - mãos dentro da manga (o vão no pulso era de 15–19 mm; agora a mão entra 54–60 mm na manga);
+  - `pose_idle_adult`;
+  - rosto de senhora para a Amora;
+  - pelo do filhote;
+  - 6 retratos novos.
+- Revisão (`reviewer`, 2 rodadas):
+  - 1ª: REPROVADO por causa das mãos soltas.
+  - 2ª: APROVADO. O pulso foi medido de novo, o manifesto confere, o idle de 3,6 s não quebra ninguém. Num merge local com G1, a Amora aparece de olhos abertos no `m4_intro` aos 4,5 s.
+  - `characters`: 837 PASS; `assets`: 276; `ep01_v3`: 232.
+- Ressalvas abertas: há uma costura no topo do lenço da Amora (`build_amora_v2.py:115`); o grisalho nas têmporas lê como halo; falta ver o vão entre as pernas num ângulo baixo; moradores `villager_*` não foram refeitos porque não aparecem no v3.
+- `tools/test.sh` agora isola `user://` por checkout (`XDG_DATA_HOME`). Revisado e aprovado.

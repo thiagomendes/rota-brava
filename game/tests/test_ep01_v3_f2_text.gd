@@ -10,8 +10,8 @@ const WORLD_PATH := "res://worlds/village_v3/village_world.tscn"
 const ICON_DIR := "res://ui/brand/icons/"
 const MODELS := {"tracker": "res://assets/models/characters/rastro_v2.glb",
 	"climber": "res://assets/models/characters/pico_v2.glb", "pilot": "res://assets/models/characters/leme_v2.glb",
-	"captain": "res://assets/models/characters/captain.glb", "pup": "res://assets/models/characters/pup.glb",
-	"vendor": "res://assets/models/characters/amora.glb"}
+	"captain": "res://assets/models/characters/captain_v2.glb", "pup": "res://assets/models/characters/pup_v2.glb",
+	"vendor": "res://assets/models/characters/amora_v2.glb"}
 const STEPS: Array[String] = ["M1.bench", "M1.boot", "M1.trail", "M2.free_pieces", "M2.find_third", "M2.hang",
 	"M3.stream", "M3.leaves", "M4.read", "M4.deliver", "M5.feathers", "M5.compass", "M5.fish", "M6.board", "M6.buoys",
 	"M6.approach", "M6.rope", "M7.lens", "M7.climb", "M7.aim", "M8.thanks"]

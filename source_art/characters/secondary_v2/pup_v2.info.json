@@ -1,0 +1,141 @@
+{
+  "tris": 16892,
+  "tris_por_objeto": {
+    "Pup_Body": 6598,
+    "Pup_Head": 6526,
+    "Pup_Gear": 1400,
+    "Pup_Face": 2368
+  },
+  "materials": [
+    "mat_pup_v2_face_dark",
+    "mat_pup_v2_face_eye",
+    "mat_pup_v2_face_iris",
+    "mat_pup_v2_face_mouth",
+    "mat_pup_v2_face_skin",
+    "mat_pup_v2_fur_body",
+    "mat_pup_v2_fur_head",
+    "mat_pup_v2_gear"
+  ],
+  "height_m": 0.5024,
+  "min_z": 0.0017,
+  "objects": [
+    "Pup_Body",
+    "Pup_Face",
+    "Pup_Gear",
+    "Pup_Head"
+  ],
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "ear.L",
+    "ear.R",
+    "fl_upper.L",
+    "fl_lower.L",
+    "fl_paw.L",
+    "fl_upper.R",
+    "fl_lower.R",
+    "fl_paw.R",
+    "tail1",
+    "tail2",
+    "tail3",
+    "bl_upper.L",
+    "bl_lower.L",
+    "bl_paw.L",
+    "bl_upper.R",
+    "bl_lower.R",
+    "bl_paw.R"
+  ],
+  "bone_count": 23,
+  "animations": {
+    "bark": [
+      0,
+      24
+    ],
+    "idle": [
+      0,
+      84
+    ],
+    "jump_happy": [
+      0,
+      30
+    ],
+    "run": [
+      0,
+      18
+    ],
+    "step_on_horn": [
+      0,
+      42
+    ],
+    "wag": [
+      0,
+      36
+    ],
+    "walk": [
+      0,
+      30
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "triste",
+    "brava_leve",
+    "blink",
+    "mouth_A",
+    "mouth_E",
+    "mouth_O",
+    "mouth_M",
+    "look_left",
+    "look_right",
+    "look_up"
+  ],
+  "texturas": {
+    "pup_v2_fur_body_color": [
+      1024,
+      1024
+    ],
+    "pup_v2_fur_body_normal": [
+      1024,
+      1024
+    ],
+    "pup_v2_fur_body_orm": [
+      1024,
+      1024
+    ],
+    "pup_v2_fur_head_color": [
+      1024,
+      1024
+    ],
+    "pup_v2_fur_head_normal": [
+      1024,
+      1024
+    ],
+    "pup_v2_fur_head_orm": [
+      1024,
+      1024
+    ],
+    "pup_v2_gear_color": [
+      512,
+      512
+    ],
+    "pup_v2_gear_normal": [
+      512,
+      512
+    ],
+    "pup_v2_gear_orm": [
+      512,
+      512
+    ]
+  },
+  "walk_speed_mps": 0.569,
+  "run_speed_mps": 1.2745,
+  "variant": "pup_v2"
+}

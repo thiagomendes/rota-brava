@@ -1,0 +1,162 @@
+{
+  "tris": 23072,
+  "tris_por_objeto": {
+    "Amora_Skin": 5620,
+    "Amora_Hair": 3044,
+    "Amora_Cloth": 9028,
+    "Amora_Gear": 3012,
+    "Amora_Face": 2368
+  },
+  "materials": [
+    "mat_amora_v2_cloth",
+    "mat_amora_v2_face_dark",
+    "mat_amora_v2_face_eye",
+    "mat_amora_v2_face_iris",
+    "mat_amora_v2_face_mouth",
+    "mat_amora_v2_face_skin",
+    "mat_amora_v2_gear",
+    "mat_amora_v2_hair",
+    "mat_amora_v2_skin"
+  ],
+  "height_m": 1.6834,
+  "min_z": -0.0001,
+  "objects": [
+    "Amora_Cloth",
+    "Amora_Face",
+    "Amora_Gear",
+    "Amora_Hair",
+    "Amora_Skin"
+  ],
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "hand_tip.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "hand_tip.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R",
+    "toe.R",
+    "toe_tip.R",
+    "heel.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "toe.L",
+    "toe_tip.L",
+    "heel.L"
+  ],
+  "bone_count": 28,
+  "animations": {
+    "idle": [
+      0,
+      108
+    ],
+    "point": [
+      0,
+      36
+    ],
+    "talk": [
+      0,
+      90
+    ],
+    "thanks": [
+      0,
+      60
+    ],
+    "wave": [
+      0,
+      48
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "triste",
+    "brava_leve",
+    "blink",
+    "mouth_A",
+    "mouth_E",
+    "mouth_O",
+    "mouth_M",
+    "look_left",
+    "look_right",
+    "look_up"
+  ],
+  "texturas": {
+    "amora_v2_cloth_color": [
+      2048,
+      2048
+    ],
+    "amora_v2_cloth_normal": [
+      2048,
+      2048
+    ],
+    "amora_v2_cloth_orm": [
+      2048,
+      2048
+    ],
+    "amora_v2_gear_color": [
+      512,
+      512
+    ],
+    "amora_v2_gear_normal": [
+      512,
+      512
+    ],
+    "amora_v2_gear_orm": [
+      512,
+      512
+    ],
+    "amora_v2_hair_color": [
+      1024,
+      1024
+    ],
+    "amora_v2_hair_normal": [
+      1024,
+      1024
+    ],
+    "amora_v2_hair_orm": [
+      1024,
+      1024
+    ],
+    "amora_v2_skin_color": [
+      1024,
+      1024
+    ],
+    "amora_v2_skin_normal": [
+      1024,
+      1024
+    ],
+    "amora_v2_skin_orm": [
+      1024,
+      1024
+    ]
+  },
+  "head_h_m": 0.355,
+  "head_ratio": 0.2109,
+  "loops": {
+    "idle": true,
+    "wave": false,
+    "thanks": false,
+    "point": false,
+    "talk": true
+  },
+  "walk_speed_mps": 0.0,
+  "run_speed_mps": 0.0,
+  "variant": "amora_v2"
+}
