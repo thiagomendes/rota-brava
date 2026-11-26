@@ -76,7 +76,8 @@ func _physics_process(delta: float) -> void:
 		return
 	_hand_t = 0.0
 	# F2: enquanto a camera mostra o alvo (olhar dirigido, 1,5 s) o bot espera, como quem assiste (nao pula).
-	if main.blocked() or main.current == null or main.guide.looking:
+	# G9: missao concluida = conversa da ponte; o bot escuta parado (antes saia atras de emblemas da missao velha).
+	if main.blocked() or main.current == null or main.guide.looking or not main.current.is_active():
 		_walk(Vector3.ZERO)
 		_stuck_t = 0.0
 		return

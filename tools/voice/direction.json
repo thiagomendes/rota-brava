@@ -430,7 +430,7 @@
    "emotion": "atenção calma",
    "energy": 2,
    "pace": "normal",
-   "note": "do leme, aponta as boias da rota"
+   "note": "ao timão do barco, aponta as boias da rota"
   },
   "ep01.bay.pilot.see_dinghy": {
    "emotion": "surpresa curiosa",
@@ -514,7 +514,7 @@
    "emotion": "narração animada",
    "energy": 2,
    "pace": "normal",
-   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece; Leme é o nome de uma menina, não a peça do barco"
   },
   "ep01.intro.pilot.hello": {
    "emotion": "confiança alegre",
@@ -576,12 +576,6 @@
    "pace": "normal",
    "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
   },
-  "ep01.narrator.m3.ball": {
-   "emotion": "travessura divertida",
-   "energy": 2,
-   "pace": "normal",
-   "note": "conta a arte do filhote como quem ri, nada grave"
-  },
   "ep01.narrator.m3.no_water": {
    "emotion": "narração animada",
    "energy": 2,
@@ -599,12 +593,6 @@
    "energy": 2,
    "pace": "normal",
    "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
-  },
-  "ep01.narrator.m5.gull": {
-   "emotion": "travessura divertida",
-   "energy": 2,
-   "pace": "normal",
-   "note": "conta a arte do filhote como quem ri, nada grave"
   },
   "ep01.narrator.m5.feathers": {
    "emotion": "narração animada",
@@ -628,7 +616,7 @@
    "emotion": "narração animada",
    "energy": 2,
    "pace": "normal",
-   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece; Leme é o nome de uma menina, não a peça do barco"
   },
   "ep01.narrator.m7.pup_up": {
    "emotion": "travessura divertida",
@@ -683,6 +671,162 @@
    "energy": 2,
    "pace": "lento",
    "note": "despedida de fim de episódio, sorriso"
+  },
+  "ep01.arrival.pilot.boat_empty": {
+   "emotion": "estranhamento calmo",
+   "energy": 2,
+   "pace": "normal",
+   "note": "olha dentro do barco vazio, pergunta séria mas tranquila"
+  },
+  "ep01.arrival.climber.horn_alone": {
+   "emotion": "espanto brincalhão",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "acha graça e estranha ao mesmo tempo, olhos arregalados"
+  },
+  "ep01.arrival.tracker.clue_dock": {
+   "emotion": "confiança curiosa",
+   "energy": 2,
+   "pace": "normal",
+   "note": "já se abaixa para olhar o chão do cais, tom de detetive"
+  },
+  "ep01.narrator.bridge.m1_m2": {
+   "emotion": "narração clara",
+   "energy": 2,
+   "pace": "normal",
+   "note": "resume a descoberta para a criança, pausa leve entre pata e bota"
+  },
+  "ep01.dock.pilot.captain_rowed": {
+   "emotion": "dedução calma",
+   "energy": 2,
+   "pace": "normal",
+   "note": "liga as pistas com segurança, como quem traça um rumo"
+  },
+  "ep01.dock.climber.go_line": {
+   "emotion": "empolgação",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "já sai correndo, chama a turma"
+  },
+  "ep01.bank.tracker.sock_fur": {
+   "emotion": "descoberta",
+   "energy": 2,
+   "pace": "normal",
+   "note": "segura a meia e mostra o pelo, voz de achado"
+  },
+  "ep01.team.tracker.follow_1": {
+   "emotion": "convite animado",
+   "energy": 2,
+   "pace": "normal",
+   "note": "aponta as patinhas e chama a turma"
+  },
+  "ep01.team.tracker.follow_2": {
+   "emotion": "alegria de detetive",
+   "energy": 2,
+   "pace": "normal",
+   "note": "orgulhosa da pista, puxa a fila"
+  },
+  "ep01.team.tracker.follow_3": {
+   "emotion": "brincadeira confiante",
+   "energy": 2,
+   "pace": "normal",
+   "note": "faz pose de detetive, sorriso na voz"
+  },
+  "ep01.narrator.bridge.m2_m3": {
+   "emotion": "narração clara",
+   "energy": 2,
+   "pace": "normal",
+   "note": "mostra o lugar novo, convidativo"
+  },
+  "ep01.plaza.tracker.ball_rolls": {
+   "emotion": "descoberta",
+   "energy": 2,
+   "pace": "normal",
+   "note": "acompanha a bola com o olhar, aponta"
+  },
+  "ep01.plaza.vendor.help_call": {
+   "emotion": "aflição leve e carinhosa",
+   "energy": 2,
+   "pace": "normal",
+   "note": "senhora simpática chamando de longe, sem medo"
+  },
+  "ep01.market.pilot.we_help": {
+   "emotion": "acolhimento",
+   "energy": 2,
+   "pace": "normal",
+   "note": "fala com carinho e firmeza, tranquiliza"
+  },
+  "ep01.market.tracker.gull_where": {
+   "emotion": "curiosidade",
+   "energy": 2,
+   "pace": "normal",
+   "note": "liga a pista nova ao filhote, decidida"
+  },
+  "ep01.market.climber.see_gull": {
+   "emotion": "empolgação",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "aponta para o céu, quase pulando"
+  },
+  "ep01.narrator.bridge.m4_m5": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "segue a gaivota com a voz, leve suspense divertido"
+  },
+  "ep01.narrator.bridge.m5_m6": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "virada da história, animada sem susto"
+  },
+  "ep01.street.pilot.to_boat": {
+   "emotion": "coragem tranquila",
+   "energy": 2,
+   "pace": "normal",
+   "note": "assume a tarefa com orgulho calmo"
+  },
+  "ep01.street.tracker.captain_knows": {
+   "emotion": "ideia",
+   "energy": 2,
+   "pace": "normal",
+   "note": "tem uma ideia boa, olhos brilhando"
+  },
+  "ep01.bay.climber.lighthouse_high": {
+   "emotion": "alegria corajosa",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "adora altura, comemora o desafio"
+  },
+  "ep01.bay.pilot.lamp_dark": {
+   "emotion": "preocupação leve",
+   "energy": 1,
+   "pace": "normal",
+   "note": "observa o farol, pensa no barco da festa, sem medo"
+  },
+  "ep01.lighthouse.climber.pup_hug": {
+   "emotion": "ternura alegre",
+   "energy": 2,
+   "pace": "normal",
+   "note": "abraça o filhote, risinho"
+  },
+  "ep01.lighthouse.pilot.to_party": {
+   "emotion": "alegria",
+   "energy": 3,
+   "pace": "normal",
+   "note": "chama para a festa, comemorando"
+  },
+  "ep01.festival.tracker.pup_home": {
+   "emotion": "carinho animado",
+   "energy": 2,
+   "pace": "normal",
+   "note": "missão quase no fim, voz de alegria"
+  },
+  "ep01.festival.captain.wave": {
+   "emotion": "alívio feliz",
+   "energy": 2,
+   "pace": "normal",
+   "note": "capitão gentil acenando de longe, voz um pouco rouca"
   }
  },
  "demo": {
@@ -890,7 +1034,7 @@
     "emotion": "chamado",
     "energy": 2,
     "pace": "normal",
-    "note": "passa a vez a Leme, confiante"
+    "note": "passa a vez à Leme (menina), confiante"
    },
    "keys": [
     "ep01.market.tracker.call_pilot",

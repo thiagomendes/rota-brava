@@ -114,6 +114,12 @@ static func said(group: String) -> bool:
 	return _last.has(group)
 
 
+## G9: fala de ponte com `vary` na ficha vira uma variante sorteada do grupo (sem repetir a ultima); senao, a propria.
+static func vary(key: String) -> String:
+	var g := str(line(key).get("vary", ""))
+	return pick(g) if g != "" and has_group(g) else key
+
+
 static func has_group(group: String) -> bool:
 	return not group_keys(group).is_empty()
 
