@@ -420,3 +420,9 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - `refresh()` por mudança de altura sem teste em cutscene.
   - "Examinar" e ajuda não soltam o mouse, por decisão.
   - Ninguém viu o cursor real.
+
+### Pacote G, itens novos (Thiago, 2026-11-26)
+| Id | Relato | Critério de aceite | Dono |
+|---|---|---|---|
+| G10 | Ao apertar um botão do menu (ou ir a outro lugar), o jogo "fica pensando um tempão" antes de trocar de tela | Medir o tempo de cada troca (menu → jogo, menu → abertura, etc.) e achar a causa; carregar em segundo plano com tela de carregamento animada na identidade do jogo (estrela-guia do logo C); a resposta ao clique aparece em < 100 ms; sem travar quadro na tela de carregamento | `gameplay` |
+| G11 | No fim da abertura do jogo a tela trava e precisa de clique | Fim da abertura leva ao menu sozinho, com transição suave; pular continua possível | `gameplay` |
