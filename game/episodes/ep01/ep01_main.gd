@@ -627,14 +627,14 @@ func _resume() -> void:
 func _on_replay() -> void:
 	carry_completed = director.completed_episodes.duplicate()
 	get_tree().paused = false
-	get_tree().reload_current_scene()
+	SceneLoaderService.go(scene_file_path)
 
 
 func _on_menu() -> void:
 	print("[RB] back_to_menu")
 	carry_completed = director.completed_episodes.duplicate()
 	get_tree().paused = false
-	get_tree().change_scene_to_file(MENU_SCENE)
+	SceneLoaderService.go(MENU_SCENE)
 
 
 func _on_option_changed(_section: String, key: String, _value: Variant) -> void:

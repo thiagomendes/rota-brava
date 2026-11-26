@@ -76,4 +76,4 @@ func _ready() -> void:
 func _on_finished(_id: StringName, skipped: bool) -> void:
 	done.emit(skipped)
 	if next_scene != "" and is_inside_tree():
-		get_tree().change_scene_to_file(next_scene)
+		SceneLoaderService.go(next_scene)

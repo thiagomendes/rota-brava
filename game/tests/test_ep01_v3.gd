@@ -194,8 +194,10 @@ func _resume_from_menu() -> void:
 	r.tree.root.add_child(menu)
 	r.tree.current_scene = menu
 	await r.frames(3)
+	await _wait_loader()
 	await _tap(&"ui_accept")
 	await r.frames(4)
+	await _wait_loader()
 	var play := r.tree.current_scene as Ep01V3Main
 	r.check(play != null and play.current != null and play.current.id == &"M0", "v3 menu: Jogar sem salvo comeca no M0")
 	if play == null:
@@ -209,12 +211,14 @@ func _resume_from_menu() -> void:
 	await _tap(&"ui_down")
 	await _tap(&"ui_accept")
 	await r.frames(4)
+	await _wait_loader()
 	var menu2 := r.tree.current_scene as MainMenu
 	r.check(menu2 != null, "v3 menu: Menu na pausa volta ao menu")
 	if menu2 == null:
 		return
 	await _tap(&"ui_accept")
 	await r.frames(4)
+	await _wait_loader()
 	var again := r.tree.current_scene as Ep01V3Main
 	r.check(again != null and again.current != null and again.current.id == &"M2", "v3 menu: Jogar retoma no M2")
 	if again != null:
@@ -299,3 +303,13 @@ func _market_wrong_stall() -> void:
 	r.check(shape != null and not shape.disabled, "v3 M4: fora do M4 a caixa estatica do carrinho volta")
 	await _free(main)
 	Ep01V3Main.start_mission = &""
+
+
+## G10: espera o SceneLoader terminar a troca, com teto e FAIL claro (nunca trava a suite).
+func _wait_loader() -> void:
+	var n := 0
+	while SceneLoaderService.instance().is_busy() and n < 6000:
+		await r.tree.process_frame
+		n += 1
+	if n >= 6000:
+		r.check(false, "G10: SceneLoader nao terminou a troca em 6000 quadros")

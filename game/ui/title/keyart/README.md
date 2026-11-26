@@ -46,3 +46,11 @@ Custo: o menu carrega a vila v3 inteira (o Jogar carrega a mesma vila depois); m
 - Olhos: depois do G1 o olho fechado vem so da forma `alegre`/`blink`; o palco zera as duas a cada quadro, depois de o
   clipe ser avaliado (prioridade 10), e usa a expressao `neutra`.
 - Render medido so em Vulkan por software (llvmpipe); custo em GPU real nao medido.
+
+## Imagem parada do menu (G10)
+`stills/b_bg_16x9.jpg` (1920x1080, SHA-256 `f35d2f930b2c18a02468c2f439b0df5273c6eb9093c7a8d10a1606ad221c0f4c`): fundo do
+menu sem logo e sem botoes, mostrado so se o palco 3D faltar/falhar ou se a tela de carregamento estourar o teto de
+60 s (o palco entra depois com fade). Gerada de `keyart_b.tscn` com
+`xvfb-run -a -s "-screen 0 2560x2048x24" bash tools/godot.sh --path game --rendering-driver vulkan --script res://ui/title/keyart/keyart_capture.gd -- --proposal=b --out=<dir> --only=bg`
+(PNG convertido para JPEG qualidade 88 com PIL). Registrada em `source_art/manifest.json` (`keyart_b_bg_still`).
+Regerar se a cena B mudar.

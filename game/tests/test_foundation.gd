@@ -73,6 +73,8 @@ func _swap_to(path: String) -> Node:
 	r.tree.root.add_child(inst)
 	r.tree.current_scene = inst
 	await r.frames()
+	# G10: o menu como cena atual cobre com a tela de carregamento ate o palco 3D desenhar (abertura do jogo).
+	await _wait_loader()
 	return inst
 
 
@@ -129,6 +131,8 @@ func run(runner) -> void:
 
 	await _tap(&"ui_accept")
 	await r.frames(3)
+	# G10: a troca passa pelo SceneLoader (assincrona); espera ele terminar.
+	await _wait_loader()
 	var play := r.tree.current_scene as Ep01V3Main
 	r.check(play != null, "ui_accept em Jogar abre o episodio (Ep01 v3 na vila)")
 	if play:
@@ -142,9 +146,20 @@ func run(runner) -> void:
 		await _tap(&"ui_down")   # Menu
 		await _tap(&"ui_accept")
 		await r.frames(3)
+		await _wait_loader()
 		var back := r.tree.current_scene as MainMenu
 		r.check(back != null, "Menu na pausa volta ao menu principal")
 		r.check(not r.tree.paused, "o jogo nao fica pausado no menu")
 		if back:
 			var owner_name := String(_focus(back).name) if _focus(back) != null else "nenhum"
 			r.check(_focus(back) == back.play_button, "foco recuperado em Jogar apos voltar (foco em: %s)" % owner_name)
+
+
+## G10: espera o SceneLoader terminar a troca, com teto e FAIL claro (nunca trava a suite).
+func _wait_loader() -> void:
+	var n := 0
+	while SceneLoaderService.instance().is_busy() and n < 6000:
+		await r.tree.process_frame
+		n += 1
+	if n >= 6000:
+		r.check(false, "G10: SceneLoader nao terminou a troca em 6000 quadros")
