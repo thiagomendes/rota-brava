@@ -114,7 +114,11 @@ def pose_idle_lv2(R, F, t, T):
         hip = Vector((F.v["belly"] + 0.045, 0.012, F.hz + 0.065))
         reach(R, "R", restr.lerp(hip, brim), Vector((0.1, 0.2, -1.0)).lerp(Vector((-0.45, 0.05, -0.9)), brim), pole=(1.0, -0.9, 0.3))
     stand_feet(R)
-    return ha.face(atenta=0.75 * comp, alegre=0.95 * sea + 0.2 * (1 - comp) * (1 - sea),
+    # G1 (RB-R1): "alegre" e o sorriso de OLHOS FECHADOS. Antes ele seguia o "sea" inteiro (~1,8 s de olhos fechados a cada
+    # 5,2 s; 39% do idle), e a Leme parecia dormir no menu e nas cenas. Agora so um "sorriso de olhos" curto (~0,5 s) quando
+    # o rosto chega ao mar; depois os olhos ficam abertos com a boca neutra (que ja sorri de leve) ate voltar.
+    squint = smooth(t, 3.25, 3.45) * (1 - smooth(t, 3.75, 3.95))
+    return ha.face(atenta=0.75 * comp, alegre=0.95 * squint + 0.2 * (1 - comp) * (1 - sea),
                    blink=blink_curve(t, 0.25) + blink_curve(t, 2.8) + blink_curve(t, 4.85))
 
 
@@ -185,6 +189,27 @@ def pose_wave_lv2(R, F, t, T):
     return ha.face(alegre=a, blink=0.0)
 
 
+def short_squint(fn, t0, t1):
+    """G1 (RB-R1): "alegre" e o sorriso de OLHOS FECHADOS; nos gestos ele durava ~1,2 s e, no close da abertura e no menu,
+    a heroina parecia de olhos fechados. Mantem o sorriso so num aperto curto (~0,45 s com peso >= 0,5) entre t0 e t1;
+    fora dele a boca volta a neutra (que ja sorri de leve) e os olhos ficam abertos. Corpo e demais chaves iguais."""
+    def g(R, F, t, T):
+        f = fn(R, F, t, T)
+        f["alegre"] = f.get("alegre", 0.0) * smooth(t, t0 - 0.12, t0) * (1 - smooth(t, t1, t1 + 0.12))
+        return f
+    return g
+
+
+def blink_once(fn, at):
+    """G1 (RB-R1): troca a piscada do clipe por uma so em `at`. O `point` (1,2 s, sem laco) piscava em 1,05 s e terminava
+    com o olho 62% fechado; parado no ultimo quadro (close da abertura), a heroina ficava de olho quase fechado."""
+    def g(R, F, t, T):
+        f = fn(R, F, t, T)
+        f["blink"] = blink_curve(t, at)
+        return f
+    return g
+
+
 CLIPS = dict(ha.CLIPS)
 CLIPS["team_pose"] = (1.5, False, pose_team_lv2)
 CLIPS["wave"] = (1.6, False, pose_wave_lv2)
@@ -207,6 +232,10 @@ RUN = hg.gait_cfg(19 / 30, 0.47, 3.2 * (19 / 30) / 1.15, center=-0.03, lift=0.10
                   blink_at=None, knee_out=0.10, face={"atenta": 0.4, "fist_R": 0.9, "fist_L": 0.9})
 CLIPS["walk"] = hg.clip(WALK)
 CLIPS["run"] = hg.clip(RUN)
+# G1: sorriso de olhos fechados curto nos gestos (antes 0,92-1,22 s seguidos; janela no pico do gesto)
+for _n, (_a, _b) in {"wave": (0.68, 1.01), "celebrate": (0.50, 0.83), "team_pose": (0.68, 1.01)}.items():
+    CLIPS[_n] = (CLIPS[_n][0], CLIPS[_n][1], short_squint(CLIPS[_n][2], _a, _b))
+CLIPS["point"] = (CLIPS["point"][0], CLIPS["point"][1], blink_once(CLIPS["point"][2], 0.80))
 CLIP_SET = ["idle", "walk", "run", "stop", "idle_wheel", "steer_left", "steer_right", "react_horn", "celebrate", "wave", "point", "team_pose"]
 HAND_KEYS = ("fist_R", "fist_L", "thumb_up_R", "thumb_up_L")
 

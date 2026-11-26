@@ -224,11 +224,14 @@ func _build_environment() -> void:
 	sun.name = "Sun"
 	sun.light_color = Color("ffe3b8")
 	sun.light_energy = 2.4
-	sun.light_angular_distance = 1.2
+	# G3 (RB-R1): penumbra larga (angular 1,2 + blur 1,3) com o filtro suave padrao fazia a amostragem da sombra cair na
+	# propria malha curva dos personagens e virava uma grade de pontos (xadrez) nas costas e ombros com a camera perto.
+	# Medido em captura a 1,3 m: angular 0,5 + blur 0,5 tira a grade e mantem a borda macia (blur 0 deixa a sombra serrilhada).
+	sun.light_angular_distance = 0.5
 	sun.shadow_enabled = true
 	sun.shadow_bias = 0.03
 	sun.shadow_normal_bias = 1.0
-	sun.shadow_blur = 1.3
+	sun.shadow_blur = 0.5
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
 	sun.directional_shadow_max_distance = 80.0
 	sun.directional_shadow_split_1 = 0.08

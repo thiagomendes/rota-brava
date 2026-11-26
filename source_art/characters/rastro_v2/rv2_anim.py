@@ -90,6 +90,27 @@ def pose_celebrate_v2(R, F, t, T):
     return f
 
 
+def short_squint(fn, t0, t1):
+    """G1 (RB-R1): "alegre" e o sorriso de OLHOS FECHADOS; nos gestos ele durava ~1,2 s e, no close da abertura e no menu,
+    a heroina parecia de olhos fechados. Mantem o sorriso so num aperto curto (~0,45 s com peso >= 0,5) entre t0 e t1;
+    fora dele a boca volta a neutra (que ja sorri de leve) e os olhos ficam abertos. Corpo e demais chaves iguais."""
+    def g(R, F, t, T):
+        f = fn(R, F, t, T)
+        f["alegre"] = f.get("alegre", 0.0) * smooth(t, t0 - 0.12, t0) * (1 - smooth(t, t1, t1 + 0.12))
+        return f
+    return g
+
+
+def blink_once(fn, at):
+    """G1 (RB-R1): troca a piscada do clipe por uma so em `at`. O `point` (1,2 s, sem laco) piscava em 1,05 s e terminava
+    com o olho 62% fechado; parado no ultimo quadro (close da abertura), a heroina ficava de olho quase fechado."""
+    def g(R, F, t, T):
+        f = fn(R, F, t, T)
+        f["blink"] = blink_curve(t, at)
+        return f
+    return g
+
+
 CLIPS = dict(ha.CLIPS)
 CLIPS["team_pose"] = (1.5, False, pose_team_v2)
 CLIPS["celebrate"] = (1.2, False, pose_celebrate_v2)
@@ -108,6 +129,11 @@ RUN = hg.gait_cfg(0.6, 0.46, 3.2 * 0.6 / 1.12, center=-0.03, lift=0.115, lift_at
                   face={"atenta": 0.3, "alegre": 0.25, "fist_R": 0.45, "fist_L": 0.45})
 CLIPS["walk"] = hg.clip(WALK)
 CLIPS["run"] = hg.clip(RUN)
+# G1: sorriso de olhos fechados curto nos gestos (antes 0,92-1,22 s seguidos; janela no pico do gesto)
+for _n, (_a, _b) in {"wave": (0.68, 1.01), "celebrate": (0.50, 0.83), "team_pose": (0.68, 1.01),
+                     "look_to_leme": (1.10, 1.43)}.items():
+    CLIPS[_n] = (CLIPS[_n][0], CLIPS[_n][1], short_squint(CLIPS[_n][2], _a, _b))
+CLIPS["point"] = (CLIPS["point"][0], CLIPS["point"][1], blink_once(CLIPS["point"][2], 0.80))
 CLIP_SET = ["idle", "walk", "run", "stop", "crouch", "inspect_touch", "look_to_leme", "react_surprise", "point", "wave", "celebrate", "team_pose"]
 GEAR_KEYS = ("fist_R", "fist_L")
 

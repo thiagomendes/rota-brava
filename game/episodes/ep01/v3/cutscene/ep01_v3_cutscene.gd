@@ -81,8 +81,11 @@ var _probe: SphereShape3D
 const TARGET_SHELL := 2.5
 ## HUD de jogo escondido durante a cena (fica so a legenda e a dica de pular): no -> visivel antes.
 const HUD_GAME_NODES: Array[String] = ["TopLeft", "MemberPanel", "PromptPanel", "GlyphBadge"]
-const HERO_EXPRESSION := &"alegre"
-const HERO_EXPRESSION_WEIGHT := 0.6
+## Expressao mantida nos herois durante a cena (G1, RB-R1): `neutra` (boca ja sorri de leve) deixa os olhos abertos e
+## as piscadas e sorrisos dos clipes passam. Nao usar `alegre`: nos herois v2 e o sorriso de OLHOS FECHADOS, e como
+## `set_expression` soma o peso (maximo) a todo quadro, os olhos ficavam fechados a cena inteira (so a sobrancelha).
+const HERO_EXPRESSION := &"neutra"
+const HERO_EXPRESSION_WEIGHT := 1.0
 var _hud_hidden: Dictionary = {}
 
 
