@@ -125,7 +125,10 @@ func _bot_with_lines() -> void:
 		if main.hud.is_speaking() and main.hud._sub_text.text == Loc.t(k):
 			shown.append(k)
 	main.hud.line_started.connect(func(k: String) -> void: shown.append(k))
+	var queued: Array[Dictionary] = []
 	var bot := Ep01V3Bot.new()
+	main.hud.line_queued.connect(func(k: String) -> void:
+		queued.append({"k": k, "t": bot.elapsed, "m": main.current.id if main.current != null else &""}))
 	bot.main = main
 	main.add_child(bot)
 	Engine.time_scale = TIME_SCALE
@@ -144,6 +147,7 @@ func _bot_with_lines() -> void:
 		extra += 1
 	Engine.time_scale = 1.0
 	Ep01V3Bot.release_all()
+	_check_repeats(queued)
 	print("[RB] v3 E6 bot com falas: %.1f s de jogo, %d falas, legenda aberta em %d de %d quadros" % [
 		t_end, shown.size(), spoke_frames, frames])
 	r.check(bot.done and bot.fail_reason == "" and main.complete,
@@ -161,3 +165,29 @@ func _bot_with_lines() -> void:
 	r.check(unknown.is_empty(), "v3 E6: nenhuma legenda sem texto no catalogo %s" % str(unknown))
 	main.queue_free()
 	await r.frames(3)
+
+
+## RB-R1 (Thiago: "as vozes falam repetidamente"): nenhuma chave entra na fila duas vezes em menos de REPEAT_WINDOW s
+## de jogo, de M0 a M3 (e, como medida, no resto). Excecoes explicitas em REPEAT_OK.
+const REPEAT_WINDOW := 5.0
+const REPEAT_OK: Array[String] = []
+
+
+func _check_repeats(queued: Array[Dictionary]) -> void:
+	var last := {}
+	var early: Array[String] = []
+	var late: Array[String] = []
+	var early_n := 0
+	for e in queued:
+		var k := String(e["k"])
+		var m := String(e["m"])
+		var is_early := m in ["", "M0", "M1", "M2", "M3"]
+		if is_early:
+			early_n += 1
+		if last.has(k) and float(e["t"]) - float(last[k]) < REPEAT_WINDOW and not k in REPEAT_OK:
+			(early if is_early else late).append("%s %s %.1fs" % [m, k, float(e["t"]) - float(last[k])])
+		last[k] = e["t"]
+	print("  medida falas: %d enfileiradas (%d em M0-M3); repetidas < %.0f s: M0-M3 %d, M4-M8 %d %s" % [
+		queued.size(), early_n, REPEAT_WINDOW, early.size(), late.size(), (early + late).slice(0, 6)])
+	r.check(early_n >= 10 and early.is_empty(), "v3 R1: M0-M3 sem fala enfileirada duas vezes em < %.0f s (%d falas; %s)" % [REPEAT_WINDOW, early_n, early.slice(0, 4)])
+	r.check(late.is_empty(), "v3 R1: M4-M8 sem fala enfileirada duas vezes em < %.0f s (%s)" % [REPEAT_WINDOW, late.slice(0, 4)])

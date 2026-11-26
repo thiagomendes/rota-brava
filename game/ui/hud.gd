@@ -7,6 +7,8 @@ extends CanvasLayer
 ## Layout em unidades virtuais (viewport de referencia 1080 de altura; stretch canvas_items/expand).
 
 signal line_started(key: String)
+## Toda fala que entra na fila (antes de tocar), para testes de fala repetida.
+signal line_queued(key: String)
 signal line_finished
 signal choice_made(id: StringName)
 signal handoff_confirmed
@@ -819,6 +821,7 @@ func say(key: String, params: Dictionary = {}, is_hint: bool = false, emotes: Ar
 	if use_emotes.is_empty() and emotes_hook.is_valid():
 		use_emotes = emotes_hook.call(key)
 	_queue.append({"key": key, "params": params, "hint": is_hint, "emotes": use_emotes})
+	line_queued.emit(key)
 	if not _speaking:
 		_pump()
 

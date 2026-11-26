@@ -129,12 +129,22 @@ func _physics_process(delta: float) -> void:
 				return
 			_replans += 1
 			var ahead := (_route[_wp] if _wp < _route.size() else target) - here
-			if nav != null:
-				nav.block(here + ahead.normalized() * 0.6 if ahead.length() > 0.05 else here, 0.6)
+			var spot := here + ahead.normalized() * 0.6 if ahead.length() > 0.05 else here
+			# Seguidor no caminho e obstaculo movel: nao vira parede permanente na grade (antes fechava a passagem).
+			if nav != null and not _follower_near(spot, 1.0):
+				nav.block(spot, 0.6)
 			_route.clear()
 			_force_route = true
 		_stuck_t = 0.0
 		_stuck_from = here
+
+
+func _follower_near(p: Vector3, dist: float) -> bool:
+	for m: StringName in main.actors:
+		var a := main.actors[m] as Node3D
+		if a != main.controlled_node and Vector2(a.global_position.x - p.x, a.global_position.z - p.z).length() < dist:
+			return true
+	return false
 
 
 ## Emblema do heroi em controle primeiro (opcional, mas o bot pega todos); depois o que a ajuda mostraria.

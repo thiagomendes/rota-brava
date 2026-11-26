@@ -569,9 +569,20 @@ func _on_progressed(_id: StringName) -> void:
 	say(Ep01V3Dialogue.pick("success.%s" % active_member))
 
 
+## RB-R1 ("as vozes falam repetidamente"): a mesma chave nao entra na fila de novo antes de SAY_REPEAT_S de jogo. Caso
+## achado pelo teste: `success.climber` (sorteio do acerto parcial) inclui "sock_high", que o M2 tambem diz ao soltar a
+## meia; os dois caiam no mesmo quadro.
+const SAY_REPEAT_S := 5.0
+var _said_at: Dictionary = {}
+
+
 func say(key: String) -> void:
-	if Loc.has_key(key):
-		hud.say(key)
+	if not Loc.has_key(key):
+		return
+	if _said_at.has(key) and _clock - float(_said_at[key]) < SAY_REPEAT_S:
+		return
+	_said_at[key] = _clock
+	hud.say(key)
 
 
 # ---------- troca de heroi contextual ----------

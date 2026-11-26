@@ -56,6 +56,7 @@ func _ready() -> void:
 		rig.camera.global_position = _vec(_arg("--cam="))
 		rig.camera.look_at(focus.global_position + rig.look_offset, Vector3.UP)
 		rig.set_process(false)
+		rig.set_physics_process(false)
 
 
 func _build_world() -> void:
