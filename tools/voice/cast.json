@@ -1,7 +1,7 @@
 {
- "_doc": "D19: elenco. Voz base do Gemini TTS + estilo base + preset local (tools/voice/treat.py) por personagem. A direcao por fala fica em direction.json. Timbres segundo os rotulos de uma palavra que o Google da a cada voz (lembrados, NAO verificados nesta sessao: a pagina oficial nao abria pela rede); genero das vozes tambem nao verificado, conferir pela F0 medida e pelo ouvido de Thiago. Evitadas como escolha: Zephyr (padrao do AI Studio), Kore e Puck (as dos exemplos oficiais, as que todo app usa). D19d (2026-11-25): Thiago escolheu as vozes na versao CRUA; preset de todos = raw (so silencio + loudnorm). treat_preset_off guarda o preset antigo, desligado. Elenco fechado em 2026-11-25.",
+ "_doc": "D19: elenco. Voz base do Gemini TTS + estilo base + preset local (tools/voice/treat.py) por personagem. A direcao por fala fica em direction.json. Timbres segundo os rotulos de uma palavra que o Google da a cada voz (lembrados, NAO verificados nesta sessao: a pagina oficial nao abria pela rede); genero das vozes tambem nao verificado, conferir pela F0 medida e pelo ouvido de Thiago. Evitadas como escolha: Zephyr (padrao do AI Studio), Kore e Puck (as dos exemplos oficiais, as que todo app usa). D19d (2026-11-25): Thiago escolheu as vozes na versao CRUA; preset de todos = raw (so silencio + loudnorm). treat_preset_off guarda o preset antigo, desligado. Elenco fechado em 2026-11-25. Modo de prompt once_t (notas + \"uma unica leitura\" + temperature 0.4): 2/10 reprovados no teste contra 4/10 do notes (prompt_trial.py, 2026-11-26).",
  "model": "gemini-3.8-flash-tts",
- "style_mode": "notes",
+ "style_mode": "once_t",
  "characters": {
   "rastro": {
    "speaker": "tracker",

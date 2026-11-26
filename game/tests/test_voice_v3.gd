@@ -3,6 +3,9 @@ extends RefCounted
 ## na lista explicita de excecoes; arquivos existem e a duracao bate; a ficha prefere o take v3; narrador no HUD.
 ## NAO comprova audicao (timbre, pronuncia e atuacao ficam com Thiago).
 
+## Takes aceitos apesar do detector de leitura dupla (chave -> motivo). Vazio: nenhuma excecao.
+const DOUBLE_EXCEPTIONS: Dictionary = {}
+
 
 func _spoken_keys() -> Dictionary:
 	var out: Dictionary = {}
@@ -56,6 +59,15 @@ func run(r) -> void:
 		if not FileAccess.file_exists(str(v3[k]["visemes"])) or str(v3[k].get("sha256", "")) == "" or str(v3[k].get("model", "")) == "":
 			files_ok = false
 	r.check(files_ok, "voz v3: todo take carrega, tem visemas e procedencia (modelo, sha256)")
+	# Leitura dupla (tools/voice/detect_double.py, rodado na geracao e gravado em double_check). Excecoes explicitas:
+	var double_bad: Array[String] = []
+	for k: String in v3:
+		var dc: Variant = v3[k].get("double_check", null)
+		if DOUBLE_EXCEPTIONS.has(k):
+			continue
+		if not dc is Dictionary or bool(dc.get("reprova", true)) or dc.get("leitura_dupla") != null or float(dc.get("razao", 9.0)) > 1.35:
+			double_bad.append(k)
+	r.check(double_bad.is_empty(), "voz v3: nenhum take com leitura dupla nem longo demais pelo detector (%s)" % ", ".join(double_bad))
 	r.check(dur_ok, "voz v3: duracao do catalogo bate com o arquivo (total %.1f s)" % total)
 	var any_key: String = v3.keys()[0] if not v3.is_empty() else ""
 	r.check(any_key != "" and Ep01V3Dialogue.take(any_key) == VoiceCatalog.V3_PREFIX + any_key,
