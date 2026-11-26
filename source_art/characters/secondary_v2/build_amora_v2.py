@@ -59,6 +59,8 @@ class Amora(Adult):
     belly_bump = 0.016
     # G4 r2: rosto de senhora: mandibula mais afunilada e queixo mais longo, sem maca de bebe
     JAW, CHIN, CHEEK = 0.32, 0.14, -0.015
+    # G4 r3b: o cabelo puxado cobre as orelhas; a orelha modelada furava o cabelo na lateral (lia como buraco na cabeca)
+    EARS = False
 
     def __init__(self):
         super().__init__(CID, "AM2", parts)
@@ -414,11 +416,26 @@ def paint_hair(b):
         temple *= S.sstep(P[:, 1], hc[1] - 0.05, hc[1] + 0.0) * S.sstep(-(P[:, 2] - (hc[2] + 0.10)), 0.0, 0.04)
         # mechas: o cabelo e puxado para o coque, entao os fios correm da linha do cabelo ate o alto; as mechas sao faixas
         # finas no azimute em torno do eixo vertical da cabeca (largura de alguns mm), com a fase variando pouco ao longo
+        # G4 r3b: mechas irregulares. Duas familias de faixas no azimute (uma inclinada, que cruza a outra); cada faixa
+        # sorteia (hash do indice) se e grisalho, a largura, o deslocamento e onde comeca/termina na altura.
         az = np.arctan2(P[:, 0] - hc[0], P[:, 1] - hc[1])
-        ph = az * 120.0 + 6.0 * S.fbm(P, 0.03, 2)
-        lane = 0.5 + 0.5 * np.sin(ph)
-        sel_lane = S.sstep(np.sin(az * 9.0 + 1.3 * S.fbm(P + 5.0, 0.05, 2)), -0.35, 0.15)    # so algumas faixas viram grisalho
-        strand_on = S.sstep(lane, 0.70, 0.90) * sel_lane * (0.55 + 0.45 * S.sstep(S.fbm(P + 9.0, 0.012, 2), 0.35, 0.6))
+        zr = (P[:, 2] - hc[2]) / F.hr[2]
+
+        def lanes(freq, tilt, seed, keep):
+            ph = az * freq + tilt * zr * freq * 0.12 + 4.0 * S.fbm(P + seed, 0.03, 2)
+            idx = np.floor(ph / (2 * np.pi)).astype(np.int64)
+            fr = ph / (2 * np.pi) - idx
+            rnd = lambda k: S.T._hash3(idx, idx * 0 + k, idx * 0 + seed)
+            on = rnd(1) < keep
+            width = 0.10 + 0.22 * rnd(2)                          # fracao da faixa
+            cen = 0.25 + 0.5 * rnd(3)
+            z0 = -0.9 + 0.9 * rnd(4)                              # comeca (baixo) e termina (alto) em alturas sorteadas
+            z1 = z0 + 0.5 + 1.0 * rnd(5)
+            d = np.abs(fr - cen) / width
+            prof = np.clip(1 - d ** 2, 0, 1)
+            span = S.sstep(zr, z0, z0 + 0.15) * (1 - S.sstep(zr, z1 - 0.15, z1))
+            return prof * span * on * (0.6 + 0.4 * rnd(6))
+        strand_on = np.maximum(lanes(95.0, 0.0, 11, 0.42), lanes(70.0, 2.2, 23, 0.30) * 0.85)
         grey = np.clip(temple * strand_on, 0, 1)
         col = col * (1 - 0.70 * grey[:, None]) + S.lin("#A39599") * 0.70 * grey[:, None]
         col *= (0.75 + 0.25 * m["ao"] ** 0.8)[:, None]

@@ -4077,13 +4077,13 @@
         "source_art/characters/secondary_v2/amora_v2.blend"
       ],
       "saida_glb": "game/assets/models/characters/amora_v2.glb",
-      "glb_sha256": "4215a7cf6627e316c6ae5aeffdbce718c046e092a13c664ecbee11597cb91749",
-      "glb_bytes": 4059128,
+      "glb_sha256": "084dfbb49a8f48f76b0f7101cf9b62b3909a15d7167b3522f4e54421541fdd4c",
+      "glb_bytes": 4033280,
       "cena": "game/actors/characters/amora_model.tscn",
       "importacao": "game/lookdev/gltf_pbr_import.gd (mipmaps e verniz, como no trio v2)",
-      "triangulos": 23134,
+      "triangulos": 22630,
       "triangulos_por_objeto": {
-        "Amora_Skin": 5620,
+        "Amora_Skin": 5116,
         "Amora_Hair": 3044,
         "Amora_Cloth": 9090,
         "Amora_Gear": 3012,

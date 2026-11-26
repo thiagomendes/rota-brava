@@ -58,3 +58,6 @@ byte idêntico entre exportações (JPEG e ordem interna), mas malha, materiais 
   escuro entre as coxas visto de baixo da barra do casaco.
 - GLB: `amora_v2.glb` `4215a7cf6627e316c6ae5aeffdbce718c046e092a13c664ecbee11597cb91749` (23 134 tris),
   `captain_v2.glb` `2c956bac94e0fadb9e1c8f81f429e091719417d441774476f5916fae378805d8` (24 038 tris).
+- r3b: Dona Amora sem orelhas modeladas (`EARS = False`; o cabelo puxado as cobre; a orelha furava o cabelo na lateral);
+  grisalho em mechas irregulares (duas familias de faixas, uma inclinada que cruza; largura, posicao, comeco e fim
+  sorteados por faixa). `amora_v2.glb` `084dfbb49a8f48f76b0f7101cf9b62b3909a15d7167b3522f4e54421541fdd4c` (22 630 tris).

@@ -78,7 +78,7 @@ class Adult(hero_lib.Builder):
             if y > 0 and z > 0.15:                         # testa
                 y *= 1.0 + 0.02 * z
             v.co = V(F.hc.x + x * F.hr[0], F.hc.y + y * F.hr[1], F.hc.z + z * F.hr[2])
-        for sx in (1, -1):   # orelhas
+        for sx in ((1, -1) if self.EARS else ()):   # orelhas (G4 r3b: quem tem cabelo cobrindo a orelha nao as modela)
             tb = bmesh.new()
             cl.ellipsoid(tb, (0, 0, 0), (0.014 * k, 0.026 * k, 0.040 * k), 14, 10)
             for vv in tb.verts:      # concha: frente achatada
@@ -227,6 +227,7 @@ class Adult(hero_lib.Builder):
     belly_bump = 0.010
     # cabeca adulta: afunilamento da mandibula, alongamento do queixo, maca do rosto (G4 r2: por personagem)
     JAW, CHIN, CHEEK = 0.26, 0.10, 0.025
+    EARS = True
 
     # ------------------------------------------------------------ calca e sapatos
     def trousers(self, part="trousers", top_r=None, hem_up=0.055):
