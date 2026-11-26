@@ -36,7 +36,7 @@ import sv2_lib as S
 from char_anim import lerp
 from hero_lib import join_bm
 from rbart import REPO, arg_value, new_object, reset_scene
-from sv2_human import Adult, V
+from sv2_human import Adult, V, pose_idle_adult
 
 CID = "amora_v2"
 PREFIX = "amora_v2"
@@ -45,7 +45,7 @@ C = dict(pele="#D9976A", rubor="#E5806E", cabelo="#5A2E3A", cabelo_lt="#7A4352",
          creme="#F7FBFF", amora="#4A2370", meia="#4A2370", sapato="#6B3A2A", sola="#F2E4D0", folha="#3DBE5A", lenco="#8A49B0",
          iris="#4A3A6A", boca="#A0404A")
 hero_lib.VARIANTS["AM2"] = dict(head=0.355, leg=0.760, torso=0.470, belly=0.172, sh_x=0.180, limb=0.055, hand=1.38, boot=1.05,
-                                eye=0.82, layers=False, label="senhora v2")
+                                eye=0.74, layers=False, label="senhora v2")
 hero_lib.CAST[CID] = dict(display="Amora", K=1.0, variant="AM2", hat="none", hair="short", team=False, gear=(), gloves=False,
                           pal=dict(pele=C["pele"], cabelo=C["cabelo"], iris=C["iris"], uniforme=C["vestido"], creme=C["creme"],
                                    calca=C["meia"], botas=C["sapato"], chapeu=C["lenco"], couro=C["sapato"], emblema="#123A5E",
@@ -57,6 +57,8 @@ APRON = {}
 
 class Amora(Adult):
     belly_bump = 0.016
+    # G4 r2: rosto de senhora: mandibula mais afunilada e queixo mais longo, sem maca de bebe
+    JAW, CHIN, CHEEK = 0.32, 0.14, -0.015
 
     def __init__(self):
         super().__init__(CID, "AM2", parts)
@@ -350,8 +352,18 @@ def paint_skin(b):
             c = hc + np.array([sx * 0.016 * k, 0.15 * k, -0.075 * k])
             r = np.sqrt(((P[:, 0] - c[0]) / 1.0) ** 2 + ((P[:, 2] - c[2]) / 1.25) ** 2)
             arc = S.line(r - 0.050 * k, 0.0040 * k) * front * (sx * P[:, 0] > 0.030 * k) * (P[:, 2] < hc[2] - 0.065 * k) * (P[:, 2] > hc[2] - 0.135 * k)
-            col *= (1 - 0.10 * arc)[:, None]
-            h -= 0.00035 * arc
+            col *= (1 - 0.16 * arc)[:, None]
+            h -= 0.00050 * arc
+            # pes de galinha: tres riscos curtos saindo do canto de fora do olho
+            co_ = hc + np.array([sx * 0.100 * k, 0.12 * k, -0.040 * k])
+            for ang in (-0.45, 0.0, 0.45):
+                dvec = np.array([sx * math.cos(ang), 0.0, math.sin(ang)])
+                rel = P - co_
+                along = rel @ dvec
+                perp = np.linalg.norm(rel - np.outer(along, dvec), axis=1)
+                crow = S.line(perp, 0.0018 * k) * (along > 0.002 * k) * (along < 0.020 * k) * front
+                col *= (1 - 0.08 * crow)[:, None]
+                h -= 0.00020 * crow
             ce = hc + np.array([sx * 0.060 * k, 0.15 * k, -0.062 * k])
             und = S.line(np.sqrt((P[:, 0] - ce[0]) ** 2 + ((P[:, 2] - ce[2]) * 2.2) ** 2) - 0.030 * k, 0.0025 * k) * front * (P[:, 2] < ce[2])
             col *= (1 - 0.06 * und)[:, None]
@@ -390,12 +402,85 @@ def paint_hair(b):
 
 
 # ------------------------------------------------------------------ montagem
+def mature_face(face_ob, eye_info, k):
+    """G4 r2 (senhora): sobrancelhas mais finas (o tubo afina em volta da linha do meio) e olhos levemente caidos (cada olho
+    gira ~7 graus em torno do proprio centro, canto de fora para baixo). Aplicado igual em todas as shape keys, sobre o
+    rosto do hero_face (que nao e alterado)."""
+    me = face_ob.data
+    dark = set()
+    for poly in me.polygons:
+        if poly.material_index == 2:
+            dark.update(poly.vertices)
+    basis = [v.co.copy() for v in me.vertices]
+    brow = sorted(i for i in dark if any(basis[i].z > I["c"].z + I["ez"] + 0.010 * k and abs(basis[i].x - I["c"].x) < 0.06 * k
+                                           for I in eye_info.values()))
+    runs, cur = [], []
+    for i in brow:
+        if cur and i != cur[-1] + 1:
+            runs.append(cur)
+            cur = []
+        cur.append(i)
+    if cur:
+        runs.append(cur)
+    eye_sets = {}
+    for s_, I in eye_info.items():
+        c, ex, ez = I["c"], I["ex"], I["ez"]
+        eye_sets[s_] = [i for i, b in enumerate(basis) if abs(b.x - c.x) < ex * 1.45 and abs(b.z - c.z) < ez * 1.40
+                        and i not in brow and b.y > c.y - ex * 0.8]
+    for kb in me.shape_keys.key_blocks:
+        co = kb.data
+        for run in runs:
+            nring = (len(run) - 2) // 6
+            centers = []
+            for r in range(nring):
+                idx = run[r * 6:(r + 1) * 6]
+                cc = sum((co[i].co for i in idx), Vector()) / 6.0
+                centers.append(cc)
+                for i in idx:
+                    co[i].co = cc + (co[i].co - cc) * 0.55
+            for i in run[nring * 6:]:
+                cc = min(centers, key=lambda q: (q - co[i].co).length)
+                co[i].co = cc + (co[i].co - cc) * 0.55
+        for s_, I in eye_info.items():
+            c = I["c"]
+            th = math.radians(7.0) * I["sx"]
+            cs, sn = math.cos(th), math.sin(th)
+            for i in eye_sets[s_]:
+                p_ = co[i].co
+                dx, dz = p_.x - c.x, p_.z - c.z
+                co[i].co = Vector((c.x + dx * cs + dz * sn, p_.y, c.z - dx * sn + dz * cs))
+    kb0 = me.shape_keys.key_blocks[0].data
+    for i, v in enumerate(me.vertices):
+        v.co = kb0[i].co
+    return {"sobrancelha_vertices": len(brow), "olho_vertices": {s_: len(v) for s_, v in eye_sets.items()}}
+
+
+def pose_idle_amora_v2(R, F, t, T):
+    f = pose_idle_adult(R, F, t, T)
+    f["atenta"] = 0.10
+    return f
+
+
+def kind_lids(fn):
+    """Palpebra de cima um pouco baixa (olhar de senhora simpatica) por baixo das piscadas do clipe."""
+    def w(R, F, t, T):
+        f = fn(R, F, t, T)
+        f["blink"] = max(f.get("blink", 0.0), 0.12)
+        return f
+    return w
+
+
 def build(glb=None, blend=None):
     sc = reset_scene()
     sc.render.fps = ha.FPS
     b = Amora()
     rig, objs = b.build(True)
     b.fix_skirt_weights(b.dress, HEM)
+    for ob in objs:
+        if ob.name.endswith(("_HandR", "_HandL")):
+            b.fix_wrist_weights(ob)
+    face_rep = mature_face(b.face_ob, b.eye_info, b.F.k)
+    print("ROSTO", face_rep)
     for ob in objs:
         if ob.name.endswith("_Apron"):
             b.fix_skirt_weights(ob, HEM)
@@ -409,6 +494,9 @@ def build(glb=None, blend=None):
                                     ("hair", 1024, paint_hair(b), 0.35, 0.30), ("gear", 512, paint_gear(b), 0.7, 0.10)):
         S.apply_material(groups[g], S.texture_group(groups[g], "%s_%s" % (PREFIX, g), res, paint, TEX_DIR, coat=coat, coat_rough=cr))
     S.face_materials(groups["face"], PREFIX, C["iris"], C["pele"], mouth_hex=C["boca"], dark_hex="#2A1A24")
+    # G4 r2: idle relaxado (bracos soltos, respiracao) no lugar do idle em A; palpebra levemente baixa no idle
+    # (so no idle: somada ao sorriso do talk/point a palpebra fechava o olho e os brilhos ficavam soltos)
+    A1.CLIPS["idle"] = (3.6, True, kind_lids(pose_idle_amora_v2))
     A1.author(rig, groups["face"], b.F)
     bpy.context.view_layer.update()
     info = S.base_info(list(groups.values()), rig, groups["face"], PREFIX)
