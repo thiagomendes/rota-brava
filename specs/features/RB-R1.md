@@ -547,3 +547,11 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - Gravação atômica.
   - A suíte não toca no save real.
   - Ressalvas: o controle não tem `ui_accept`/`ui_cancel` (o A não aperta Jogar no menu, problema que já existia); `ui_` e `keyart` saem com código 134 ao fechar a Godot, mesmo dando OK.
+
+### Decisões de Thiago (2026-11-26, depois do G13) e G14
+- **Controle nos menus:** o A confirma (`ui_accept`) e o B volta (`ui_cancel`). Quando um painel com botões está aberto (pausa, troca, escolha, conclusão, espaços), o A só confirma e não faz pular.
+- **Teto da tela de carregamento:** 20 s (antes eram 60 s).
+
+| Id | Item | Critério de aceite | Dono |
+|---|---|---|---|
+| G14 | Controle nos menus + teto 20 s + Godot abortando ao fechar (código 134 em `ui_` e `keyart`) | A/B funcionam no menu, nos espaços, na pausa e nos painéis, sem pulo junto (teste). Teto `HOLD_MAX_MS` = 20000. Causa do 134 achada e corrigida, sem abort ao sair | `gameplay` |
