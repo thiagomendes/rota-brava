@@ -71,6 +71,17 @@ var _bars: CanvasLayer
 var _bar_top: ColorRect
 var _bar_bottom: ColorRect
 var _skip_label: Label
+## Oclusao (como no CameraRig): camadas do mundo, corpos ignorados e copas das arvores (centro xyz, raio w).
+var collision_mask: int = 1
+var exclude: Array[RID] = []
+var occluders: Array[Vector4] = []
+var _probe: SphereShape3D
+const TARGET_SHELL := 2.5
+## HUD de jogo escondido durante a cena (fica so a legenda e a dica de pular): no -> visivel antes.
+const HUD_GAME_NODES: Array[String] = ["TopLeft", "MemberPanel", "PromptPanel", "GlyphBadge"]
+const HERO_EXPRESSION := &"alegre"
+const HERO_EXPRESSION_WEIGHT := 0.6
+var _hud_hidden: Dictionary = {}
 
 
 # ---------- ficha ----------
@@ -231,6 +242,7 @@ func play(id: StringName) -> bool:
 	lines_said.clear()
 	_held.clear()
 	playing = true
+	_hide_game_hud()
 	if hud != null:
 		hud.hide_prompt()
 		hud.clear_speech()
@@ -255,6 +267,7 @@ func _step(delta: float) -> void:
 	time += delta
 	if on_step.is_valid():
 		on_step.call()
+	_hide_game_hud()
 	if not reduced_motion:
 		_layout_bars(minf(time, BAR_IN) / BAR_IN)
 	var idx := _shots.size() - 1
@@ -269,7 +282,7 @@ func _step(delta: float) -> void:
 		var sh: Dictionary = _shots[shot_index]
 		var dur := maxf(float(sh.get("duration", 0.0)), 0.001)
 		var u := clampf((time - _starts[shot_index]) / dur, 0.0, 1.0)
-		var pose := shot_pose(sh, u)
+		var pose := camera_pose(sh, u)
 		camera.global_position = pose[0]
 		if (pose[0] as Vector3).distance_to(pose[1]) > 0.01:
 			camera.look_at(pose[1], Vector3.UP)
@@ -367,6 +380,7 @@ func _place_actor(a: Dictionary, cam_from: Vector3, sh: Dictionary) -> void:
 		face_to = point_of(sh["look_to"])
 	if member != null:
 		member.face_now(face_to)
+		member.set_expression(HERO_EXPRESSION, HERO_EXPRESSION_WEIGHT)
 	else:
 		StoryFigure.face(node, face_to)
 	var anim := resolve_anim(node, StringName(str(a.get("anim", "idle"))), StringName(str(a.get("fallback", "idle"))), who)
@@ -441,6 +455,7 @@ func _finish(skipped: bool) -> void:
 	var id := scene_id
 	mark_seen(id)
 	_restore_actors()
+	_restore_game_hud()
 	if hud != null:
 		hud.clear_speech()
 	_bars.visible = false
@@ -464,6 +479,7 @@ func _restore_actors() -> void:
 		var tr: Transform3D = saved["t"]
 		if node is MemberActor:
 			(node as MemberActor).teleport(tr.origin)
+			(node as MemberActor).set_expression(&"neutra", 1.0)
 		else:
 			node.global_transform = tr
 			StoryFigure.loop(node, &"idle")
@@ -476,3 +492,122 @@ func _restore_actors() -> void:
 func exit_point(id: StringName) -> Vector3:
 	var s := scene_data(id)
 	return point_of(s.get("exit_look", {}))
+
+
+# ---------- HUD de jogo ----------
+
+func _hide_game_hud() -> void:
+	if hud == null:
+		return
+	for n: String in HUD_GAME_NODES:
+		var c := hud.find_child(n, true, false) as CanvasItem
+		if c == null:
+			continue
+		if not _hud_hidden.has(n):
+			_hud_hidden[n] = c.visible
+		c.visible = false
+
+
+func _restore_game_hud() -> void:
+	if hud == null:
+		return
+	for n: String in _hud_hidden:
+		var c := hud.find_child(n, true, false) as CanvasItem
+		if c != null:
+			c.visible = bool(_hud_hidden[n])
+	_hud_hidden.clear()
+
+
+## Algum elemento do HUD de jogo visivel? (testes)
+func game_hud_visible() -> bool:
+	if hud == null:
+		return false
+	for n: String in HUD_GAME_NODES:
+		var c := hud.find_child(n, true, false) as CanvasItem
+		if c != null and c.is_visible_in_tree():
+			return true
+	return false
+
+
+# ---------- oclusao ----------
+
+## Pose do plano com a camera trazida para perto do alvo quando parede, telhado ou copa ficam no caminho.
+func camera_pose(sh: Dictionary, u: float) -> Array[Vector3]:
+	var pose := shot_pose(sh, u)
+	var p := avoid(pose[1], pose[0])
+	# Puxar para perto nao pode por a camera dentro de algo que o enquadramento da ficha evitava.
+	if p != pose[0] and inside_obstacle(p) and not inside_obstacle(pose[0]):
+		p = pose[0]
+	return [p, pose[1]]
+
+
+func avoid(from: Vector3, to: Vector3) -> Vector3:
+	var seg := to - from
+	var dist := seg.length()
+	if dist < 0.01 or world == null or not world.is_inside_tree():
+		return to
+	var dir := seg / dist
+	var allowed := dist
+	if collision_mask != 0:
+		if _probe == null:
+			_probe = SphereShape3D.new()
+			_probe.radius = 0.2
+		var q := PhysicsShapeQueryParameters3D.new()
+		q.shape = _probe
+		# O alvo pode estar dentro da propria estrutura (galeria do farol): ignora os primeiros TARGET_SHELL metros.
+		var skip := minf(TARGET_SHELL, dist * 0.5)
+		q.transform = Transform3D(Basis(), from + dir * skip)
+		q.motion = dir * (dist - skip)
+		q.collision_mask = collision_mask
+		q.exclude = exclude
+		var res := world.get_world_3d().direct_space_state.cast_motion(q)
+		if res.size() == 2 and res[1] > 0.0 and res[0] < 1.0:
+			allowed = minf(allowed, skip + (dist - skip) * res[0] - 0.08)
+	for o in occluders:
+		var c := Vector3(o.x, o.y, o.z)
+		var oc := from - c
+		if oc.length() <= o.w:
+			continue
+		var b := oc.dot(dir)
+		var disc := b * b - (oc.length_squared() - o.w * o.w)
+		if disc < 0.0:
+			continue
+		var t := -b - sqrt(disc)
+		if t > 0.0 and t < allowed:
+			allowed = t - 0.08
+	if allowed >= dist:
+		return to
+	return from + dir * maxf(allowed, TARGET_SHELL)
+
+
+## Camera dentro de colisao do mundo ou de uma copa? (testes)
+func inside_obstacle(p: Vector3) -> bool:
+	for o in occluders:
+		if p.distance_to(Vector3(o.x, o.y, o.z)) < o.w:
+			return true
+	if world == null or not world.is_inside_tree():
+		return false
+	var q := PhysicsPointQueryParameters3D.new()
+	q.position = p
+	q.collision_mask = collision_mask
+	q.exclude = exclude
+	return not world.get_world_3d().direct_space_state.intersect_point(q, 1).is_empty()
+
+
+## Copas das arvores do kit do mundo (mesma conta do Ep01V3Main.tree_canopies), para quem nao tem o jogo (abertura).
+static func canopies_of(w: VillageWorld) -> Array[Vector4]:
+	var out: Array[Vector4] = []
+	var kit: Dictionary = w.layout.get("kit", {})
+	for kind: String in kit:
+		if not kind.begins_with("tree_"):
+			continue
+		var mmi := w.get_node_or_null("Kit/" + kind) as MultiMeshInstance3D
+		var box := AABB(Vector3(-1.2, 0, -1.2), Vector3(2.4, 4.0, 2.4))
+		if mmi != null and mmi.multimesh != null and mmi.multimesh.mesh != null:
+			box = mmi.multimesh.mesh.get_aabb()
+		for row: Variant in kit[kind]:
+			var r: Array = row
+			var sc := float(r[4])
+			out.append(Vector4(float(r[0]), float(r[1]) + (box.position.y + box.size.y * 0.68) * sc, float(r[2]),
+				maxf(box.size.x, box.size.z) * 0.5 * sc * 0.85))
+	return out

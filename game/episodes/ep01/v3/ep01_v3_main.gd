@@ -745,6 +745,8 @@ func _cutscene_setup() -> void:
 	cutscene.setup(world, hud, {&"tracker": actors[&"tracker"], &"climber": actors[&"climber"],
 		&"pilot": actors[&"pilot"], &"captain": land.captain, &"pup": land.pup})
 	cutscene.on_step = _cutscene_hold_input
+	cutscene.exclude = camera_rig.exclude.duplicate()
+	cutscene.occluders = camera_rig.occluders
 	for m in missions:
 		m.step_done.connect(func(mid: StringName, _n: int, step: StringName) -> void:
 			var sid := Ep01V3Cutscene.scene_for("%s.%s.done" % [mid, step])

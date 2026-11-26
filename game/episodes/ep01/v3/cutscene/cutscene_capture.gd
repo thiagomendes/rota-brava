@@ -13,12 +13,16 @@ const EP_SHOTS := [[&"opening", &"M0", 7.0, "ep01_opening"], [&"m1_intro", &"M1"
 	[&"closing", &"M8", 5.5, "ep01_closing"]]
 
 var out_dir := ""
+## --only=nome1,nome2: so estas capturas (vazio = todas).
+var only: PackedStringArray = []
 
 
 func _initialize() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--out="):
 			out_dir = a.trim_prefix("--out=")
+		if a.begins_with("--only="):
+			only = a.trim_prefix("--only=").split(",")
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	DisplayServer.window_set_size(Vector2i(1920, 1080))
 	root.size = Vector2i(1920, 1080)
@@ -48,11 +52,15 @@ func _run() -> void:
 	current_scene = intro
 	await process_frame
 	for s: Array in INTRO_SHOTS:
+		if not only.is_empty() and not only.has(str(s[1])) and not only.has("game_intro"):
+			continue
 		await _until(intro.cutscene, float(s[0]))
 		await _shot(str(s[1]))
 	intro.queue_free()
 	await create_timer(0.3).timeout
 	for s: Array in EP_SHOTS:
+		if not only.is_empty() and not only.has(str(s[3])):
+			continue
 		Ep01V3Cutscene.enabled = false
 		Ep01V3Main.start_mission = s[1]
 		var main := (load("res://episodes/ep01/v3/ep01_v3_main.tscn") as PackedScene).instantiate() as Ep01V3Main

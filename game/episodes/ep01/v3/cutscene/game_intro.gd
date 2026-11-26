@@ -63,6 +63,11 @@ func _ready() -> void:
 	cutscene.reduced_motion = Options.reduced_motion()
 	add_child(cutscene)
 	cutscene.setup(world, hud, actors)
+	cutscene.occluders = Ep01V3Cutscene.canopies_of(world)
+	for path: String in ["Collision/WaterLimits", "Collision/MapBounds", "Collision/AccessRamps"]:
+		var b := world.get_node_or_null(path) as CollisionObject3D
+		if b != null:
+			cutscene.exclude.append(b.get_rid())
 	cutscene.finished.connect(_on_finished)
 	if not cutscene.play(SCENE_ID):
 		_on_finished.call_deferred(SCENE_ID, true)

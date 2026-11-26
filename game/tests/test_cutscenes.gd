@@ -20,6 +20,7 @@ func run(runner) -> void:
 	await _each_scene()
 	await _skip_rules()
 	await _reduced_motion()
+	await _no_shot_inside()
 	await _game_intro()
 	_menu_target()
 	await _bot_with_cutscenes()
@@ -119,6 +120,7 @@ func _each_scene() -> void:
 		during["followers"] = main.followers_enabled
 		during["bars"] = cs.bar_height() > 0.0 or cs.reduced_motion
 		during["cam"] = cs.camera.current
+		during["hud"] = cs.game_hud_visible()
 		for m: StringName in main.actors:
 			if (main.actors[m] as MemberActor).controlled:
 				during["nobody"] = false
@@ -133,6 +135,10 @@ func _each_scene() -> void:
 		r.check(during["blocked"] and during["nobody"] and not during["followers"] and during["cam"],
 			"cutscene %s: durante a cena entrada bloqueada, ninguem em controle, seguidores desligados, camera da cena" % id)
 		r.check(during["bars"], "cutscene %s: barras de cinema" % id)
+		r.check(not during["hud"] and main.hud.find_child("SubtitlePanel", true, false) != null,
+			"cutscene %s: HUD de jogo escondido durante a cena (fica a legenda)" % id)
+		r.check(main.hud.find_child("TopLeft", true, false).visible and main.hud.find_child("MemberPanel", true, false).visible,
+			"cutscene %s: HUD de jogo de volta ao sair" % id)
 		var ctrl := main.controlled_node
 		var back := ctrl != null and (ctrl == main.boat or (ctrl as MemberActor).controlled) and main.followers_enabled \
 			and main.camera_rig.camera.current and not main.blocked()
@@ -243,7 +249,9 @@ func _game_intro() -> void:
 	r.tree.current_scene = intro
 	await r.frames(4)
 	var cs := intro.cutscene
-	r.check(cs.playing and cs.scene_id == &"game_intro" and not cs.skippable, "abertura: toca e nao pula na primeira vez")
+	await _intro_closes(intro)
+	cs = intro.cutscene
+	r.check(cs.playing or cs.shots_played > 0 and cs.scene_id == &"game_intro" and not cs.skippable, "abertura: toca e nao pula na primeira vez")
 	await _press_interact()
 	r.check(cs.playing, "abertura: interact nao pula na primeira vez")
 	Engine.time_scale = TIME_SCALE
@@ -264,6 +272,57 @@ func _game_intro() -> void:
 	r.check(not intro.cutscene.playing, "abertura: interact pula a abertura ja vista")
 	await _free(intro)
 	GameIntroScene.next_scene = GameIntroScene.EP01_SCENE
+
+
+## Closes da abertura (planos 2-7): cabeca do heroi apresentado entre 20% e 60% da altura da tela e nenhum outro ator
+## entre a camera e ele. Corre a cena em tempo acelerado.
+func _intro_closes(intro: GameIntroScene) -> void:
+	var cs := intro.cutscene
+	var shots: Array = Ep01V3Cutscene.scene_data(&"game_intro")["shots"]
+	Engine.time_scale = TIME_SCALE
+	for i in range(2, 8):
+		while cs.playing and cs.shot_index < i:
+			await r.tree.process_frame
+		await r.frames(3)
+		var who := StringName(str(((shots[i] as Dictionary)["actors"] as Array)[0]["who"]))
+		var hero := intro.actors[who] as MemberActor
+		var cam := cs.camera
+		var head := hero.global_position + Vector3(0, 0.95, 0)
+		var vp := cam.get_viewport().get_visible_rect().size
+		var y := cam.unproject_position(head).y / vp.y
+		var x := cam.unproject_position(head).x / vp.x
+		var blocked := ""
+		for other: StringName in intro.actors:
+			if other == who:
+				continue
+			var o := (intro.actors[other] as Node3D).global_position + Vector3(0, 0.6, 0)
+			var seg := head - cam.global_position
+			var t := clampf((o - cam.global_position).dot(seg) / seg.length_squared(), 0.0, 1.0)
+			if t > 0.0 and t < 1.0 and (cam.global_position + seg * t).distance_to(o) < 0.5:
+				blocked = String(other)
+		r.check(not cam.is_position_behind(head) and y >= 0.2 and y <= 0.6 and absf(x - 0.5) < 0.2 and blocked == "",
+			"abertura plano %d (%s): cabeca a %.0f%% da altura, %.0f%% da largura, ninguem na frente %s" % [i, who, y * 100.0, x * 100.0, blocked])
+	Engine.time_scale = 1.0
+
+
+## Nenhum plano de nenhuma cena comeca com a camera dentro de colisao do mundo ou de uma copa.
+func _no_shot_inside() -> void:
+	var main := await _new_main(false)
+	var cs := main.cutscene
+	var bad: Array[String] = []
+	for id in Ep01V3Cutscene.scene_ids():
+		var shots: Array = Ep01V3Cutscene.scene_data(id)["shots"]
+		for i in shots.size():
+			var p: Vector3 = cs.camera_pose(shots[i], 0.0)[0]
+			if cs.inside_obstacle(p):
+				bad.append("%s#%d" % [id, i])
+	r.check(cs.occluders.size() > 0, "cutscene: player recebe as copas das arvores (%d)" % cs.occluders.size())
+	r.check(bad.is_empty(), "cutscene: nenhum plano comeca com a camera dentro de colisao ou copa %s" % str(bad))
+	var sh: Dictionary = (Ep01V3Cutscene.scene_data(&"nightfall")["shots"] as Array)[1]
+	var raw: Vector3 = cs.shot_pose(sh, 0.0)[0]
+	r.check(cs.inside_obstacle(raw) == false or not cs.inside_obstacle(cs.camera_pose(sh, 0.0)[0]),
+		"cutscene: nightfall 2o plano sai de dentro da copa (cru dentro=%s)" % cs.inside_obstacle(raw))
+	await _free(main)
 
 
 func _menu_target() -> void:
