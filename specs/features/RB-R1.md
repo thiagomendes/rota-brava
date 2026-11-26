@@ -380,3 +380,13 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 - Usar só a cota diária do **Gemini 3.8 Flash TTS** (100 pedidos/dia), sem pressa. Os modelos 2.5 TTS não serão usados.
 - O painel mostrou 14 pedidos/min contra o limite de 10. Por isso o intervalo mínimo entre pedidos em `tools/voice/gemini_tts.py` subiu de 4,0 s para 6,5 s.
 - Fila: 205 falas, cerca de 3 dias de cota.
+
+### G2 + G9 integrados (`feature/rb-r1-g-roteiro`, autor `adventure`)
+- G2: nenhum erro de gênero no texto. O narrador lia "Leme" como a peça do barco. Agora as falas trazem artigo: "A Rastro…", "O Pico…", "A Leme…". Essas falas ainda não tinham take gerado.
+- G9: roteiro em `docs/proposals/ep01_v3_pontes.md`, com 24 falas novas de ponte (`pt_BR.ep01v3_g9.json`, `vary()` em grupos). A espera pela conversa é `BRIDGE_WAIT_S` = 12 s. `_regroup_followers()` tira do alto a seguidora que o teleporte deixou num telhado. Teste `test_ep01_v3_bridge_regroup` (falha sem a correção). Removidas 2 chaves órfãs. Fila de voz: 201.
+- Revisão (`reviewer`, 2 rodadas). A 1ª REPROVOU: o bot ficava sem caminho no M6 em 2 de 3 rodadas. A 2ª APROVOU: `cutscene` passou 3 de 3, o teste nega a correção, `ep01_v3` deu `OK (196 PASS)`.
+- Ressalvas abertas, para um ticket de seguidores depois do pacote G:
+  - (1) o plano B do reagrupamento não checa colisão;
+  - (2) um pulo no último quadro da ponte pula o reagrupamento;
+  - (3) sem cutscene não há espera nem reagrupamento;
+  - (4) o teleporte de seguidor e da troca de herói pode deixar alguém num telhado também fora das pontes (só lido no código, não reproduzido).
