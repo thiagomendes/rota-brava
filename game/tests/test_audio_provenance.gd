@@ -4,7 +4,7 @@ extends RefCounted
 
 const PROVENANCE := "../source_audio/PROVENANCE.md"
 ## "gerado (Lyria)": trilha gerada pela Gemini API, aprovada por Thiago (D20/D20a); termos de uso a confirmar.
-const ALLOWED: Array[String] = ["CC0-1.0", "original", "original (TTS)", "gerado (Lyria)"]
+const ALLOWED: Array[String] = ["CC0-1.0", "original", "original (TTS)", "gerado (Lyria)", "gerado (Gemini TTS)"]
 
 
 func _audio_files(dir: String, out: Array[String]) -> void:

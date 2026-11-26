@@ -60,6 +60,10 @@ class AuthError(RuntimeError):
     pass
 
 
+class QuotaError(RuntimeError):
+    """429 persistente (cota esgotada): quem chama deve parar e manter o cache."""
+
+
 HERE = Path(__file__).resolve().parent
 
 
@@ -151,6 +155,12 @@ def call_api(model: str, body: dict, retries: int = 5) -> tuple[bytes, str, int]
                 raise AuthError(
                     f"HTTP {e.code}: a API nativa recusou a autenticacao. O segredo do ambiente precisa ser "
                     "injetado no cabecalho x-goog-api-key (nao Bearer). Nada foi gerado.") from None
+            last_code = e.code
+            if e.code == 429:
+                body = e.read().decode("utf-8", "replace")
+                if "per_day" in body or "PerDay" in body:  # cota diaria: nao adianta esperar minutos
+                    retry = body.split("Please retry in ")[1].split("s.")[0] + "s" if "Please retry in " in body else "?"
+                    raise QuotaError(f"cota diaria do modelo {model} esgotada (tentar de novo em {retry})") from None
             if e.code == 429 or e.code >= 500:
                 ra = e.headers.get("Retry-After")
                 wait = float(ra) if ra and ra.isdigit() else min(60.0, 5.0 * 2 ** attempt)
@@ -162,6 +172,8 @@ def call_api(model: str, body: dict, retries: int = 5) -> tuple[bytes, str, int]
             wait = min(60.0, 5.0 * 2 ** attempt)
             print(f"[gemini_tts] rede: {e}; nova tentativa em {wait:.0f} s", file=sys.stderr)
             time.sleep(wait)
+    if locals().get("last_code") == 429:
+        raise QuotaError("HTTP 429 persistente depois de todas as tentativas (cota?)")
     raise RuntimeError("esgotou as tentativas (429/5xx/rede)")
 
 

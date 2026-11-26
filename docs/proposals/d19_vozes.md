@@ -98,3 +98,12 @@ As páginas de termos não abriram pela rede daqui. O que se sabe de memória, a
 - Confirmar termos nas páginas oficiais.
 - Piper local para a prova do tratamento: o modelo `pt_BR-jeff-medium` não baixa daqui (Hugging Face bloqueado pelo proxy). A prova usou takes Piper já gerados no projeto (`source_audio/radio/takes/`, cache do `radio.py`). Os rótulos "voz um..." das amostras foram gerados pelo Gemini (voz Schedar, sem estilo nem tratamento), não pelo Piper.
 - Gerar o roteiro inteiro só depois da aprovação; ligar no jogo é outra etapa.
+
+## Geração do Ep01 v3 (2026-11-26, interrompida pela cota)
+
+- **Inventário:** 224 chaves faladas (ficha `lines` + `groups` + cutscenes). Exceção explícita: a fala do filhote, que late com o som que já existe.
+- **Direção:** a das falas novas veio de `docs/proposals/ep01_v3_cutscenes.md`, seção 5. Precedência: `lines` > grupo > estilo base.
+- **Script:** `tools/voice/gen_v3.py` gera OGG, visemas e o catálogo `game/audio/voice/v3/voice_v3_catalog.json`, com procedência por take. O `register_v3.py` escreve no `PROVENANCE.md`, com a licença "gerado (Gemini TTS)".
+- **No jogo:** `Ep01V3Dialogue.take` prefere `v3:<chave>`; sem take, toca o balbucio de reserva.
+- **Cota:** a do `gemini-3.8-flash-tts` é de **100 pedidos por dia** (Tier 1) e se esgotou com 15 falas geradas. As 208 restantes ficam em `pending` no catalogo. Para retomar: `python tools/voice/gen_v3.py`, depois `python tools/voice/register_v3.py`. O cache evita repetir o que já foi feito.
+- **Não troquei de modelo** para contornar a cota: outro modelo mudaria a voz aprovada.

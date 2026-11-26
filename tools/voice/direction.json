@@ -1,5 +1,5 @@
 {
- "_doc": "D19: direção por fala, separada do elenco (cast.json). emotion/energy(1-3)/pace/note entram nas notas de direção do pedido ao Gemini (modo notes, não lido em voz alta); o preset local é sempre o do personagem. Público 4-8 anos: sem medo nem bronca. ep01.lighthouse.pup.horn fica fora (filhote late, sem TTS).",
+ "_doc": "D19: direção por fala, separada do elenco (cast.json). emotion/energy(1-3)/pace/note entram nas notas de direção do pedido ao Gemini (modo notes, não lido em voz alta); o preset local é sempre o do personagem. Público 4-8 anos: sem medo nem bronca. ep01.lighthouse.pup.horn fica fora (filhote late, sem TTS). Falas novas (F2/D21, incl. narrador): direcao de docs/proposals/ep01_v3_cutscenes.md secao 5. Precedencia: lines > grupo > so o estilo base do personagem.",
  "source": "game/episodes/ep01/v3/ep01_v3_dialogue.json",
  "energy_text": {
   "1": "energia baixa, voz contida",
@@ -323,6 +323,366 @@
    "energy": 3,
    "pace": "normal",
    "note": "fecha o episódio, 'Viva!' e carinho pelo time"
+  },
+  "ep01.dock.tracker.look_paw": {
+   "emotion": "descoberta animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "aponta a tábua ao lado do barco, convida a olhar"
+  },
+  "ep01.dock.tracker.boot_steps": {
+   "emotion": "curiosidade",
+   "energy": 2,
+   "pace": "normal",
+   "note": "segue as botas com o dedo até o poste vazio"
+  },
+  "ep01.dock.tracker.follow_paws": {
+   "emotion": "chamado animado",
+   "energy": 2,
+   "pace": "rápido",
+   "note": "mostra o caminho das patinhas, vamos juntos"
+  },
+  "ep01.bank.tracker.pup_to_line": {
+   "emotion": "surpresa divertida",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "viu o filhote correndo ao longe, meio rindo"
+  },
+  "ep01.bank.climber.cloth_on_shed": {
+   "emotion": "empolgação",
+   "energy": 3,
+   "pace": "normal",
+   "note": "olha para cima, já pensando em subir"
+  },
+  "ep01.bank.tracker.cloth_reeds": {
+   "emotion": "descoberta atenta",
+   "energy": 2,
+   "pace": "normal",
+   "note": "aponta o capim junto da água"
+  },
+  "ep01.bank.pilot.hang_line": {
+   "emotion": "confiança",
+   "energy": 2,
+   "pace": "normal",
+   "note": "organiza a equipe, tranquila"
+  },
+  "ep01.bank.tracker.paws_to_fountain": {
+   "emotion": "chamado animado",
+   "energy": 2,
+   "pace": "rápido",
+   "note": "a trilha continua; puxa a equipe para a praça"
+  },
+  "ep01.plaza.tracker.see_channel": {
+   "emotion": "atenção",
+   "energy": 2,
+   "pace": "normal",
+   "note": "agachada, mostra o chão"
+  },
+  "ep01.plaza.climber.leaves_top": {
+   "emotion": "empolgação",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "olha para o alto, pronto para subir"
+  },
+  "ep01.plaza.tracker.see_market": {
+   "emotion": "curiosidade",
+   "energy": 2,
+   "pace": "normal",
+   "note": "ouviu a feirante, aponta as barracas"
+  },
+  "ep01.market.tracker.see_cart": {
+   "emotion": "atenção",
+   "energy": 2,
+   "pace": "normal",
+   "note": "aponta o carrinho e as cores"
+  },
+  "ep01.market.pilot.see_stalls": {
+   "emotion": "confiança",
+   "energy": 2,
+   "pace": "normal",
+   "note": "explica o jogo das cores com calma"
+  },
+  "ep01.street.tracker.see_feathers": {
+   "emotion": "descoberta animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "aponta a primeira pena no chão"
+  },
+  "ep01.street.pilot.see_vane": {
+   "emotion": "confiança",
+   "energy": 2,
+   "pace": "normal",
+   "note": "aponta o cata-vento, segura"
+  },
+  "ep01.street.climber.gull_roof": {
+   "emotion": "empolgação",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "olha para cima, quer subir já"
+  },
+  "ep01.bay.pilot.see_boat": {
+   "emotion": "decisão animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "aponta o barco, pronta para pilotar"
+  },
+  "ep01.bay.pilot.see_buoys": {
+   "emotion": "atenção calma",
+   "energy": 2,
+   "pace": "normal",
+   "note": "do leme, aponta as boias da rota"
+  },
+  "ep01.bay.pilot.see_dinghy": {
+   "emotion": "surpresa curiosa",
+   "energy": 2,
+   "pace": "normal",
+   "note": "achou o bote, sem susto"
+  },
+  "ep01.bay.climber.rope_dinghy": {
+   "emotion": "coragem alegre",
+   "energy": 3,
+   "pace": "normal",
+   "note": "pega a corda, confiante"
+  },
+  "ep01.lighthouse.tracker.go_lighthouse": {
+   "emotion": "chamado animado",
+   "energy": 2,
+   "pace": "rápido",
+   "note": "a trilha vai para o farol, puxa a equipe"
+  },
+  "ep01.lighthouse.tracker.lens_bush": {
+   "emotion": "descoberta atenta",
+   "energy": 1,
+   "pace": "lento",
+   "note": "viu um brilho, quase sussurrando"
+  },
+  "ep01.lighthouse.climber.pup_top": {
+   "emotion": "cuidado animado",
+   "energy": 2,
+   "pace": "normal",
+   "note": "olha para o alto, vai buscar o amigo"
+  },
+  "ep01.lighthouse.pilot.see_boats": {
+   "emotion": "encanto",
+   "energy": 2,
+   "pace": "lento",
+   "note": "olha o mar de cima, admirada"
+  },
+  "ep01.festival.tracker.see_captain": {
+   "emotion": "alegria",
+   "energy": 2,
+   "pace": "normal",
+   "note": "avista o capitão na praça iluminada"
+  },
+  "ep01.narrator.intro.village": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.intro.team": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.intro.tracker": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.intro.tracker.hello": {
+   "emotion": "orgulho alegre",
+   "energy": 3,
+   "pace": "normal",
+   "note": "se apresenta para a câmera, confiante, sorriso aberto"
+  },
+  "ep01.narrator.intro.climber": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.intro.climber.hello": {
+   "emotion": "empolgação",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "se apresenta pulando, vibrante"
+  },
+  "ep01.narrator.intro.pilot": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.intro.pilot.hello": {
+   "emotion": "confiança alegre",
+   "energy": 2,
+   "pace": "normal",
+   "note": "ajeita os fones e se apresenta, segura"
+  },
+  "ep01.radio.intro.hello": {
+   "emotion": "alegria",
+   "energy": 2,
+   "pace": "normal",
+   "note": "voz amiga do rádio, acolhe a equipe"
+  },
+  "ep01.narrator.intro.call": {
+   "emotion": "chamado heroico",
+   "energy": 3,
+   "pace": "normal",
+   "note": "grito de abertura de desenho, convida para a aventura"
+  },
+  "ep01.narrator.opening.village": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.opening.team": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.opening.empty_boat": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.m1.pup_runs": {
+   "emotion": "travessura divertida",
+   "energy": 2,
+   "pace": "normal",
+   "note": "conta a arte do filhote como quem ri, nada grave"
+  },
+  "ep01.narrator.m1.paw": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.m2.pup_line": {
+   "emotion": "travessura divertida",
+   "energy": 2,
+   "pace": "normal",
+   "note": "conta a arte do filhote como quem ri, nada grave"
+  },
+  "ep01.narrator.m2.wind": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.m3.ball": {
+   "emotion": "travessura divertida",
+   "energy": 2,
+   "pace": "normal",
+   "note": "conta a arte do filhote como quem ri, nada grave"
+  },
+  "ep01.narrator.m3.no_water": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.m4.crates": {
+   "emotion": "travessura divertida",
+   "energy": 2,
+   "pace": "normal",
+   "note": "conta a arte do filhote como quem ri, nada grave"
+  },
+  "ep01.narrator.m4.vendor": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.m5.gull": {
+   "emotion": "travessura divertida",
+   "energy": 2,
+   "pace": "normal",
+   "note": "conta a arte do filhote como quem ri, nada grave"
+  },
+  "ep01.narrator.m5.feathers": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.bay.captain.stuck": {
+   "emotion": "surpresa bem-humorada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "acena do bote, sem medo, até rindo"
+  },
+  "ep01.narrator.m6.boat": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.boat.go": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.m7.pup_up": {
+   "emotion": "travessura divertida",
+   "energy": 2,
+   "pace": "normal",
+   "note": "conta a arte do filhote como quem ri, nada grave"
+  },
+  "ep01.narrator.m7.lens": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.climb.top": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.climb.boats": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.night.sunset": {
+   "emotion": "calma encantada",
+   "energy": 1,
+   "pace": "lento",
+   "note": "o dia acaba, voz suave"
+  },
+  "ep01.narrator.night.lanterns": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.festival.captain.thanks_team": {
+   "emotion": "gratidão",
+   "energy": 2,
+   "pace": "lento",
+   "note": "agradece de coração, voz quente"
+  },
+  "ep01.narrator.end.saved": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
+  },
+  "ep01.narrator.end.bye": {
+   "emotion": "carinho",
+   "energy": 2,
+   "pace": "lento",
+   "note": "despedida de fim de episódio, sorriso"
   }
  },
  "demo": {
@@ -348,7 +708,7 @@
   }
  },
  "groups": {
-  "_doc": "D19c: falas repetidas por situacao viram grupos de 3 a 5 variantes, sorteadas sem repetir a ultima (logica no jogo: gameplay; texto: adventure). id do grupo -> lista de chaves. 'target' = variantes planejadas; listas so com a chave atual (ou vazias) aguardam texto do adventure. Direcao do grupo vale para as variantes sem direcao propria em lines. speaker '*' = quem chama varia.",
+  "_doc": "D19c: falas repetidas por situacao viram grupos de 3 a 5 variantes, sorteadas sem repetir a ultima (logica no jogo: gameplay; texto: adventure). id do grupo -> lista de chaves. 'target' = variantes planejadas; listas so com a chave atual (ou vazias) aguardam texto do adventure. Direcao do grupo vale para as variantes sem direcao propria em lines. speaker '*' = quem chama varia. Chaves preenchidas a partir de ep01_v3_dialogue.json (texto aprovado, b46d186); hint.radio.<etapa> virou um grupo por passo.",
   "help.radio.invite": {
    "speaker": "radio",
    "target": 5,
@@ -358,21 +718,13 @@
     "pace": "normal",
     "note": "oferece ajuda sem pressa, como quem estende a mao"
    },
-   "keys": []
-  },
-  "hint.radio.<etapa>": {
-   "speaker": "radio",
-   "target": 3,
-   "direction": {
-    "emotion": "gentileza",
-    "energy": 2,
-    "pace": "lento",
-    "note": "dica clara, voz de quem sorri"
-   },
    "keys": [
-    "ep01v3.<etapa>.hint_gesture"
-   ],
-   "_doc": "um grupo por etapa (21, de ep01v3.M1.bench a ep01v3.M8.thanks); a dica atual e a variante 1"
+    "ep01.radio.help.invite_1",
+    "ep01.radio.help.invite_2",
+    "ep01.radio.help.invite_3",
+    "ep01.radio.help.invite_4",
+    "ep01.radio.help.invite_5"
+   ]
   },
   "success.tracker": {
    "speaker": "tracker",
@@ -383,7 +735,12 @@
     "pace": "normal",
     "note": "acertou, satisfeita"
    },
-   "keys": []
+   "keys": [
+    "ep01.team.tracker.success_1",
+    "ep01.team.tracker.success_2",
+    "ep01.team.tracker.success_3",
+    "ep01.team.tracker.success_4"
+   ]
   },
   "success.climber": {
    "speaker": "climber",
@@ -395,7 +752,10 @@
     "note": "acertou, vibrante"
    },
    "keys": [
-    "ep01.bank.climber.sock_high"
+    "ep01.bank.climber.sock_high",
+    "ep01.team.climber.success_1",
+    "ep01.team.climber.success_2",
+    "ep01.team.climber.success_3"
    ]
   },
   "success.pilot": {
@@ -407,7 +767,12 @@
     "pace": "normal",
     "note": "acertou, segura"
    },
-   "keys": []
+   "keys": [
+    "ep01.team.pilot.success_1",
+    "ep01.team.pilot.success_2",
+    "ep01.team.pilot.success_3",
+    "ep01.team.pilot.success_4"
+   ]
   },
   "oops.vendor": {
    "speaker": "vendor",
@@ -419,7 +784,10 @@
     "note": "corrige com doçura, sem bronca"
    },
    "keys": [
-    "ep01.market.vendor.wrong_stall"
+    "ep01.market.vendor.wrong_stall",
+    "ep01.market.vendor.oops_1",
+    "ep01.market.vendor.oops_2",
+    "ep01.market.vendor.oops_3"
    ]
   },
   "oops.pilot.buoy": {
@@ -431,7 +799,11 @@
     "pace": "lento",
     "note": "encostou na boia, tudo bem, tenta de novo"
    },
-   "keys": []
+   "keys": [
+    "ep01.bay.pilot.buoy_oops_1",
+    "ep01.bay.pilot.buoy_oops_2",
+    "ep01.bay.pilot.buoy_oops_3"
+   ]
   },
   "oops.tracker": {
    "speaker": "tracker",
@@ -442,7 +814,11 @@
     "pace": "normal",
     "note": "'quase!' sorrindo, vamos de novo"
    },
-   "keys": []
+   "keys": [
+    "ep01.team.tracker.oops_1",
+    "ep01.team.tracker.oops_2",
+    "ep01.team.tracker.oops_3"
+   ]
   },
   "oops.climber": {
    "speaker": "climber",
@@ -453,7 +829,11 @@
     "pace": "normal",
     "note": "'quase!' rindo, vamos de novo"
    },
-   "keys": []
+   "keys": [
+    "ep01.team.climber.oops_1",
+    "ep01.team.climber.oops_2",
+    "ep01.team.climber.oops_3"
+   ]
   },
   "oops.pilot": {
    "speaker": "pilot",
@@ -464,7 +844,11 @@
     "pace": "normal",
     "note": "'quase!' tranquila, vamos de novo"
    },
-   "keys": []
+   "keys": [
+    "ep01.team.pilot.oops_1",
+    "ep01.team.pilot.oops_2",
+    "ep01.team.pilot.oops_3"
+   ]
   },
   "switch.to_tracker": {
    "speaker": "*",
@@ -476,12 +860,15 @@
     "note": "chama a Rastro pelo nome, confiando nela"
    },
    "keys": [
-    "ep01.bank.climber.call_tracker"
+    "ep01.bank.climber.call_tracker",
+    "ep01.team.climber.call_tracker_2",
+    "ep01.team.pilot.call_tracker_2",
+    "ep01.team.pilot.call_tracker_3"
    ]
   },
   "switch.to_climber": {
    "speaker": "*",
-   "target": 4,
+   "target": 5,
    "direction": {
     "emotion": "chamado",
     "energy": 2,
@@ -498,7 +885,7 @@
   },
   "switch.to_pilot": {
    "speaker": "*",
-   "target": 4,
+   "target": 5,
    "direction": {
     "emotion": "chamado",
     "energy": 2,
@@ -508,7 +895,9 @@
    "keys": [
     "ep01.market.tracker.call_pilot",
     "ep01.street.tracker.call_pilot",
-    "ep01.lighthouse.climber.call_pilot"
+    "ep01.lighthouse.climber.call_pilot",
+    "ep01.team.climber.call_pilot_2",
+    "ep01.team.tracker.call_pilot_2"
    ]
   },
   "cheer.tracker": {
@@ -521,7 +910,11 @@
     "note": "comemora o emblema"
    },
    "keys": [
-    "ep01.festival.tracker.cheer"
+    "ep01.festival.tracker.cheer",
+    "ep01.team.tracker.cheer_1",
+    "ep01.team.tracker.cheer_2",
+    "ep01.team.tracker.cheer_3",
+    "ep01.team.tracker.cheer_4"
    ]
   },
   "cheer.climber": {
@@ -534,7 +927,11 @@
     "note": "comemora o emblema"
    },
    "keys": [
-    "ep01.plaza.climber.m3_done"
+    "ep01.plaza.climber.m3_done",
+    "ep01.team.climber.cheer_1",
+    "ep01.team.climber.cheer_2",
+    "ep01.team.climber.cheer_3",
+    "ep01.team.climber.cheer_4"
    ]
   },
   "cheer.pilot": {
@@ -547,7 +944,326 @@
     "note": "comemora o emblema"
    },
    "keys": [
-    "ep01.bank.pilot.m2_done"
+    "ep01.bank.pilot.m2_done",
+    "ep01.team.pilot.cheer_1",
+    "ep01.team.pilot.cheer_2",
+    "ep01.team.pilot.cheer_3",
+    "ep01.team.pilot.cheer_4"
+   ]
+  },
+  "hint.radio.M1.bench": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m1.bench",
+    "ep01.radio.v3_m1.bench_2",
+    "ep01.radio.v3_m1.bench_3"
+   ]
+  },
+  "hint.radio.M1.boot": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m1.boot",
+    "ep01.radio.v3_m1.boot_2",
+    "ep01.radio.v3_m1.boot_3"
+   ]
+  },
+  "hint.radio.M1.trail": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m1.trail",
+    "ep01.radio.v3_m1.trail_2",
+    "ep01.radio.v3_m1.trail_3"
+   ]
+  },
+  "hint.radio.M2.free_pieces": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m2.free_pieces",
+    "ep01.radio.v3_m2.free_pieces_2",
+    "ep01.radio.v3_m2.free_pieces_3"
+   ]
+  },
+  "hint.radio.M2.find_third": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m2.find_third",
+    "ep01.radio.v3_m2.find_third_2",
+    "ep01.radio.v3_m2.find_third_3"
+   ]
+  },
+  "hint.radio.M2.hang": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m2.hang",
+    "ep01.radio.v3_m2.hang_2",
+    "ep01.radio.v3_m2.hang_3"
+   ]
+  },
+  "hint.radio.M3.stream": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m3.stream",
+    "ep01.radio.v3_m3.stream_2",
+    "ep01.radio.v3_m3.stream_3"
+   ]
+  },
+  "hint.radio.M3.leaves": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m3.leaves",
+    "ep01.radio.v3_m3.leaves_2",
+    "ep01.radio.v3_m3.leaves_3"
+   ]
+  },
+  "hint.radio.M4.read": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m4.read",
+    "ep01.radio.v3_m4.read_2",
+    "ep01.radio.v3_m4.read_3"
+   ]
+  },
+  "hint.radio.M4.deliver": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m4.deliver",
+    "ep01.radio.v3_m4.deliver_2",
+    "ep01.radio.v3_m4.deliver_3"
+   ]
+  },
+  "hint.radio.M5.feathers": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m5.feathers",
+    "ep01.radio.v3_m5.feathers_2",
+    "ep01.radio.v3_m5.feathers_3"
+   ]
+  },
+  "hint.radio.M5.compass": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m5.compass",
+    "ep01.radio.v3_m5.compass_2",
+    "ep01.radio.v3_m5.compass_3"
+   ]
+  },
+  "hint.radio.M5.fish": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m5.fish",
+    "ep01.radio.v3_m5.fish_2",
+    "ep01.radio.v3_m5.fish_3"
+   ]
+  },
+  "hint.radio.M6.board": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m6.board",
+    "ep01.radio.v3_m6.board_2",
+    "ep01.radio.v3_m6.board_3"
+   ]
+  },
+  "hint.radio.M6.buoys": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m6.buoys",
+    "ep01.radio.v3_m6.buoys_2",
+    "ep01.radio.v3_m6.buoys_3"
+   ]
+  },
+  "hint.radio.M6.approach": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m6.approach",
+    "ep01.radio.v3_m6.approach_2",
+    "ep01.radio.v3_m6.approach_3"
+   ]
+  },
+  "hint.radio.M6.rope": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m6.rope",
+    "ep01.radio.v3_m6.rope_2",
+    "ep01.radio.v3_m6.rope_3"
+   ]
+  },
+  "hint.radio.M7.lens": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m7.lens",
+    "ep01.radio.v3_m7.lens_2",
+    "ep01.radio.v3_m7.lens_3"
+   ]
+  },
+  "hint.radio.M7.climb": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m7.climb",
+    "ep01.radio.v3_m7.climb_2",
+    "ep01.radio.v3_m7.climb_3"
+   ]
+  },
+  "hint.radio.M7.aim": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m7.aim",
+    "ep01.radio.v3_m7.aim_2",
+    "ep01.radio.v3_m7.aim_3"
+   ]
+  },
+  "hint.radio.M8.thanks": {
+   "speaker": "radio",
+   "target": 3,
+   "direction": {
+    "emotion": "gentileza",
+    "energy": 2,
+    "pace": "lento",
+    "note": "dica clara, voz de quem sorri"
+   },
+   "keys": [
+    "ep01.radio.v3_m8.thanks",
+    "ep01.radio.v3_m8.thanks_2",
+    "ep01.radio.v3_m8.thanks_3"
    ]
   }
  }
