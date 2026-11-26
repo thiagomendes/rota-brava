@@ -29,7 +29,16 @@ const CART_AHEAD := 1.05
 const STALL_COLORS := {&"M4_Stall_Apple": Color("e0412b"), &"M4_Stall_Lemon": Color("f2c81d"), &"M4_Stall_Grapes": Color("4a6fd8")}
 const CARGO_ORDER: Array[StringName] = [&"M4_Stall_Apple", &"M4_Stall_Lemon", &"M4_Stall_Grapes"]
 const CART_STATIC_SHAPE := "Collision/Props/cart_1_0"
+## G6: os 3 caixotes ficam em fila sobre o fundo do carrinho (topo do fundo a 0,65 m no kit `cart`; vao interno
+## 1,22 x 0,72 m), nao empilhados nem afundados nas laterais. Caixote 0,42 x 0,32 m em escala 0,92: 3 x 0,386 m com
+## 1,4 cm entre eles. Conferido por tests/test_prop_overlap.gd.
+const CARGO_FLOOR := 0.652
+const CARGO_SCALE := 0.92
+const CARGO_SLOTS: Array[float] = [-0.4, 0.0, 0.4]
 const CART_KIT_INDEX := 1
+## G6: topo da grade do M3 acima do marcador M3_Grate (medido por tests/prop_overlap.gd). A bola final tem origem no chao
+## e recebia +0,16 m como o bloco provisorio (origem no centro): flutuava 4,1 cm na grade e 15,6 cm nas barracas.
+const BALL_GRATE_TOP := 0.119
 ## F2 (M1): bota do capitao junto a amarra vazia (lugar testado pelo art3d em clues_v3_capture.gd) e trilha da pata do
 ## cais ate a margem (rota andavel da grade do bot, tabua -> terra). As 4 pegadinhas automaticas ficam na trilha: a 1a a
 ## 1,7 m da pata do cais.
@@ -322,7 +331,7 @@ func _build_m3() -> void:
 	_spot(&"fountain_climb", points[&"FountainBase"], &"carabiner", "ui.action.climb", &"climber")
 	_spot(&"leaves", _mk(&"M3_UpperBasin"), &"leaf", "ui.action.pull", &"climber", 1.1)
 	_ball = Ep01V3Pieces.ball(_root)
-	_ball.global_position = _mk(&"M3_Grate") + Vector3(0, 0.16, 0)
+	_ball.global_position = _mk(&"M3_Grate") + Vector3(0, BALL_GRATE_TOP + _ball_lift(), 0)
 	var leaves := Ep01V3Pieces.leaves(_root)
 	leaves.global_position = _mk(&"M3_UpperBasin") + Vector3(0, 0.08, 0)
 	_pieces.append(leaves)
@@ -366,7 +375,7 @@ func _build_cart() -> void:
 	_cargo_box = Node3D.new()
 	_cargo_box.name = "Cargo"
 	cart.add_child(_cargo_box)
-	_cargo_box.position = Vector3(0, 0.85, 0)
+	_cargo_box.position = Vector3(0, CARGO_FLOOR, 0)
 	_refresh_cargo()
 
 
@@ -397,7 +406,8 @@ func _refresh_cargo() -> void:
 	for i in range(_cargo, CARGO_ORDER.size()):
 		var col: Color = STALL_COLORS[CARGO_ORDER[i]]
 		var b := Ep01V3Pieces.crate(_cargo_box, "Crate%d" % i, col, CARGO_ORDER[i])
-		b.position = Vector3(0, 0.01 + (i - _cargo) * 0.28, 0)
+		b.position = Vector3(CARGO_SLOTS[i], 0.0, 0.0)
+		b.scale = Vector3.ONE * CARGO_SCALE
 		b.set_meta(&"stall", CARGO_ORDER[i])
 
 
@@ -626,10 +636,17 @@ func _fly(node: Node3D, to: Vector3, t: float) -> void:
 func _roll_ball() -> void:
 	if _ball == null:
 		return
-	var to := _mk(&"M3_BallStop") + Vector3(0, 0.16, 0)
+	var to := _mk(&"M3_BallStop") + Vector3(0, _ball_lift(), 0)
 	var tw := _ball.create_tween().set_parallel(true)
 	tw.tween_property(_ball, "global_position", to, 1.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tw.tween_property(_ball, "rotation:x", -TAU * 2.0, 1.4)
+	# G6: a bola final gira no filho Spin (centro); girar a raiz (ponto de contato) afundava a bola no chao ao rolar.
+	tw.tween_property(_ball.get_node_or_null("Spin") if _ball.has_node("Spin") else _ball, "rotation:x", -TAU * 2.0, 1.4)
+
+
+## Altura da origem da bola acima do chao: a bola final tem origem no ponto de contato (centro no filho Spin a 0,16 m);
+## o bloco provisorio tem origem no centro.
+func _ball_lift() -> float:
+	return 0.0 if _ball.has_node("Spin") else 0.16
 
 
 func _examine(actor: Node3D, it: Ep01Interactable) -> void:

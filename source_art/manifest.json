@@ -1950,9 +1950,9 @@
         "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice (COLOR_0 linear), UV em metros, normais ponderadas por area (WeightedNormal), sem texturas embutidas"
       },
       "saida_glb": "game/assets/models/environment_v2/wv2_kit.glb",
-      "glb_sha256": "0624cc2a5311390a3bdfaac0c87cb2575b98b2e05e1f3a35ed0679171234a6f3",
-      "glb_bytes": 1741376,
-      "triangulos": 43620,
+      "glb_sha256": "73dbc496d8a528a5e725b1e347a4ce2d3ca2e9149c84b712da5a6a84e45cc401",
+      "glb_bytes": 1741116,
+      "triangulos": 43594,
       "materiais": [
         "wv2_bark",
         "wv2_burlap",
@@ -2277,11 +2277,11 @@
       },
       "saida": "game/worlds/village_v3",
       "arquivos_sha256": {
-        "village_collision.tscn": "8f5fd910b7b85cd2c893c49ff8cf7bc73cd25e3d1b0984408bce0873631631a9",
+        "village_collision.tscn": "c7163aa1d8bf9a48bc0cb28581152aa7bbd914f820ac9e0d3e08847168d13ae3",
         "village_world.tscn": "c86dc7e1a6bf826dd3165f999a9cc8794ba72311142b08c2e3812fabd36967c1"
       },
       "arquivos_bytes": {
-        "village_collision.tscn": 193517,
+        "village_collision.tscn": 193516,
         "village_world.tscn": 9770
       },
       "colisao": {
@@ -2533,12 +2533,12 @@
       ],
       "missao": "M4",
       "saida_glb": "game/assets/models/props_v3/crate_apple.glb",
-      "glb_sha256": "61c81308eab50292efa8b5afbbf1c4d90cf18f56bf129b11df80b21d6b3e834f",
-      "glb_bytes": 74176,
+      "glb_sha256": "3bc9f35b42b6ce59577f7bb64ed2568b52f796bae0514badb049d9def5a778fa",
+      "glb_bytes": 75212,
       "cena": "game/assets/models/props_v3/crate_apple.tscn",
-      "cena_sha256": "ace5fe985905042788ebe0f50282103fc8000b04210d467b510e903b47b71d05",
+      "cena_sha256": "2ee1e908ca0d31d263a2a66a7ef1e0c773ab9a346e913abb93c1454b0b41ee02",
       "cena_bytes": 863,
-      "triangulos": 1404,
+      "triangulos": 1416,
       "orcamento_tris": 4500,
       "materiais": [
         "wv2_glossy",
@@ -2571,12 +2571,12 @@
       ],
       "missao": "M4",
       "saida_glb": "game/assets/models/props_v3/crate_grapes.glb",
-      "glb_sha256": "5d05fe36b1afa3ff82984bb235ebcdd4b2e86e719e8f6d7d98958407d25aca5b",
-      "glb_bytes": 92964,
+      "glb_sha256": "2512ea774ea7722ebfdfcf712fa99784238ec51148273d345614669f37bcea27",
+      "glb_bytes": 93996,
       "cena": "game/assets/models/props_v3/crate_grapes.tscn",
-      "cena_sha256": "418412de697c6f486f936d2bcb7b5dbd724e81271ec3b7721e37eec3e2ec2e56",
+      "cena_sha256": "cc6d7f16c9eb586d91651be2f8f4fa3093f2a210fdf43c4f4da9c031bc37613f",
       "cena_bytes": 865,
-      "triangulos": 1948,
+      "triangulos": 1960,
       "orcamento_tris": 4500,
       "materiais": [
         "wv2_glossy",
@@ -2609,12 +2609,12 @@
       ],
       "missao": "M4",
       "saida_glb": "game/assets/models/props_v3/crate_lemon.glb",
-      "glb_sha256": "1f1505d0022187ab5ebc2b58dd2d1d4758861753e39fdcc5aa8542183171a39a",
-      "glb_bytes": 75032,
+      "glb_sha256": "02f336432cef0548210f68129f864e78022e3c4f6d9157fd8a7957f3c4285935",
+      "glb_bytes": 76068,
       "cena": "game/assets/models/props_v3/crate_lemon.tscn",
-      "cena_sha256": "8967f4bcd2b078dc79e625f66b54a8817f20eb48ec00428e95feef0fb1f26ab9",
+      "cena_sha256": "05ad961a1e5c6d3fe8a3e7cd789ca66773347757c3cbbc7f7651c6af298aa73f",
       "cena_bytes": 862,
-      "triangulos": 1708,
+      "triangulos": 1720,
       "orcamento_tris": 4500,
       "materiais": [
         "wv2_glossy",

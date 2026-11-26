@@ -716,6 +716,75 @@ def scatter_vegetation():
         put(rng.choice(["bush_a", "bush_c"]), x, head_h(x, z) - 0.05, z, rng.uniform(0, 360), rng.uniform(0.9, 1.4))
 
 
+# G6 (RB-R1): objetos que se atravessavam ou flutuavam, achados por tools/prop-overlap.sh (criterios em
+# game/tests/prop_overlap.gd). Correcao DEPOIS de toda a dispersao, por (tipo, indice), para nao mudar a ordem dos sorteios
+# nem os indices (a colisao e os testes usam o indice). y None = mesma regra de altura da origem do objeto.
+G6_MOVES = {
+    # covos empilhados: a rede (casca cilindrica) desce 0,18 m abaixo do fundo e atravessava o covo de baixo (9,8 e
+    # 9,1 cm); o de cima vai para o chao ao lado
+    ("lobster_trap", 1): (6.72, 0.0, -1.45),
+    ("lobster_trap", 6): (23.45, 0.0, -16.05),
+    ("sack", 1): (5.70, 0.0, 0.12),                # sacos 10,7 cm um dentro do outro
+    ("crate", 0): (-6.65, 0.0, -1.9),              # caixotes encostados 2,9 cm um no outro
+    ("crate", 8): (-15.05, 0.0, -16.2),            # 2,0 e 2,5 cm
+    ("crate", 9): (-14.4, 0.0, -15.85),
+    ("crate", 10): (8.55, "bank", 6.2),            # 2,2 cm no covo da margem
+    # barris em cima do degrau da porta (x -10,33..-8,73; 0,16 m de altura): 14 cm enterrados nele; um de cada lado
+    ("barrel_lid", 2): (-10.7, 0.0, -17.2),
+    ("barrel", 5): (-8.38, 0.0, -17.05),
+    # vaso 14 cm dentro do canteiro; canteiro e vasos em cima do degrau da porta (x 10,9..12,5): vaso de cada lado da
+    # porta, canteiro depois do vaso da direita
+    ("pot_c", 1): (10.6, 0.0, -17.3),
+    ("pot_a", 3): (12.78, 0.0, -17.3),
+    ("planter", 2): (13.72, 0.0, -17.3),
+    # caixotes do cais norte com a frente 3 cm dentro da faixa de pedra do meio-fio (z > -16,75): recuam
+    ("crate_fish", 5): (-12.4, 0.0, -17.1),
+    ("crate_fish", 6): (-11.7, 0.0, -17.12),
+    ("crate_fruit", 1): (1.2, 0.0, -17.1),
+    ("crate_fruit", 2): (0.5, 0.0, -17.1),         # (em x 1,85 batia no degrau da porta)
+    ("rock_b", 19): (20.94, "head", -19.69),       # pedra 25 cm dentro do barril
+    ("rock_b", 27): (24.76, "head", -15.35),       # pedra 30 cm dentro do poste
+    ("tree_b", 102): (25.0, "head_tree", -26.6),   # tronco 46 cm dentro de duas pedras
+    ("tree_b", 103): (35.8, "head_tree", -18.6),   # tronco 38 cm dentro da pedra
+    ("pot_b", 3): (-27.6, 0.0, -12.6),             # vaso sem chao embaixo (1,5 m no vazio)
+    ("rock_b", 40): (20.0, "head", -25.55),        # pedra 76 cm para fora do barranco: 1 m para dentro
+    ("parasol", 1): (19.95, 0.0, -15.5),           # lonas dos dois guarda-sois do cafe 8 cm uma na outra
+    ("cafe_set", 1): (19.95, 0.0, -15.5),
+    ("crate", 13): (-16.44, 0.0, -8.94),           # 2,7 cm no barril da praca
+    ("rope_coil", 1): (1.66, 0.0, 2.34),           # 2,5 cm no monte de rede
+}
+# Pilha de caixote + caixote de fruta junto ao carrinho do M4: o canto do carrinho (x ~ -18,6) atravessava a pilha; ela
+# sai 25 cm para oeste.
+G6_STACK_NEAR_CART = ((-18.75, 1.55), (-19.0, 1.6))
+# Moitas: base arredondada ficava 3-5 cm acima do chao plano; todas descem 5 cm.
+G6_BUSH_SINK = 0.05
+
+
+def g6_fixes():
+    moved = 0
+    for (kind, i), to in G6_MOVES.items():
+        x, y, z = to
+        if y == "bank":
+            y = bank_h(x, z)
+        elif y == "head":
+            y = head_h(x, z) - 0.2
+        elif y == "head_tree":
+            y = head_h(x, z) - 0.1
+        row = inst[kind][i]
+        row[0], row[1], row[2] = round(x, 3), round(y, 3), round(z, 3)
+        moved += 1
+    (ox, oz), (nx, nz) = G6_STACK_NEAR_CART
+    for kind in ("crate", "crate_fruit"):
+        for row in inst[kind]:
+            if abs(row[0] - ox) < 1e-6 and abs(row[2] - oz) < 1e-6:
+                row[0], row[2] = nx, nz
+                moved += 1
+    for kind in ("bush_a", "bush_b", "bush_c"):
+        for row in inst[kind]:
+            row[1] = round(row[1] - G6_BUSH_SINK, 3)
+    return moved
+
+
 def build_bank():
     m = MB("wv2_bank")
     rng = random.Random(61)
@@ -1112,6 +1181,7 @@ def main():
     terrain = build_terrain()
     scatter_vegetation()
     street_props()
+    g6_fixes()
     info = {"gerado_por": "source_art/environment_v2/build_world_v2.py", "provisorio": True, "texturas": tex_info,
             "estatico": {}, "kit": {}}
     for mb in (dock, quay, street, plaza, back, lighthouse, bank, terrain):
