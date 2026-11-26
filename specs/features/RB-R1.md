@@ -506,3 +506,11 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - Na capa 3:4 sobra céu e cais.
   - O estilo padrão de `Button` (branco sobre `2F8CFF`) tem contraste de 3,32:1, abaixo de 4,5.
   - O menu instancia a vila inteira (17–37 s medidos em llvmpipe); quem resolve é o G10.
+- **G4 r3 integrado** (`feature/rb-r1-g4-amora-r3`):
+  - **Dona Amora.** Lenço em tubo cíclico, sem costura. Grisalho em mechas irregulares, que não lê mais como halo. Orelha removida, porque atravessava o cabelo.
+  - **Capitão.** Calça em "U" com fundilho, sem vão entre as pernas visto de baixo.
+  - **Revisão (`reviewer`): APROVADO.**
+    - Topologia: o lenço e a pele da Amora estão fechados, sem bordas abertas.
+    - A esticagem da calça em `walk` caiu de 4,49 para 2,61.
+    - Manifesto confere. `characters` 837 PASS, `assets` 276 PASS, `ep01_v3` 232 PASS.
+  - **Ressalva fora do escopo:** `Captain_Hair` tem 194 arestas de borda (pode ser casca aberta de propósito).
