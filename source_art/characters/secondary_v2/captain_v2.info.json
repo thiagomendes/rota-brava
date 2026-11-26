@@ -1,9 +1,9 @@
 {
-  "tris": 24414,
+  "tris": 23976,
   "tris_por_objeto": {
-    "Captain_Skin": 5996,
+    "Captain_Skin": 5620,
     "Captain_Hair": 4728,
-    "Captain_Cloth": 8054,
+    "Captain_Cloth": 7992,
     "Captain_Gear": 3268,
     "Captain_Face": 2368
   },
@@ -61,7 +61,7 @@
   "animations": {
     "idle": [
       0,
-      90
+      108
     ],
     "thanks": [
       0,

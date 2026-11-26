@@ -31,7 +31,7 @@ import hero_lib
 import sv2_lib as S
 from hero_lib import join_bm
 from rbart import REPO, arg_value, new_object, reset_scene
-from sv2_human import Adult, V
+from sv2_human import Adult, V, pose_idle_adult
 
 CID = "captain_v2"
 PREFIX = "captain_v2"
@@ -451,6 +451,9 @@ def build(glb=None, blend=None):
     b = Captain()
     rig, objs = b.build(True)
     b.fix_skirt_weights(b.coat, HEM)
+    for ob in objs:
+        if ob.name.endswith(("_HandR", "_HandL")):
+            b.fix_wrist_weights(ob)
     rig["provisional"] = True
     rig["agent"] = "art3d"
     rig["variant"] = CID
@@ -461,6 +464,8 @@ def build(glb=None, blend=None):
                                     ("hair", 1024, paint_hair(b), 0.30, 0.35), ("gear", 1024, paint_gear(b), 0.55, 0.18)):
         S.apply_material(groups[g], S.texture_group(groups[g], "%s_%s" % (PREFIX, g), res, paint, TEX_DIR, coat=coat, coat_rough=cr))
     S.face_materials(groups["face"], PREFIX, C["iris"], C["pele"], mouth_hex=C["boca"], dark_hex="#3A3036")
+    # G4 r2: idle relaxado (bracos soltos ao lado do corpo, respiracao) no lugar do idle em A; mesmo nome de clipe
+    ha.IDLES["captain"] = (3.6, pose_idle_adult)
     rep = ha.author(rig, groups["face"], b.F, cid="captain")
     bpy.context.view_layer.update()
     info = S.base_info(list(groups.values()), rig, groups["face"], PREFIX)

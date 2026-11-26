@@ -69,12 +69,12 @@ class Adult(hero_lib.Builder):
             x, y, z = v.co
             if z < 0.1:                                    # mandibula adulta: afunila e alonga
                 t = (0.1 - z) / 1.1
-                x *= 1.0 - 0.26 * t ** 1.3
+                x *= 1.0 - self.JAW * t ** 1.3
                 y *= 1.0 - 0.06 * t
-                z = z - 0.10 * t ** 1.5
+                z = z - self.CHIN * t ** 1.5
             if y > 0.2 and -0.75 < z < -0.25:              # queixo levemente para frente
                 y *= 1.0 + 0.05 * math.exp(-((z + 0.62) ** 2) / 0.03)
-            x *= 1.0 + 0.025 * math.exp(-((z + 0.20) ** 2) / 0.05) * max(y, 0.0)    # macas do rosto discretas
+            x *= 1.0 + self.CHEEK * math.exp(-((z + 0.20) ** 2) / 0.05) * max(y, 0.0)    # macas do rosto discretas
             if y > 0 and z > 0.15:                         # testa
                 y *= 1.0 + 0.02 * z
             v.co = V(F.hc.x + x * F.hr[0], F.hc.y + y * F.hr[1], F.hc.z + z * F.hr[2])
@@ -119,7 +119,13 @@ class Adult(hero_lib.Builder):
                 if link is not None:
                     ee.append((link, len(nn) - 1))
                 return len(nn) - 1
-            w0 = add(W - d * 0.030, 0.025 * k)
+            # G4 r2: o pulso continua para dentro da manga (antes a mao comecava 3 cm antes do pulso, fina e solta da manga)
+            el = V(sx * F.elbow.x, F.elbow.y, F.elbow.z)
+            Wc = V(sx * F.wrist.x, F.wrist.y, F.wrist.z)
+            L = v["limb"]
+            f_in = add(el.lerp(Wc, 0.62), L * 0.66)
+            f_mid = add(el.lerp(Wc, 0.84), L * 0.60, f_in)
+            w0 = add(W - d * 0.004, L * 0.55, f_mid)
             palm = add(W + d * 0.032 * k, 0.031 * k, w0)
             t0 = add(W + d * 0.026 * k + f * 0.028 * k + n * 0.004, 0.0125 * k, palm)
             add(W + d * 0.052 * k + f * 0.044 * k + n * 0.010, 0.0105 * k, t0)
@@ -127,7 +133,7 @@ class Adult(hero_lib.Builder):
                 base = add(W + d * 0.060 * k + f * off * k, 0.0118 * k, palm)
                 add(W + d * (0.060 + ln) * k + f * off * k + n * 0.012 * k, 0.0102 * k, base)
             ob = cl.skin_obj(self.name("Hand" + sd), nn, ee, self.M["pele"], levels=3)
-            S.decimate(ob, 0.24)
+            S.decimate(ob, 0.19)
             self.reg(self.t(ob, "skin_hand", "skin"), "dist")
 
     # ------------------------------------------------------------ tronco com mangas (casaco/blusa)
@@ -160,7 +166,7 @@ class Adult(hero_lib.Builder):
             s2 = add(sh.lerp(el, 0.50), L * 1.14, s1)
             e0 = add(sh.lerp(el, 0.92), L * 1.04, s2)
             f0 = add(el.lerp(W, 0.45), L * 1.02, e0)
-            add(el.lerp(W, 0.90), L * cuff_k, f0)
+            add(el.lerp(W, 0.93), L * cuff_k, f0)
             self.limb_segs += [("upper_arm", s, sh, el), ("forearm", s, el, W)]
         ob = cl.skin_obj(self.name(part.capitalize()), nodes, edges, self.M["uniforme"], levels=3, branch=1.0, scale=(1, 0.88, 1))
         self.shape_torso(ob, hem_z)
@@ -219,22 +225,25 @@ class Adult(hero_lib.Builder):
         S.set_verts(ob, out)
 
     belly_bump = 0.010
+    # cabeca adulta: afunilamento da mandibula, alongamento do queixo, maca do rosto (G4 r2: por personagem)
+    JAW, CHIN, CHEEK = 0.26, 0.10, 0.025
 
     # ------------------------------------------------------------ calca e sapatos
     def trousers(self, part="trousers", top_r=None, hem_up=0.055):
         F, v = self.F, self.v
         hz = F.hz
         lk = (v["limb"] / 0.050)
-        # topo da calca bem por dentro do casaco/saia (o SKIN incha na juncao das pernas e furava o tecido de cima)
-        nodes = [((0, 0, hz + 0.02), top_r or v["belly"] * 0.72)]
-        edges = []
+        # G4 r2: duas pernas sem no de juncao (o casco do SKIN inchava na bifurcacao e uma lasca furava a frente do
+        # casaco/vestido no quadril); o topo de cada perna fica escondido por dentro da roupa de cima
+        nodes, edges, roots = [], [], []
         for sx in (1, -1):
             i0 = len(nodes)
+            roots.append(i0)
             x = sx * F.hip_x
-            nodes += [((x * 1.05, 0, hz - 0.09), 0.074 * lk), ((x, 0.004, F.knee_z + 0.03), 0.063 * lk),
+            nodes += [((x * 0.85, 0, hz + 0.02), 0.058 * lk), ((x, 0, hz - 0.10), 0.064 * lk), ((x, 0.004, F.knee_z + 0.03), 0.063 * lk),
                       ((x, 0.006, F.knee_z - 0.02), 0.060 * lk), ((x, -0.002, F.ankle_z + hem_up), 0.058 * lk)]
-            edges += [(0, i0), (i0, i0 + 1), (i0 + 1, i0 + 2), (i0 + 2, i0 + 3)]
-        ob = cl.skin_obj(self.name(part.capitalize()), nodes, edges, self.M["calca"], levels=3, scale=(1, 0.92, 1))
+            edges += [(i0, i0 + 1), (i0 + 1, i0 + 2), (i0 + 2, i0 + 3), (i0 + 3, i0 + 4)]
+        ob = cl.skin_obj(self.name(part.capitalize()), nodes, edges, self.M["calca"], levels=3, scale=(1, 0.92, 1), roots=tuple(roots))
         self.pants = ob
         P = S.verts_np(ob)
         zz = P[:, 2]
@@ -304,6 +313,28 @@ class Adult(hero_lib.Builder):
         hit = bvh.ray_cast(V(x, y, z0), V(0, 0, -1))
         return hit[0].z if hit[0] is not None else None
 
+    def fix_wrist_weights(self, ob):
+        """Mao: o trecho dentro da manga segue o antebraco; do pulso para a frente, a mao (transicao curta no pulso)."""
+        F = self.F
+        vg = {g.name: g for g in ob.vertex_groups}
+        for sx, s in ((1, "R"), (-1, "L")):
+            el = V(sx * F.elbow.x, F.elbow.y, F.elbow.z)
+            W = V(sx * F.wrist.x, F.wrist.y, F.wrist.z)
+            d = (W - el)
+            L = d.length
+            d = d / L
+            for vx in ob.data.vertices:
+                if (vx.co.x > 0) != (sx > 0):
+                    continue
+                u = (vx.co - W).dot(d)               # < 0: antebraco; > 0: depois do pulso
+                wh = min(1.0, max(0.0, (u + 0.012) / 0.024))
+                for g in list(vx.groups):
+                    ob.vertex_groups[g.group].remove([vx.index])
+                if wh < 0.999:
+                    vg["forearm." + s].add([vx.index], 1.0 - wh, "REPLACE")
+                if wh > 0.001:
+                    vg["hand." + s].add([vx.index], wh, "REPLACE")
+
     def fix_skirt_weights(self, ob, hem_z):
         """Barra do casaco/saia abaixo do quadril: pesos repartidos entre quadril e coxas (nao estica com a perna)."""
         F = self.F
@@ -321,3 +352,25 @@ class Adult(hero_lib.Builder):
             vg["hips"].add([vx.index], 1.0 - wt, "REPLACE")
             if wt > 0.01:
                 vg["thigh." + side].add([vx.index], wt, "REPLACE")
+
+
+# ------------------------------------------------------------------ idle adulto (G4 r2)
+def pose_idle_adult(R, F, t, T):
+    """Em pe e relaxado: bracos soltos junto ao corpo (cotovelo e pulso levemente dobrados, maos viradas para a coxa),
+    respiracao no peito e nos ombros, peso que passa devagar de um pe para o outro, cabeca olhando em volta."""
+    import hero_anim as ha
+    from char_anim import blink_curve, stand_feet, torso
+    from char_lib import eul
+    ph = 2 * math.pi * t / T
+    breath = math.sin(ph)
+    sway = math.sin(ph * 0.5)
+    R.hips_off = Vector((0.006 * sway, 0.0, -0.006 + 0.0025 * breath))
+    torso(R, lean=1.0 + 0.9 * breath, roll=1.2 * sway, head_yaw=7.0 * math.sin(ph * 0.5 + 0.6), head_pitch=1.2 * math.sin(ph + 1.0),
+          head_roll=1.5 * math.sin(ph + 2.0))
+    for s, sx in (("R", 1), ("L", -1)):
+        R.rel("shoulder." + s, eul(y=-1.2 * sx * (0.5 + 0.5 * breath)))
+        R.rel("upper_arm." + s, eul(x=4.0 + 1.5 * breath, y=1.5 * sx - 0.6 * sx * breath))
+        R.rel("forearm." + s, eul(x=13.0 + 2.5 * breath))
+        R.rel("hand." + s, eul(x=8.0))
+    stand_feet(R)
+    return ha.face(blink=blink_curve(t, 1.0) + blink_curve(t, T - 0.6))
