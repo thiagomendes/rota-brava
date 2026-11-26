@@ -375,7 +375,8 @@ func _has_button(action: StringName, b: JoyButton) -> bool:
 	return false
 
 
-## Revisao C2: com fala aberta, um E perto de um ponto de acao so avanca a fala (a acao nao dispara); sem fala, dispara.
+## Revisao C2, ajustada pela G7: com fala aberta e o botao de acao visivel, o E e da acao (a legenda nao rouba);
+## sem acao no alcance o E avanca a fala (coberto em test_ep01_v3_input.gd).
 func _speech_eats_interact() -> void:
 	var lead := main.actors[&"tracker"] as MemberActor
 	await _physics(10)
@@ -402,7 +403,7 @@ func _speech_eats_interact() -> void:
 	await r.frames(2)
 	_key(KEY_E, false)
 	await r.frames(3)
-	r.check(main.hud._queue.size() < q0 and hits[0] == 1, "mov fala: com fala aberta, E so avanca a fala (acao nao disparou: %d)" % hits[0])
+	r.check(main.hud._queue.size() == q0 and hits[0] == 2, "mov fala: com fala aberta e acao visivel, o E age e nao avanca a fala (G7: %d)" % hits[0])
 	main.hud.clear_speech()
 	main.land.spots.erase(&"c2_test")
 	it.queue_free()

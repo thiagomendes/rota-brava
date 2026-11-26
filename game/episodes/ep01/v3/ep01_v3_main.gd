@@ -811,9 +811,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		if not blocked():
 			help_now()
 	elif event.is_action_pressed(&"interact"):
-		if guide.skip_look():
-			get_viewport().set_input_as_handled()
-		elif try_interact():
+		# G7: com acao ao alcance o mesmo E age (try_interact ja encerra o olhar); sem acao, o E so encerra o olhar.
+		if try_interact() or guide.skip_look():
 			get_viewport().set_input_as_handled()
 
 
@@ -853,7 +852,6 @@ func _on_footstep(speed: float, pos: Vector3) -> void:
 
 
 func _pause() -> void:
-	camera_rig.release_mouse()
 	get_tree().paused = true
 	hud.open_pause()
 
@@ -950,10 +948,11 @@ func play_cutscene(sid: StringName, restore_members: bool = true) -> void:
 	var orbit := camera_rig.orbit_enabled
 	set_followers_enabled(false)
 	camera_rig.orbit_enabled = false
-	camera_rig.release_mouse()
+	MouseLock.block(&"cutscene")
 	if cutscene.play(sid):
 		_cutscene_hold_input()
 		await cutscene.finished
+	MouseLock.unblock(&"cutscene")
 	if not is_inside_tree():
 		return
 	camera_rig.orbit_enabled = orbit
