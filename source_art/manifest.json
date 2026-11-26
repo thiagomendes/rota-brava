@@ -3758,15 +3758,15 @@
         "source_art/characters/secondary_v2/captain_v2.blend"
       ],
       "saida_glb": "game/assets/models/characters/captain_v2.glb",
-      "glb_sha256": "e6822f04e19f073a869f1f2ebc924e592e538070d3193a9dc322edbf4196e827",
-      "glb_bytes": 4235520,
+      "glb_sha256": "2c956bac94e0fadb9e1c8f81f429e091719417d441774476f5916fae378805d8",
+      "glb_bytes": 4233760,
       "cena": "game/actors/characters/captain_model.tscn",
       "importacao": "game/lookdev/gltf_pbr_import.gd (mipmaps e verniz, como no trio v2)",
-      "triangulos": 23976,
+      "triangulos": 24038,
       "triangulos_por_objeto": {
         "Captain_Skin": 5620,
         "Captain_Hair": 4728,
-        "Captain_Cloth": 7992,
+        "Captain_Cloth": 8054,
         "Captain_Gear": 3268,
         "Captain_Face": 2368
       },
@@ -4077,15 +4077,15 @@
         "source_art/characters/secondary_v2/amora_v2.blend"
       ],
       "saida_glb": "game/assets/models/characters/amora_v2.glb",
-      "glb_sha256": "90eb7f9044713dcb0cc08863ee421a8effa39cd27e1548c56d378dda6ff29404",
-      "glb_bytes": 4091456,
+      "glb_sha256": "4215a7cf6627e316c6ae5aeffdbce718c046e092a13c664ecbee11597cb91749",
+      "glb_bytes": 4059128,
       "cena": "game/actors/characters/amora_model.tscn",
       "importacao": "game/lookdev/gltf_pbr_import.gd (mipmaps e verniz, como no trio v2)",
-      "triangulos": 23072,
+      "triangulos": 23134,
       "triangulos_por_objeto": {
         "Amora_Skin": 5620,
         "Amora_Hair": 3044,
-        "Amora_Cloth": 9028,
+        "Amora_Cloth": 9090,
         "Amora_Gear": 3012,
         "Amora_Face": 2368
       },
