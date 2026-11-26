@@ -1,0 +1,92 @@
+{
+ "decal_boot_print_l": {
+  "descricao": "pegada da bota do capitao, pe esquerdo (M1.boot)",
+  "extensao_visivel_m": [
+   0.267,
+   0.537
+  ],
+  "px": [
+   256,
+   512
+  ],
+  "tamanho_decal_m": [
+   0.28,
+   0.56
+  ]
+ },
+ "decal_boot_print_r": {
+  "descricao": "pegada da bota do capitao, pe direito (M1.boot)",
+  "extensao_visivel_m": [
+   0.267,
+   0.537
+  ],
+  "px": [
+   256,
+   512
+  ],
+  "tamanho_decal_m": [
+   0.28,
+   0.56
+  ]
+ },
+ "decal_feather_big": {
+  "descricao": "pena de gaivota (M5)",
+  "extensao_visivel_m": [
+   0.288,
+   0.581
+  ],
+  "px": [
+   512,
+   512
+  ],
+  "tamanho_decal_m": [
+   0.6,
+   0.6
+  ]
+ },
+ "decal_paw_big": {
+  "descricao": "pata do filhote, lama seca (M1/P4)",
+  "extensao_visivel_m": [
+   0.45,
+   0.445
+  ],
+  "px": [
+   512,
+   512
+  ],
+  "tamanho_decal_m": [
+   0.6,
+   0.6
+  ]
+ },
+ "decal_paw_dock": {
+  "descricao": "pata de lama na tabua do cais (M1.bench)",
+  "extensao_visivel_m": [
+   0.592,
+   0.603
+  ],
+  "px": [
+   512,
+   512
+  ],
+  "tamanho_decal_m": [
+   0.66,
+   0.66
+  ]
+ },
+ "decal_paw_wet_big": {
+  "descricao": "pata molhada do filhote (M2/P4)",
+  "extensao_visivel_m": [
+   0.564,
+   0.526
+  ],
+  "px": [
+   512,
+   512
+  ],
+  "tamanho_decal_m": [
+   0.6,
+   0.6
+  ]
+ }
+}

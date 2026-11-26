@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://assets/models/props_v3/props_v3_piece.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/captain_boot.glb" id="2_glb"]
+
+[node name="Pv3CaptainBoot" type="Node3D"]
+script = ExtResource("1_script")
+metadata/piece_id = "captain_boot"
+metadata/mission = "M1"
+metadata/interactive = true
+metadata/interaction = "examine"
+metadata/member = "tracker"
+metadata/note = "bota do capitao caida de lado (M1.boot): junto a amarra vazia M1_EmptyMooring; le a 8 m na camera baixa"
+metadata/tris = 2816
+metadata/tris_budget = 3500
+metadata/pivot = "centro do contato no chao (bota deitada; bico para +Z, cano para -Z)"
+metadata/provisional = false
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/clues_v3/build_clues_v3.py"
+
+[node name="Model" parent="." instance=ExtResource("2_glb")]

@@ -2,7 +2,7 @@ class_name PropsV3Piece
 extends Node3D
 ## Peca de missao do Ep01 v3 (RB-R1, art3d): raiz de cada cena em game/assets/models/props_v3/*.tscn.
 ## Troca os materiais do GLB pelo acabamento da vila v2.1 (nome `wv2_*` -> WV2Materials) ou pelos 5 materiais proprios
-## das pecas (`pv3_*`, abaixo) e toca a animacao inicial. Geometria: source_art/props_v3/build_props_v3.py.
+## das pecas (`pv3_*`, abaixo; `pv3_beam` e o pilar de luz das pistas F2, source_art/clues_v3/) e toca a animacao inicial. Geometria: source_art/props_v3/build_props_v3.py.
 ##
 ## Contrato para o jogo (metadados na raiz de cada cena): `piece_id`, `mission`, `interactive` (bool), `interaction`
 ## (verbo: pick, hang, pull, carry, examine, throw...), `member` (heroi que age, ou vazio), `tris` e `tris_budget`.
@@ -80,6 +80,8 @@ static func apply_materials(root: Node) -> int:
 			if m != null:
 				mi.set_surface_override_material(i, m)
 				count += 1
+				if src.resource_name == "pv3_beam":
+					mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF   # pilar de luz nao faz sombra
 	return count
 
 
@@ -139,5 +141,16 @@ static func _build(mat_name: String) -> Material:
 			r.albedo_color = Color(1.0, 1.0, 1.0, 0.95)
 			r.resource_name = mat_name
 			return r
+		"pv3_beam":
+			# pilar de luz do anel de alvo (F2): aditivo, sem luz, alfa da cor de vertice (some para cima)
+			var b := StandardMaterial3D.new()
+			b.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			b.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			b.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+			b.vertex_color_use_as_albedo = true
+			b.cull_mode = BaseMaterial3D.CULL_DISABLED
+			b.albedo_color = Color(1.0, 0.93, 0.62, 1.0)
+			b.resource_name = mat_name
+			return b
 	push_warning("PropsV3Piece: material sem regra %s" % mat_name)
 	return null

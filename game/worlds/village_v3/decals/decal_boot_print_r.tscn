@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://worlds/village_v3/decals/tex/decal_boot_print_r_albedo.png" id="1_alb"]
+[ext_resource type="Texture2D" path="res://worlds/village_v3/decals/tex/decal_boot_print_r_emission.png" id="2_emi"]
+
+[node name="DecalBootPrintR" type="Decal"]
+size = Vector3(0.28, 0.5, 0.56)
+texture_albedo = ExtResource("1_alb")
+texture_emission = ExtResource("2_emi")
+emission_energy = 0.3
+normal_fade = 0.25
+upper_fade = 0.2
+lower_fade = 0.35
+metadata/piece_id = "decal_boot_print_r"
+metadata/mission = "M1"
+metadata/provisional = false
+metadata/tris = 0
+metadata/tris_note = "decalque projetado (sem malha)"
+metadata/size_m = Vector3(0.28, 0.5, 0.56)
+metadata/visible_m = [0.267, 0.537]
+metadata/floors = "tabua, terra"
+metadata/note = "pegada da bota do capitao, pe direito (M1.boot)"
+metadata/front = "-Z (dedos, ponta e bico para a frente da cena)"
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/clues_v3/gen_decals.py"

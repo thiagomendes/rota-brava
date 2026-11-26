@@ -1,0 +1,62 @@
+{
+ "blender": "4.5.16 LTS",
+ "data": "2026-11-25",
+ "pecas": {
+  "captain_boot": {
+   "glb": "game/assets/models/props_v3/captain_boot.glb",
+   "glb_bytes": 119160,
+   "materiais": [
+    "pv3_vinyl",
+    "wv2_metal"
+   ],
+   "objetos": {
+    "pv3_captain_boot": 2816
+   },
+   "orcamento_tris": 3500,
+   "pivo": "centro do contato no chao (bota deitada; bico para +Z, cano para -Z)",
+   "tamanho_m": [
+    0.676,
+    0.478,
+    0.763
+   ],
+   "triangulos": 2816
+  },
+  "feather": {
+   "glb": "game/assets/models/props_v3/feather.glb",
+   "glb_bytes": 32512,
+   "materiais": [
+    "pv3_cloth",
+    "pv3_vinyl"
+   ],
+   "objetos": {
+    "pv3_feather": 832
+   },
+   "orcamento_tris": 1600,
+   "pivo": "meio da raque, no chao; ponta para -Z",
+   "tamanho_m": [
+    0.173,
+    0.061,
+    0.501
+   ],
+   "triangulos": 832
+  },
+  "target_beam": {
+   "glb": "game/assets/models/props_v3/target_beam.glb",
+   "glb_bytes": 19064,
+   "materiais": [
+    "pv3_beam"
+   ],
+   "objetos": {
+    "pv3_target_beam": 384
+   },
+   "orcamento_tris": 600,
+   "pivo": "centro, no chao (sobe 1,9 m)",
+   "tamanho_m": [
+    0.92,
+    1.9,
+    0.92
+   ],
+   "triangulos": 384
+  }
+ }
+}

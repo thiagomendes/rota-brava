@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://worlds/village_v3/decals/tex/decal_paw_big_albedo.png" id="1_alb"]
+[ext_resource type="Texture2D" path="res://worlds/village_v3/decals/tex/decal_paw_big_emission.png" id="2_emi"]
+
+[node name="DecalPawBig" type="Decal"]
+size = Vector3(0.6, 0.6, 0.6)
+texture_albedo = ExtResource("1_alb")
+texture_emission = ExtResource("2_emi")
+emission_energy = 0.35
+normal_fade = 0.25
+upper_fade = 0.2
+lower_fade = 0.35
+metadata/piece_id = "decal_paw_big"
+metadata/mission = "M1"
+metadata/provisional = false
+metadata/tris = 0
+metadata/tris_note = "decalque projetado (sem malha)"
+metadata/size_m = Vector3(0.6, 0.6, 0.6)
+metadata/visible_m = [0.45, 0.445]
+metadata/floors = "terra, grama, pedra, tabua"
+metadata/note = "pata do filhote grande (P4); substitui decal_paw nas trilhas"
+metadata/front = "-Z (dedos, ponta e bico para a frente da cena)"
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/clues_v3/gen_decals.py"
