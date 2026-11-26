@@ -33,6 +33,7 @@ var _still: TextureRect
 var _key_pending: Array[String] = []
 var _key_held: Array[Resource] = []
 var _key_settle := -1
+var _key_frame_ms := 0
 var hero_stage: SubViewportContainer
 ## Onde o lead instancia os 3 herois 3D (os placeholders sao filhos chamados Placeholder*).
 var hero_root: Node3D
@@ -311,6 +312,9 @@ func _process(delta: float) -> void:
 ## KEY_SETTLE quadros e some a imagem com fade (movimento reduzido: troca direta).
 func _poll_key_art() -> void:
 	if _key_settle > 0:
+		var now := Time.get_ticks_msec()
+		print("[RB] title key_art quadro=%dms" % (now - _key_frame_ms))
+		_key_frame_ms = now
 		_key_settle -= 1
 		if _key_settle == 0:
 			_reveal_key_art()
@@ -329,14 +333,17 @@ func _poll_key_art() -> void:
 	var packed := ResourceLoader.load(KEY_ART) as PackedScene
 	if packed == null:
 		return
+	var t0 := Time.get_ticks_msec()
 	key_art = packed.instantiate() as KeyArtView
+	var t1 := Time.get_ticks_msec()
 	key_art.name = "KeyArt"
 	key_art.framing = &"menu"
 	key_art.show_logo = false   # o logo e o TextureRect `logo` abaixo (com mola e escondido nas opcoes)
 	add_child(key_art)
 	move_child(key_art, background.get_index() + 1)
 	_key_settle = KEY_SETTLE
-	print("[RB] title key_art_instanced ms=%d" % Time.get_ticks_msec())
+	_key_frame_ms = Time.get_ticks_msec()
+	print("[RB] title key_art instanciar=%dms ready=%dms" % [t1 - t0, _key_frame_ms - t1])
 
 
 func _reveal_key_art() -> void:

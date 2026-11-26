@@ -83,5 +83,19 @@ func _measure_loader(path: String) -> void:
 		var now := Time.get_ticks_usec()
 		fr.append("%.0f" % ((now - last) / 1000.0))
 		last = now
+	# Menu: espera a arte-chave 3D entrar atras da imagem parada e mede o pior quadro do menu ja interativo.
+	var menu := current_scene as TitleScreen
+	if menu != null:
+		var worst_menu := 0.0
+		var n := 0
+		var tm := Time.get_ticks_usec()
+		while (menu.key_art == null or menu.get_node_or_null("KeyArtStill") != null) and n < 3000:
+			await process_frame
+			var now := Time.get_ticks_usec()
+			worst_menu = maxf(worst_menu, (now - last) / 1000.0)
+			last = now
+			n += 1
+		print("[RB] menu_keyart %s ate_palco=%.0fms pior_quadro_menu=%.0fms foco=%s" % [menu.key_art != null,
+			(Time.get_ticks_usec() - tm) / 1000.0, worst_menu, menu.play_button.has_focus()])
 	print("[RB] loader_measure %s tela_no_pedido=%s quadros=%d pior_quadro=%.0fms total=%.0fms depois=[%s]ms" % [
 		path.get_file(), screen_now, frames_n, worst, (t1 - t0) / 1000.0, ", ".join(fr)])
