@@ -252,7 +252,7 @@ func _test_manifest() -> void:
 		return
 	for a in (man as Dictionary)["ativos"]:
 		var d := a as Dictionary
-		r.check(d.get("agente") == "art3d" and d.get("status") == "provisorio", "assets: manifesto %s com agente art3d e status provisorio" % d.get("id"))
+		r.check(d.get("agente") in ["art3d", "ux"] and d.get("status") == "provisorio", "assets: manifesto %s com agente (art3d ou ux) e status provisorio" % d.get("id"))
 		if not d.has("saida_glb"):
 			# ativos sem GLB (RB-R1: retratos do HUD): cada arquivo listado existe e confere o sha256
 			var bad: Array = []

@@ -72,3 +72,22 @@
   do osso `head` menos 7 cm, elevacao 6 graus, giro -20 graus, lente 85 mm).
 - **Reproduzir:** `bash tools/blender.sh --background source_art/characters/<id>_v2/<id>_v2.blend --python source_art/scripts/hero_portraits_v2.py -- <id>`
   para `rastro`, `pico`, `leme`. Comparacao antes/depois: `captures/e3b/retratos_antes_depois.png` (fora do Git).
+
+
+## RB-R1 E7: retratos da legenda de quem nao e heroi e pictogramas da festa (PROVISORIO)
+- **Agente:** `ux`, 2026-11-25. **Status:** `provisorio`; aprovacao de Thiago pendente. Manifesto: entradas `portraits_v2_npc`
+  e `brand_icons_e7` (a antiga entrada `portraits`, retratos da primeira geracao de `captain` e `pup`, saiu: os arquivos foram
+  substituidos no mesmo caminho).
+- **Capitao e filhote:** renders dos proprios modelos do projeto (`source_art/characters/heroes/{captain,pup}/*.blend`, primeira
+  geracao, sem modelo v2) com `source_art/scripts/hero_portraits_v2.py` (agora aceita `captain` e `pup`, usando a luz e o render
+  do Rastro v2, `rv2_render`). Mesmo tamanho (512x512), formato (PNG RGBA, fundo transparente), elevacao, giro e lente dos
+  retratos v2 dos herois; distancia calibrada lado a lado (capitao 1,85 m, alvo 2 cm acima do meio do osso `head`, para caber
+  o quepe; filhote 0,95 m, alvo 2 cm abaixo). Nenhum personagem novo.
+  Reproduzir: `bash tools/blender.sh --background source_art/characters/heroes/<id>/<id>.blend --python source_art/scripts/hero_portraits_v2.py -- <id>`.
+- **Pictogramas SVG (`game/ui/brand/icons/`):** `moon`, `fish`, `flower` (barquinhos da festa: estrela, lua, peixe, flor),
+  `vendor` (retrato-icone da Dona Amora em circulo, sem modelo 3D: rosto, coque, lenco roxo com amoras, avental), `radio`
+  (Farol 7: farol listrado com ondas de radio) e `carabiner` redesenhado (D inclinado, trava prata, luva amarela; o anterior
+  era uma oval simetrica que lia como "0" cortado). SVG escrito a mao, viewBox 100x100, contorno `#123A5E`, paleta da
+  style-bible. Nenhuma fonte, imagem ou icone de terceiros; sem modelo de imagem.
+- **Nao mexido:** o emblema 3D do mosquetao (`props_v3`, `_emb_icon` em `source_art/props_v3/build_props_v3.py`) e geometria
+  propria do `art3d` (oval com barra dourada); o achado "le como 0" continua la.

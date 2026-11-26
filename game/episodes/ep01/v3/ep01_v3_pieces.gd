@@ -196,6 +196,10 @@ static func aim_rope(r: Node3D, a: Vector3, b: Vector3) -> void:
 		r.look_at(b, Vector3.UP if absf(d.normalized().y) < 0.99 else Vector3.RIGHT)
 
 
+## M7/M8: icones dos 4 barquinhos da festa (proposta v3: estrela, lua, peixe, flor; SVG da marca, RB-R1 E7).
+const FESTA_BOAT_ICONS: Array[StringName] = [&"star", &"moon", &"fish", &"flower"]
+
+
 ## M7/M8: placa com icone sobre um barquinho da festa (Sprite3D sempre de frente). `lit` acende.
 static func boat_icon(parent: Node, n: String, icon: StringName) -> Sprite3D:
 	var s := Sprite3D.new()

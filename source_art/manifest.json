@@ -1122,39 +1122,45 @@
       "nota": "RB-R1: crianca-heroi (8 anos), variacao A \"brinquedo brilhante\": cabeca ~37% da altura, olhos grandes com iris, pupila e dois brilhos, maos de 4 dedos, botas grandes com sola creme; jaqueta de equipe laranja #FF8A1F com gola creme, emblema da Rota Brava em relevo no peito esquerdo, cinto com fivela-bussola, chapeu de aba larga com faixa e rosa dos ventos, rabos de cavalo, bolsa com caderno, lupa. Rig 28 ossos + ponteiras (RB-04), expressoes, visemas, olhar, 12 clipes."
     },
     {
-      "id": "portraits",
-      "nome": "Retratos do HUD",
-      "agente": "art3d",
+      "id": "portraits_v2_npc",
+      "nome": "Retratos da legenda do capitao e do filhote (render v2 dos modelos da primeira geracao)",
+      "agente": "ux",
       "processo": {
-        "script": "source_art/scripts/hero_portraits.py",
-        "ferramenta": "Blender 4.5.16 (tools/blender.ps1, headless)",
-        "exportador": "PNG RGBA 512x512 (Eevee toon, contorno Solidify)"
+        "script": "source_art/scripts/hero_portraits_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless), Cycles CPU 96 amostras + OpenImageDenoise",
+        "exportador": "PNG RGBA 512x512, fundo transparente (mesmo tamanho, formato e caminho dos retratos v2 dos herois)",
+        "comando": "bash tools/blender.sh --background source_art/characters/heroes/<id>/<id>.blend --python source_art/scripts/hero_portraits_v2.py -- <id>  (id = captain | pup)"
       },
       "origem": [
-        "source_art/scripts/hero_portraits.py",
-        "source_art/scripts/hero_build.py",
-        "source_art/scripts/pup_build.py",
-        "source_art/scripts/hero_lib.py",
-        "source_art/scripts/hero_face.py",
-        "source_art/scripts/hero_anim.py",
-        "source_art/scripts/char_lib.py",
-        "source_art/scripts/char_anim.py",
-        "source_art/scripts/rbart.py"
+        "source_art/characters/heroes/captain/captain.blend",
+        "source_art/characters/heroes/pup/pup.blend",
+        "source_art/characters/rastro_v2/rv2_render.py",
+        "source_art/scripts/hero_portraits_v2.py"
       ],
       "saida": "game/ui/portraits",
       "arquivos_sha256": {
-        "captain_alegre.png": "c5132981e0e3824f472628221250d5be69c5ce9746abfc7af1fc1ddfbe1c26bd",
-        "captain_neutra.png": "4c16703fa3879dc8eb29a6e949792211093b3c8ba52d736672325887ba88b317",
-        "captain_surpresa.png": "0465046690367f4c64ff7ae43975b163189c9bd8727d2876d47f8a27906bcc0d",
-        "pup_alegre.png": "04cba7ab4d301ea7789a64b22bda2c15a924f57aee0ce93a3d6c8b3826726d3b",
-        "pup_neutra.png": "08804e42abb700aa356f5f172ecc86927741cea37000138a3794fea50927c6aa",
-        "pup_surpresa.png": "3a74b5510fbf8a589dfc69f2603238c3e9abd44687a61593dd67bd9a3060f983"
+        "captain_neutra.png": "3ceeff07416a6330eb0102a7808564be07016bf0523090189b5cb8c82e07f7d9",
+        "captain_alegre.png": "72a794b6dd954e9992000e559f11d52d0da01ca241c9bfb5bad059b1dd1b7805",
+        "captain_surpresa.png": "898557944f9c235698125aa9eb454cf4f663f6885858d421ab4d551d4ad26d13",
+        "pup_neutra.png": "8fdfc4322a1b398df137911af67a22f459e0df28ae7951bfe4957b62c138fb5d",
+        "pup_alegre.png": "fd93dd6599e5b9738b33947a5e812313b7f5273ef5ccba659a0963585fc489c1",
+        "pup_surpresa.png": "76d7b2cd2b25e82bc3080f353baf86d6201e814ee3feefb59e7ed94a9b674584"
       },
+      "arquivos_bytes": {
+        "captain_neutra.png": 262297,
+        "captain_alegre.png": 256241,
+        "captain_surpresa.png": 261898,
+        "pup_neutra.png": 242996,
+        "pup_alegre.png": 234728,
+        "pup_surpresa.png": 243068
+      },
+      "enquadramento": "busto, elevacao 6 graus, giro -20 graus, lente 85 mm (como os herois v2); capitao a 1,85 m do meio do osso head + 2 cm (cabe o quepe), filhote a 0,95 m menos 2 cm (cabeca pequena); calibrado lado a lado com rastro_neutra/pico_neutra",
+      "luz": "luz de cena das provas v2 (rv2_render.scene_lights), sem o chao de prova",
       "status": "provisorio",
       "aprovacao": "pendente (Thiago)",
-      "originalidade": "renders dos personagens procedurais do projeto; nada de terceiros",
-      "data": "2026-11-23",
-      "nota": "captain e pup x neutra, alegre, surpresa (retratos da primeira geracao). Os de rastro, pico e leme foram substituidos pelos dos herois v2 em 2026-11-25 (entrada portraits_v2). Uso: Hud.set_portrait_texture(member, tex)."
+      "originalidade": "renders dos personagens procedurais do projeto (captain.blend, pup.blend); nada de terceiros; sem modelo de imagem",
+      "data": "2026-11-25",
+      "nota": "RB-R1 E7 (ux). Substituem os retratos da primeira geracao (Eevee toon com contorno; antiga entrada 'portraits', script hero_portraits.py) no mesmo caminho. Usados pela legenda do HUD (Hud.SPEAKER_PORTRAITS) quando o capitao ou o filhote falam. Modelos continuam os da primeira geracao (dividas do capitao e do olho do filhote seguem com o art3d)."
     },
     {
       "id": "portraits_v2",
@@ -3117,6 +3123,46 @@
         "gull.gd": 2080,
         "tow_rope.gd": 1283
       }
+    },
+    {
+      "id": "brand_icons_e7",
+      "nome": "Pictogramas da marca da E7: lua, peixe, flor (barquinhos da festa), Dona Amora e Farol 7 (retratos-icone da legenda), mosquetao redesenhado",
+      "agente": "ux",
+      "processo": {
+        "script": null,
+        "ferramenta": "SVG escrito a mao (texto), viewBox 100x100, 256 px, contorno #123A5E 6 u, mesmo estilo dos 28 pictogramas de 038be7b",
+        "exportador": "importador de textura SVG da Godot (svg/scale 1.0)"
+      },
+      "origem": [
+        "game/ui/brand/icons/moon.svg",
+        "game/ui/brand/icons/fish.svg",
+        "game/ui/brand/icons/flower.svg",
+        "game/ui/brand/icons/vendor.svg",
+        "game/ui/brand/icons/radio.svg",
+        "game/ui/brand/icons/carabiner.svg"
+      ],
+      "saida": "game/ui/brand/icons",
+      "arquivos_sha256": {
+        "moon.svg": "69dc2cd87fc34e4d793a6883c239cca54766e38630367bcce91a40f5056f0131",
+        "fish.svg": "2a24d427dbb0bf01a31038db46223417f433d401704ddd30d89cbbb11ce1db55",
+        "flower.svg": "185d2766ac18f392f01c6be40b80ad0676aa53f6c0867bb5f9ead0a64852f0eb",
+        "vendor.svg": "397a67a0ad12c7590f4e24a35d076e257912262cbb0b9c8dc04ba9aa80b0b3c5",
+        "radio.svg": "96c5754cf82e18b0f2adbd1f8c35c72b9b882e88ea45b9a1602b263522ffdb6f",
+        "carabiner.svg": "0b99327d537308edcb5ca141a4e254863fea5fed386cdcf091f11685d8eb1540"
+      },
+      "arquivos_bytes": {
+        "moon.svg": 484,
+        "fish.svg": 564,
+        "flower.svg": 565,
+        "vendor.svg": 1886,
+        "radio.svg": 692,
+        "carabiner.svg": 695
+      },
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "formas desenhadas no projeto, sem referencia, fonte ou imagem de terceiros; sem modelo de imagem",
+      "data": "2026-11-25",
+      "nota": "RB-R1 E7 (ux). carabiner.svg substitui o desenho de 038be7b (oval simetrica que lia como '0' cortado): forma de D inclinada 22 graus, trava prata e luva amarela. Prova: game/tests/test_ep01_v3_portraits.gd (48 px) e captures/e7_icones/prancha_icones_48_96.png (fora do Git)."
     }
   ]
 }

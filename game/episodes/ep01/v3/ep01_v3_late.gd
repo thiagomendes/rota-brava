@@ -23,7 +23,7 @@ const EMBLEM_HERO := {
 const FEATHERS: Array[StringName] = [&"M5_FeatherTrail_4", &"M5_FeatherTrail_3", &"M5_FeatherTrail_2", &"M5_FeatherTrail_1"]
 const FESTA_BOATS: Array[StringName] = [&"M7_FestaBoat_1_star", &"M7_FestaBoat_2_moon", &"M7_FestaBoat_3_fish", &"M7_FestaBoat_4_flower"]
 ## Icones PROVISORIOS: a marca ainda nao tem lua, peixe e flor (pedir ao ux); usam pictogramas que ja existem.
-const FESTA_ICONS: Array[StringName] = [&"star", &"wave", &"heart", &"leaf"]
+const FESTA_ICONS: Array[StringName] = Ep01V3Pieces.FESTA_BOAT_ICONS
 ## Barco: raio do casco para a folga (m), raio de passagem nas boias e da aproximacao assistida.
 const HULL := 1.0
 const BOW_HULL := 0.5
