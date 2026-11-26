@@ -20,6 +20,7 @@ func run(runner) -> void:
 	await _reduced_motion()
 	r.check(not loader.change_scene("res://nao/existe.tscn") and not loader.is_busy(), "loader: caminho inexistente nao muda nada")
 	await _intro_end_to_menu()
+	await _menu_fast()
 	Options.motion_override = -1
 	r.tree.unload_current_scene()
 	await r.frames(2)
@@ -87,3 +88,23 @@ func _intro_end_to_menu() -> void:
 	r.check(GameIntroScene.play_target() == GameIntroScene.EP01_SCENE, "abertura: vista, Jogar nao abre de novo")
 	Ep01V3Cutscene.enabled = false
 	GameIntroScene.next_scene = GameIntroScene.EP01_SCENE
+
+
+## G10 + G8: o menu abre sem esperar a arte-chave 3D (imagem parada + foco em Jogar ja no _ready) e o palco entra depois.
+func _menu_fast() -> void:
+	var t0 := Time.get_ticks_msec()
+	var m := (load(MENU) as PackedScene).instantiate() as MainMenu
+	r.tree.root.add_child(m)
+	var ready_ms := Time.get_ticks_msec() - t0
+	r.check(m.key_art == null, "menu: _ready nao instancia a arte-chave 3D na hora (%d ms)" % ready_ms)
+	r.check(m.play_button.has_focus(), "menu: foco em Jogar desde o primeiro quadro")
+	if ResourceLoader.exists(TitleScreen.KEY_STILL):
+		r.check(m.get_node_or_null("KeyArtStill") != null, "menu: imagem parada da arte-chave na frente enquanto carrega")
+	var n := 0
+	while (m.key_art == null or m.get_node_or_null("KeyArtStill") != null) and n < 20000:
+		await r.tree.process_frame
+		n += 1
+	r.check(m.key_art != null and m.key_art.is_inside_tree(), "menu: arte-chave 3D entra depois (%d quadros)" % n)
+	r.check(m.play_button.has_focus(), "menu: foco continua em Jogar depois da troca do fundo")
+	m.queue_free()
+	await r.frames(2)

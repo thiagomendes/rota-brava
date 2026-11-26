@@ -11,6 +11,14 @@ signal ui_sound(name: StringName)
 const LOGO := "res://ui/title/keyart/logos/logo_c_noite.svg"
 ## Arte-chave do fundo (G8): proposta B com o logo C noite (KeyArtPresets.LOGOS[&"b"]).
 const KEY_ART := "res://ui/title/keyart/keyart_b.tscn"
+## G10: imagem parada do fundo da arte-chave B (sem logo e sem botoes), mostrada ate o palco 3D ficar pronto.
+const KEY_STILL := "res://ui/title/keyart/stills/b_bg_16x9.jpg"
+const KEY_ART_DEPS: Array[String] = ["res://worlds/village_v3/village_world.tscn", "res://worlds/village_v3/boat_wv2.tscn",
+	"res://assets/models/environment_v2/wv2_static.glb", "res://assets/models/environment_v2/wv2_kit.glb",
+	"res://assets/models/environment_v2/wv3_props.glb"]
+const KEY_FADE := 0.6
+## Quadros do palco recem-criado escondido antes do fade (primeiro quadro paga shader).
+const KEY_SETTLE := 3
 ## Fracao maxima da altura util para o logo (o trio fica embaixo dele no terco esquerdo).
 const LOGO_MAX_H := 0.34
 const SAFE_FRACTION := 0.05
@@ -21,6 +29,10 @@ var background: ColorRect
 ## Fundo 3D animado (null se a cena da arte-chave nao existir).
 var key_art: KeyArtView
 var logo: TextureRect
+var _still: TextureRect
+var _key_pending: Array[String] = []
+var _key_held: Array[Resource] = []
+var _key_settle := -1
 var hero_stage: SubViewportContainer
 ## Onde o lead instancia os 3 herois 3D (os placeholders sao filhos chamados Placeholder*).
 var hero_root: Node3D
@@ -66,11 +78,21 @@ func _build() -> void:
 		background.material = mat
 	add_child(background)
 	if ResourceLoader.exists(KEY_ART):
-		key_art = (load(KEY_ART) as PackedScene).instantiate() as KeyArtView
-		key_art.name = "KeyArt"
-		key_art.framing = &"menu"
-		key_art.show_logo = false   # o logo e o TextureRect `logo` abaixo (com mola e escondido nas opcoes)
-		add_child(key_art)
+		# G10: a arte-chave 3D (vila inteira) leva segundos; o menu abre na hora sobre a imagem parada dela e o palco
+		# carrega em segundo plano, entrando com fade quando pronto (_poll_key_art).
+		if ResourceLoader.exists(KEY_STILL):
+			_still = TextureRect.new()
+			_still.name = "KeyArtStill"
+			_still.set_anchors_preset(Control.PRESET_FULL_RECT)
+			_still.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			_still.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			_still.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			_still.texture = load(KEY_STILL) as Texture2D
+			add_child(_still)
+		_key_pending = [KEY_ART]
+		_key_pending.append_array(KEY_ART_DEPS)
+		for path: String in _key_pending:
+			ResourceLoader.load_threaded_request(path, "", true)
 	_safe = Control.new()
 	_safe.name = "Safe"
 	_safe.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -274,6 +296,7 @@ func _raster_logo(logical_w: float) -> void:
 
 
 func _process(delta: float) -> void:
+	_poll_key_art()
 	if Options.reduced_motion() or logo == null:
 		return
 	_t += delta
@@ -282,3 +305,49 @@ func _process(delta: float) -> void:
 		for c in hero_root.get_children():
 			if c is Node3D and String(c.name).begins_with("Placeholder"):
 				(c as Node3D).rotation.y = sin(_t + (c as Node3D).position.x) * 0.3
+
+
+## G10: recolhe a arte-chave carregada em segundo plano; cria o palco atras da imagem parada (que o cobre), deixa passar
+## KEY_SETTLE quadros e some a imagem com fade (movimento reduzido: troca direta).
+func _poll_key_art() -> void:
+	if _key_settle > 0:
+		_key_settle -= 1
+		if _key_settle == 0:
+			_reveal_key_art()
+		return
+	if _key_pending.is_empty():
+		return
+	for path: String in _key_pending.duplicate():
+		var st := ResourceLoader.load_threaded_get_status(path)
+		if st == ResourceLoader.THREAD_LOAD_LOADED:
+			_key_held.append(ResourceLoader.load_threaded_get(path))
+			_key_pending.erase(path)
+		elif st != ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			_key_pending.erase(path)
+	if not _key_pending.is_empty():
+		return
+	var packed := ResourceLoader.load(KEY_ART) as PackedScene
+	if packed == null:
+		return
+	key_art = packed.instantiate() as KeyArtView
+	key_art.name = "KeyArt"
+	key_art.framing = &"menu"
+	key_art.show_logo = false   # o logo e o TextureRect `logo` abaixo (com mola e escondido nas opcoes)
+	add_child(key_art)
+	move_child(key_art, background.get_index() + 1)
+	_key_settle = KEY_SETTLE
+	print("[RB] title key_art_instanced ms=%d" % Time.get_ticks_msec())
+
+
+func _reveal_key_art() -> void:
+	_key_held.clear()
+	if _still == null:
+		return
+	var still := _still
+	_still = null
+	if Options.reduced_motion():
+		still.queue_free()
+		return
+	var tw := create_tween()
+	tw.tween_property(still, "modulate:a", 0.0, KEY_FADE)
+	tw.tween_callback(still.queue_free)
