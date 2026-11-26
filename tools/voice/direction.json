@@ -430,7 +430,7 @@
    "emotion": "atenção calma",
    "energy": 2,
    "pace": "normal",
-   "note": "do leme, aponta as boias da rota"
+   "note": "ao timão do barco, aponta as boias da rota"
   },
   "ep01.bay.pilot.see_dinghy": {
    "emotion": "surpresa curiosa",
@@ -890,7 +890,7 @@
     "emotion": "chamado",
     "energy": 2,
     "pace": "normal",
-    "note": "passa a vez a Leme, confiante"
+    "note": "passa a vez à Leme (menina), confiante"
    },
    "keys": [
     "ep01.market.tracker.call_pilot",
