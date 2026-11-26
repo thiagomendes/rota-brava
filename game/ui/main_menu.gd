@@ -6,6 +6,8 @@ extends TitleScreen
 const PLAY_SCENE := "res://episodes/ep01/v3/ep01_v3_main.tscn"
 const REFERENCE_SCENE := "res://episodes/reference/reference_demo.tscn"
 
+var intro_button: Button
+
 
 func _ready() -> void:
 	super._ready()
@@ -13,11 +15,18 @@ func _ready() -> void:
 	options_button.pressed.connect(_open_options)
 	references_button.pressed.connect(_on_references_pressed)
 	quit_button.pressed.connect(_on_quit_pressed)
+	# D21: "Ver abertura" revê a abertura do jogo (pulavel depois da primeira vez) e volta ao menu.
+	intro_button = _button("IntroButton", "ui.menu.watch_intro", &"star", &"QuietButton")
+	menu.move_child(intro_button, references_button.get_index())
+	intro_button.custom_minimum_size.x = references_button.custom_minimum_size.x
+	intro_button.pressed.connect(_on_intro_pressed)
+	_layout()
 	options_panel.back_requested.connect(_close_options)
 	play_button.grab_focus()
 	print("[RB] menu_ready focus=%s" % play_button.name)
 	# Gravacao/demonstracao da build exportada: o exe so abre o menu, entao o bot entra por aqui.
 	if OS.get_cmdline_user_args().has("--ep01-demo") or OS.get_cmdline_args().has("--ep01-demo"):
+		Ep01V3Cutscene.seen_path = ""  # demonstracao nao grava as cenas vistas
 		_on_play_pressed.call_deferred()
 	elif OS.get_cmdline_user_args().has("--ref-demo") or OS.get_cmdline_args().has("--ref-demo"):
 		_on_references_pressed.call_deferred()
@@ -32,12 +41,28 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_play_pressed() -> void:
 	print("[RB] play")
-	get_tree().change_scene_to_file(PLAY_SCENE)
+	# D21: na primeira vez, a abertura do jogo antes do Ep01 (GameIntroScene segue para PLAY_SCENE).
+	var target := GameIntroScene.play_target()
+	get_tree().change_scene_to_file(target if target != GameIntroScene.EP01_SCENE else PLAY_SCENE)
+
+
+func _on_intro_pressed() -> void:
+	print("[RB] watch_intro")
+	GameIntroScene.next_scene = GameIntroScene.MENU_SCENE
+	get_tree().change_scene_to_file(GameIntroScene.SELF_SCENE)
 
 
 func _on_references_pressed() -> void:
 	print("[RB] references")
 	get_tree().change_scene_to_file(REFERENCE_SCENE)
+
+
+func _layout() -> void:
+	if intro_button != null:
+		intro_button.custom_minimum_size.x = play_button.custom_minimum_size.x
+	super._layout()
+	if intro_button != null:
+		intro_button.custom_minimum_size.x = play_button.custom_minimum_size.x
 
 
 func _open_options() -> void:
