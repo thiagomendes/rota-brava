@@ -12,17 +12,20 @@
    "voice": "babble"
   },
   "captain": {
-   "voice": "babble"
+   "voice": "babble",
+   "portrait": "res://ui/portraits/captain_neutra.png"
   },
   "pup": {
-   "voice": "babble"
+   "voice": "babble",
+   "portrait": "res://ui/portraits/pup_neutra.png"
   },
   "vendor": {
    "voice": "none",
-   "icon": "leaf"
+   "icon": "vendor"
   },
   "radio": {
-   "voice": "radio_tts"
+   "voice": "radio_tts",
+   "icon": "radio"
   }
  },
  "mission_start": {
