@@ -20,7 +20,7 @@ const FADE_OUT := 0.3
 const SETTLE_FRAMES := 3
 ## Teto (ms, relogio real) que uma cena pode segurar a tela por `loading_hold()`; estourou, chama `loading_timeout()`
 ## e a tela sai (crianca nunca fica presa no carregamento).
-const HOLD_MAX_MS := 60000
+const HOLD_MAX_MS := 20000
 
 var hold_max_ms: int = HOLD_MAX_MS  # testes encurtam
 ## Recursos pesados que as cenas carregam no proprio `_ready` com `load()` (a .tscn em si e minuscula): vao junto em
