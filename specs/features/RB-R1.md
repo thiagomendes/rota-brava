@@ -531,3 +531,4 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - tempo em GPU real não medido (logs `[RB] loader` e `[RB] title key_art`);
   - teto de 60 s é longo para criança;
   - cena original ALWAYS sem teste no `_fail`.
+- **Suíte completa depois do pacote G** (`d540b78`, `RB_TEST_TIMEOUT=2400`): `FALHOU (4150 PASS, 2 FALHA(S))` em 986 s. As duas falhas eram de `test_assets`: a entrada `keyart_b_bg_still` do manifesto estava fora do formato (`agente` gameplay; `arquivo` e `sha256` em vez de `saida` e `arquivos_sha256`). Os revisores do G10 não rodaram `test_assets`. O lead corrigiu só o formato, com o mesmo hash, e depois `test_assets` deu `OK (278 PASS)`. A correção vai para o próximo revisor. A suíte passou do limite padrão de 900 s, então acelerar a suíte é o próximo item da E7.
