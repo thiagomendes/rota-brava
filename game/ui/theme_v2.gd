@@ -13,12 +13,26 @@ const SKY := Color("4FA6E8")
 const BLUE := Color("2F8CFF")
 const ORANGE_TEXT := Color("D9620B")
 const MUTED := Color("5C7189")
+const GREEN := Color("3DBE5A")
+const ORANGE := Color("FF8A1F")
 const FONT_SIZE := 34
 const BUTTON_FONT_SIZE := 42
 const RADIUS := 32
 const FOCUS_BORDER := 10
 
 static var _cached: Theme
+
+
+## Razao de contraste WCAG 2.x entre duas cores opacas (1..21).
+static func contrast_ratio(a: Color, b: Color) -> float:
+	var la := _luminance(a)
+	var lb := _luminance(b)
+	return (maxf(la, lb) + 0.05) / (minf(la, lb) + 0.05)
+
+
+static func _luminance(c: Color) -> float:
+	var ch := func(v: float) -> float: return v / 12.92 if v <= 0.03928 else pow((v + 0.055) / 1.055, 2.4)
+	return 0.2126 * ch.call(c.r) + 0.7152 * ch.call(c.g) + 0.0722 * ch.call(c.b)
 
 
 static func font(weight: int = 600) -> FontVariation:
@@ -108,8 +122,10 @@ static func build() -> Theme:
 	th.set_stylebox("panel", "PillPanel", box(NAVY, 28, 8, 5, Color.WHITE, 6))
 	button_styles(th, &"Button", BLUE, Color.WHITE)
 	th.set_font("font", "Button", font(700))
-	for pair in [[&"PrimaryButton", ACTION, NAVY], [&"GreenButton", Color("3DBE5A"), Color.WHITE],
-			[&"OrangeButton", Color("FF8A1F"), Color.WHITE], [&"QuietButton", PAPER, NAVY]]:
+	# G8: texto azul-noite nos botoes verde e laranja (branco dava 2,41:1 e 2,36:1; azul-noite da 6,50:1 e 6,64:1,
+	# >= 4,5:1 WCAG AA tambem no hover e no pressionado). Cores de fundo da identidade mantidas.
+	for pair in [[&"PrimaryButton", ACTION, NAVY], [&"GreenButton", GREEN, NAVY_DEEP],
+			[&"OrangeButton", ORANGE, NAVY_DEEP], [&"QuietButton", PAPER, NAVY]]:
 		th.set_type_variation(pair[0], "Button")
 		button_styles(th, pair[0], pair[1], pair[2])
 	th.set_type_variation("GhostButton", "Button")
