@@ -42,9 +42,7 @@ var hero_stage: SubViewportContainer
 var hero_root: Node3D
 var menu: VBoxContainer
 var play_button: Button
-var continue_button: Button
 var options_button: Button
-var references_button: Button
 var quit_button: Button
 var options_panel: OptionsPanel
 var back_button: Button
@@ -62,7 +60,7 @@ func _ready() -> void:
 	_layout()
 	ThemeV2.pop_in(logo, 0.4, 0.7)
 	var i := 0
-	for b in [play_button, options_button, references_button, quit_button]:
+	for b in [play_button, options_button, quit_button]:
 		ThemeV2.pop_in(b, 0.6, 0.4, 0.25 + i * 0.07)
 		i += 1
 	play_button.grab_focus()
@@ -120,11 +118,8 @@ func _build() -> void:
 	_safe.add_child(menu)
 	play_button = _button("PlayButton", "ui.menu.play", &"boat", &"PrimaryButton", 170.0)
 	play_button.add_theme_font_size_override("font_size", 60)
-	continue_button = _button("ContinueButton", "ui.menu.continue", &"notebook", &"Button")
-	# Sem sistema de salvamento ainda: Continuar fica oculto (e fora da navegacao) ate existir progresso salvo.
-	continue_button.visible = false
+	# G12: so Jogar, Opcoes e Sair ("quanto mais simples, melhor"). Os espacos de jogo abrem por Jogar (G13).
 	options_button = _button("OptionsButton", "ui.menu.options", &"gear", &"GreenButton")
-	references_button = _button("ReferencesButton", "ui.menu.references", &"magnifier", &"QuietButton")
 	quit_button = _button("QuitButton", "ui.menu.quit", &"wave", &"OrangeButton")
 	options_panel = OptionsPanel.new()
 	options_panel.visible = false
@@ -268,7 +263,7 @@ func _layout() -> void:
 	if background.material is ShaderMaterial:
 		(background.material as ShaderMaterial).set_shader_parameter("aspect", vp.x / maxf(vp.y, 1.0))
 	var menu_w := clampf(area.x * 0.34, 520.0, 640.0)
-	for b: Button in [play_button, continue_button, options_button, references_button, quit_button]:
+	for b: Button in [play_button, options_button, quit_button]:
 		b.custom_minimum_size.x = menu_w
 	menu.size = Vector2(menu_w, 0)
 	menu.reset_size()

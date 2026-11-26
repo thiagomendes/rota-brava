@@ -182,20 +182,20 @@ func _tap(action: StringName) -> void:
 	await _send(action, false)
 
 
-## Retomada pelo caminho do jogador: menu -> Jogar; o bot joga M0 e M1 de verdade; pausa -> Menu -> Jogar retoma no M2
-## com o trio onde o M1 terminou e o emblema do M1 contado.
+## Retomada pelo caminho do jogador: menu -> Jogar -> espaco 1 (vazio, G13); o bot joga M0 e M1 de verdade; pausa ->
+## Menu -> Jogar -> espaco 1 retoma no M2 com o trio onde o M1 terminou e o emblema do M1 contado.
 func _resume_from_menu() -> void:
-	var path := "user://test_ep01_v3_menu.save.json"
-	if FileAccess.file_exists(path):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	SaveSlots.erase(1)
+	var path := SaveSlots.save_path(1)
 	Ep01V3Main.start_mission = &""
-	Ep01V3Main.save_path = path
 	var menu := (load("res://ui/main_menu.tscn") as PackedScene).instantiate()
 	r.tree.root.add_child(menu)
 	r.tree.current_scene = menu
 	await r.frames(3)
 	await _wait_loader()
-	await _tap(&"ui_accept")
+	await _tap(&"ui_accept")  # Jogar -> espacos
+	await r.frames(2)
+	await _tap(&"ui_accept")  # cartao 1 (vazio) -> novo jogo
 	await r.frames(4)
 	await _wait_loader()
 	var play := r.tree.current_scene as Ep01V3Main
@@ -205,7 +205,8 @@ func _resume_from_menu() -> void:
 	var bot := await _run_bot(play, &"M2")
 	bot.queue_free()
 	await r.frames(2)
-	r.check(play.current.id == &"M2" and FileAccess.file_exists(path), "v3 menu: depois de jogar M0 e M1 o salvo existe")
+	r.check(play.current.id == &"M2" and Ep01V3Main.save_path == path and SaveSlots.summary(1).get("mission") == &"M2",
+		"v3 menu: depois de jogar M0 e M1 o salvo do espaco 1 aponta o M2")
 	await _tap(&"pause")
 	await _tap(&"ui_down")
 	await _tap(&"ui_down")
@@ -216,11 +217,13 @@ func _resume_from_menu() -> void:
 	r.check(menu2 != null, "v3 menu: Menu na pausa volta ao menu")
 	if menu2 == null:
 		return
-	await _tap(&"ui_accept")
+	await _tap(&"ui_accept")  # Jogar -> espacos (foco no espaco em uso)
+	await r.frames(2)
+	await _tap(&"ui_accept")  # cartao 1 (cheio) -> continua
 	await r.frames(4)
 	await _wait_loader()
 	var again := r.tree.current_scene as Ep01V3Main
-	r.check(again != null and again.current != null and again.current.id == &"M2", "v3 menu: Jogar retoma no M2")
+	r.check(again != null and again.current != null and again.current.id == &"M2", "v3 menu: Jogar no espaco 1 retoma no M2")
 	if again != null:
 		var p := again.land.start_position(&"M2")
 		var t := again.actors[&"tracker"] as MemberActor
@@ -228,7 +231,7 @@ func _resume_from_menu() -> void:
 			"v3 menu: trio retoma onde o M1 terminou")
 		r.check(again.missions[1].is_completed() and again.emblems_found == 1, "v3 menu: M1 concluida e emblema do M1 contado (%d)" % again.emblems_found)
 		await _free(again)
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	SaveSlots.erase(1)
 	Ep01V3Main.save_path = ""
 
 
