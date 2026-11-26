@@ -1,0 +1,151 @@
+{
+  "tris": 24414,
+  "tris_por_objeto": {
+    "Captain_Skin": 5996,
+    "Captain_Hair": 4728,
+    "Captain_Cloth": 8054,
+    "Captain_Gear": 3268,
+    "Captain_Face": 2368
+  },
+  "materials": [
+    "mat_captain_v2_cloth",
+    "mat_captain_v2_face_dark",
+    "mat_captain_v2_face_eye",
+    "mat_captain_v2_face_iris",
+    "mat_captain_v2_face_mouth",
+    "mat_captain_v2_face_skin",
+    "mat_captain_v2_gear",
+    "mat_captain_v2_hair",
+    "mat_captain_v2_skin"
+  ],
+  "height_m": 1.766,
+  "min_z": -0.0,
+  "objects": [
+    "Captain_Cloth",
+    "Captain_Face",
+    "Captain_Gear",
+    "Captain_Hair",
+    "Captain_Skin"
+  ],
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "hand_tip.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "hand_tip.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R",
+    "toe.R",
+    "toe_tip.R",
+    "heel.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "toe.L",
+    "toe_tip.L",
+    "heel.L"
+  ],
+  "bone_count": 28,
+  "animations": {
+    "idle": [
+      0,
+      90
+    ],
+    "thanks": [
+      0,
+      60
+    ],
+    "walk": [
+      0,
+      30
+    ],
+    "wave": [
+      0,
+      48
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "triste",
+    "brava_leve",
+    "blink",
+    "mouth_A",
+    "mouth_E",
+    "mouth_O",
+    "mouth_M",
+    "look_left",
+    "look_right",
+    "look_up"
+  ],
+  "texturas": {
+    "captain_v2_cloth_color": [
+      2048,
+      2048
+    ],
+    "captain_v2_cloth_normal": [
+      2048,
+      2048
+    ],
+    "captain_v2_cloth_orm": [
+      2048,
+      2048
+    ],
+    "captain_v2_gear_color": [
+      1024,
+      1024
+    ],
+    "captain_v2_gear_normal": [
+      1024,
+      1024
+    ],
+    "captain_v2_gear_orm": [
+      1024,
+      1024
+    ],
+    "captain_v2_hair_color": [
+      1024,
+      1024
+    ],
+    "captain_v2_hair_normal": [
+      1024,
+      1024
+    ],
+    "captain_v2_hair_orm": [
+      1024,
+      1024
+    ],
+    "captain_v2_skin_color": [
+      1024,
+      1024
+    ],
+    "captain_v2_skin_normal": [
+      1024,
+      1024
+    ],
+    "captain_v2_skin_orm": [
+      1024,
+      1024
+    ]
+  },
+  "head_h_m": 0.37,
+  "head_ratio": 0.2095,
+  "walk_speed_mps": 1.1347,
+  "run_speed_mps": 2.4107,
+  "variant": "captain_v2"
+}
