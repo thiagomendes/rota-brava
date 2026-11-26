@@ -383,7 +383,7 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 
 ### G2 + G9 integrados (`feature/rb-r1-g-roteiro`, autor `adventure`)
 - G2: nenhum erro de gênero no texto. O narrador lia "Leme" como a peça do barco. Agora as falas trazem artigo: "A Rastro…", "O Pico…", "A Leme…". Essas falas ainda não tinham take gerado.
-- G9: roteiro em `docs/proposals/ep01_v3_pontes.md`, com 24 falas novas de ponte (`pt_BR.ep01v3_g9.json`, `vary()` em grupos). A espera pela conversa é `BRIDGE_WAIT_S` = 12 s. `_regroup_followers()` tira do alto a seguidora que o teleporte deixou num telhado. Teste `test_ep01_v3_bridge_regroup` (falha sem a correção). Removidas 2 chaves órfãs. Fila de voz: 201.
+- G9: roteiro em `docs/proposals/ep01_v3_pontes.md`, com 26 falas novas de ponte (`pt_BR.ep01v3_g9.json`, `vary()` em grupos). A espera pela conversa é `BRIDGE_WAIT_S` = 12 s. `_regroup_followers()` tira do alto a seguidora que o teleporte deixou num telhado. Teste `test_ep01_v3_bridge_regroup` (falha sem a correção). Removidas 2 chaves órfãs. Fila de voz: 201.
 - Revisão (`reviewer`, 2 rodadas). A 1ª REPROVOU: o bot ficava sem caminho no M6 em 2 de 3 rodadas. A 2ª APROVOU: `cutscene` passou 3 de 3, o teste nega a correção, `ep01_v3` deu `OK (196 PASS)`.
 - Ressalvas abertas, para um ticket de seguidores depois do pacote G:
   - (1) o plano B do reagrupamento não checa colisão;
