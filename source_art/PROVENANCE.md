@@ -138,3 +138,16 @@
 - **Reproducao:** builds no Blender (comandos no PROVENANCE da pasta), `python3 -I source_art/characters/secondary_v2/manifest_g4.py`
   (entradas `captain_v2`, `pup_v2`, `amora_v2` no manifesto), provas com `render_sv2.py` e capturas no jogo com
   `game/tests/capture_g4.tscn`.
+
+### G4 rodada 2 (PROVISORIO, 2026-11-26, `art3d`)
+- **Maos:** a pele do antebraco comeca dentro da manga (62% do antebraco) e os pesos do pulso foram refeitos
+  (`sv2_human.hands`, `fix_wrist_weights`). Vao manga-mao medido no .blend (ilhas de `*_Skin` x `*_Cloth`, idle quadro 0):
+  capitao +18,8 mm -> -59,4 mm, Dona Amora +15,4 mm -> -53,3 mm (negativo = encaixada na manga).
+- **Idle adulto** (`sv2_human.pose_idle_adult`): bracos soltos, respiracao e peso; mesmo nome de clipe, 3,6 s.
+- **Calca/meia** em duas pernas sem no de juncao (lasca do SKIN furava a roupa de cima no quadril).
+- **Dona Amora:** rosto de senhora (mandibula, olhos 0,74 e caidos, sobrancelha fina, linhas de sorriso e pes de galinha).
+- **Filhote:** pelo curto na atlas e na normal, sem verniz no pelo; creme #F6E4C4.
+- **Retratos do HUD** do capitao e do filhote regerados dos `.blend` v2 (`hero_portraits_v2.py`, entrada `portraits_v2_npc`).
+- GLB: `captain_v2.glb` `e6822f04e19f073a869f1f2ebc924e592e538070d3193a9dc322edbf4196e827` (23 976 tris, 4,24 MB),
+  `pup_v2.glb` `65d155db9d1f58384096aebad9a3ba78a9dfffe5211d5dc919645c646e041db7` (16 892 tris, 3,08 MB),
+  `amora_v2.glb` `90eb7f9044713dcb0cc08863ee421a8effa39cd27e1548c56d378dda6ff29404` (23 072 tris, 4,09 MB).

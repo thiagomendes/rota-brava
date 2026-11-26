@@ -26,13 +26,13 @@ ITEMS = {
                        tecnicas="base adulta v2 (sv2_human: cabeca adulta, tronco+mangas SKIN + SUBSURF 3 com forma em numpy, calca, maos, sapatos); "
                                 "quepe por torno, pala por grade + solidify, barba e cabelo por metaballs; " + TEC,
                        nota="RB-R1 G4: capitao refeito no padrao do trio v2 e com proporcao adulta (cabeca ~21% da altura). Mesmo esqueleto de "
-                            "28 ossos e mesmos clipes (idle, walk, wave, thanks) do captain.glb; velocidades recalculadas pela proporcao nova."),
+                            "28 ossos e mesmos clipes (idle, walk, wave, thanks) do captain.glb; velocidades recalculadas pela proporcao nova. G4 r2: pulso continua para dentro da manga (sem vao), idle relaxado (bracos soltos, respiracao)."),
     "pup_v2": dict(nome="Filhote v2", papel="pup", build="build_pup_v2.py", extra=["source_art/scripts/pup_build.py"],
                    cena="game/actors/characters/pup_model.tscn",
                    tecnicas="corpo e pernas numa malha SKIN + SUBSURF 3 com patas assentadas; cabeca por metaballs; orelhas, nariz, coleira e "
                             "pingente em bmesh; creme do focinho/peito/patas pintado; " + TEC,
                    nota="RB-R1 G4: filhote refeito no padrao do trio v2. Mesmo esqueleto (23 ossos, mesmas posicoes) e mesmos clipes "
-                        "(idle, wag, jump_happy, bark, step_on_horn, walk, run) do pup_build.py, mesmas velocidades."),
+                        "(idle, wag, jump_happy, bark, step_on_horn, walk, run) do pup_build.py, mesmas velocidades. G4 r2: pelo curto pintado e na normal (tufos, fios), sem verniz no pelo."),
     "amora_v2": dict(nome="Dona Amora v2", papel="vendor", build="build_amora_v2.py", extra=[SV2 + "sv2_human.py", "source_art/characters/amora/build_amora.py",
                                                                                            "source_art/scripts/hero_anim.py", "source_art/scripts/char_anim.py"],
                      cena="game/actors/characters/amora_model.tscn",
@@ -40,7 +40,7 @@ ITEMS = {
                               "grade projetada na saia + solidify, peitilho, lenco por tubo achatado; bolinhas de amora, punhos e pespontos "
                               "pintados; " + TEC,
                      nota="RB-R1 G4: Dona Amora refeita com proporcao de senhora (cabeca ~21% da altura; antes 27%, lia como crianca), "
-                          "olhos menores, linhas de sorriso e fios grisalhos pintados. Mesmos clipes (idle, wave, thanks, point, talk)."),
+                          "olhos menores, linhas de sorriso e fios grisalhos pintados. Mesmos clipes (idle, wave, thanks, point, talk). G4 r2: rosto de senhora (mandibula mais longa, sem bochecha de bebe, olhos menores e caidos, sobrancelha fina, pes de galinha), pulso dentro da manga, idle relaxado."),
 }
 
 
@@ -80,6 +80,22 @@ def main():
             "aprovacao": "pendente (Thiago)", "originalidade": ORIG, "data": "2026-11-26", "nota": it["nota"]})
         if "head_ratio" in inf:
             e["razao_cabeca_altura"] = inf["head_ratio"]
+    # retratos da legenda (G4 r2): renderizados de novo a partir dos .blend v2, mesmo script, caminho e formato
+    pr = by_id["portraits_v2_npc"]
+    names = ["%s_%s.png" % (i, e_) for i in ("captain", "pup") for e_ in ("neutra", "alegre", "surpresa")]
+    pr["nome"] = "Retratos da legenda do capitao e do filhote (render dos modelos v2 do G4)"
+    pr["processo"]["comando"] = ("bash tools/blender.sh --background source_art/characters/secondary_v2/<id>_v2.blend --python "
+                                 "source_art/scripts/hero_portraits_v2.py -- <id>  (id = captain | pup)")
+    pr["origem"] = [SV2 + "captain_v2.blend", SV2 + "pup_v2.blend", "source_art/characters/rastro_v2/rv2_render.py",
+                    "source_art/scripts/hero_portraits_v2.py"]
+    pr["arquivos_sha256"] = {n: sha("game/ui/portraits/" + n) for n in names}
+    pr["arquivos_bytes"] = {n: os.path.getsize(os.path.join(REPO, "game/ui/portraits", n)) for n in names}
+    pr["enquadramento"] = ("busto, elevacao 6 graus, giro -20 graus, lente 85 mm (como os herois v2); capitao v2 a 1,62 m do meio "
+                           "do osso head + 3 cm (cabeca adulta menor, cabe o quepe), filhote a 0,95 m menos 2 cm; calibrado lado a lado "
+                           "com leme_neutra")
+    pr["originalidade"] = "renders dos personagens procedurais do projeto (captain_v2.blend, pup_v2.blend); nada de terceiros; sem modelo de imagem"
+    pr["data_g4"] = "2026-11-26"
+    pr["nota_g4"] = "RB-R1 G4 r2 (art3d): regerados dos modelos v2 (capitao adulto, filhote com pelo) no mesmo caminho; agente original ux."
     with open(MAN, "w", encoding="utf-8") as f:
         json.dump(man, f, indent=2, ensure_ascii=False)
         f.write("\n")

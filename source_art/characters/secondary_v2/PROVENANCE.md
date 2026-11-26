@@ -39,3 +39,13 @@ bash tools/blender.sh --background source_art/characters/secondary_v2/captain_v2
 ```
 Texturas intermediárias vão para `captures/g4/build_textures/` (fora do Git); o `.blend` as empacota. O GLB não sai byte a
 byte idêntico entre exportações (JPEG e ordem interna), mas malha, materiais e medidas sim.
+
+## Rodada 2 (retorno de Thiago)
+- Maos encaixadas na manga (pele do antebraco por dentro da manga, pesos do pulso refeitos) e idle adulto relaxado
+  (`sv2_human.py`); calca/meia sem no de juncao.
+- Dona Amora com rosto de senhora: `JAW/CHIN/CHEEK` da cabeca adulta por personagem; `mature_face()` afina as sobrancelhas
+  e inclina os olhos (~7 graus) aplicando a mesma transformacao em todas as shape keys do rosto gerado pelo `hero_face.py`,
+  que nao foi alterado.
+- Filhote: pelo curto (tufos, fios, fio fino) na cor e na altura da atlas, fosco.
+- Retratos do HUD do capitao e do filhote: `bash tools/blender.sh --background source_art/characters/secondary_v2/<id>_v2.blend
+  --python source_art/scripts/hero_portraits_v2.py -- <id>`.

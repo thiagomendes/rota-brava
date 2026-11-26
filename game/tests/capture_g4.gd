@@ -111,13 +111,21 @@ func _set_shot(i: int) -> void:
 		cam.global_position = center + view_dir * off.z + Vector3(0, off.y, 0)
 		cam.look_at(center + Vector3(0, CameraRig.LOW_LOOK_Y, 0))
 		return
-	var focus := s.trim_prefix("close:").trim_suffix("_old")
+	var face_shot := s.begins_with("face:")
+	var focus := s.trim_prefix("close:").trim_prefix("face:").trim_suffix("_old")
 	if not figures.has(focus) and figures.has(focus + "_old"):
 		figures[focus] = figures[focus + "_old"]
 	var f := figures.get(focus, figures["tracker"]) as Node3D
 	const TOPS := {"pup": 0.42, "captain": 1.55, "amora": 1.45, "villager_a": 1.45, "villager_b": 1.45}
 	var top: float = TOPS.get(focus, 0.95)
 	cam.fov = 40.0
+	if face_shot:
+		# rosto de perto (TOPS ~ centro da cabeca dos secundarios)
+		var hz_head := top
+		var fd := 0.45 if focus == "pup" else 0.7
+		cam.global_position = f.global_position + view_dir * fd + Vector3(0, hz_head, 0)
+		cam.look_at(f.global_position + Vector3(0, hz_head - 0.02, 0))
+		return
 	var d := float(_arg("--g4-dist", "1.5")) * (0.75 if focus == "pup" else (1.25 if top > 1.2 else 1.0))
 	# o vizinho do trio (Leme) fica a esquerda da tela: a camera mira entre os dois, mais perto do secundario
 	cam.global_position = f.global_position + view_dir * d - side * 0.2 + Vector3(0, top * 0.95, 0)
