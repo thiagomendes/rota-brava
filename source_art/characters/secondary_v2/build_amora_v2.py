@@ -107,13 +107,28 @@ class Amora(Adult):
 
         pts = []
         N = 48
-        for i in range(N + 1):
+        for i in range(N):
             a = 2 * math.pi * i / N
             u = (1 - math.cos(a)) / 2
             pts.append(on_head((math.sin(a), lerp(0.30, -0.95, u), lerp(1.0, -0.35, u))))
+        # G4 r3: tubo CICLICO (o anel N liga no anel 0). Antes o tubo aberto fechava emendando o fim no comeco bem no topo
+        # da frente, com o referencial do fim girado em relacao ao do comeco: a costura aparecia em close.
+        # Referencial de cada anel pelo raio da cabeca (sem deriva de transporte paralelo).
         bm = bmesh.new()
-        cl.tube(bm, pts[:-1] + [pts[0]], [0.026 * k] * N + [0.026 * k], 12, False)
-        bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=1e-5)
+        sides = 12
+        rings = []
+        for i, p in enumerate(pts):
+            t = (pts[(i + 1) % N] - pts[i - 1]).normalized()
+            up = (p - hc).normalized()
+            nn = (up - t * up.dot(t)).normalized()
+            bb = t.cross(nn)
+            r = 0.026 * k
+            rings.append([bm.verts.new(p + (nn * math.cos(2 * math.pi * j / sides) + bb * math.sin(2 * math.pi * j / sides)) * r)
+                          for j in range(sides)])
+        for i in range(N):
+            ra, rb = rings[i], rings[(i + 1) % N]
+            for j in range(sides):
+                bm.faces.new((ra[j], ra[(j + 1) % sides], rb[(j + 1) % sides], rb[j]))
         for vtx in bm.verts:
             base = on_head(vtx.co - hc)
             vtx.co = base + (vtx.co - base) * 0.45 + (base - hc).normalized() * 0.005 * k
@@ -392,10 +407,20 @@ def paint_hair(b):
         fine = S.fur_noise(P + 0.4, f, N, across=0.0006, along=0.008)
         col = np.tile(S.lin(C["cabelo"]), (n, 1))
         col = col * (0.80 + 0.35 * st[:, None]) + S.lin(C["cabelo_lt"]) * 0.10 * fine[:, None]
-        # fios grisalhos nas temporas e mechas prateadas esparsas (senhora)
-        grey = np.clip(S.sstep(np.abs(P[:, 0]), F.hr[0] * 0.55, F.hr[0] * 0.85) * (P[:, 1] > hc[1] - 0.02) * (P[:, 2] < hc[2] + 0.06), 0, 1)
-        grey = np.maximum(grey * (0.55 + 0.45 * st), 0.35 * S.sstep(fine, 0.72, 0.85))
-        col = col * (1 - 0.6 * grey[:, None]) + S.lin("#B9B2BC") * 0.6 * grey[:, None]
+        # G4 r3: grisalho em MECHAS (antes uma faixa larga e lisa de 55-85% da largura da cabeca lia como casca/halo):
+        # so na tempora e acima da orelha, so nos fios (liga e desliga pelo ruido dos fios), cinza-acastanhado de
+        # contraste moderado contra o castanho, mais alguns fios soltos no resto do cabelo
+        temple = S.sstep(np.abs(P[:, 0]), F.hr[0] * 0.55, F.hr[0] * 0.65)
+        temple *= S.sstep(P[:, 1], hc[1] - 0.05, hc[1] + 0.0) * S.sstep(-(P[:, 2] - (hc[2] + 0.10)), 0.0, 0.04)
+        # mechas: o cabelo e puxado para o coque, entao os fios correm da linha do cabelo ate o alto; as mechas sao faixas
+        # finas no azimute em torno do eixo vertical da cabeca (largura de alguns mm), com a fase variando pouco ao longo
+        az = np.arctan2(P[:, 0] - hc[0], P[:, 1] - hc[1])
+        ph = az * 120.0 + 6.0 * S.fbm(P, 0.03, 2)
+        lane = 0.5 + 0.5 * np.sin(ph)
+        sel_lane = S.sstep(np.sin(az * 9.0 + 1.3 * S.fbm(P + 5.0, 0.05, 2)), -0.35, 0.15)    # so algumas faixas viram grisalho
+        strand_on = S.sstep(lane, 0.70, 0.90) * sel_lane * (0.55 + 0.45 * S.sstep(S.fbm(P + 9.0, 0.012, 2), 0.35, 0.6))
+        grey = np.clip(temple * strand_on, 0, 1)
+        col = col * (1 - 0.70 * grey[:, None]) + S.lin("#A39599") * 0.70 * grey[:, None]
         col *= (0.75 + 0.25 * m["ao"] ** 0.8)[:, None]
         return col, 0.0006 * st + 0.0002 * fine, 0.40 - 0.10 * st, np.zeros(n)
     return fn
