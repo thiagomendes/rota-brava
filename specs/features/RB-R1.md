@@ -494,3 +494,15 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 - `tools/test.sh` agora isola `user://` por checkout (`XDG_DATA_HOME`). Revisado e aprovado.
 | G12 | "Ver abertura" e "Referências" no menu principal não fazem sentido para a criança; "quanto mais simples, melhor" | Menu principal com **Jogar, Opções e Sair**. "Rever abertura" passa para dentro de Opções. "Referências" (demo antiga `reference_demo`) sai da interface e fica só pelo argumento de linha de comando `--ref-demo`. Testes do menu atualizados | `ux` |
 | G13 | "Jogar" sempre volta ao ponto salvo; falta como começar de novo, "como um memory card" | **3 espaços de jogo**, cada um com um cartão grande: missão atual (ícone e nome), emblemas e retrato do herói. Vazio = "Novo jogo". Apagar só com confirmação segurando o botão, para evitar apagar sem querer. Os saves atuais migram para o espaço 1. Funciona com mouse, teclado e controle. Testes de salvar, carregar, apagar e migrar | `ux` + `gameplay` |
+
+### G8 integrado (`feature/rb-r1-g-capa`, autor `ux`)
+- Escolha de Thiago: cena B (Noite das lanternas) com o logo C, numa versão noite (`logo_c_noite.svg`). O lettering é próprio e sai de `make_logos.py`, sem fonte de terceiros.
+- A tela inicial mostra `keyart_b.tscn` animada de leve atrás dos botões. O trio fica fora da coluna de botões pela projeção real. "Opções" e "Sair" ganharam texto `0B2440`, com contraste de cerca de 6,5:1. O filtro de exportação inclui os SVG.
+- Revisão (`reviewer`, 2 rodadas):
+  - 1ª: REPROVADO. O Pico ficava atrás dos botões em 4:3 e faltavam testes.
+  - 2ª: APROVADO. `test_keyart` com 24 PASS; o teste falha com o palco antigo; `ui_brand` 73; `test_ep01_v3.gd` 47.
+- Ressalvas:
+  - A ligação dos botões com `free_rect` não tem teste próprio, porque o padrão já cobre o caso.
+  - Na capa 3:4 sobra céu e cais.
+  - O estilo padrão de `Button` (branco sobre `2F8CFF`) tem contraste de 3,32:1, abaixo de 4,5.
+  - O menu instancia a vila inteira (17–37 s medidos em llvmpipe); quem resolve é o G10.
