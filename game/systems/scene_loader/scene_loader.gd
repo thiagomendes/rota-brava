@@ -55,6 +55,8 @@ var _alpha: float = 0.0
 var _pending: Array[String] = []
 var _held: Array[Resource] = []
 var _hold_start_ms: int = 0
+var _old_scene: Node
+var _old_mode: Node.ProcessMode = Node.PROCESS_MODE_INHERIT
 
 
 func _ready() -> void:
@@ -97,7 +99,11 @@ static func instance() -> SceneLoaderService:
 
 ## Atalho usado pelas cenas do jogo no lugar de `change_scene_to_file`.
 static func go(path: String) -> bool:
-	return instance().change_scene(path)
+	var ok := instance().change_scene(path)
+	if not ok:
+		# Pedido ignorado (troca em andamento ou cena inexistente): o clique repetido no menu pode ser ignorado.
+		print("[RB] loader ignorado %s (ocupado=%s)" % [path, instance().is_busy()])
+	return ok
 
 
 ## Cobre a tela ja (opaca, sem fade de entrada) e segura ate a cena atual liberar. Usado pelo menu na abertura do
@@ -113,6 +119,8 @@ func cover_current() -> void:
 	_started_ms = Time.get_ticks_msec()
 	_root.visible = true
 	_star.visible = true
+	MouseLock.block(&"loader")
+	_stay_last()
 	phase = Phase.SETTLING
 	_settle_left = SETTLE_FRAMES
 	_set_alpha(1.0)
@@ -161,13 +169,14 @@ func change_scene(path: String) -> bool:
 	_set_alpha(maxf(_alpha, 0.35))
 	_held.clear()
 	_pending.clear()
+	_begin_block()
 	for dep: String in WARM.get(path, []):
 		if ResourceLoader.exists(dep) and ResourceLoader.load_threaded_request(dep, "", true) == OK:
 			_pending.append(dep)
+	print("[RB] loader request %s" % path)
 	var err := ResourceLoader.load_threaded_request(path, "PackedScene", true)
 	if err != OK:
-		push_error("SceneLoader: falha ao pedir %s (%d)" % [path, err])
-	print("[RB] loader request %s" % path)
+		_fail("pedido recusado (%d)" % err)
 	return true
 
 
@@ -176,6 +185,7 @@ func _process(delta: float) -> void:
 		return
 	var real := delta / maxf(Engine.time_scale, 0.0001)
 	_star.advance(real)
+	_stay_last()
 	match phase:
 		Phase.LOADING:
 			_set_alpha(minf(1.0, _alpha + real / FADE_IN))
@@ -184,8 +194,7 @@ func _process(delta: float) -> void:
 			if status == ResourceLoader.THREAD_LOAD_LOADED and _pending.is_empty() and _loaded_ms == 0:
 				_loaded_ms = Time.get_ticks_msec()
 			elif status == ResourceLoader.THREAD_LOAD_FAILED or status == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
-				push_error("SceneLoader: carregamento falhou %s" % target_path)
-				phase = Phase.FADING_OUT
+				_fail("status %d" % status)
 				return
 			# So troca com a tela totalmente opaca e depois do tempo minimo.
 			if _loaded_ms > 0 and _alpha >= 1.0 and Time.get_ticks_msec() - _started_ms >= MIN_SHOW_MS:
@@ -202,6 +211,7 @@ func _process(delta: float) -> void:
 				_root.visible = false
 				_star.visible = false
 				phase = Phase.IDLE
+				_end_block()
 				last_timings["total_ms"] = Time.get_ticks_msec() - _started_ms
 				print("[RB] loader done %s %s" % [target_path, last_timings])
 
@@ -222,9 +232,11 @@ func _swap() -> void:
 	var t0 := Time.get_ticks_msec()
 	var err := get_tree().change_scene_to_packed(packed) if packed != null else ERR_CANT_OPEN
 	if err != OK:
-		push_error("SceneLoader: troca falhou %s (%d)" % [target_path, err])
+		_fail("troca recusada (%d)" % err)
+		return
 	# change_scene_to_packed instancia aqui e troca no fim do quadro; o _ready da cena nova roda nesse fim de quadro.
 	await get_tree().process_frame
+	_old_scene = null  # ja liberada pela troca
 	_swap_ms = Time.get_ticks_msec() - t0
 	last_timings = {"load_ms": _loaded_ms - _started_ms, "swap_ms": _swap_ms}
 	_settle_left = SETTLE_FRAMES
@@ -238,6 +250,44 @@ func _set_alpha(a: float) -> void:
 	# A estrela fica inteira enquanto o fundo entra (aparece no quadro do clique) e some junto no fade de saida.
 	_star.modulate.a = _alpha if phase == Phase.FADING_OUT or phase == Phase.IDLE else 1.0
 	_star.visible = _root.visible
+
+
+## Caminho de erro explicito: a cena pedida nao carregou (corrompida, tipo errado, troca recusada). O jogador fica na
+## cena de antes (que volta a processar), a tela sai com fade e o motivo vai para o log.
+func _fail(reason: String) -> void:
+	push_error("SceneLoader: falhou %s: %s" % [target_path, reason])
+	print("[RB] loader falhou %s: %s" % [target_path, reason])
+	last_timings = {"failed": reason}
+	_held.clear()
+	_pending.clear()
+	if _old_scene != null and is_instance_valid(_old_scene):
+		_old_scene.process_mode = _old_mode
+	_old_scene = null
+	phase = Phase.FADING_OUT
+
+
+## Bloqueio de entrada durante a troca: (1) a cena velha para de processar (nem `_input` nem leitura de `Input`);
+## (2) o carregador fica por ultimo na raiz, entao o `_input` dele roda antes do de qualquer cena e consome o evento;
+## (3) o mouse nao e preso pela camera (MouseLock).
+func _begin_block() -> void:
+	MouseLock.block(&"loader")
+	var cur := get_tree().current_scene
+	if cur != null and _old_scene == null:
+		_old_scene = cur
+		_old_mode = cur.process_mode
+		cur.process_mode = Node.PROCESS_MODE_DISABLED
+	_stay_last()
+
+
+func _end_block() -> void:
+	MouseLock.unblock(&"loader")
+	_old_scene = null
+
+
+func _stay_last() -> void:
+	var p := get_parent()
+	if p != null and get_index() != p.get_child_count() - 1:
+		p.move_child(self, -1)
 
 
 func _input(event: InputEvent) -> void:

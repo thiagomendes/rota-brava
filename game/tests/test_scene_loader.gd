@@ -22,6 +22,8 @@ func run(runner) -> void:
 	await _intro_end_to_menu()
 	await _menu_fast()
 	await _menu_timeout()
+	await _input_blocked()
+	await _corrupt_scene()
 	Options.motion_override = -1
 	r.tree.unload_current_scene()
 	await r.frames(2)
@@ -144,3 +146,58 @@ func _menu_timeout() -> void:
 	r.check(m2.key_art == null and m2.play_button.has_focus(), "palco ausente: menu abre sobre a imagem parada com foco")
 	m2.queue_free()
 	await r.frames(2)
+
+
+func _key(action: StringName) -> void:
+	var ev := InputEventAction.new()
+	ev.action = action
+	ev.pressed = true
+	Input.parse_input_event(ev)
+	await r.tree.process_frame
+	var up := InputEventAction.new()
+	up.action = action
+	up.pressed = false
+	Input.parse_input_event(up)
+	await r.tree.process_frame
+
+
+## Revisao G10: uma acao apertada durante a troca nao chega a cena (a nova, ja na arvore atras da tela, nem a velha);
+## MouseLock bloqueado durante a troca e solto no fim.
+func _input_blocked() -> void:
+	var ref := "res://episodes/reference/reference_demo.tscn"
+	loader.change_scene(ref)
+	r.check(MouseLock.blocked(), "entrada: MouseLock bloqueado durante a troca")
+	var n := 0
+	while not (r.tree.current_scene is ReferenceDemo) and n < WAIT_FRAMES:
+		await r.tree.process_frame
+		n += 1
+	var demo := r.tree.current_scene as ReferenceDemo
+	r.check(demo != null and loader.is_showing(), "entrada: cena nova na arvore com a tela ainda por cima")
+	if demo == null:
+		return
+	var page := demo.page_index
+	var variant := demo.variant
+	await _key(&"move_right")
+	await _key(&"interact")
+	r.check(demo.page_index == page and demo.variant == variant,
+		"entrada: move_right/interact durante a troca nao mudam a pagina (%d->%d)" % [page, demo.page_index])
+	await _wait_idle()
+	r.check(not MouseLock.blocked(), "entrada: MouseLock solto no fim da troca")
+	await _key(&"move_right")
+	r.check(demo.page_index != page, "entrada: depois da troca a cena volta a receber move_right")
+
+
+## Revisao G10: cena corrompida (status FAILED) -> tela some e o jogador fica na cena anterior, que volta a processar.
+func _corrupt_scene() -> void:
+	var bad := "user://test_scene_loader_corrupt.tscn"
+	var f := FileAccess.open(bad, FileAccess.WRITE)
+	f.store_string("[gd_scene format=3]\n[node name=\"X\" type=\"NaoExiste\" parent=\"@@@\"]\nlixo {{{")
+	f.close()
+	var before: Node = r.tree.current_scene
+	var ok := loader.change_scene(bad)
+	var n := await _wait_idle()
+	r.check(ok and n < WAIT_FRAMES, "corrompida: o carregador nao trava (%d quadros)" % n)
+	r.check(r.tree.current_scene == before and not loader.is_showing(), "corrompida: tela some e o jogador fica na cena anterior")
+	r.check(loader.last_timings.has("failed"), "corrompida: caminho de erro registrado (%s)" % loader.last_timings)
+	r.check(before != null and before.can_process() and not MouseLock.blocked(), "corrompida: cena anterior volta a processar e mouse solto")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(bad))
