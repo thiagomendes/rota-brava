@@ -115,3 +115,6 @@ Estimativa: pequena a média (~25 falas novas + 3 revisões).
 ## 5. Capturas desta auditoria (`captures/f2/`, fora do Git)
 `m1_a_inicio`, `m1_b_banco`, `m1_c_banco_olha_bota`, `m1_d_bota`, `m1_e_bota_olha_trilha`, `m1_f_trilha1`, `m1_g_ajuda3`, `m1_h_bota_ajuda1` (na verdade, ajuda 3 no banco), `m2_a_inicio`, `m2_b_galpao`, `m2_c_juncos`, `m2_d_varal`, `m3_a_inicio`, `m3_b_filete`, `m3_c_grade`, `m4_a_inicio`, `m4_b_barraca`, `m5_a_inicio`, `m5_a2_inicio_60f`, `m5_b_pena1`, `m5_c_pena4`, `m5_d_telhado`, `m6_a_inicio`, `m7_a_inicio`, `m7_b_lente`, `m7_c_escada`, `m8_a_inicio` (todas .png).
 Não capturado: M6 com o barco navegando, M7.aim e qualquer passo com o passo já ativo (exige avançar a missão; fica para o `gameplay` com o bot).
+
+## 6. Texto final (adventure, 2026-11-26)
+Falas que apontam, revisões de "banco"/"bota"/"oeste", variantes D19c e roteiro das cutscenes: `docs/proposals/ep01_v3_cutscenes.md` (texto no catálogo `pt_BR.ep01v3_f2.json`; chaves de §2.1 mantidas: `look_paw`, `boot_steps`, `follow_paws`).
