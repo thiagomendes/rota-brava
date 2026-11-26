@@ -28,6 +28,10 @@ var holders: Dictionary = {}      # id -> Node3D (onde o visual esta montado)
 var preset: Dictionary = {}
 var extra_lights: Array[Light3D] = []
 var ready_to_shoot := false
+## Area livre para o trio no modo menu (fracoes do viewport): a tela-titulo passa o lado esquerdo dos botoes.
+var free_rect := Rect2(0, 0, 0.6, 1)
+## Cena da vila ja carregada (G10: carregamento em segundo plano). Nula = `load(VILLAGE)` aqui.
+var village_scene: PackedScene
 var _t := 0.0
 var _boat_base := Transform3D.IDENTITY
 var _cam_base := {}
@@ -37,7 +41,8 @@ func _ready() -> void:
 	# roda depois dos visuais (prioridade 0): o rosto e ajustado depois de o clipe ser avaliado no quadro
 	process_priority = 10
 	preset = KeyArtPresets.get_preset(proposal)
-	world = (load(VILLAGE) as PackedScene).instantiate() as VillageWorld
+	var vs := village_scene if village_scene != null else load(VILLAGE) as PackedScene
+	world = vs.instantiate() as VillageWorld
 	add_child(world)
 	cam = Camera3D.new()
 	cam.name = "KeyCamera"
@@ -66,6 +71,14 @@ func _ready() -> void:
 	set_framing(framing)
 	get_viewport().size_changed.connect(_update_camera)
 	ready_to_shoot = true
+
+
+## Caminhos que o palco carrega (para um carregador em segundo plano pedir antes).
+static func resource_paths() -> PackedStringArray:
+	var out := PackedStringArray([VILLAGE, BOAT])
+	for id: StringName in HEROES:
+		out.append(String(HEROES[id]))
+	return out
 
 
 # ---------------------------------------------------------------- luz e ceu
@@ -254,28 +267,74 @@ func _update_camera() -> void:
 	cam.look_at(look, Vector3.UP)
 	cam.rotate_object_local(Vector3.FORWARD, deg_to_rad(float(c.get("roll", 0.0))))
 	cam.h_offset = 0.0
-	# `subject_x`: fracao da largura onde o centro do trio deve ficar (menu: terco esquerdo, longe dos botoes).
-	# Desloca a camera de lado (h_offset) na profundidade do trio, entao vale em 16:9, 20:9 e 4:3.
+	# `subject_x`: fracao da largura onde o centro do trio deve ficar. No menu o trio inteiro cabe em `free_rect`
+	# (a area livre a esquerda dos botoes, passada pela tela a partir do retangulo real deles).
 	var want := float(c.get("subject_x", 0.30 if framing == &"menu" else -1.0))
 	if want >= 0.0 and not heroes.is_empty():
-		var center := Vector3.ZERO
+		var area := free_rect if framing == &"menu" else Rect2(0, 0, 1, 1)
+		_fit_into(area, want)
+
+
+## Margem (fracao da largura) entre o trio e a borda da area livre.
+const FIT_MARGIN := 0.025
+## O trio projetado na tela (fracoes 0..1 do viewport), com folga lateral de BODY_HALF_W metros por heroi.
+const BODY_HALF_W := 0.38
+
+
+## Desloca a camera de lado (h_offset) e, se o trio nao couber, abre o campo de visao (ate 80 graus) para que todos
+## os pontos projetados do trio fiquem dentro de `area` (fracoes do viewport). Mede pela projecao real da camera.
+func _fit_into(area: Rect2, want: float) -> void:
+	var x0 := area.position.x + FIT_MARGIN
+	var x1 := area.end.x - FIT_MARGIN
+	var vp := get_viewport().get_visible_rect().size
+	for i in 12:
+		var span := hero_screen_rect()
+		var w := span.size.x
+		if w > x1 - x0 and cam.fov < 80.0:
+			cam.fov = minf(80.0, cam.fov * clampf(w / maxf(x1 - x0, 0.05), 1.02, 1.25))
+			continue
+		var target := clampf(want, x0 + w * 0.5, maxf(x1 - w * 0.5, x0 + w * 0.5))
+		var err := span.get_center().x - target
+		if absf(err) < 0.001:
+			break
+		# erro em fracao -> metros na profundidade media do trio
+		var depth := 0.0
 		for id: StringName in holders:
-			center += (holders[id] as Node3D).global_position + Vector3(0, 0.6, 0)
-		center /= float(holders.size())
-		var local := cam.global_transform.affine_inverse() * center
-		var depth := maxf(-local.z, 0.5)
-		var vp := get_viewport().get_visible_rect().size
-		var aspect := vp.x / maxf(vp.y, 1.0)
-		var half_w := depth * tan(deg_to_rad(cam.fov) * 0.5) * aspect
-		cam.h_offset = local.x - (want - 0.5) * 2.0 * half_w
-		# telas estreitas (4:3): ninguem do trio encosta na borda esquerda (margem de 5% da largura)
-		var worst := 0.0
-		for id: StringName in holders:
-			var hl := cam.global_transform.affine_inverse() * ((holders[id] as Node3D).global_position + Vector3(0, 0.6, 0))
-			var hw := maxf(-hl.z, 0.5) * tan(deg_to_rad(cam.fov) * 0.5) * aspect
-			var left := 0.5 + (hl.x - 0.4 - cam.h_offset) / (2.0 * hw)
-			worst = minf(worst, (left - 0.05) * 2.0 * hw)
-		cam.h_offset += worst
+			depth += maxf(-(cam.global_transform.affine_inverse() * (holders[id] as Node3D).global_position).z, 0.5)
+		depth /= float(holders.size())
+		var half_w := depth * tan(deg_to_rad(cam.fov) * 0.5) * (vp.x / maxf(vp.y, 1.0))
+		if cam.keep_aspect == Camera3D.KEEP_WIDTH:
+			half_w = depth * tan(deg_to_rad(cam.fov) * 0.5)
+		cam.h_offset += err * 2.0 * half_w
+
+
+## Retangulo (fracoes 0..1 do viewport do palco) que o trio ocupa na tela, pela projecao da camera:
+## pes, meio e cabeca de cada heroi, com BODY_HALF_W de folga para cada lado.
+func hero_screen_rect() -> Rect2:
+	var vp := get_viewport().get_visible_rect().size
+	var right := cam.global_transform.basis.x.normalized()
+	var r := Rect2()
+	var first := true
+	for id: StringName in holders:
+		var base := (holders[id] as Node3D).global_position
+		for y: float in [0.0, 0.6, 1.25]:
+			for sx: float in [-1.0, 1.0]:
+				var w := base + Vector3(0, y, 0) + right * BODY_HALF_W * sx
+				if cam.is_position_behind(w):
+					continue
+				var px := cam.unproject_position(w) / vp
+				if first:
+					r = Rect2(px, Vector2.ZERO)
+					first = false
+				else:
+					r = r.expand(px)
+	return r
+
+
+## Area livre para o trio (fracoes do viewport do palco). A tela-titulo passa o lado esquerdo dos botoes.
+func set_free_rect(r: Rect2) -> void:
+	free_rect = r
+	_update_camera()
 
 
 # ---------------------------------------------------------------- movimento leve

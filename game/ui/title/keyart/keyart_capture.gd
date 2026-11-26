@@ -160,4 +160,7 @@ func _real_menu() -> void:
 		await _size(MENU_SIZES[k])
 		await _shot("game_menu_" + k.trim_prefix("menu").insert(2 if k != "menu43" else 1, "x"))
 		var b := menu.play_button.get_global_rect()
-		print("[RB] %s Jogar=%s logo=%s" % [k, b, menu.logo.get_global_rect()])
+		var hr := menu.key_art.stage.hero_screen_rect()
+		var kr := menu.key_art.get_global_rect()
+		print("[RB] %s Jogar=%s logo=%s trio_x=%.0f..%.0f botoes_x>=%.0f" % [k, b, menu.logo.get_global_rect(),
+			kr.position.x + hr.position.x * kr.size.x, kr.position.x + hr.end.x * kr.size.x, menu.menu.get_global_rect().position.x])

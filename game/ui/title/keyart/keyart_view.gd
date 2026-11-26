@@ -12,6 +12,8 @@ extends Control
 @export var animate := true
 ## Antisserrilhado 3D (no menu do jogo pode subir; nas capturas por software fica desligado por memoria).
 @export var msaa: Viewport.MSAA = Viewport.MSAA_2X
+## Vila ja carregada (G10). Nula = o palco carrega sozinho.
+var village_scene: PackedScene
 
 var stage: KeyArtStage
 var viewport: SubViewport
@@ -29,6 +31,7 @@ func _ready() -> void:
 	box.name = "Stage"
 	box.stretch = true
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.focus_mode = Control.FOCUS_NONE
 	box.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(box)
 	viewport = SubViewport.new()
@@ -42,6 +45,7 @@ func _ready() -> void:
 	stage.proposal = proposal
 	stage.framing = framing
 	stage.animate = animate
+	stage.village_scene = village_scene
 	viewport.add_child(stage)
 	scrim = TextureRect.new()
 	scrim.name = "MenuScrim"
@@ -59,6 +63,13 @@ func _ready() -> void:
 	_logo_svg = String(KeyArtPresets.LOGOS[proposal])
 	resized.connect(_layout)
 	set_framing(framing)
+
+
+## Area livre para o trio, em coordenadas desta moldura (ex.: tudo a esquerda da coluna de botoes).
+func set_free_rect_local(r: Rect2) -> void:
+	if stage == null or size.x < 1.0 or size.y < 1.0:
+		return
+	stage.set_free_rect(Rect2(r.position / size, r.size / size))
 
 
 func set_framing(f: StringName) -> void:
