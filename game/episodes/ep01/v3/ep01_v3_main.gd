@@ -28,6 +28,13 @@ const PORTRAIT_FILES := {&"tracker": "rastro", &"climber": "pico", &"pilot": "le
 const TEAM_POSE_SECONDS := 1.2
 const TEAM_POSE_ANIMS: Array[StringName] = [&"team_pose", &"celebrate", &"wave"]
 const GESTURE_ANIMS: Array[StringName] = [&"point", &"wave"]
+## F2 (P6): degraus da ajuda (s parado) no 1o passo de cada missao e nos demais.
+static var HELP_TIMES_FIRST := PackedFloat32Array([5.0, 12.0, 20.0])
+static var HELP_TIMES_NEXT := PackedFloat32Array([8.0, 16.0, 28.0])
+## Acerto parcial (D19c): intervalo minimo entre duas falas de acerto (s).
+const SUCCESS_COOLDOWN := 6.0
+## Passos de pisar em pegadas/penas: cada uma ja brilha; sem fala de acerto a cada pisada.
+const QUIET_STEPS: Array[StringName] = [&"trail", &"feathers", &"buoys"]
 ## Distancia vertical maxima para usar um ponto de acao (o topo do galpao nao serve a quem esta no chao).
 const INTERACT_DY := 1.0
 ## Seguidores (F1): longe demais (preso atras de algo), reaparecem perto do lider fora da vista da camera. Desistido
@@ -66,6 +73,8 @@ var mission_data: Dictionary = {}
 var current: Mission
 var complete: bool = false
 var land: Ep01V3Late
+## F2: olhar dirigido, anel de alvo, rastros entre missoes e falas que apontam (Ep01V3Guide).
+var guide: Ep01V3Guide
 var help: MissionHelp
 var posing: bool = false
 var emblems_found: int = 0
@@ -122,12 +131,19 @@ func _ready() -> void:
 	land = Ep01V3Late.new()
 	add_child(land)
 	land.setup(self)
+	land.hop_aborted.connect(func() -> void: say(Ep01V3Dialogue.pick("oops.climber")))
+	guide = Ep01V3Guide.new()
+	add_child(guide)
+	guide.setup(self)
+	Ep01V3Dialogue.randomize_picks()
 	_build_arrow()
 	help = MissionHelp.new()
 	help.reduced_motion = Options.reduced_motion()
 	help.gesture_hint.connect(_on_gesture_hint)
 	help.radio_hint.connect(_on_radio_hint)
 	help.pointer_hint.connect(_on_pointer_hint)
+	# D19c: no ultimo degrau o Farol 7 se oferece (variante do grupo, sem repetir a ultima).
+	help.pointer_hint.connect(func(_t: StringName, _m: bool) -> void: say(Ep01V3Dialogue.pick("help.radio.invite")))
 	help.cleared.connect(_hide_arrow)
 	_load_missions()
 	set_controlled(actors[active_member])
@@ -147,6 +163,7 @@ func _ready() -> void:
 	hud.set_collectibles(emblems_found, emblems_total, false)
 	if first != &"" and first != &"M0":
 		_place_trio_at(land.start_position(first))
+		_settle_trio.call_deferred()
 	_start_mission(_index_of(first) if first != &"" else 0)
 	_apply_dev_args()
 	if demo:
@@ -188,13 +205,29 @@ func tree_canopies() -> Array[Vector4]:
 
 
 ## Dev/captura: --ep01v3-at=<marcador> poe o trio junto do marcador; --ep01v3-yaw=<graus> gira a camera baixa;
-## --ep01v3-mission=<id> comeca na missao; --ep01v3-help=<1..3> forca o degrau de ajuda.
+## --ep01v3-mission=<id> comeca na missao; --ep01v3-help=<1..3> forca o degrau de ajuda; --ep01v3-step=<n> pula passos.
 func _apply_dev_args() -> void:
 	var at := _user_arg("--ep01v3-at")
 	if at != "" and world.marker(StringName(at)) != null:
 		var p := world.marker(StringName(at)).global_position
 		for m: StringName in HEROES:
 			(actors[m] as MemberActor).teleport(p + (TRIO_OFFSETS[m] as Vector3) + Vector3(0, 0.05, 0))
+	# --ep01v3-step=<n>: pula os n primeiros passos da missao (captura do inicio de um passo do meio).
+	var sk := int(_user_arg("--ep01v3-step")) if _user_arg("--ep01v3-step") != "" else 0
+	for i in sk:
+		if current == null or not current.is_active():
+			break
+		var st := current.current_step()
+		current.set_active_hero(StringName(st["hero"]) if st["hero"] != &"" else active_member)
+		for c in int(st["count"]):
+			current.notify(StringName(st["event"]), current.active_hero)
+	if sk > 0:
+		var need := current.required_hero() if current != null else &""
+		if need != &"" and need != active_member:
+			_pending_switch = &""
+			active_member = need
+			set_controlled(actors[need])
+		land.refresh()
 	var yaw := _user_arg("--ep01v3-yaw")
 	if yaw != "":
 		camera_rig.set_low_view(deg_to_rad(float(yaw)))
@@ -232,7 +265,63 @@ func _place_trio_at(p: Vector3) -> void:
 	if p == Vector3.INF:
 		return
 	for m: StringName in HEROES:
-		(actors[m] as MemberActor).teleport(p + (TRIO_OFFSETS[m] as Vector3) + Vector3(0, 0.05, 0))
+		# F2: cada um no chao do mesmo nivel (antes a Leme da festa caia na borda do chafariz e o bot ficava sem caminho).
+		var to := p + (TRIO_OFFSETS[m] as Vector3)
+		var g := ground_near(to, p.y + 0.4) if is_inside_tree() else Vector3.INF
+		(actors[m] as MemberActor).teleport((g if g != Vector3.INF else to) + Vector3(0, 0.05, 0))
+
+
+## Retomada (F2): depois do 1o quadro de fisica, quem nao tem chao embaixo (vao, dentro de casa) vai para o chao livre
+## mais perto do lider. Antes o M5 retomado caia num vao e a camera seguia o trio despencando (tela azul).
+func _settle_trio() -> void:
+	await get_tree().physics_frame
+	if not is_inside_tree():
+		return
+	for m: StringName in HEROES:
+		var a := actors[m] as MemberActor
+		var p := ground_near(a.global_position)
+		if p != Vector3.INF and p.distance_to(a.global_position) > 0.3:
+			a.teleport(p + Vector3(0, 0.05, 0))
+	camera_rig.follow(controlled_node, true)
+
+
+## Onde o heroi chamado aparece ao lado do lider (F2): o lugar de sempre (a direita, um pouco atras na vista) se tiver
+## linha livre e folga (`slot_clear`); senao, o primeiro lugar livre em volta. Antes dependia so do rumo da camera e,
+## com o olhar dirigido girando a camera, chegava a cair dentro de arbusto ou na borda do chafariz.
+func handoff_point(lead: MemberActor, a: MemberActor) -> Vector3:
+	var base := Basis(Vector3.UP, camera_rig.yaw) * Vector3(1.0, 0.0, 0.6)
+	var from := lead.global_position
+	for radius: float in [1.0, 1.6, 2.4]:
+		for k in 12:
+			var p := from + base.normalized().rotated(Vector3.UP, TAU * k / 12.0) * radius
+			var ground := floor_at(p)
+			# Chao no mesmo nivel (nada de cair do promontorio ou parar na borda de algo).
+			if ground != Vector3.INF and absf(ground.y - from.y) < 0.35 and a.slot_clear(from, ground):
+				return ground + Vector3(0, 0.05, 0)
+	return from + base + Vector3(0, 0.05, 0)
+
+
+## Chao (camada 1) logo abaixo de `p` (de 0,6 m acima ate 1,5 m abaixo); INF se nao houver.
+func floor_at(p: Vector3) -> Vector3:
+	var q := PhysicsRayQueryParameters3D.create(p + Vector3(0, 0.6, 0), p + Vector3(0, -1.5, 0), 1)
+	var hit := world.get_world_3d().direct_space_state.intersect_ray(q)
+	return hit.position if not hit.is_empty() else Vector3.INF
+
+
+## Chao andavel (camada 1, acima da agua e ate `max_y`) sob `p` ou, se nao houver, no anel mais perto ate 4 m; INF se
+## nada serve.
+func ground_near(p: Vector3, max_y: float = INF) -> Vector3:
+	var ss := world.get_world_3d().direct_space_state
+	for radius: float in [0.0, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0]:
+		var n := 1 if radius == 0.0 else 12
+		for k in n:
+			var o := Vector3(radius, 0, 0).rotated(Vector3.UP, TAU * k / n)
+			var from := Vector3(p.x, maxf(p.y, 0.0), p.z) + o
+			var q := PhysicsRayQueryParameters3D.create(from + Vector3(0, 0.9, 0), from + Vector3(0, -3.0, 0), 1)
+			var hit := ss.intersect_ray(q)
+			if not hit.is_empty() and float((hit.position as Vector3).y) > -0.25 and float((hit.position as Vector3).y) <= max_y:
+				return hit.position
+	return Vector3.INF
 
 
 # ---------- missoes ----------
@@ -249,7 +338,10 @@ func _load_missions() -> void:
 		m.hero_switch_requested.connect(_on_switch_requested)
 		m.emblem_found.connect(_on_emblem_found)
 		m.step_started.connect(_on_step_started)
-		m.step_done.connect(func(_i: StringName, _n: int, _s: StringName) -> void: _hide_arrow())
+		m.step_done.connect(func(i: StringName, n: int, s: StringName) -> void:
+			_hide_arrow()
+			guide.on_step_done(i, n, s))
+		m.progressed.connect(_on_progressed)
 		emblems_total += m.emblems.size()
 
 
@@ -273,6 +365,7 @@ func _start_mission(index: int) -> void:
 	land.refresh()
 	if data.has("camera_yaw"):
 		camera_rig.set_low_view(deg_to_rad(float(data["camera_yaw"])))
+	guide.on_mission_started(current.id)
 	for k in Ep01V3Dialogue.start_lines(current.id):
 		say(k)
 	print("[RB] v3 mission %s" % current.id)
@@ -313,10 +406,25 @@ func _on_mission_completed(id: StringName) -> void:
 		FeedbackFx.sparkle(world, controlled_node.global_position + Vector3(0, 1.0, 0))
 	if _save != "":
 		MissionSave.save(_save, EPISODE_ID, missions)
-	for k in Ep01V3Dialogue.done_lines(id):
-		say(k)
+	# Comemoracao (D19c): a fala da missao entra no sorteio do grupo do falante; sem fala, um viva do heroi em controle.
+	var done := Ep01V3Dialogue.done_lines(id)
+	for k in done:
+		var group := "cheer.%s" % Ep01V3Dialogue.speaker(k)
+		say(Ep01V3Dialogue.pick(group, k) if k in Ep01V3Dialogue.group_keys(group) else k)
+	if done.is_empty() and id != &"M0":
+		say(Ep01V3Dialogue.pick("cheer.%s" % active_member))
+	guide.on_mission_completed(id)
 	mission_completed.emit(id)
-	_start_mission.call_deferred(_index_of(id) + 1)
+	_start_after_hops.call_deferred(_index_of(id) + 1)
+
+
+## F2: a missao seguinte so monta depois do salto encadeado em curso (antes a montagem cortava a descida do Pico e ele
+## ficava no degrau do chafariz; o heroi trazido pela troca caia na borda).
+func _start_after_hops(index: int) -> void:
+	while land.busy and is_inside_tree():
+		await land.busy_changed
+	if is_inside_tree():
+		_start_mission(index)
 
 
 func _finish_episode() -> void:
@@ -356,7 +464,7 @@ func _process(delta: float) -> void:
 	for m: StringName in actors:
 		(actors[m] as MemberActor).move_yaw = camera_rig.yaw
 	_update_prompt()
-	if current != null and current.is_active() and not blocked():
+	if current != null and current.is_active() and not blocked() and not guide.looking:
 		help.tick(delta)
 	if arrow.visible:
 		var t := help_target()
@@ -410,6 +518,7 @@ func _update_prompt() -> void:
 func try_interact() -> bool:
 	if blocked():
 		return false
+	guide.skip_look()
 	var target := best_interactable()
 	if target == null:
 		return false
@@ -430,12 +539,30 @@ func _on_emblem_found(_mission: StringName, emblem_id: StringName, _found: int, 
 	audio.play_badge_sting()
 
 
-## Objetivo por icone: o icone do cartao segue o passo atual (pata, corda, folha, leme...).
-func _on_step_started(_mission: StringName, _index: int, _step: StringName) -> void:
+## Objetivo por icone: o icone do cartao segue o passo atual (pata, corda, folha, leme...). F2: ajuda mais cedo no 1o
+## passo (P6), fala que aponta e olhar dirigido (diferido: as falas de abertura da missao vem antes).
+func _on_step_started(mission: StringName, index: int, step: StringName) -> void:
+	help.tier_times = HELP_TIMES_FIRST if index == 0 else HELP_TIMES_NEXT
+	guide.on_step_started.call_deferred(mission, step)
 	var s := current.current_step() if current != null else {}
 	var icon: StringName = s.get("icon", &"")
 	if icon != &"" and IconView.has_icon(icon):
 		hud.set_objective(Loc.t(String(current.title_key)), icon)
+
+
+var _success_at: float = -INF
+
+
+## Acerto parcial (D19c): passo de varias partes andou sem terminar (roupa solta, caixote entregue...).
+func _on_progressed(_id: StringName) -> void:
+	# So o acerto parcial: o progresso que fecha o passo ja tem a fala do acontecimento e a do passo seguinte.
+	if current == null or not current.is_active() or current.step_progress == 0 \
+			or current.step_progress >= int(current.current_step().get("count", 1)):
+		return
+	if current.current_step().get("id", &"") in QUIET_STEPS or _clock - _success_at < SUCCESS_COOLDOWN:
+		return
+	_success_at = _clock
+	say(Ep01V3Dialogue.pick("success.%s" % active_member))
 
 
 func say(key: String) -> void:
@@ -453,6 +580,9 @@ func _on_switch_requested(_mission: StringName, hero: StringName, _icon: StringN
 
 
 func _open_switch() -> void:
+	# F2: o cartao espera o fim do salto encadeado (antes abria no meio e o novo heroi era trazido para o degrau).
+	while land.busy and is_inside_tree():
+		await land.busy_changed
 	if _pending_switch == &"" or hud.handoff_open:
 		return
 	var hero := _pending_switch
@@ -473,7 +603,7 @@ func _on_handoff_confirmed() -> void:
 	var a := actors[hero] as MemberActor
 	var lead := controlled_node as MemberActor
 	if lead != null and a.global_position.distance_to(lead.global_position) > 4.0 and lead.is_on_floor():
-		a.teleport(lead.global_position + Basis(Vector3.UP, camera_rig.yaw) * Vector3(1.0, 0.05, 0.6))
+		a.teleport(handoff_point(lead, a))
 	posing = true
 	active_member = hero
 	set_controlled(a)
@@ -484,7 +614,7 @@ func _on_handoff_confirmed() -> void:
 	FeedbackFx.sparkle(world, a.global_position + Vector3(0, 1.0, 0))
 	audio.play_hero_switch_sting()
 	if current != null:
-		say(Ep01V3Dialogue.switch_line(current.id, hero))
+		say(Ep01V3Dialogue.pick("switch.to_%s" % hero, Ep01V3Dialogue.switch_line(current.id, hero)))
 	print("[RB] v3 control %s" % hero)
 	await get_tree().create_timer(TEAM_POSE_SECONDS).timeout
 	if not is_inside_tree():
@@ -493,6 +623,7 @@ func _on_handoff_confirmed() -> void:
 	if current != null:
 		current.set_active_hero(hero)
 	land.refresh()
+	guide.request_look()
 
 
 func _update_followers() -> void:
@@ -615,11 +746,18 @@ func _on_gesture_hint(_target: StringName, _key: StringName) -> void:
 	FeedbackFx.pulse(world, t.global_position)
 
 
+## Dica do radio (D19c): variante do grupo do passo, sem repetir a ultima (a 1a vez, a dica da ficha da missao).
 func _on_radio_hint(key: StringName) -> void:
-	print("[RB] v3 help radio %s" % key)
-	if key != &"" and Loc.has_key(String(key)):
+	var k := String(key)
+	if current != null:
+		var group := "hint.radio.%s.%s" % [current.id, current.current_step().get("id", &"")]
+		if Ep01V3Dialogue.has_group(group):
+			# 1a vez: a dica da ficha da missao; depois, variantes do grupo sem repetir a ultima.
+			k = Ep01V3Dialogue.pick(group, "" if Ep01V3Dialogue.said(group) else k)
+	print("[RB] v3 help radio %s" % k)
+	if k != "" and Loc.has_key(k):
 		hud.clear_speech(true)
-		hud.say(String(key), {}, true)
+		hud.say(k, {}, true)
 
 
 func _on_pointer_hint(_target: StringName, move_camera: bool) -> void:
@@ -658,7 +796,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		if not blocked():
 			help_now()
 	elif event.is_action_pressed(&"interact"):
-		if try_interact():
+		if guide.skip_look():
+			get_viewport().set_input_as_handled()
+		elif try_interact():
 			get_viewport().set_input_as_handled()
 
 

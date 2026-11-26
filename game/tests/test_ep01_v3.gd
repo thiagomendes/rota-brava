@@ -70,7 +70,10 @@ func _walkthrough() -> void:
 	var berth := main.world.marker(&"M6_BoatStart").global_position
 	r.check(main.boat.global_position.distance_to(berth) < 0.01, "v3: barco atracado no marcador do M6")
 	r.check(main.current != null and main.current.id == &"M0", "v3: comeca no M0")
-	# Camera baixa: altura da camera e fracao da tela ocupada pelo heroi (pes ao topo da cabeca ~1,12 m).
+	# Camera baixa: altura da camera e fracao da tela ocupada pelo heroi (pes ao topo da cabeca ~1,12 m). F2: o olhar
+	# dirigido do inicio (camera no alvo) e pulado antes de medir o enquadramento normal.
+	await r.frames(2)
+	main.guide.skip_look()
 	await r.frames(5)
 	var cam := main.camera_rig.camera
 	var cam_h := cam.global_position.y - tracker.global_position.y

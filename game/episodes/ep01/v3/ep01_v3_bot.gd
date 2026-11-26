@@ -75,8 +75,10 @@ func _physics_process(delta: float) -> void:
 			_tap(&"interact")
 		return
 	_hand_t = 0.0
-	if main.blocked() or main.current == null:
+	# F2: enquanto a camera mostra o alvo (olhar dirigido, 1,5 s) o bot espera, como quem assiste (nao pula).
+	if main.blocked() or main.current == null or main.guide.looking:
 		_walk(Vector3.ZERO)
+		_stuck_t = 0.0
 		return
 	var goal := _pick_goal()
 	if goal == null:

@@ -2088,6 +2088,42 @@
    ],
    "take": null,
    "group": "hint.radio.M8.thanks"
+  },
+  "ep01.team.tracker.call_climber_2": {
+   "speaker": "tracker",
+   "emotes": [
+    "carabiner",
+    "exclamation"
+   ],
+   "take": null,
+   "group": "switch.to_climber"
+  },
+  "ep01.team.pilot.call_climber_2": {
+   "speaker": "pilot",
+   "emotes": [
+    "carabiner",
+    "exclamation"
+   ],
+   "take": null,
+   "group": "switch.to_climber"
+  },
+  "ep01.team.tracker.call_climber_3": {
+   "speaker": "tracker",
+   "emotes": [
+    "carabiner",
+    "exclamation"
+   ],
+   "take": null,
+   "group": "switch.to_climber"
+  },
+  "ep01.team.climber.call_pilot_3": {
+   "speaker": "climber",
+   "emotes": [
+    "helm",
+    "exclamation"
+   ],
+   "take": null,
+   "group": "switch.to_pilot"
   }
  },
  "step_start": {
@@ -2174,24 +2210,19 @@
    "ep01.team.pilot.oops_3"
   ],
   "switch.to_tracker": [
-   "ep01.bank.climber.call_tracker",
    "ep01.team.climber.call_tracker_2",
    "ep01.team.pilot.call_tracker_2",
    "ep01.team.pilot.call_tracker_3"
   ],
   "switch.to_climber": [
-   "ep01.bank.tracker.call_climber",
-   "ep01.plaza.tracker.call_climber",
-   "ep01.street.pilot.call_climber",
-   "ep01.bay.pilot.call_climber",
-   "ep01.lighthouse.tracker.call_climber"
+   "ep01.team.tracker.call_climber_2",
+   "ep01.team.pilot.call_climber_2",
+   "ep01.team.tracker.call_climber_3"
   ],
   "switch.to_pilot": [
-   "ep01.market.tracker.call_pilot",
-   "ep01.street.tracker.call_pilot",
-   "ep01.lighthouse.climber.call_pilot",
    "ep01.team.climber.call_pilot_2",
-   "ep01.team.tracker.call_pilot_2"
+   "ep01.team.tracker.call_pilot_2",
+   "ep01.team.climber.call_pilot_3"
   ],
   "cheer.tracker": [
    "ep01.festival.tracker.cheer",
@@ -2320,5 +2351,6 @@
    "ep01.radio.v3_m8.thanks_3"
   ]
  },
- "_note_f2": "RB-R1 F2/D19c: step_start ('Mx.passo'), travel ('Ma>Mb') e step_done = falas que apontam; gesture.anim = clipe do heroi (Pico nao tem 'point': usa look_up/wave), fallback se faltar, target = marcador de village_world. groups = variantes sorteadas sem repetir a ultima (hint.radio.<passo>: a 1a e a dica atual). take null = sem audio ainda (vozes D19 depois)."
+ "_note_f2": "RB-R1 F2/D19c: step_start ('Mx.passo'), travel ('Ma>Mb') e step_done = falas que apontam; gesture.anim = clipe do heroi (Pico nao tem 'point': usa look_up/wave), fallback se faltar, target = marcador de village_world. groups = variantes sorteadas sem repetir a ultima (hint.radio.<passo>: a 1a e a dica atual). take null = sem audio ainda (vozes D19 depois).",
+ "_note_switch": "F2/A1: switch.to_* so tem chamados genericos (sem lugar); a fala da missao (switch) sempre vence."
 }
