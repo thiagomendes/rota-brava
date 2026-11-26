@@ -149,5 +149,9 @@
   "ep01.narrator.night.lanterns": "As lanternas acendem. É noite de festa!",
   "ep01.festival.captain.thanks_team": "Obrigado, Rota Brava! Vocês são demais!",
   "ep01.narrator.end.saved": "A Rota Brava salvou a Festa das Lanternas!",
-  "ep01.narrator.end.bye": "Até a próxima aventura!"
+  "ep01.narrator.end.bye": "Até a próxima aventura!",
+  "ep01.team.tracker.call_climber_2": "Pico, sua vez de subir!",
+  "ep01.team.pilot.call_climber_2": "Pico, sua vez! Lá para o alto!",
+  "ep01.team.tracker.call_climber_3": "Pico, vem! Lá em cima é com você!",
+  "ep01.team.climber.call_pilot_3": "Leme, sua vez! Vamos juntos!"
 }

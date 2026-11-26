@@ -67,13 +67,28 @@ func _variants() -> void:
 	r.check(groups.size() >= 30 and repeats == 0, "f2 D19c: %d grupos, 40 sorteios cada, nenhuma fala repete a anterior (%d)" % [groups.size(), repeats])
 	r.check(missing.is_empty(), "f2 D19c: toda variante sorteada esta no catalogo %s" % [missing])
 	r.check(seen_all, "f2 D19c: o sorteio passa por todas as variantes de cada grupo")
-	# Fala de contexto (chamado da missao) vem primeiro; repetida logo em seguida, sai outra do grupo.
+	# A1: a fala de troca da missao sempre vence; os grupos de troca so tem chamados genericos (sem lugar), sorteados
+	# sem repetir quando a missao nao tem fala propria.
 	Ep01V3Dialogue.reset_picks(3)
-	var call := Ep01V3Dialogue.switch_line(&"M2", &"climber")
-	var a := Ep01V3Dialogue.pick("switch.to_climber", call)
-	var b := Ep01V3Dialogue.pick("switch.to_climber", call)
-	r.check(a == call and b != call and b in Ep01V3Dialogue.group_keys("switch.to_climber"),
-		"f2 D19c: chamado da missao primeiro, e nao repete na vez seguinte (%s, %s)" % [a, b])
+	var always := true
+	var generic := true
+	for key: Variant in (Ep01V3Dialogue.sheet().get("switch", {}) as Dictionary):
+		var parts := str(key).split(":")
+		var call := Ep01V3Dialogue.switch_line(StringName(parts[0]), StringName(parts[1]))
+		for i in 3:
+			always = always and Ep01V3Dialogue.pick("switch.to_" + parts[1], call) == call
+		generic = generic and not (call in Ep01V3Dialogue.group_keys("switch.to_" + parts[1]))
+	r.check(always, "f2 A1: a fala de troca da missao sempre sai (3 vezes seguidas em cada missao)")
+	r.check(generic, "f2 A1: grupos de troca sem falas de lugar/missao")
+	for hero: String in ["tracker", "climber", "pilot"]:
+		var keys := Ep01V3Dialogue.group_keys("switch.to_" + hero)
+		var ok := keys.size() >= 2
+		var last := ""
+		for i in 12:
+			var k := Ep01V3Dialogue.pick("switch.to_" + hero)
+			ok = ok and k != last and k.begins_with("ep01.team.") and Loc.has_key(k)
+			last = k
+		r.check(ok, "f2 A1: sem fala da missao, chamado generico para %s sem repetir (%d variantes)" % [hero, keys.size()])
 
 
 # ---------------------------------------------------------------- P1

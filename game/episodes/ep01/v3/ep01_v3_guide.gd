@@ -199,8 +199,51 @@ func end_look(skipped: bool = false) -> void:
 		_look_actor.controlled = true
 	_look_actor = null
 	if main.controlled_node != null:
+		if look_target != Vector3.INF and not main.land.sailing:
+			main.camera_rig.set_low_view(clear_yaw(main.controlled_node.global_position, look_target))
 		main.camera_rig.follow(main.controlled_node, skipped)
 	look_finished.emit(skipped)
+
+
+## Rumo da camera baixa (de volta ao heroi) com o alvo a vista (F2/A5): o rumo direto heroi->alvo e, se a linha
+## camera->alvo cruzar um seguidor ou uma parede/cabine (camada 1), desvios de 15 em 15 graus ate 60.
+func clear_yaw(hero: Vector3, target: Vector3) -> float:
+	var d := target - hero
+	d.y = 0.0
+	var base := atan2(d.x, d.z) + PI if d.length() > 0.01 else main.camera_rig.yaw
+	for off: float in [0.0, 15.0, -15.0, 30.0, -30.0, 45.0, -45.0, 60.0, -60.0]:
+		var yaw := base + deg_to_rad(off)
+		if target_visible_from(hero + Basis(Vector3.UP, yaw) * CameraRig.LOW_OFFSET, target):
+			return yaw
+	return base
+
+
+## Linha da camera ate o alvo livre de seguidores (a menos de 0,55 m), do barco atracado e de colisao da camada 1.
+func target_visible_from(cam: Vector3, target: Vector3) -> bool:
+	var aim := target + Vector3(0, 0.15, 0)
+	for m: StringName in main.actors:
+		var a := main.actors[m] as MemberActor
+		if a == main.controlled_node:
+			continue
+		var c := a.global_position + Vector3(0, 0.6, 0)
+		var seg := aim - cam
+		var t := clampf((c - cam).dot(seg) / seg.length_squared(), 0.0, 1.0)
+		if (cam + seg * t).distance_to(c) < 0.55:
+			return false
+	# O barco atracado nao tem colisao: cabine e casco contam pelas caixas das malhas.
+	if main.boat != null and not main.land.sailing:
+		for v: Node in main.boat.find_children("*", "VisualInstance3D", true, false):
+			var vi := v as VisualInstance3D
+			var box := vi.global_transform * vi.get_aabb()
+			if vi.is_visible_in_tree() and not box.grow(0.1).has_point(aim) and box.intersects_segment(cam, aim):
+				return false
+	var q := PhysicsRayQueryParameters3D.create(cam, aim, 1)
+	for path: String in ["Collision/WaterLimits", "Collision/MapBounds", "Collision/AccessRamps"]:
+		var b := main.world.get_node_or_null(path) as CollisionObject3D
+		if b != null:
+			q.exclude = q.exclude + [b.get_rid()]
+	var hit := get_world_3d().direct_space_state.intersect_ray(q)
+	return hit.is_empty() or (hit.position as Vector3).distance_to(aim) < 0.4
 
 
 func skip_look() -> bool:

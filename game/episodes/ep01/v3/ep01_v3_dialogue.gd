@@ -109,27 +109,33 @@ static func group_keys(group: String) -> Array[String]:
 	return out
 
 
+## Ja saiu alguma fala deste grupo (desde o ultimo reset_picks)?
+static func said(group: String) -> bool:
+	return _last.has(group)
+
+
 static func has_group(group: String) -> bool:
 	return not group_keys(group).is_empty()
 
 
 ## Uma variante do grupo, nunca igual a ultima dita do mesmo grupo. `prefer`: fala de contexto (ex.: o chamado da
-## missao) usada quando esta no grupo e nao foi a ultima. "" se o grupo nao existe.
+## missao, F2/A1) que SEMPRE vence; o sorteio sem repetir so vale entre as variantes quando nao ha fala de contexto.
+## "" se nao ha fala nem grupo.
 static func pick(group: String, prefer: String = "") -> String:
 	var keys := group_keys(group)
-	if keys.is_empty():
+	if prefer != "":
+		if prefer in keys:
+			_last[group] = prefer
 		return prefer
+	if keys.is_empty():
+		return ""
 	var last := str(_last.get(group, ""))
-	var choice := ""
-	if prefer != "" and prefer in keys and prefer != last:
-		choice = prefer
-	else:
-		var pool: Array[String] = []
-		for k in keys:
-			if k != last:
-				pool.append(k)
-		if pool.is_empty():
-			pool = keys
-		choice = pool[_rng.randi_range(0, pool.size() - 1)]
+	var pool: Array[String] = []
+	for k in keys:
+		if k != last:
+			pool.append(k)
+	if pool.is_empty():
+		pool = keys
+	var choice := pool[_rng.randi_range(0, pool.size() - 1)]
 	_last[group] = choice
 	return choice

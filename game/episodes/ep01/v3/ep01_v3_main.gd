@@ -294,10 +294,10 @@ func handoff_point(lead: MemberActor, a: MemberActor) -> Vector3:
 	for radius: float in [1.0, 1.6, 2.4]:
 		for k in 12:
 			var p := from + base.normalized().rotated(Vector3.UP, TAU * k / 12.0) * radius
-			var floor := floor_at(p)
+			var ground := floor_at(p)
 			# Chao no mesmo nivel (nada de cair do promontorio ou parar na borda de algo).
-			if floor != Vector3.INF and absf(floor.y - from.y) < 0.35 and a.slot_clear(from, floor):
-				return floor + Vector3(0, 0.05, 0)
+			if ground != Vector3.INF and absf(ground.y - from.y) < 0.35 and a.slot_clear(from, ground):
+				return ground + Vector3(0, 0.05, 0)
 	return from + base + Vector3(0, 0.05, 0)
 
 
@@ -752,7 +752,8 @@ func _on_radio_hint(key: StringName) -> void:
 	if current != null:
 		var group := "hint.radio.%s.%s" % [current.id, current.current_step().get("id", &"")]
 		if Ep01V3Dialogue.has_group(group):
-			k = Ep01V3Dialogue.pick(group, k)
+			# 1a vez: a dica da ficha da missao; depois, variantes do grupo sem repetir a ultima.
+			k = Ep01V3Dialogue.pick(group, "" if Ep01V3Dialogue.said(group) else k)
 	print("[RB] v3 help radio %s" % k)
 	if k != "" and Loc.has_key(k):
 		hud.clear_speech(true)

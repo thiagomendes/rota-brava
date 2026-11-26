@@ -74,6 +74,7 @@ func _reset_shared_state() -> void:
 	Engine.time_scale = 1.0
 	Ep01V3Main.save_path = ""
 	Ep01V3Main.start_mission = &""
+	Ep01V3Dialogue.reset_picks()
 	for action: StringName in InputMap.get_actions():
 		Input.action_release(action)
 	paused = false

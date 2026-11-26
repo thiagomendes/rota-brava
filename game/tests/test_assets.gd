@@ -261,12 +261,30 @@ func _test_manifest() -> void:
 				var fp := ProjectSettings.globalize_path("res://").path_join("../" + String(d.get("saida", "")) + "/" + String(fname))
 				if FileAccess.get_sha256(fp) != String(files[fname]):
 					bad.append(fname)
-			r.check(files.size() > 0 and bad.is_empty(), "assets: arquivos do manifesto conferem (%s) %s" % [d.get("id"), bad])
+			# Decalques (sem GLB e sem `arquivos_sha256`): cena + texturas, cada um com o sha256 registrado.
+			var listed := files.size()
+			if d.has("cena"):
+				var root := ProjectSettings.globalize_path("res://").path_join("../")
+				listed += 1
+				if FileAccess.get_sha256(root + String(d["cena"])) != String(d.get("cena_sha256", "")):
+					bad.append(d["cena"])
+				var tsum: Dictionary = d.get("texturas_sha256", {})
+				for t: Variant in d.get("texturas", []):
+					listed += 1
+					if FileAccess.get_sha256(root + String(t)) != String(tsum.get(String(t).get_file(), "")):
+						bad.append(t)
+			r.check(listed > 0 and bad.is_empty(), "assets: arquivos do manifesto conferem (%s) %s" % [d.get("id"), bad])
 			continue
-		var glb: String = d.get("saida_glb", "")
-		var abs_glb := ProjectSettings.globalize_path("res://").path_join("../" + glb)
-		r.check(FileAccess.file_exists(abs_glb), "assets: GLB %s existe" % glb)
-		r.check(FileAccess.get_sha256(abs_glb) == String(d.get("glb_sha256", "")), "assets: sha256 do GLB confere com o manifesto (%s)" % d.get("id"))
+		# saida_glb: um caminho (sha256 em texto) ou uma lista (sha256 por nome de arquivo).
+		var out: Variant = d.get("saida_glb", "")
+		var glbs: Array = out if out is Array else [out]
+		var sums: Variant = d.get("glb_sha256", "")
+		for g: Variant in glbs:
+			var glb := String(g)
+			var abs_glb := ProjectSettings.globalize_path("res://").path_join("../" + glb)
+			var want := String((sums as Dictionary).get(glb.get_file(), "")) if sums is Dictionary else String(sums)
+			r.check(FileAccess.file_exists(abs_glb), "assets: GLB %s existe" % glb)
+			r.check(want != "" and FileAccess.get_sha256(abs_glb) == want, "assets: sha256 do GLB confere com o manifesto (%s %s)" % [d.get("id"), glb.get_file()])
 		var missing_src: Array = []
 		for s in d.get("origem", []):
 			if not FileAccess.file_exists(ProjectSettings.globalize_path("res://").path_join("../" + String(s))):
