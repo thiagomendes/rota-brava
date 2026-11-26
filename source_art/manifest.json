@@ -3729,6 +3729,495 @@
       "altura_m": 1.5641,
       "velocidade_walk_mps": 0.0,
       "velocidade_run_mps": 0.0
+    },
+    {
+      "id": "captain_v2",
+      "nome": "Capitao v2",
+      "papel": "captain",
+      "agente": "art3d",
+      "status": "provisorio",
+      "processo": {
+        "script": "source_art/characters/secondary_v2/build_captain_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, texturas JPEG embutidas, KHR_materials_clearcoat",
+        "tecnicas": "base adulta v2 (sv2_human: cabeca adulta, tronco+mangas SKIN + SUBSURF 3 com forma em numpy, calca, maos, sapatos); quepe por torno, pala por grade + solidify, barba e cabelo por metaballs; textura assada e pintada no pipeline do trio v2 (rv2_tex: UV Smart Project, mapas de posicao/normal/parte/AO no Cycles, pintura procedural em numpy, normal map da altura, cor + ORM, Principled com verniz -> KHR_materials_clearcoat); malha por grupo de material (uma atlas por grupo)"
+      },
+      "origem": [
+        "source_art/characters/secondary_v2/build_captain_v2.py",
+        "source_art/characters/secondary_v2/sv2_human.py",
+        "source_art/scripts/hero_anim.py",
+        "source_art/scripts/char_anim.py",
+        "source_art/characters/secondary_v2/sv2_lib.py",
+        "source_art/characters/rastro_v2/rv2_tex.py",
+        "source_art/scripts/hero_lib.py",
+        "source_art/scripts/hero_face.py",
+        "source_art/scripts/char_lib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/characters/secondary_v2/captain_v2.blend"
+      ],
+      "saida_glb": "game/assets/models/characters/captain_v2.glb",
+      "glb_sha256": "dadae571f9fcd69be076865c7d130f12ddf13a1beae628778119324e99e4c2b1",
+      "glb_bytes": 4255776,
+      "cena": "game/actors/characters/captain_model.tscn",
+      "importacao": "game/lookdev/gltf_pbr_import.gd (mipmaps e verniz, como no trio v2)",
+      "triangulos": 24414,
+      "triangulos_por_objeto": {
+        "Captain_Skin": 5996,
+        "Captain_Hair": 4728,
+        "Captain_Cloth": 8054,
+        "Captain_Gear": 3268,
+        "Captain_Face": 2368
+      },
+      "materiais": [
+        "mat_captain_v2_cloth",
+        "mat_captain_v2_face_dark",
+        "mat_captain_v2_face_eye",
+        "mat_captain_v2_face_iris",
+        "mat_captain_v2_face_mouth",
+        "mat_captain_v2_face_skin",
+        "mat_captain_v2_gear",
+        "mat_captain_v2_hair",
+        "mat_captain_v2_skin"
+      ],
+      "texturas": {
+        "captain_v2_cloth_color": [
+          2048,
+          2048
+        ],
+        "captain_v2_cloth_normal": [
+          2048,
+          2048
+        ],
+        "captain_v2_cloth_orm": [
+          2048,
+          2048
+        ],
+        "captain_v2_gear_color": [
+          1024,
+          1024
+        ],
+        "captain_v2_gear_normal": [
+          1024,
+          1024
+        ],
+        "captain_v2_gear_orm": [
+          1024,
+          1024
+        ],
+        "captain_v2_hair_color": [
+          1024,
+          1024
+        ],
+        "captain_v2_hair_normal": [
+          1024,
+          1024
+        ],
+        "captain_v2_hair_orm": [
+          1024,
+          1024
+        ],
+        "captain_v2_skin_color": [
+          1024,
+          1024
+        ],
+        "captain_v2_skin_normal": [
+          1024,
+          1024
+        ],
+        "captain_v2_skin_orm": [
+          1024,
+          1024
+        ]
+      },
+      "objetos": [
+        "Captain_Cloth",
+        "Captain_Face",
+        "Captain_Gear",
+        "Captain_Hair",
+        "Captain_Skin"
+      ],
+      "ossos": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "neck",
+        "head",
+        "shoulder.R",
+        "upper_arm.R",
+        "forearm.R",
+        "hand.R",
+        "hand_tip.R",
+        "shoulder.L",
+        "upper_arm.L",
+        "forearm.L",
+        "hand.L",
+        "hand_tip.L",
+        "thigh.R",
+        "shin.R",
+        "foot.R",
+        "toe.R",
+        "toe_tip.R",
+        "heel.R",
+        "thigh.L",
+        "shin.L",
+        "foot.L",
+        "toe.L",
+        "toe_tip.L",
+        "heel.L"
+      ],
+      "quantidade_ossos": 28,
+      "animacoes_duracao_s": {
+        "idle": 3.0,
+        "thanks": 2.0,
+        "walk": 1.0,
+        "wave": 1.6
+      },
+      "shape_keys": [
+        "Basis",
+        "neutra",
+        "atenta",
+        "surpresa",
+        "alegre",
+        "triste",
+        "brava_leve",
+        "blink",
+        "mouth_A",
+        "mouth_E",
+        "mouth_O",
+        "mouth_M",
+        "look_left",
+        "look_right",
+        "look_up"
+      ],
+      "altura_m": 1.766,
+      "velocidade_walk_mps": 1.1347,
+      "velocidade_run_mps": 2.4107,
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (SKIN + SUBSURF, metaballs, torno, bmesh, deslocamento em numpy); texturas pintadas por formula; rig e animacoes autorais por script; nenhum modelo, malha, rig, mocap, textura, HDRI ou personagem-base de terceiros",
+      "data": "2026-11-26",
+      "nota": "RB-R1 G4: capitao refeito no padrao do trio v2 e com proporcao adulta (cabeca ~21% da altura). Mesmo esqueleto de 28 ossos e mesmos clipes (idle, walk, wave, thanks) do captain.glb; velocidades recalculadas pela proporcao nova.",
+      "razao_cabeca_altura": 0.2095
+    },
+    {
+      "id": "pup_v2",
+      "nome": "Filhote v2",
+      "papel": "pup",
+      "agente": "art3d",
+      "status": "provisorio",
+      "processo": {
+        "script": "source_art/characters/secondary_v2/build_pup_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, texturas JPEG embutidas, KHR_materials_clearcoat",
+        "tecnicas": "corpo e pernas numa malha SKIN + SUBSURF 3 com patas assentadas; cabeca por metaballs; orelhas, nariz, coleira e pingente em bmesh; creme do focinho/peito/patas pintado; textura assada e pintada no pipeline do trio v2 (rv2_tex: UV Smart Project, mapas de posicao/normal/parte/AO no Cycles, pintura procedural em numpy, normal map da altura, cor + ORM, Principled com verniz -> KHR_materials_clearcoat); malha por grupo de material (uma atlas por grupo)"
+      },
+      "origem": [
+        "source_art/characters/secondary_v2/build_pup_v2.py",
+        "source_art/scripts/pup_build.py",
+        "source_art/characters/secondary_v2/sv2_lib.py",
+        "source_art/characters/rastro_v2/rv2_tex.py",
+        "source_art/scripts/hero_lib.py",
+        "source_art/scripts/hero_face.py",
+        "source_art/scripts/char_lib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/characters/secondary_v2/pup_v2.blend"
+      ],
+      "saida_glb": "game/assets/models/characters/pup_v2.glb",
+      "glb_sha256": "dc9f2e89f17f2600462259ed0669206c7e1055f29925ca98a99f3ad91f1bceb0",
+      "glb_bytes": 2571760,
+      "cena": "game/actors/characters/pup_model.tscn",
+      "importacao": "game/lookdev/gltf_pbr_import.gd (mipmaps e verniz, como no trio v2)",
+      "triangulos": 16892,
+      "triangulos_por_objeto": {
+        "Pup_Body": 6598,
+        "Pup_Head": 6526,
+        "Pup_Gear": 1400,
+        "Pup_Face": 2368
+      },
+      "materiais": [
+        "mat_pup_v2_face_dark",
+        "mat_pup_v2_face_eye",
+        "mat_pup_v2_face_iris",
+        "mat_pup_v2_face_mouth",
+        "mat_pup_v2_face_skin",
+        "mat_pup_v2_fur_body",
+        "mat_pup_v2_fur_head",
+        "mat_pup_v2_gear"
+      ],
+      "texturas": {
+        "pup_v2_fur_body_color": [
+          1024,
+          1024
+        ],
+        "pup_v2_fur_body_normal": [
+          1024,
+          1024
+        ],
+        "pup_v2_fur_body_orm": [
+          1024,
+          1024
+        ],
+        "pup_v2_fur_head_color": [
+          1024,
+          1024
+        ],
+        "pup_v2_fur_head_normal": [
+          1024,
+          1024
+        ],
+        "pup_v2_fur_head_orm": [
+          1024,
+          1024
+        ],
+        "pup_v2_gear_color": [
+          512,
+          512
+        ],
+        "pup_v2_gear_normal": [
+          512,
+          512
+        ],
+        "pup_v2_gear_orm": [
+          512,
+          512
+        ]
+      },
+      "objetos": [
+        "Pup_Body",
+        "Pup_Face",
+        "Pup_Gear",
+        "Pup_Head"
+      ],
+      "ossos": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "neck",
+        "head",
+        "ear.L",
+        "ear.R",
+        "fl_upper.L",
+        "fl_lower.L",
+        "fl_paw.L",
+        "fl_upper.R",
+        "fl_lower.R",
+        "fl_paw.R",
+        "tail1",
+        "tail2",
+        "tail3",
+        "bl_upper.L",
+        "bl_lower.L",
+        "bl_paw.L",
+        "bl_upper.R",
+        "bl_lower.R",
+        "bl_paw.R"
+      ],
+      "quantidade_ossos": 23,
+      "animacoes_duracao_s": {
+        "bark": 0.8,
+        "idle": 2.8,
+        "jump_happy": 1.0,
+        "run": 0.6,
+        "step_on_horn": 1.4,
+        "wag": 1.2,
+        "walk": 1.0
+      },
+      "shape_keys": [
+        "Basis",
+        "neutra",
+        "atenta",
+        "surpresa",
+        "alegre",
+        "triste",
+        "brava_leve",
+        "blink",
+        "mouth_A",
+        "mouth_E",
+        "mouth_O",
+        "mouth_M",
+        "look_left",
+        "look_right",
+        "look_up"
+      ],
+      "altura_m": 0.5024,
+      "velocidade_walk_mps": 0.569,
+      "velocidade_run_mps": 1.2745,
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (SKIN + SUBSURF, metaballs, torno, bmesh, deslocamento em numpy); texturas pintadas por formula; rig e animacoes autorais por script; nenhum modelo, malha, rig, mocap, textura, HDRI ou personagem-base de terceiros",
+      "data": "2026-11-26",
+      "nota": "RB-R1 G4: filhote refeito no padrao do trio v2. Mesmo esqueleto (23 ossos, mesmas posicoes) e mesmos clipes (idle, wag, jump_happy, bark, step_on_horn, walk, run) do pup_build.py, mesmas velocidades."
+    },
+    {
+      "id": "amora_v2",
+      "nome": "Dona Amora v2",
+      "papel": "vendor",
+      "agente": "art3d",
+      "status": "provisorio",
+      "processo": {
+        "script": "source_art/characters/secondary_v2/build_amora_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, texturas JPEG embutidas, KHR_materials_clearcoat",
+        "tecnicas": "base adulta v2 (sv2_human) com vestido inteirico (blusa + saia rodada numa malha SKIN), meia, sapatos, avental por grade projetada na saia + solidify, peitilho, lenco por tubo achatado; bolinhas de amora, punhos e pespontos pintados; textura assada e pintada no pipeline do trio v2 (rv2_tex: UV Smart Project, mapas de posicao/normal/parte/AO no Cycles, pintura procedural em numpy, normal map da altura, cor + ORM, Principled com verniz -> KHR_materials_clearcoat); malha por grupo de material (uma atlas por grupo)"
+      },
+      "origem": [
+        "source_art/characters/secondary_v2/build_amora_v2.py",
+        "source_art/characters/secondary_v2/sv2_human.py",
+        "source_art/characters/amora/build_amora.py",
+        "source_art/scripts/hero_anim.py",
+        "source_art/scripts/char_anim.py",
+        "source_art/characters/secondary_v2/sv2_lib.py",
+        "source_art/characters/rastro_v2/rv2_tex.py",
+        "source_art/scripts/hero_lib.py",
+        "source_art/scripts/hero_face.py",
+        "source_art/scripts/char_lib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/characters/secondary_v2/amora_v2.blend"
+      ],
+      "saida_glb": "game/assets/models/characters/amora_v2.glb",
+      "glb_sha256": "7917f64abd463f777138e0162af61612223c4c14e0329f126460c45c180f0db2",
+      "glb_bytes": 4199424,
+      "cena": "game/actors/characters/amora_model.tscn",
+      "importacao": "game/lookdev/gltf_pbr_import.gd (mipmaps e verniz, como no trio v2)",
+      "triangulos": 23510,
+      "triangulos_por_objeto": {
+        "Amora_Skin": 5996,
+        "Amora_Hair": 3044,
+        "Amora_Cloth": 9090,
+        "Amora_Gear": 3012,
+        "Amora_Face": 2368
+      },
+      "materiais": [
+        "mat_amora_v2_cloth",
+        "mat_amora_v2_face_dark",
+        "mat_amora_v2_face_eye",
+        "mat_amora_v2_face_iris",
+        "mat_amora_v2_face_mouth",
+        "mat_amora_v2_face_skin",
+        "mat_amora_v2_gear",
+        "mat_amora_v2_hair",
+        "mat_amora_v2_skin"
+      ],
+      "texturas": {
+        "amora_v2_cloth_color": [
+          2048,
+          2048
+        ],
+        "amora_v2_cloth_normal": [
+          2048,
+          2048
+        ],
+        "amora_v2_cloth_orm": [
+          2048,
+          2048
+        ],
+        "amora_v2_gear_color": [
+          512,
+          512
+        ],
+        "amora_v2_gear_normal": [
+          512,
+          512
+        ],
+        "amora_v2_gear_orm": [
+          512,
+          512
+        ],
+        "amora_v2_hair_color": [
+          1024,
+          1024
+        ],
+        "amora_v2_hair_normal": [
+          1024,
+          1024
+        ],
+        "amora_v2_hair_orm": [
+          1024,
+          1024
+        ],
+        "amora_v2_skin_color": [
+          1024,
+          1024
+        ],
+        "amora_v2_skin_normal": [
+          1024,
+          1024
+        ],
+        "amora_v2_skin_orm": [
+          1024,
+          1024
+        ]
+      },
+      "objetos": [
+        "Amora_Cloth",
+        "Amora_Face",
+        "Amora_Gear",
+        "Amora_Hair",
+        "Amora_Skin"
+      ],
+      "ossos": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "neck",
+        "head",
+        "shoulder.R",
+        "upper_arm.R",
+        "forearm.R",
+        "hand.R",
+        "hand_tip.R",
+        "shoulder.L",
+        "upper_arm.L",
+        "forearm.L",
+        "hand.L",
+        "hand_tip.L",
+        "thigh.R",
+        "shin.R",
+        "foot.R",
+        "toe.R",
+        "toe_tip.R",
+        "heel.R",
+        "thigh.L",
+        "shin.L",
+        "foot.L",
+        "toe.L",
+        "toe_tip.L",
+        "heel.L"
+      ],
+      "quantidade_ossos": 28,
+      "animacoes_duracao_s": {
+        "idle": 3.6,
+        "point": 1.2,
+        "talk": 3.0,
+        "thanks": 2.0,
+        "wave": 1.6
+      },
+      "shape_keys": [
+        "Basis",
+        "neutra",
+        "atenta",
+        "surpresa",
+        "alegre",
+        "triste",
+        "brava_leve",
+        "blink",
+        "mouth_A",
+        "mouth_E",
+        "mouth_O",
+        "mouth_M",
+        "look_left",
+        "look_right",
+        "look_up"
+      ],
+      "altura_m": 1.6834,
+      "velocidade_walk_mps": 0.0,
+      "velocidade_run_mps": 0.0,
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria (SKIN + SUBSURF, metaballs, torno, bmesh, deslocamento em numpy); texturas pintadas por formula; rig e animacoes autorais por script; nenhum modelo, malha, rig, mocap, textura, HDRI ou personagem-base de terceiros",
+      "data": "2026-11-26",
+      "nota": "RB-R1 G4: Dona Amora refeita com proporcao de senhora (cabeca ~21% da altura; antes 27%, lia como crianca), olhos menores, linhas de sorriso e fios grisalhos pintados. Mesmos clipes (idle, wave, thanks, point, talk).",
+      "razao_cabeca_altura": 0.2109
     }
   ]
 }

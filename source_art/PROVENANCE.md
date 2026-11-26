@@ -121,3 +121,20 @@
   `Cut_VillageWide`, `Cut_LighthouseView` (estes dois com `metadata/camera = true` e `look_at`).
 - **Reproducao:** `python3 -I source_art/scripts/manifest_arte_cenas.py` (sha256 e medidas no manifesto); provas no Blender com
   `source_art/scripts/render_arte_cenas.py`; capturas no jogo com `tools/capture_arte_cenas.gd`.
+
+## RB-R1 G4: secundarios v2 no padrao do trio (PROVISORIO, 2026-11-26)
+
+- **Agente:** `art3d`. Detalhes em `source_art/characters/secondary_v2/PROVENANCE.md`. Geometria, textura e animacao 100% por
+  script, sem nada de terceiros. Pipeline de textura e material do trio (`rv2_tex.py`, so leitura) via `sv2_lib.py`; base
+  adulta em `sv2_human.py`. Provas em `captures/g4/` (fora do Git).
+- **Capitao v2** (`build_captain_v2.py`): proporcao adulta (cabeca 21% de 1,77 m), 28 ossos e clipes iguais; GLB
+  `game/assets/models/characters/captain_v2.glb` `dadae571f9fcd69be076865c7d130f12ddf13a1beae628778119324e99e4c2b1`, 24 414 tris,
+  4,26 MB; `captain_model.tscn` aponta para ele (`metadata/pbr`, walk 1,1347 m/s, run 2,4107 m/s).
+- **Filhote v2** (`build_pup_v2.py`): 23 ossos, clipes e velocidades iguais aos do `pup_build.py`; GLB `pup_v2.glb`
+  `dc9f2e89f17f2600462259ed0669206c7e1055f29925ca98a99f3ad91f1bceb0`, 16 892 tris, 2,57 MB.
+- **Dona Amora v2** (`build_amora_v2.py`): proporcao de senhora (cabeca 21% de 1,68 m com o coque), clipes iguais; GLB
+  `amora_v2.glb` `7917f64abd463f777138e0162af61612223c4c14e0329f126460c45c180f0db2`, 23 510 tris, 4,20 MB.
+- Os GLB anteriores (`captain.glb`, `pup.glb`, `amora.glb`) ficam no disco e no manifesto, sem uso no jogo.
+- **Reproducao:** builds no Blender (comandos no PROVENANCE da pasta), `python3 -I source_art/characters/secondary_v2/manifest_g4.py`
+  (entradas `captain_v2`, `pup_v2`, `amora_v2` no manifesto), provas com `render_sv2.py` e capturas no jogo com
+  `game/tests/capture_g4.tscn`.
