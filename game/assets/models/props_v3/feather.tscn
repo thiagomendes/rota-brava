@@ -1,0 +1,63 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://assets/models/props_v3/props_v3_piece.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/feather.glb" id="2_glb"]
+
+[sub_resource type="Animation" id="Animation_flutter"]
+resource_name = "flutter"
+length = 2.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Flutter:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0.04517), Vector3(0.015, 0.0433, 0.07213), Vector3(0.045, 0.0433, 0.07977), Vector3(0.06, 0, 0.06603), Vector3(0.045, -0.0433, 0.0346), Vector3(0.015, -0.0433, -0.00611), Vector3(0, 0, -0.04517), Vector3(0, 0.0433, -0.07213), Vector3(0, 0.0433, -0.07977), Vector3(0, 0, -0.06603), Vector3(0, -0.0433, -0.0346), Vector3(0, -0.0433, 0.00611), Vector3(0, 0, 0.04517)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Flutter:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0.004, 0), Vector3(0, 0.00693, 0), Vector3(0, 0.008, 0), Vector3(0, 0.00693, 0), Vector3(0, 0.004, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_pv3"]
+_data = {
+&"flutter": SubResource("Animation_flutter")
+}
+
+[node name="Pv3Feather" type="Node3D"]
+script = ExtResource("1_script")
+autoplay_anim = &"flutter"
+metadata/piece_id = "feather"
+metadata/mission = "M5"
+metadata/interactive = true
+metadata/interaction = "examine"
+metadata/member = "tracker"
+metadata/note = "pena de gaivota solta (M5.feathers), opcional ao decalque decal_feather_big; balanca no vento"
+metadata/tris = 832
+metadata/tris_budget = 1600
+metadata/pivot = "meio da raque, no chao; ponta para -Z"
+metadata/provisional = false
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/clues_v3/build_clues_v3.py"
+
+[node name="Flutter" type="Node3D" parent="."]
+
+[node name="Model" parent="Flutter" instance=ExtResource("2_glb")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_pv3")
+}

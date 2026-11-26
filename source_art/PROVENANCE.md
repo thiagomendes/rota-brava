@@ -91,3 +91,8 @@
   style-bible. Nenhuma fonte, imagem ou icone de terceiros; sem modelo de imagem.
 - **Nao mexido:** o emblema 3D do mosquetao (`props_v3`, `_emb_icon` em `source_art/props_v3/build_props_v3.py`) e geometria
   propria do `art3d` (oval com barra dourada); o achado "le como 0" continua la.
+
+## RB-R1 F2: pistas do roteiro intuitivo (bota do capitao, pegadas grandes, pena, anel alto)
+- **Agente:** `art3d`, 2026-11-26. **Status:** `provisorio` no manifesto (entradas `clues_v3_*`); nas cenas `provisional = false`.
+- **Originalidade:** geometria e decalques 100% por script/formula do projeto; nenhum modelo, malha, textura ou imagem de
+  terceiros; sem modelo de imagem. Detalhes, arquivos e como reproduzir: `source_art/clues_v3/PROVENANCE.md`.

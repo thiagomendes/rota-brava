@@ -3114,12 +3114,12 @@
       "data": "2026-11-25",
       "saida": "game/assets/models/props_v3",
       "arquivos_sha256": {
-        "props_v3_piece.gd": "4e72b821459ea86986d2850ce2052c161d018d7ed0fbd8f6b1885d5fd2292064",
+        "props_v3_piece.gd": "a30f0c53934e06250b1580fa154fd9a675c553ff64791088d23259ed3a4fe9c4",
         "gull.gd": "45df2d291e5186431e74a7079a78678df66bc1b78efa9f566b6e81df65415467",
         "tow_rope.gd": "74d4309f18143c4d3f4137cf57bdeaf9a0a7a56bfe6a4cfc4e8695c23d006675"
       },
       "arquivos_bytes": {
-        "props_v3_piece.gd": 5248,
+        "props_v3_piece.gd": 5936,
         "gull.gd": 2080,
         "tow_rope.gd": 1283
       }
@@ -3163,6 +3163,426 @@
       "originalidade": "formas desenhadas no projeto, sem referencia, fonte ou imagem de terceiros; sem modelo de imagem",
       "data": "2026-11-25",
       "nota": "RB-R1 E7 (ux). carabiner.svg substitui o desenho de 038be7b (oval simetrica que lia como '0' cortado): forma de D inclinada 22 graus, trava prata e luva amarela. Prova: game/tests/test_ep01_v3_portraits.gd (48 px) e captures/e7_icones/prancha_icones_48_96.png (fora do Git)."
+    },
+    {
+      "id": "clues_v3_captain_boot",
+      "nome": "Ep01 v3 F2 · bota do capitao caida de lado (M1.boot): junto a amarra vazia M1_EmptyMooring; le a 8 m na camera baixa",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = os do props v3 (wv2_* procedurais + pv3_* da Godot)",
+      "processo": {
+        "script": "source_art/clues_v3/build_clues_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice"
+      },
+      "origem": [
+        "source_art/clues_v3/build_clues_v3.py",
+        "source_art/clues_v3/gen_decals.py",
+        "source_art/clues_v3/gen_scenes_clues.py",
+        "source_art/clues_v3/clues_v3.blend",
+        "source_art/clues_v3/PROVENANCE.md",
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M1",
+      "saida_glb": [
+        "game/assets/models/props_v3/captain_boot.glb"
+      ],
+      "glb_sha256": {
+        "captain_boot.glb": "d5b9e07160b6e955eb552a97885b0867780c1e7076fba75992c46819c3d616dd"
+      },
+      "glb_bytes": {
+        "captain_boot.glb": 119160
+      },
+      "cena": "game/assets/models/props_v3/captain_boot.tscn",
+      "cena_sha256": "be54b001c0188f06ac35b47d1a460789b0513bf45e078acb4fcb05e0a2a62fa8",
+      "cena_bytes": 889,
+      "triangulos": 2816,
+      "orcamento_tris": 3500,
+      "materiais": [
+        "pv3_vinyl",
+        "wv2_metal"
+      ],
+      "pivo": "centro do contato no chao (bota deitada; bico para +Z, cano para -Z)",
+      "animacoes": [],
+      "tamanho_m": [
+        0.676,
+        0.478,
+        0.763
+      ]
+    },
+    {
+      "id": "clues_v3_feather",
+      "nome": "Ep01 v3 F2 · pena de gaivota solta (M5.feathers), opcional ao decalque decal_feather_big; balanca no vento",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = os do props v3 (wv2_* procedurais + pv3_* da Godot)",
+      "processo": {
+        "script": "source_art/clues_v3/build_clues_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice"
+      },
+      "origem": [
+        "source_art/clues_v3/build_clues_v3.py",
+        "source_art/clues_v3/gen_decals.py",
+        "source_art/clues_v3/gen_scenes_clues.py",
+        "source_art/clues_v3/clues_v3.blend",
+        "source_art/clues_v3/PROVENANCE.md",
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M5",
+      "saida_glb": [
+        "game/assets/models/props_v3/feather.glb"
+      ],
+      "glb_sha256": {
+        "feather.glb": "93290a3a24e4c93d25fa68f02630bfb5559f3092a0384b7628fec47316fa5549"
+      },
+      "glb_bytes": {
+        "feather.glb": 32512
+      },
+      "cena": "game/assets/models/props_v3/feather.tscn",
+      "cena_sha256": "b7985afa14a0ed95e87bd9bd6b09a49d682a235bfd47767272d603bc275f41e2",
+      "cena_bytes": 2647,
+      "triangulos": 832,
+      "orcamento_tris": 1600,
+      "materiais": [
+        "pv3_cloth",
+        "pv3_vinyl"
+      ],
+      "pivo": "meio da raque, no chao; ponta para -Z",
+      "animacoes": [
+        "flutter"
+      ],
+      "tamanho_m": [
+        0.173,
+        0.061,
+        0.501
+      ]
+    },
+    {
+      "id": "clues_v3_target_ring_tall",
+      "nome": "Ep01 v3 F2 · anel de alvo para grama alta: o anel do chao + um anel a 0,5 m + pilar de luz suave de 1,9 m",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = os do props v3 (wv2_* procedurais + pv3_* da Godot)",
+      "processo": {
+        "script": "source_art/clues_v3/build_clues_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice"
+      },
+      "origem": [
+        "source_art/clues_v3/build_clues_v3.py",
+        "source_art/clues_v3/gen_decals.py",
+        "source_art/clues_v3/gen_scenes_clues.py",
+        "source_art/clues_v3/clues_v3.blend",
+        "source_art/clues_v3/PROVENANCE.md",
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "geral",
+      "saida_glb": [
+        "game/assets/models/props_v3/target_ring.glb",
+        "game/assets/models/props_v3/target_beam.glb"
+      ],
+      "glb_sha256": {
+        "target_ring.glb": "1ef86137a6d216d86f5028beebfc563a79d03f00bfe15f605fd765b7ce05f45b",
+        "target_beam.glb": "c3d32758c129d45014c99f86771fde8b98a1a709ee4a56fc23bdf6e824fab449"
+      },
+      "glb_bytes": {
+        "target_ring.glb": 10308,
+        "target_beam.glb": 19064
+      },
+      "cena": "game/assets/models/props_v3/target_ring_tall.tscn",
+      "cena_sha256": "38787650af0e005213a0800c289173847b43d43a84ab3c976a13ff3708d1288f",
+      "cena_bytes": 4993,
+      "triangulos": 736,
+      "orcamento_tris": 1000,
+      "materiais": [
+        "pv3_beam"
+      ],
+      "pivo": "centro, no chao",
+      "animacoes": [
+        "pulse"
+      ]
+    },
+    {
+      "id": "clues_v3_decal_paw_big",
+      "nome": "Ep01 v3 F2 · decalque pata do filhote grande (P4); substitui decal_paw nas trilhas",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "final para o jogo; aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "desenho 100% por formulas proprias (campos de distancia em numpy); nenhuma imagem de terceiros; sem modelo de imagem",
+      "processo": {
+        "script": "source_art/clues_v3/gen_decals.py",
+        "ferramenta": "Python 3 + numpy (PNG proprio do wv2_textures)"
+      },
+      "origem": [
+        "source_art/clues_v3/gen_decals.py",
+        "source_art/clues_v3/gen_scenes_clues.py",
+        "source_art/environment_v2/wv2_textures.py"
+      ],
+      "missao": "M1",
+      "cena": "game/worlds/village_v3/decals/decal_paw_big.tscn",
+      "cena_sha256": "5cc4c894418ecb580e65bec3a8471ab83f8449644fe67fdec351ec9f11581fdd",
+      "cena_bytes": 991,
+      "texturas": [
+        "game/worlds/village_v3/decals/tex/decal_paw_big_albedo.png",
+        "game/worlds/village_v3/decals/tex/decal_paw_big_emission.png"
+      ],
+      "texturas_sha256": {
+        "decal_paw_big_albedo.png": "3a19d285494a2bdc54814f59b3d7e57fe92d1731484da9d617c8b00bd670ed05",
+        "decal_paw_big_emission.png": "12476814f099e53b63237a96d7e00c0553380eba754029b8daea3d1a0b273004"
+      },
+      "texturas_bytes": {
+        "decal_paw_big_albedo.png": 50065,
+        "decal_paw_big_emission.png": 19769
+      },
+      "tamanho_decal_m": [
+        0.6,
+        0.6
+      ],
+      "extensao_visivel_m": [
+        0.45,
+        0.445
+      ],
+      "triangulos": 0
+    },
+    {
+      "id": "clues_v3_decal_paw_wet_big",
+      "nome": "Ep01 v3 F2 · decalque pata molhada grande (M2, cesto -> juncos)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "final para o jogo; aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "desenho 100% por formulas proprias (campos de distancia em numpy); nenhuma imagem de terceiros; sem modelo de imagem",
+      "processo": {
+        "script": "source_art/clues_v3/gen_decals.py",
+        "ferramenta": "Python 3 + numpy (PNG proprio do wv2_textures)"
+      },
+      "origem": [
+        "source_art/clues_v3/gen_decals.py",
+        "source_art/clues_v3/gen_scenes_clues.py",
+        "source_art/environment_v2/wv2_textures.py"
+      ],
+      "missao": "M2",
+      "cena": "game/worlds/village_v3/decals/decal_paw_wet_big.tscn",
+      "cena_sha256": "356915e183224dc2057a5043c8847bfbf2cb53b01b62e2699e07f6bba71c4e27",
+      "cena_bytes": 988,
+      "texturas": [
+        "game/worlds/village_v3/decals/tex/decal_paw_wet_big_albedo.png",
+        "game/worlds/village_v3/decals/tex/decal_paw_wet_big_emission.png"
+      ],
+      "texturas_sha256": {
+        "decal_paw_wet_big_albedo.png": "9521fef4de2d95de493963492edac0e49b94b0464fdb38dcc61fd25f303232a9",
+        "decal_paw_wet_big_emission.png": "b1efe3d10bfb2c3ef3dc864de3a4022b4fa04febe13e6c13afe62f1cfaac456a"
+      },
+      "texturas_bytes": {
+        "decal_paw_wet_big_albedo.png": 63332,
+        "decal_paw_wet_big_emission.png": 30515
+      },
+      "tamanho_decal_m": [
+        0.6,
+        0.6
+      ],
+      "extensao_visivel_m": [
+        0.564,
+        0.526
+      ],
+      "triangulos": 0
+    },
+    {
+      "id": "clues_v3_decal_paw_dock",
+      "nome": "Ep01 v3 F2 · decalque pata de lama na tabua do cais (M1.bench), junto ao barco",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "final para o jogo; aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "desenho 100% por formulas proprias (campos de distancia em numpy); nenhuma imagem de terceiros; sem modelo de imagem",
+      "processo": {
+        "script": "source_art/clues_v3/gen_decals.py",
+        "ferramenta": "Python 3 + numpy (PNG proprio do wv2_textures)"
+      },
+      "origem": [
+        "source_art/clues_v3/gen_decals.py",
+        "source_art/clues_v3/gen_scenes_clues.py",
+        "source_art/environment_v2/wv2_textures.py"
+      ],
+      "missao": "M1",
+      "cena": "game/worlds/village_v3/decals/decal_paw_dock.tscn",
+      "cena_sha256": "083680e8f335e99f2fda6f0239ae4ee74011fe9636de2977b2abd51ac1730c36",
+      "cena_bytes": 982,
+      "texturas": [
+        "game/worlds/village_v3/decals/tex/decal_paw_dock_albedo.png",
+        "game/worlds/village_v3/decals/tex/decal_paw_dock_emission.png"
+      ],
+      "texturas_sha256": {
+        "decal_paw_dock_albedo.png": "9a69bf306d3112e719ae1a1c8c62857bb6e785f1e3c32a8a54089dd7116a5e50",
+        "decal_paw_dock_emission.png": "32783b0f55a1173efac1970b7d158dd815ca88f35939574018e882ab63c61a44"
+      },
+      "texturas_bytes": {
+        "decal_paw_dock_albedo.png": 61843,
+        "decal_paw_dock_emission.png": 29267
+      },
+      "tamanho_decal_m": [
+        0.66,
+        0.66
+      ],
+      "extensao_visivel_m": [
+        0.592,
+        0.603
+      ],
+      "triangulos": 0
+    },
+    {
+      "id": "clues_v3_decal_feather_big",
+      "nome": "Ep01 v3 F2 · decalque pena de gaivota grande (M5.feathers)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "final para o jogo; aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "desenho 100% por formulas proprias (campos de distancia em numpy); nenhuma imagem de terceiros; sem modelo de imagem",
+      "processo": {
+        "script": "source_art/clues_v3/gen_decals.py",
+        "ferramenta": "Python 3 + numpy (PNG proprio do wv2_textures)"
+      },
+      "origem": [
+        "source_art/clues_v3/gen_decals.py",
+        "source_art/clues_v3/gen_scenes_clues.py",
+        "source_art/environment_v2/wv2_textures.py"
+      ],
+      "missao": "M5",
+      "cena": "game/worlds/village_v3/decals/decal_feather_big.tscn",
+      "cena_sha256": "5b99a4307617645d42e51a648681721aa07136192d9023c3582d4262473b3cc5",
+      "cena_bytes": 983,
+      "texturas": [
+        "game/worlds/village_v3/decals/tex/decal_feather_big_albedo.png",
+        "game/worlds/village_v3/decals/tex/decal_feather_big_emission.png"
+      ],
+      "texturas_sha256": {
+        "decal_feather_big_albedo.png": "c5cae219a5cb8238f43a974517abf8588e310c16c71e2a838d85d385674f6875",
+        "decal_feather_big_emission.png": "b98120a288d2cd654e5fcd24d322c6c488708da0340de11445a23d6f1ab13a29"
+      },
+      "texturas_bytes": {
+        "decal_feather_big_albedo.png": 44031,
+        "decal_feather_big_emission.png": 21700
+      },
+      "tamanho_decal_m": [
+        0.6,
+        0.6
+      ],
+      "extensao_visivel_m": [
+        0.288,
+        0.581
+      ],
+      "triangulos": 0
+    },
+    {
+      "id": "clues_v3_decal_boot_print_l",
+      "nome": "Ep01 v3 F2 · decalque pegada da bota do capitao, pe esquerdo (M1.boot)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "final para o jogo; aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "desenho 100% por formulas proprias (campos de distancia em numpy); nenhuma imagem de terceiros; sem modelo de imagem",
+      "processo": {
+        "script": "source_art/clues_v3/gen_decals.py",
+        "ferramenta": "Python 3 + numpy (PNG proprio do wv2_textures)"
+      },
+      "origem": [
+        "source_art/clues_v3/gen_decals.py",
+        "source_art/clues_v3/gen_scenes_clues.py",
+        "source_art/environment_v2/wv2_textures.py"
+      ],
+      "missao": "M1",
+      "cena": "game/worlds/village_v3/decals/decal_boot_print_l.tscn",
+      "cena_sha256": "c1fb53459a41dd6a34019e1ae74a5c5f2e5b5dff7068c67dc00dbd94cfa9abf0",
+      "cena_bytes": 988,
+      "texturas": [
+        "game/worlds/village_v3/decals/tex/decal_boot_print_l_albedo.png",
+        "game/worlds/village_v3/decals/tex/decal_boot_print_l_emission.png"
+      ],
+      "texturas_sha256": {
+        "decal_boot_print_l_albedo.png": "420928d3dc7208350e8af06f384acc7461b51a6cbdf8e633432bc6eefefe287e",
+        "decal_boot_print_l_emission.png": "4bb6c2cabf68283561fefecdf8f24b6980b6c04de13a3a29bdc41d7f698edb4c"
+      },
+      "texturas_bytes": {
+        "decal_boot_print_l_albedo.png": 21030,
+        "decal_boot_print_l_emission.png": 13065
+      },
+      "tamanho_decal_m": [
+        0.28,
+        0.56
+      ],
+      "extensao_visivel_m": [
+        0.267,
+        0.537
+      ],
+      "triangulos": 0
+    },
+    {
+      "id": "clues_v3_decal_boot_print_r",
+      "nome": "Ep01 v3 F2 · decalque pegada da bota do capitao, pe direito (M1.boot)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "final para o jogo; aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "desenho 100% por formulas proprias (campos de distancia em numpy); nenhuma imagem de terceiros; sem modelo de imagem",
+      "processo": {
+        "script": "source_art/clues_v3/gen_decals.py",
+        "ferramenta": "Python 3 + numpy (PNG proprio do wv2_textures)"
+      },
+      "origem": [
+        "source_art/clues_v3/gen_decals.py",
+        "source_art/clues_v3/gen_scenes_clues.py",
+        "source_art/environment_v2/wv2_textures.py"
+      ],
+      "missao": "M1",
+      "cena": "game/worlds/village_v3/decals/decal_boot_print_r.tscn",
+      "cena_sha256": "ffae1b1969655bd1ce8dd3f32aef28b6a70af8e3b337ffb482a1a9cbd4860d0a",
+      "cena_bytes": 987,
+      "texturas": [
+        "game/worlds/village_v3/decals/tex/decal_boot_print_r_albedo.png",
+        "game/worlds/village_v3/decals/tex/decal_boot_print_r_emission.png"
+      ],
+      "texturas_sha256": {
+        "decal_boot_print_r_albedo.png": "1311d54da4cb38e72e91dd3b634dbe0fe08a091fd638d9ced54cffefa67ee79c",
+        "decal_boot_print_r_emission.png": "b1c16b03d17f6beee66f6f361b2199d0d3914a4700be61c0faa64887276a19c8"
+      },
+      "texturas_bytes": {
+        "decal_boot_print_r_albedo.png": 20884,
+        "decal_boot_print_r_emission.png": 13059
+      },
+      "tamanho_decal_m": [
+        0.28,
+        0.56
+      ],
+      "extensao_visivel_m": [
+        0.267,
+        0.537
+      ],
+      "triangulos": 0
+    },
+    {
+      "id": "clues_v3_scripts",
+      "nome": "Ep01 v3 F2 · script das pecas (material pv3_beam)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "data": "2026-11-25",
+      "saida": "game/assets/models/props_v3",
+      "arquivos_sha256": {
+        "props_v3_piece.gd": "a30f0c53934e06250b1580fa154fd9a675c553ff64791088d23259ed3a4fe9c4"
+      },
+      "arquivos_bytes": {
+        "props_v3_piece.gd": 5936
+      }
     }
   ]
 }

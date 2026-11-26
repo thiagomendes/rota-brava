@@ -1,0 +1,158 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://assets/models/props_v3/props_v3_piece.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/target_ring.glb" id="2_glb"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/target_beam.glb" id="3_beam"]
+
+[sub_resource type="Animation" id="Animation_pulse"]
+resource_name = "pulse"
+length = 1.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Rings/Model/pv3_ring_outer:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.8, 1, 0.8), Vector3(2.2, 1, 2.2)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Rings/Model/pv3_ring_outer:transparency")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.1, 1]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Rings/Model/pv3_ring_inner:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.599, 0.6, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(1.5, 1, 1.5), Vector3(2.2, 1, 2.2), Vector3(0.8, 1, 0.8), Vector3(1.5, 1, 1.5)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Rings/Model/pv3_ring_inner:transparency")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.599, 0.6, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.55, 1, 0.1, 0.55]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("RingsHigh/Model/pv3_ring_outer:scale")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.8, 1, 0.8), Vector3(2.2, 1, 2.2)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("RingsHigh/Model/pv3_ring_outer:transparency")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.1, 1]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("RingsHigh/Model/pv3_ring_inner:scale")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.599, 0.6, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(1.5, 1, 1.5), Vector3(2.2, 1, 2.2), Vector3(0.8, 1, 0.8), Vector3(1.5, 1, 1.5)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("RingsHigh/Model/pv3_ring_inner:transparency")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 0.599, 0.6, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.55, 1, 0.1, 0.55]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Beam/Model/pv3_target_beam:transparency")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 1.05, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.45, 0.39142, 0.25, 0.10858, 0.05, 0.10858, 0.25, 0.39142, 0.45]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_pv3"]
+_data = {
+&"pulse": SubResource("Animation_pulse")
+}
+
+[node name="Pv3TargetRingTall" type="Node3D"]
+script = ExtResource("1_script")
+autoplay_anim = &"pulse"
+metadata/piece_id = "target_ring_tall"
+metadata/mission = ""
+metadata/interactive = false
+metadata/interaction = ""
+metadata/member = ""
+metadata/note = "anel de alvo para grama alta: o anel do chao + um anel a 0,5 m + pilar de luz suave de 1,9 m"
+metadata/tris = 736
+metadata/tris_budget = 1000
+metadata/pivot = "centro, no chao"
+metadata/provisional = false
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/clues_v3/build_clues_v3.py"
+
+[node name="Rings" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+
+[node name="Model" parent="Rings" instance=ExtResource("2_glb")]
+
+[node name="RingsHigh" type="Node3D" parent="."]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0.55, 0)
+
+[node name="Model" parent="RingsHigh" instance=ExtResource("2_glb")]
+
+[node name="Beam" type="Node3D" parent="."]
+
+[node name="Model" parent="Beam" instance=ExtResource("3_beam")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_pv3")
+}
