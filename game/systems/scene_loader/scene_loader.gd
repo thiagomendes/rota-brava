@@ -18,6 +18,11 @@ const FADE_IN := 0.12
 const FADE_OUT := 0.3
 ## Quadros da cena nova atras da tela antes do fade (o primeiro costuma pagar shader e upload de malha).
 const SETTLE_FRAMES := 3
+## Teto (ms, relogio real) que uma cena pode segurar a tela por `loading_hold()`; estourou, chama `loading_timeout()`
+## e a tela sai (crianca nunca fica presa no carregamento).
+const HOLD_MAX_MS := 60000
+
+var hold_max_ms: int = HOLD_MAX_MS  # testes encurtam
 ## Recursos pesados que as cenas carregam no proprio `_ready` com `load()` (a .tscn em si e minuscula): vao junto em
 ## segundo plano e ficam presos aqui ate a cena nova assentar, para o `load()` dela sair do cache.
 const VILLAGE_DEPS: Array[String] = ["res://worlds/village_v3/village_world.tscn",
@@ -49,6 +54,7 @@ var _settle_left: int = 0
 var _alpha: float = 0.0
 var _pending: Array[String] = []
 var _held: Array[Resource] = []
+var _hold_start_ms: int = 0
 
 
 func _ready() -> void:
@@ -92,6 +98,43 @@ static func instance() -> SceneLoaderService:
 ## Atalho usado pelas cenas do jogo no lugar de `change_scene_to_file`.
 static func go(path: String) -> bool:
 	return instance().change_scene(path)
+
+
+## Cobre a tela ja (opaca, sem fade de entrada) e segura ate a cena atual liberar. Usado pelo menu na abertura do
+## jogo, que nao chega pelo change_scene. Sem efeito se ja ha uma troca em andamento.
+func cover_current() -> void:
+	if phase != Phase.IDLE:
+		return
+	target_path = "(abertura)"
+	last_timings = {}
+	reduced_motion = Options.reduced_motion()
+	_star.reduced_motion = reduced_motion
+	_star.spin = 0.0
+	_started_ms = Time.get_ticks_msec()
+	_root.visible = true
+	_star.visible = true
+	phase = Phase.SETTLING
+	_settle_left = SETTLE_FRAMES
+	_set_alpha(1.0)
+	print("[RB] loader cover %s" % (get_tree().current_scene.scene_file_path if get_tree().current_scene else "?"))
+
+
+## A cena atual pede para segurar a tela (`loading_hold() -> bool`), com teto HOLD_MAX_MS.
+func _scene_holds() -> bool:
+	var cur := get_tree().current_scene
+	if cur == null or not cur.has_method(&"loading_hold") or not bool(cur.call(&"loading_hold")):
+		_hold_start_ms = 0
+		return false
+	var now := Time.get_ticks_msec()
+	if _hold_start_ms == 0:
+		_hold_start_ms = now
+	if now - _hold_start_ms >= hold_max_ms:
+		print("[RB] loader hold_timeout %dms" % (now - _hold_start_ms))
+		if cur.has_method(&"loading_timeout"):
+			cur.call(&"loading_timeout")
+		_hold_start_ms = 0
+		return false
+	return true
 
 
 func star_spin() -> float:
@@ -150,7 +193,7 @@ func _process(delta: float) -> void:
 				_swap.call_deferred()
 		Phase.SETTLING:
 			_settle_left -= 1
-			if _settle_left <= 0:
+			if _settle_left <= 0 and not _scene_holds():
 				_held.clear()
 				phase = Phase.FADING_OUT
 		Phase.FADING_OUT:

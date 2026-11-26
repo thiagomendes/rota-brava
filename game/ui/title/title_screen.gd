@@ -34,6 +34,9 @@ var _key_pending: Array[String] = []
 var _key_held: Array[Resource] = []
 var _key_settle := -1
 var _key_frame_ms := 0
+## Teto da tela de carregamento estourou: o menu abre sobre a imagem parada e o palco entra depois com fade.
+var _key_late := false
+var _key_ready := false
 var hero_stage: SubViewportContainer
 ## Onde o lead instancia os 3 herois 3D (os placeholders sao filhos chamados Placeholder*).
 var hero_root: Node3D
@@ -63,6 +66,8 @@ func _ready() -> void:
 		ThemeV2.pop_in(b, 0.6, 0.4, 0.25 + i * 0.07)
 		i += 1
 	play_button.grab_focus()
+	if not _key_pending.is_empty():
+		_cover_on_boot.call_deferred()
 
 
 func _build() -> void:
@@ -354,13 +359,37 @@ func _poll_key_art() -> void:
 
 func _reveal_key_art() -> void:
 	_key_held.clear()
+	_key_ready = true
+	print("[RB] title key_art pronto ms=%d" % Time.get_ticks_msec())
 	if _still == null:
 		return
 	var still := _still
 	_still = null
-	if Options.reduced_motion():
+	# Ainda atras da tela de carregamento: some a imagem direto (o fade e o da tela).
+	if Options.reduced_motion() or not _key_late:
 		still.queue_free()
 		return
 	var tw := create_tween()
 	tw.tween_property(still, "modulate:a", 0.0, KEY_FADE)
 	tw.tween_callback(still.queue_free)
+
+
+## G10 (decisao de Thiago): a tela de carregamento fica ate o palco 3D estar instanciado e ter desenhado KEY_SETTLE
+## quadros (shader e pipeline compilados atras dela). Sem palco (arquivo ausente/falhou): nao segura.
+func loading_hold() -> bool:
+	if _key_late or _key_ready:
+		return false
+	return not _key_pending.is_empty() or key_art != null
+
+
+## Abertura do jogo (menu e a cena principal, nao veio pelo SceneLoader): cobre com a tela de carregamento antes do
+## primeiro quadro desenhar. Instanciado a parte (testes) nao cobre.
+func _cover_on_boot() -> void:
+	if is_inside_tree() and get_tree().current_scene == self:
+		SceneLoaderService.instance().cover_current()
+
+
+## Teto do SceneLoader: abre o menu sobre a imagem parada; o palco entra depois com fade.
+func loading_timeout() -> void:
+	_key_late = true
+	print("[RB] title key_art atrasado: menu sobre a imagem parada")

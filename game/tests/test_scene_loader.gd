@@ -21,6 +21,7 @@ func run(runner) -> void:
 	r.check(not loader.change_scene("res://nao/existe.tscn") and not loader.is_busy(), "loader: caminho inexistente nao muda nada")
 	await _intro_end_to_menu()
 	await _menu_fast()
+	await _menu_timeout()
 	Options.motion_override = -1
 	r.tree.unload_current_scene()
 	await r.frames(2)
@@ -48,6 +49,11 @@ func _changes_scene() -> void:
 	var cur: Node = r.tree.current_scene
 	r.check(cur != null and cur.scene_file_path == MENU, "loader: cena trocada para o menu (%d quadros)" % n)
 	r.check(not loader.is_showing() and not loader.is_busy(), "loader: tela some ao fim")
+	var tm := cur as TitleScreen
+	if tm != null and ResourceLoader.exists(TitleScreen.KEY_ART):
+		r.check(tm.key_art != null and tm.key_art.is_inside_tree() and tm.get_node_or_null("KeyArtStill") == null,
+			"menu: so aparece depois do palco 3D instanciado e desenhado (sem imagem parada)")
+		r.check(tm.play_button.has_focus(), "menu: foco em Jogar ao sair do carregamento")
 	r.check(int(loader.last_timings.get("total_ms", 0)) >= SceneLoaderService.MIN_SHOW_MS,
 		"loader: tempo minimo de exibicao respeitado (%s)" % loader.last_timings)
 
@@ -107,4 +113,34 @@ func _menu_fast() -> void:
 	r.check(m.key_art != null and m.key_art.is_inside_tree(), "menu: arte-chave 3D entra depois (%d quadros)" % n)
 	r.check(m.play_button.has_focus(), "menu: foco continua em Jogar depois da troca do fundo")
 	m.queue_free()
+	await r.frames(2)
+
+
+## Plano B: teto da tela estourado -> menu abre sobre a imagem parada, com foco, e o palco entra depois.
+func _menu_timeout() -> void:
+	Options.motion_override = 0
+	loader.hold_max_ms = 1
+	loader.change_scene(MENU)
+	await _wait_idle()
+	loader.hold_max_ms = SceneLoaderService.HOLD_MAX_MS
+	var m := r.tree.current_scene as TitleScreen
+	r.check(m != null and not loader.is_showing(), "teto: menu abre mesmo sem o palco pronto")
+	if m == null:
+		return
+	r.check(m.get_node_or_null("KeyArtStill") != null and m.play_button.has_focus(),
+		"teto: menu sobre a imagem parada com foco em Jogar")
+	var n := 0
+	while m.get_node_or_null("KeyArtStill") != null and n < 20000:
+		await r.tree.process_frame
+		n += 1
+	r.check(m.key_art != null and m.key_art.is_inside_tree(), "teto: palco entra depois (%d quadros)" % n)
+	r.check(not m.loading_hold(), "teto: menu nao volta a segurar a tela")
+	# Palco ausente/falhou (nada pendente e nenhum palco): nao segura a tela; menu fica sobre a imagem parada.
+	var m2 := (load(MENU) as PackedScene).instantiate() as TitleScreen
+	r.tree.root.add_child(m2)
+	m2._key_pending.clear()
+	r.check(not m2.loading_hold() and m2.key_art == null, "palco ausente: menu nao segura a tela de carregamento")
+	await r.frames(3)
+	r.check(m2.key_art == null and m2.play_button.has_focus(), "palco ausente: menu abre sobre a imagem parada com foco")
+	m2.queue_free()
 	await r.frames(2)
