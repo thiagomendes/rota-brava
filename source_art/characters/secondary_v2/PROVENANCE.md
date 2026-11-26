@@ -49,3 +49,15 @@ byte idêntico entre exportações (JPEG e ordem interna), mas malha, materiais 
 - Filhote: pelo curto (tufos, fios, fio fino) na cor e na altura da atlas, fosco.
 - Retratos do HUD do capitao e do filhote: `bash tools/blender.sh --background source_art/characters/secondary_v2/<id>_v2.blend
   --python source_art/scripts/hero_portraits_v2.py -- <id>`.
+
+## Rodada 3 (Dona Amora)
+- Lenço: tubo cíclico (o anel final liga no inicial; referencial de cada anel pelo raio da cabeça), sem a costura no topo da frente.
+- Grisalho: no lugar da faixa lisa #B9B2BC (55–85% da largura, lia como halo), mechas finas pintadas na têmpora e acima da
+  orelha, seguindo o penteado puxado para o coque (#A39599, mistura 0,70, só em algumas faixas).
+- Calça/meia (também no capitão): as pernas formam uma corrente em U com fundilho baixo, sem nó de bifurcação; fecha o vão
+  escuro entre as coxas visto de baixo da barra do casaco.
+- GLB: `amora_v2.glb` `4215a7cf6627e316c6ae5aeffdbce718c046e092a13c664ecbee11597cb91749` (23 134 tris),
+  `captain_v2.glb` `2c956bac94e0fadb9e1c8f81f429e091719417d441774476f5916fae378805d8` (24 038 tris).
+- r3b: Dona Amora sem orelhas modeladas (`EARS = False`; o cabelo puxado as cobre; a orelha furava o cabelo na lateral);
+  grisalho em mechas irregulares (duas familias de faixas, uma inclinada que cruza; largura, posicao, comeco e fim
+  sorteados por faixa). `amora_v2.glb` `084dfbb49a8f48f76b0f7101cf9b62b3909a15d7167b3522f4e54421541fdd4c` (22 630 tris).
