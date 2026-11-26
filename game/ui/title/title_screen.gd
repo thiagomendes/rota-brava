@@ -13,9 +13,9 @@ const LOGO := "res://ui/title/keyart/logos/logo_c_noite.svg"
 const KEY_ART := "res://ui/title/keyart/keyart_b.tscn"
 ## G10: imagem parada do fundo da arte-chave B (sem logo e sem botoes), mostrada ate o palco 3D ficar pronto.
 const KEY_STILL := "res://ui/title/keyart/stills/b_bg_16x9.jpg"
-const KEY_ART_DEPS: Array[String] = ["res://worlds/village_v3/village_world.tscn", "res://worlds/village_v3/boat_wv2.tscn",
-	"res://assets/models/environment_v2/wv2_static.glb", "res://assets/models/environment_v2/wv2_kit.glb",
-	"res://assets/models/environment_v2/wv3_props.glb"]
+## GLBs que o VillageWorld carrega no proprio _ready (alem do que KeyArtStage.resource_paths() lista).
+const KEY_ART_GLBS: Array[String] = ["res://assets/models/environment_v2/wv2_static.glb",
+	"res://assets/models/environment_v2/wv2_kit.glb", "res://assets/models/environment_v2/wv3_props.glb"]
 const KEY_FADE := 0.6
 ## Quadros do palco recem-criado escondido antes do fade (primeiro quadro paga shader).
 const KEY_SETTLE := 3
@@ -91,7 +91,8 @@ func _build() -> void:
 			_still.texture = load(KEY_STILL) as Texture2D
 			add_child(_still)
 		_key_pending = [KEY_ART]
-		_key_pending.append_array(KEY_ART_DEPS)
+		_key_pending.append_array(Array(KeyArtStage.resource_paths()))
+		_key_pending.append_array(KEY_ART_GLBS)
 		for path: String in _key_pending:
 			ResourceLoader.load_threaded_request(path, "", true)
 	_safe = Control.new()
@@ -343,6 +344,7 @@ func _poll_key_art() -> void:
 	key_art.name = "KeyArt"
 	key_art.framing = &"menu"
 	key_art.show_logo = false   # o logo e o TextureRect `logo` abaixo (com mola e escondido nas opcoes)
+	key_art.village_scene = ResourceLoader.load(KeyArtStage.VILLAGE) as PackedScene  # ja no cache (segundo plano)
 	add_child(key_art)
 	move_child(key_art, background.get_index() + 1)
 	_key_settle = KEY_SETTLE
