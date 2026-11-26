@@ -878,6 +878,1447 @@
    "take": null,
    "mission": "M8",
    "when": "hint"
+  },
+  "ep01.dock.tracker.look_paw": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "look"
+   ],
+   "take": null,
+   "mission": "M1",
+   "when": "M1.bench",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M1_BenchClue"
+   }
+  },
+  "ep01.dock.tracker.boot_steps": {
+   "speaker": "tracker",
+   "emotes": [
+    "boot",
+    "look"
+   ],
+   "take": null,
+   "mission": "M1",
+   "when": "M1.boot",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M1_EmptyMooring"
+   }
+  },
+  "ep01.dock.tracker.follow_paws": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "look"
+   ],
+   "take": null,
+   "mission": "M1",
+   "when": "M1.trail",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M1_PawTrail_1"
+   }
+  },
+  "ep01.bank.tracker.pup_to_line": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "exclamation"
+   ],
+   "take": null,
+   "mission": "M1",
+   "when": "M1.trail",
+   "moment": "done",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M2_Clothesline"
+   }
+  },
+  "ep01.bank.climber.cloth_on_shed": {
+   "speaker": "climber",
+   "emotes": [
+    "look",
+    "carabiner"
+   ],
+   "take": null,
+   "mission": "M2",
+   "when": "M2.free_pieces",
+   "moment": "start",
+   "gesture": {
+    "anim": "look_up",
+    "fallback": "wave",
+    "target": "M2_ShedTop"
+   }
+  },
+  "ep01.bank.tracker.cloth_reeds": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "wave"
+   ],
+   "take": null,
+   "mission": "M2",
+   "when": "M2.find_third",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M2_ReedsPiece"
+   }
+  },
+  "ep01.bank.pilot.hang_line": {
+   "speaker": "pilot",
+   "emotes": [
+    "rope",
+    "thumbs_up"
+   ],
+   "take": null,
+   "mission": "M2",
+   "when": "M2.hang",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M2_Clothesline"
+   }
+  },
+  "ep01.bank.tracker.paws_to_fountain": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "look"
+   ],
+   "take": null,
+   "mission": "M3",
+   "when": "M2>M3",
+   "moment": "travel",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M3_ChannelStart"
+   }
+  },
+  "ep01.plaza.tracker.see_channel": {
+   "speaker": "tracker",
+   "emotes": [
+    "look",
+    "magnifier"
+   ],
+   "take": null,
+   "mission": "M3",
+   "when": "M3.stream",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M3_ChannelStart"
+   }
+  },
+  "ep01.plaza.climber.leaves_top": {
+   "speaker": "climber",
+   "emotes": [
+    "leaf",
+    "look"
+   ],
+   "take": null,
+   "mission": "M3",
+   "when": "M3.leaves",
+   "moment": "start",
+   "gesture": {
+    "anim": "look_up",
+    "fallback": "wave",
+    "target": "M3_UpperBasin"
+   }
+  },
+  "ep01.plaza.tracker.see_market": {
+   "speaker": "tracker",
+   "emotes": [
+    "vendor",
+    "look"
+   ],
+   "take": null,
+   "mission": "M4",
+   "when": "M3>M4",
+   "moment": "travel",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M4_Cart"
+   }
+  },
+  "ep01.market.tracker.see_cart": {
+   "speaker": "tracker",
+   "emotes": [
+    "look",
+    "magnifier"
+   ],
+   "take": null,
+   "mission": "M4",
+   "when": "M4.read",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M4_Cart"
+   }
+  },
+  "ep01.market.pilot.see_stalls": {
+   "speaker": "pilot",
+   "emotes": [
+    "helm",
+    "look"
+   ],
+   "take": null,
+   "mission": "M4",
+   "when": "M4.deliver",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M4_Stall_Lemon"
+   }
+  },
+  "ep01.street.tracker.see_feathers": {
+   "speaker": "tracker",
+   "emotes": [
+    "look",
+    "paw"
+   ],
+   "take": null,
+   "mission": "M5",
+   "when": "M5.feathers",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M5_FeatherTrail_1"
+   }
+  },
+  "ep01.street.pilot.see_vane": {
+   "speaker": "pilot",
+   "emotes": [
+    "star",
+    "look"
+   ],
+   "take": null,
+   "mission": "M5",
+   "when": "M5.compass",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M5_Weathervane"
+   }
+  },
+  "ep01.street.climber.gull_roof": {
+   "speaker": "climber",
+   "emotes": [
+    "fish",
+    "look"
+   ],
+   "take": null,
+   "mission": "M5",
+   "when": "M5.fish",
+   "moment": "start",
+   "gesture": {
+    "anim": "look_up",
+    "fallback": "wave",
+    "target": "M5_ShedRoof"
+   }
+  },
+  "ep01.bay.pilot.see_boat": {
+   "speaker": "pilot",
+   "emotes": [
+    "boat",
+    "look"
+   ],
+   "take": null,
+   "mission": "M6",
+   "when": "M6.board",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M6_BoatStart"
+   }
+  },
+  "ep01.bay.pilot.see_buoys": {
+   "speaker": "pilot",
+   "emotes": [
+    "buoy",
+    "look"
+   ],
+   "take": null,
+   "mission": "M6",
+   "when": "M6.buoys",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M6_BuoyA"
+   }
+  },
+  "ep01.bay.pilot.see_dinghy": {
+   "speaker": "pilot",
+   "emotes": [
+    "boat",
+    "exclamation"
+   ],
+   "take": null,
+   "mission": "M6",
+   "when": "M6.approach",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M6_Dinghy"
+   }
+  },
+  "ep01.bay.climber.rope_dinghy": {
+   "speaker": "climber",
+   "emotes": [
+    "rope",
+    "carabiner"
+   ],
+   "take": null,
+   "mission": "M6",
+   "when": "M6.rope",
+   "moment": "start",
+   "gesture": {
+    "anim": "wave",
+    "fallback": "wave",
+    "target": "M6_Dinghy"
+   }
+  },
+  "ep01.lighthouse.tracker.go_lighthouse": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "look"
+   ],
+   "take": null,
+   "mission": "M7",
+   "when": "M6>M7",
+   "moment": "travel",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M7_Lens"
+   }
+  },
+  "ep01.lighthouse.tracker.lens_bush": {
+   "speaker": "tracker",
+   "emotes": [
+    "magnifier",
+    "look"
+   ],
+   "take": null,
+   "mission": "M7",
+   "when": "M7.lens",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M7_Lens"
+   }
+  },
+  "ep01.lighthouse.climber.pup_top": {
+   "speaker": "climber",
+   "emotes": [
+    "paw",
+    "look"
+   ],
+   "take": null,
+   "mission": "M7",
+   "when": "M7.climb",
+   "moment": "start",
+   "gesture": {
+    "anim": "look_up",
+    "fallback": "wave",
+    "target": "M7_Gallery"
+   }
+  },
+  "ep01.lighthouse.pilot.see_boats": {
+   "speaker": "pilot",
+   "emotes": [
+    "boat",
+    "star"
+   ],
+   "take": null,
+   "mission": "M7",
+   "when": "M7.aim",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M7_FestaBoat_1_star"
+   }
+  },
+  "ep01.festival.tracker.see_captain": {
+   "speaker": "tracker",
+   "emotes": [
+    "heart",
+    "look"
+   ],
+   "take": null,
+   "mission": "M8",
+   "when": "M8.thanks",
+   "moment": "start",
+   "gesture": {
+    "anim": "point",
+    "fallback": "wave",
+    "target": "M8_FestaPlaza"
+   }
+  },
+  "ep01.radio.help.invite_1": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "help"
+   ],
+   "take": null,
+   "group": "help.radio.invite"
+  },
+  "ep01.radio.help.invite_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "help"
+   ],
+   "take": null,
+   "group": "help.radio.invite"
+  },
+  "ep01.radio.help.invite_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "help"
+   ],
+   "take": null,
+   "group": "help.radio.invite"
+  },
+  "ep01.radio.help.invite_4": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "help"
+   ],
+   "take": null,
+   "group": "help.radio.invite"
+  },
+  "ep01.radio.help.invite_5": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "help"
+   ],
+   "take": null,
+   "group": "help.radio.invite"
+  },
+  "ep01.team.tracker.success_1": {
+   "speaker": "tracker",
+   "emotes": [
+    "thumbs_up",
+    "magnifier"
+   ],
+   "take": null,
+   "group": "success.tracker"
+  },
+  "ep01.team.tracker.success_2": {
+   "speaker": "tracker",
+   "emotes": [
+    "thumbs_up",
+    "magnifier"
+   ],
+   "take": null,
+   "group": "success.tracker"
+  },
+  "ep01.team.tracker.success_3": {
+   "speaker": "tracker",
+   "emotes": [
+    "thumbs_up",
+    "magnifier"
+   ],
+   "take": null,
+   "group": "success.tracker"
+  },
+  "ep01.team.tracker.success_4": {
+   "speaker": "tracker",
+   "emotes": [
+    "thumbs_up",
+    "magnifier"
+   ],
+   "take": null,
+   "group": "success.tracker"
+  },
+  "ep01.team.climber.success_1": {
+   "speaker": "climber",
+   "emotes": [
+    "thumbs_up",
+    "carabiner"
+   ],
+   "take": null,
+   "group": "success.climber"
+  },
+  "ep01.team.climber.success_2": {
+   "speaker": "climber",
+   "emotes": [
+    "thumbs_up",
+    "carabiner"
+   ],
+   "take": null,
+   "group": "success.climber"
+  },
+  "ep01.team.climber.success_3": {
+   "speaker": "climber",
+   "emotes": [
+    "thumbs_up",
+    "carabiner"
+   ],
+   "take": null,
+   "group": "success.climber"
+  },
+  "ep01.team.pilot.success_1": {
+   "speaker": "pilot",
+   "emotes": [
+    "thumbs_up",
+    "helm"
+   ],
+   "take": null,
+   "group": "success.pilot"
+  },
+  "ep01.team.pilot.success_2": {
+   "speaker": "pilot",
+   "emotes": [
+    "thumbs_up",
+    "helm"
+   ],
+   "take": null,
+   "group": "success.pilot"
+  },
+  "ep01.team.pilot.success_3": {
+   "speaker": "pilot",
+   "emotes": [
+    "thumbs_up",
+    "helm"
+   ],
+   "take": null,
+   "group": "success.pilot"
+  },
+  "ep01.team.pilot.success_4": {
+   "speaker": "pilot",
+   "emotes": [
+    "thumbs_up",
+    "helm"
+   ],
+   "take": null,
+   "group": "success.pilot"
+  },
+  "ep01.market.vendor.oops_1": {
+   "speaker": "vendor",
+   "emotes": [
+    "question",
+    "heart"
+   ],
+   "take": null,
+   "group": "oops.vendor"
+  },
+  "ep01.market.vendor.oops_2": {
+   "speaker": "vendor",
+   "emotes": [
+    "question",
+    "heart"
+   ],
+   "take": null,
+   "group": "oops.vendor"
+  },
+  "ep01.market.vendor.oops_3": {
+   "speaker": "vendor",
+   "emotes": [
+    "question",
+    "heart"
+   ],
+   "take": null,
+   "group": "oops.vendor"
+  },
+  "ep01.bay.pilot.buoy_oops_1": {
+   "speaker": "pilot",
+   "emotes": [
+    "buoy",
+    "sweat"
+   ],
+   "take": null,
+   "group": "oops.pilot.buoy"
+  },
+  "ep01.bay.pilot.buoy_oops_2": {
+   "speaker": "pilot",
+   "emotes": [
+    "buoy",
+    "sweat"
+   ],
+   "take": null,
+   "group": "oops.pilot.buoy"
+  },
+  "ep01.bay.pilot.buoy_oops_3": {
+   "speaker": "pilot",
+   "emotes": [
+    "buoy",
+    "sweat"
+   ],
+   "take": null,
+   "group": "oops.pilot.buoy"
+  },
+  "ep01.team.tracker.oops_1": {
+   "speaker": "tracker",
+   "emotes": [
+    "question",
+    "magnifier"
+   ],
+   "take": null,
+   "group": "oops.tracker"
+  },
+  "ep01.team.tracker.oops_2": {
+   "speaker": "tracker",
+   "emotes": [
+    "question",
+    "magnifier"
+   ],
+   "take": null,
+   "group": "oops.tracker"
+  },
+  "ep01.team.tracker.oops_3": {
+   "speaker": "tracker",
+   "emotes": [
+    "question",
+    "magnifier"
+   ],
+   "take": null,
+   "group": "oops.tracker"
+  },
+  "ep01.team.climber.oops_1": {
+   "speaker": "climber",
+   "emotes": [
+    "sweat",
+    "carabiner"
+   ],
+   "take": null,
+   "group": "oops.climber"
+  },
+  "ep01.team.climber.oops_2": {
+   "speaker": "climber",
+   "emotes": [
+    "sweat",
+    "carabiner"
+   ],
+   "take": null,
+   "group": "oops.climber"
+  },
+  "ep01.team.climber.oops_3": {
+   "speaker": "climber",
+   "emotes": [
+    "sweat",
+    "carabiner"
+   ],
+   "take": null,
+   "group": "oops.climber"
+  },
+  "ep01.team.pilot.oops_1": {
+   "speaker": "pilot",
+   "emotes": [
+    "question",
+    "helm"
+   ],
+   "take": null,
+   "group": "oops.pilot"
+  },
+  "ep01.team.pilot.oops_2": {
+   "speaker": "pilot",
+   "emotes": [
+    "question",
+    "helm"
+   ],
+   "take": null,
+   "group": "oops.pilot"
+  },
+  "ep01.team.pilot.oops_3": {
+   "speaker": "pilot",
+   "emotes": [
+    "question",
+    "helm"
+   ],
+   "take": null,
+   "group": "oops.pilot"
+  },
+  "ep01.team.climber.call_tracker_2": {
+   "speaker": "climber",
+   "emotes": [
+    "magnifier",
+    "exclamation"
+   ],
+   "take": null,
+   "group": "switch.to_tracker"
+  },
+  "ep01.team.pilot.call_tracker_2": {
+   "speaker": "pilot",
+   "emotes": [
+    "magnifier",
+    "exclamation"
+   ],
+   "take": null,
+   "group": "switch.to_tracker"
+  },
+  "ep01.team.pilot.call_tracker_3": {
+   "speaker": "pilot",
+   "emotes": [
+    "magnifier",
+    "exclamation"
+   ],
+   "take": null,
+   "group": "switch.to_tracker"
+  },
+  "ep01.team.climber.call_pilot_2": {
+   "speaker": "climber",
+   "emotes": [
+    "helm",
+    "exclamation"
+   ],
+   "take": null,
+   "group": "switch.to_pilot"
+  },
+  "ep01.team.tracker.call_pilot_2": {
+   "speaker": "tracker",
+   "emotes": [
+    "helm",
+    "exclamation"
+   ],
+   "take": null,
+   "group": "switch.to_pilot"
+  },
+  "ep01.team.tracker.cheer_1": {
+   "speaker": "tracker",
+   "emotes": [
+    "star",
+    "music"
+   ],
+   "take": null,
+   "group": "cheer.tracker"
+  },
+  "ep01.team.tracker.cheer_2": {
+   "speaker": "tracker",
+   "emotes": [
+    "star",
+    "music"
+   ],
+   "take": null,
+   "group": "cheer.tracker"
+  },
+  "ep01.team.tracker.cheer_3": {
+   "speaker": "tracker",
+   "emotes": [
+    "star",
+    "music"
+   ],
+   "take": null,
+   "group": "cheer.tracker"
+  },
+  "ep01.team.tracker.cheer_4": {
+   "speaker": "tracker",
+   "emotes": [
+    "star",
+    "music"
+   ],
+   "take": null,
+   "group": "cheer.tracker"
+  },
+  "ep01.team.climber.cheer_1": {
+   "speaker": "climber",
+   "emotes": [
+    "star",
+    "thumbs_up"
+   ],
+   "take": null,
+   "group": "cheer.climber"
+  },
+  "ep01.team.climber.cheer_2": {
+   "speaker": "climber",
+   "emotes": [
+    "star",
+    "thumbs_up"
+   ],
+   "take": null,
+   "group": "cheer.climber"
+  },
+  "ep01.team.climber.cheer_3": {
+   "speaker": "climber",
+   "emotes": [
+    "star",
+    "thumbs_up"
+   ],
+   "take": null,
+   "group": "cheer.climber"
+  },
+  "ep01.team.climber.cheer_4": {
+   "speaker": "climber",
+   "emotes": [
+    "star",
+    "thumbs_up"
+   ],
+   "take": null,
+   "group": "cheer.climber"
+  },
+  "ep01.team.pilot.cheer_1": {
+   "speaker": "pilot",
+   "emotes": [
+    "star",
+    "heart"
+   ],
+   "take": null,
+   "group": "cheer.pilot"
+  },
+  "ep01.team.pilot.cheer_2": {
+   "speaker": "pilot",
+   "emotes": [
+    "star",
+    "heart"
+   ],
+   "take": null,
+   "group": "cheer.pilot"
+  },
+  "ep01.team.pilot.cheer_3": {
+   "speaker": "pilot",
+   "emotes": [
+    "star",
+    "heart"
+   ],
+   "take": null,
+   "group": "cheer.pilot"
+  },
+  "ep01.team.pilot.cheer_4": {
+   "speaker": "pilot",
+   "emotes": [
+    "star",
+    "heart"
+   ],
+   "take": null,
+   "group": "cheer.pilot"
+  },
+  "ep01.radio.v3_m1.bench_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "paw"
+   ],
+   "take": null,
+   "group": "hint.radio.M1.bench"
+  },
+  "ep01.radio.v3_m1.bench_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "paw"
+   ],
+   "take": null,
+   "group": "hint.radio.M1.bench"
+  },
+  "ep01.radio.v3_m1.boot_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "paw"
+   ],
+   "take": null,
+   "group": "hint.radio.M1.boot"
+  },
+  "ep01.radio.v3_m1.boot_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "paw"
+   ],
+   "take": null,
+   "group": "hint.radio.M1.boot"
+  },
+  "ep01.radio.v3_m1.trail_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "paw"
+   ],
+   "take": null,
+   "group": "hint.radio.M1.trail"
+  },
+  "ep01.radio.v3_m1.trail_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "paw"
+   ],
+   "take": null,
+   "group": "hint.radio.M1.trail"
+  },
+  "ep01.radio.v3_m2.free_pieces_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "rope"
+   ],
+   "take": null,
+   "group": "hint.radio.M2.free_pieces"
+  },
+  "ep01.radio.v3_m2.free_pieces_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "rope"
+   ],
+   "take": null,
+   "group": "hint.radio.M2.free_pieces"
+  },
+  "ep01.radio.v3_m2.find_third_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "rope"
+   ],
+   "take": null,
+   "group": "hint.radio.M2.find_third"
+  },
+  "ep01.radio.v3_m2.find_third_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "rope"
+   ],
+   "take": null,
+   "group": "hint.radio.M2.find_third"
+  },
+  "ep01.radio.v3_m2.hang_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "rope"
+   ],
+   "take": null,
+   "group": "hint.radio.M2.hang"
+  },
+  "ep01.radio.v3_m2.hang_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "rope"
+   ],
+   "take": null,
+   "group": "hint.radio.M2.hang"
+  },
+  "ep01.radio.v3_m3.stream_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "look"
+   ],
+   "take": null,
+   "group": "hint.radio.M3.stream"
+  },
+  "ep01.radio.v3_m3.stream_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "look"
+   ],
+   "take": null,
+   "group": "hint.radio.M3.stream"
+  },
+  "ep01.radio.v3_m3.leaves_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "look"
+   ],
+   "take": null,
+   "group": "hint.radio.M3.leaves"
+  },
+  "ep01.radio.v3_m3.leaves_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "look"
+   ],
+   "take": null,
+   "group": "hint.radio.M3.leaves"
+  },
+  "ep01.radio.v3_m4.read_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "vendor"
+   ],
+   "take": null,
+   "group": "hint.radio.M4.read"
+  },
+  "ep01.radio.v3_m4.read_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "vendor"
+   ],
+   "take": null,
+   "group": "hint.radio.M4.read"
+  },
+  "ep01.radio.v3_m4.deliver_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "vendor"
+   ],
+   "take": null,
+   "group": "hint.radio.M4.deliver"
+  },
+  "ep01.radio.v3_m4.deliver_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "vendor"
+   ],
+   "take": null,
+   "group": "hint.radio.M4.deliver"
+  },
+  "ep01.radio.v3_m5.feathers_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "fish"
+   ],
+   "take": null,
+   "group": "hint.radio.M5.feathers"
+  },
+  "ep01.radio.v3_m5.feathers_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "fish"
+   ],
+   "take": null,
+   "group": "hint.radio.M5.feathers"
+  },
+  "ep01.radio.v3_m5.compass_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "fish"
+   ],
+   "take": null,
+   "group": "hint.radio.M5.compass"
+  },
+  "ep01.radio.v3_m5.compass_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "fish"
+   ],
+   "take": null,
+   "group": "hint.radio.M5.compass"
+  },
+  "ep01.radio.v3_m5.fish_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "fish"
+   ],
+   "take": null,
+   "group": "hint.radio.M5.fish"
+  },
+  "ep01.radio.v3_m5.fish_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "fish"
+   ],
+   "take": null,
+   "group": "hint.radio.M5.fish"
+  },
+  "ep01.radio.v3_m6.board_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "boat"
+   ],
+   "take": null,
+   "group": "hint.radio.M6.board"
+  },
+  "ep01.radio.v3_m6.board_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "boat"
+   ],
+   "take": null,
+   "group": "hint.radio.M6.board"
+  },
+  "ep01.radio.v3_m6.buoys_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "boat"
+   ],
+   "take": null,
+   "group": "hint.radio.M6.buoys"
+  },
+  "ep01.radio.v3_m6.buoys_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "boat"
+   ],
+   "take": null,
+   "group": "hint.radio.M6.buoys"
+  },
+  "ep01.radio.v3_m6.approach_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "boat"
+   ],
+   "take": null,
+   "group": "hint.radio.M6.approach"
+  },
+  "ep01.radio.v3_m6.approach_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "boat"
+   ],
+   "take": null,
+   "group": "hint.radio.M6.approach"
+  },
+  "ep01.radio.v3_m6.rope_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "boat"
+   ],
+   "take": null,
+   "group": "hint.radio.M6.rope"
+  },
+  "ep01.radio.v3_m6.rope_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "boat"
+   ],
+   "take": null,
+   "group": "hint.radio.M6.rope"
+  },
+  "ep01.radio.v3_m7.lens_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "star"
+   ],
+   "take": null,
+   "group": "hint.radio.M7.lens"
+  },
+  "ep01.radio.v3_m7.lens_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "star"
+   ],
+   "take": null,
+   "group": "hint.radio.M7.lens"
+  },
+  "ep01.radio.v3_m7.climb_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "star"
+   ],
+   "take": null,
+   "group": "hint.radio.M7.climb"
+  },
+  "ep01.radio.v3_m7.climb_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "star"
+   ],
+   "take": null,
+   "group": "hint.radio.M7.climb"
+  },
+  "ep01.radio.v3_m7.aim_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "star"
+   ],
+   "take": null,
+   "group": "hint.radio.M7.aim"
+  },
+  "ep01.radio.v3_m7.aim_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "star"
+   ],
+   "take": null,
+   "group": "hint.radio.M7.aim"
+  },
+  "ep01.radio.v3_m8.thanks_2": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "heart"
+   ],
+   "take": null,
+   "group": "hint.radio.M8.thanks"
+  },
+  "ep01.radio.v3_m8.thanks_3": {
+   "speaker": "radio",
+   "emotes": [
+    "radio",
+    "heart"
+   ],
+   "take": null,
+   "group": "hint.radio.M8.thanks"
   }
- }
+ },
+ "step_start": {
+  "M1.bench": "ep01.dock.tracker.look_paw",
+  "M1.boot": "ep01.dock.tracker.boot_steps",
+  "M1.trail": "ep01.dock.tracker.follow_paws",
+  "M2.free_pieces": "ep01.bank.climber.cloth_on_shed",
+  "M2.find_third": "ep01.bank.tracker.cloth_reeds",
+  "M2.hang": "ep01.bank.pilot.hang_line",
+  "M3.stream": "ep01.plaza.tracker.see_channel",
+  "M3.leaves": "ep01.plaza.climber.leaves_top",
+  "M4.read": "ep01.market.tracker.see_cart",
+  "M4.deliver": "ep01.market.pilot.see_stalls",
+  "M5.feathers": "ep01.street.tracker.see_feathers",
+  "M5.compass": "ep01.street.pilot.see_vane",
+  "M5.fish": "ep01.street.climber.gull_roof",
+  "M6.board": "ep01.bay.pilot.see_boat",
+  "M6.buoys": "ep01.bay.pilot.see_buoys",
+  "M6.approach": "ep01.bay.pilot.see_dinghy",
+  "M6.rope": "ep01.bay.climber.rope_dinghy",
+  "M7.lens": "ep01.lighthouse.tracker.lens_bush",
+  "M7.climb": "ep01.lighthouse.climber.pup_top",
+  "M7.aim": "ep01.lighthouse.pilot.see_boats",
+  "M8.thanks": "ep01.festival.tracker.see_captain"
+ },
+ "travel": {
+  "M2>M3": "ep01.bank.tracker.paws_to_fountain",
+  "M3>M4": "ep01.plaza.tracker.see_market",
+  "M6>M7": "ep01.lighthouse.tracker.go_lighthouse"
+ },
+ "step_done": {
+  "M1.trail": "ep01.bank.tracker.pup_to_line"
+ },
+ "groups": {
+  "help.radio.invite": [
+   "ep01.radio.help.invite_1",
+   "ep01.radio.help.invite_2",
+   "ep01.radio.help.invite_3",
+   "ep01.radio.help.invite_4",
+   "ep01.radio.help.invite_5"
+  ],
+  "success.tracker": [
+   "ep01.team.tracker.success_1",
+   "ep01.team.tracker.success_2",
+   "ep01.team.tracker.success_3",
+   "ep01.team.tracker.success_4"
+  ],
+  "success.climber": [
+   "ep01.bank.climber.sock_high",
+   "ep01.team.climber.success_1",
+   "ep01.team.climber.success_2",
+   "ep01.team.climber.success_3"
+  ],
+  "success.pilot": [
+   "ep01.team.pilot.success_1",
+   "ep01.team.pilot.success_2",
+   "ep01.team.pilot.success_3",
+   "ep01.team.pilot.success_4"
+  ],
+  "oops.vendor": [
+   "ep01.market.vendor.wrong_stall",
+   "ep01.market.vendor.oops_1",
+   "ep01.market.vendor.oops_2",
+   "ep01.market.vendor.oops_3"
+  ],
+  "oops.pilot.buoy": [
+   "ep01.bay.pilot.buoy_oops_1",
+   "ep01.bay.pilot.buoy_oops_2",
+   "ep01.bay.pilot.buoy_oops_3"
+  ],
+  "oops.tracker": [
+   "ep01.team.tracker.oops_1",
+   "ep01.team.tracker.oops_2",
+   "ep01.team.tracker.oops_3"
+  ],
+  "oops.climber": [
+   "ep01.team.climber.oops_1",
+   "ep01.team.climber.oops_2",
+   "ep01.team.climber.oops_3"
+  ],
+  "oops.pilot": [
+   "ep01.team.pilot.oops_1",
+   "ep01.team.pilot.oops_2",
+   "ep01.team.pilot.oops_3"
+  ],
+  "switch.to_tracker": [
+   "ep01.bank.climber.call_tracker",
+   "ep01.team.climber.call_tracker_2",
+   "ep01.team.pilot.call_tracker_2",
+   "ep01.team.pilot.call_tracker_3"
+  ],
+  "switch.to_climber": [
+   "ep01.bank.tracker.call_climber",
+   "ep01.plaza.tracker.call_climber",
+   "ep01.street.pilot.call_climber",
+   "ep01.bay.pilot.call_climber",
+   "ep01.lighthouse.tracker.call_climber"
+  ],
+  "switch.to_pilot": [
+   "ep01.market.tracker.call_pilot",
+   "ep01.street.tracker.call_pilot",
+   "ep01.lighthouse.climber.call_pilot",
+   "ep01.team.climber.call_pilot_2",
+   "ep01.team.tracker.call_pilot_2"
+  ],
+  "cheer.tracker": [
+   "ep01.festival.tracker.cheer",
+   "ep01.team.tracker.cheer_1",
+   "ep01.team.tracker.cheer_2",
+   "ep01.team.tracker.cheer_3",
+   "ep01.team.tracker.cheer_4"
+  ],
+  "cheer.climber": [
+   "ep01.plaza.climber.m3_done",
+   "ep01.team.climber.cheer_1",
+   "ep01.team.climber.cheer_2",
+   "ep01.team.climber.cheer_3",
+   "ep01.team.climber.cheer_4"
+  ],
+  "cheer.pilot": [
+   "ep01.bank.pilot.m2_done",
+   "ep01.team.pilot.cheer_1",
+   "ep01.team.pilot.cheer_2",
+   "ep01.team.pilot.cheer_3",
+   "ep01.team.pilot.cheer_4"
+  ],
+  "hint.radio.M1.bench": [
+   "ep01.radio.v3_m1.bench",
+   "ep01.radio.v3_m1.bench_2",
+   "ep01.radio.v3_m1.bench_3"
+  ],
+  "hint.radio.M1.boot": [
+   "ep01.radio.v3_m1.boot",
+   "ep01.radio.v3_m1.boot_2",
+   "ep01.radio.v3_m1.boot_3"
+  ],
+  "hint.radio.M1.trail": [
+   "ep01.radio.v3_m1.trail",
+   "ep01.radio.v3_m1.trail_2",
+   "ep01.radio.v3_m1.trail_3"
+  ],
+  "hint.radio.M2.free_pieces": [
+   "ep01.radio.v3_m2.free_pieces",
+   "ep01.radio.v3_m2.free_pieces_2",
+   "ep01.radio.v3_m2.free_pieces_3"
+  ],
+  "hint.radio.M2.find_third": [
+   "ep01.radio.v3_m2.find_third",
+   "ep01.radio.v3_m2.find_third_2",
+   "ep01.radio.v3_m2.find_third_3"
+  ],
+  "hint.radio.M2.hang": [
+   "ep01.radio.v3_m2.hang",
+   "ep01.radio.v3_m2.hang_2",
+   "ep01.radio.v3_m2.hang_3"
+  ],
+  "hint.radio.M3.stream": [
+   "ep01.radio.v3_m3.stream",
+   "ep01.radio.v3_m3.stream_2",
+   "ep01.radio.v3_m3.stream_3"
+  ],
+  "hint.radio.M3.leaves": [
+   "ep01.radio.v3_m3.leaves",
+   "ep01.radio.v3_m3.leaves_2",
+   "ep01.radio.v3_m3.leaves_3"
+  ],
+  "hint.radio.M4.read": [
+   "ep01.radio.v3_m4.read",
+   "ep01.radio.v3_m4.read_2",
+   "ep01.radio.v3_m4.read_3"
+  ],
+  "hint.radio.M4.deliver": [
+   "ep01.radio.v3_m4.deliver",
+   "ep01.radio.v3_m4.deliver_2",
+   "ep01.radio.v3_m4.deliver_3"
+  ],
+  "hint.radio.M5.feathers": [
+   "ep01.radio.v3_m5.feathers",
+   "ep01.radio.v3_m5.feathers_2",
+   "ep01.radio.v3_m5.feathers_3"
+  ],
+  "hint.radio.M5.compass": [
+   "ep01.radio.v3_m5.compass",
+   "ep01.radio.v3_m5.compass_2",
+   "ep01.radio.v3_m5.compass_3"
+  ],
+  "hint.radio.M5.fish": [
+   "ep01.radio.v3_m5.fish",
+   "ep01.radio.v3_m5.fish_2",
+   "ep01.radio.v3_m5.fish_3"
+  ],
+  "hint.radio.M6.board": [
+   "ep01.radio.v3_m6.board",
+   "ep01.radio.v3_m6.board_2",
+   "ep01.radio.v3_m6.board_3"
+  ],
+  "hint.radio.M6.buoys": [
+   "ep01.radio.v3_m6.buoys",
+   "ep01.radio.v3_m6.buoys_2",
+   "ep01.radio.v3_m6.buoys_3"
+  ],
+  "hint.radio.M6.approach": [
+   "ep01.radio.v3_m6.approach",
+   "ep01.radio.v3_m6.approach_2",
+   "ep01.radio.v3_m6.approach_3"
+  ],
+  "hint.radio.M6.rope": [
+   "ep01.radio.v3_m6.rope",
+   "ep01.radio.v3_m6.rope_2",
+   "ep01.radio.v3_m6.rope_3"
+  ],
+  "hint.radio.M7.lens": [
+   "ep01.radio.v3_m7.lens",
+   "ep01.radio.v3_m7.lens_2",
+   "ep01.radio.v3_m7.lens_3"
+  ],
+  "hint.radio.M7.climb": [
+   "ep01.radio.v3_m7.climb",
+   "ep01.radio.v3_m7.climb_2",
+   "ep01.radio.v3_m7.climb_3"
+  ],
+  "hint.radio.M7.aim": [
+   "ep01.radio.v3_m7.aim",
+   "ep01.radio.v3_m7.aim_2",
+   "ep01.radio.v3_m7.aim_3"
+  ],
+  "hint.radio.M8.thanks": [
+   "ep01.radio.v3_m8.thanks",
+   "ep01.radio.v3_m8.thanks_2",
+   "ep01.radio.v3_m8.thanks_3"
+  ]
+ },
+ "_note_f2": "RB-R1 F2/D19c: step_start ('Mx.passo'), travel ('Ma>Mb') e step_done = falas que apontam; gesture.anim = clipe do heroi (Pico nao tem 'point': usa look_up/wave), fallback se faltar, target = marcador de village_world. groups = variantes sorteadas sem repetir a ultima (hint.radio.<passo>: a 1a e a dica atual). take null = sem audio ainda (vozes D19 depois)."
 }

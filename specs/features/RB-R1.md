@@ -192,6 +192,8 @@ Ele relatou: (1) o andar às vezes fica em câmera lenta e às vezes desliza sem
 
 - **Revisão E7 ícones (`reviewer`, 2026-11-25): APROVADO COM RESSALVAS**, suíte `OK (3442 PASS)` em 8 min 16 s (55% do limite de 15 min; tempo quintuplicou desde 2650 PASS — acelerar os bots que esperam em tempo real antes da E7). 21 arquivos conferem por sha256; SVG à mão; retratos dos `.blend` do projeto. Baixas: ficha `portrait/icon` e `Hud.SPEAKER_*` são duas fontes de verdade; `hero_portraits.py` órfão. Visto pelo lead: legenda do capitão na festa e os 4 barquinhos (estrela, lua, peixe, flor). Pendente humano: legibilidade a 48 px, rosto do capitão com pouco contraste. Integrado.
 
+- **F2 texto + D21 roteiro (`adventure` `d230cd3`, `reviewer` 2026-11-26): APROVADO COM RESSALVAS.** 25 falas que apontam o próximo passo, 8 revisões (sem ponto cardeal; bota "perto do poste sem bote"), 90 variantes em 36 grupos (D19c), 13 cutscenes em `ep01_v3_cutscenes.json` (abertura do jogo 34,5 s + Ep01 88,5 s = 123 s estimados; marcadores e clipes conferidos; `exit_look` em todas). Suíte `OK (3455 PASS)` em 8 min 23 s. Corrigido pelo lead: "Pulo!" → "Opa!"; destino das pegadinhas molhadas = capim. Arte pendente citada nas falas: poste/amarra visível, arbusto e pedras do farol, gaivota no telhado, lanternas da praça; filhote sem andar/correr, Pico sem `point`, Dona Amora sem modelo. Integrado.
+
 ## Barra de qualidade (mensurável e perceptual)
 **Personagens (crianças-heróis)**
 - Altura ~1,05 a 1,15 m no mundo; **cabeça 33 a 38% da altura** (~3 cabeças); olhos grandes (altura do olho ≥ 20% da altura da cabeça) com íris, pupila e dois brilhos; mãos de 4 dedos legíveis; pés grandes e arredondados.
