@@ -1249,8 +1249,8 @@
         "source_art/scripts/hero_gait_v2.py"
       ],
       "saida_glb": "game/assets/models/characters/rastro_v2.glb",
-      "glb_sha256": "70f4516a9e78423d014ca52b17393da301c7785a56f1ed2a61dd46ea074c53fc",
-      "glb_bytes": 6408464,
+      "glb_sha256": "d52e85add8ba23e4aafea9eb0553e3d688273ba2bbc986d372cfc020addcf473",
+      "glb_bytes": 6407668,
       "triangulos": 24229,
       "materiais": [
         "mat_rastro_v2_face_dark",
@@ -1460,8 +1460,8 @@
         "source_art/scripts/hero_gait_v2.py"
       ],
       "saida_glb": "game/assets/models/characters/pico_v2.glb",
-      "glb_sha256": "285a950a9e307618453296bdf19fc5d6129201e055a8697a040406f60a3cc228",
-      "glb_bytes": 6876120,
+      "glb_sha256": "16b918e4da6469c8c126d192315403ecabeb84bb9f7ab4f3ad8b530f34a57311",
+      "glb_bytes": 6877128,
       "triangulos": 24944,
       "materiais": [
         "mat_pico_v2_face_dark",
@@ -1655,8 +1655,8 @@
         "source_art/scripts/hero_gait_v2.py"
       ],
       "saida_glb": "game/assets/models/characters/leme_v2.glb",
-      "glb_sha256": "7c9c03025ce7a78121642ba42655c57b4973bf6e0f95b6b2c23c6bcb1f0f2305",
-      "glb_bytes": 7708724,
+      "glb_sha256": "f417f96b3c94ccbc6bd72caa7708c162784f547d8413f855bab75d9432b83e39",
+      "glb_bytes": 7707944,
       "triangulos": 24531,
       "materiais": [
         "mat_leme_v2_acc_lifevest",

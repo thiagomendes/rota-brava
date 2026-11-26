@@ -89,3 +89,14 @@ O GLB não sai byte a byte idêntico entre exportações (JPEG e ordem interna),
 Pedido de Thiago ("os pes estao muito acelerados"): `walk` e `run` refeitos por `source_art/scripts/hero_gait_v2.py` (FK/IK em Python, do zero), configurados em `lv2_anim.py` (`WALK`, `RUN`). Passada longa (curso de apoio 0,47 m), quadril calculado quadro a quadro pelo alcance real das pernas, guinada do quadril, pe que rola do calcanhar a ponta e sai/chega rente ao chao. Os demais clipes nao mudaram.
 - ciclo / curso de apoio / avanco por ciclo / escala no jogo / passos por s: andar 1,00 s / 0,47 m / 1,217 m / x1,15 / 2,30; correr 0,633 s / 0,47 m / 1,762 m / x1,15 / 3,63 (escala = 1,4 ou 3,2 m/s dividido pela velocidade nominal do clipe).
 - Folga minima entre as botas: 6,47 cm (walk), 7,28 cm (run) (`lv2_anim.measure_feet`).
+
+## Olhos abertos no idle e nos gestos (RB-R1 G1, 2026-11-26)
+Thiago viu a Leme de olhos fechados no menu e nas cenas. O "alegre" e o sorriso de OLHOS FECHADOS e durava demais:
+no idle seguia toda a virada para o mar (39% do ciclo de 5,2 s, 1,80 s seguidos) e em `wave`, `celebrate` e `team_pose`
+ficava 0,92-1,22 s seguidos. Agora e um aperto curto: no idle (`squint`, ~0,5 s quando o rosto chega ao mar) e nos gestos
+por `short_squint` (`lv2_anim.py`, janela de ~0,45 s no pico do gesto); fora dele os olhos ficam abertos com a boca neutra
+(que ja sorri de leve). Medido nas trilhas importadas na Godot (olho fechado = max(alegre, blink) >= 0,5): idle 17% / 0,50 s;
+wave 27% / 0,45 s; celebrate 36% / 0,45 s; team_pose 29% / 0,45 s. Corpo, malha, materiais e medidas
+(`leme_v2.info.json` igual) iguais; GLB reexportado pelo mesmo comando de "Reproduzir".
+O `point` (1,2 s, sem laco) piscava em 1,05 s e terminava com o olho 62% fechado; parado no ultimo quadro (close da
+abertura) a heroina ficava de olho quase fechado. Agora pisca uma vez em 0,80 s (`blink_once`) e termina de olho aberto.

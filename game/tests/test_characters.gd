@@ -67,6 +67,7 @@ func run(runner) -> void:
 		await _test_gait_contact(id, &"run")
 		await _test_hero_child(id)
 		await _test_loops_close(id)
+		await _test_eyes_open_loops(id)
 	for id in ["rastro", "pico", "leme", "captain", "villager_a", "villager_b", "villager_c"]:
 		await _test_idle_upright(id)
 	await _test_pico()
@@ -749,6 +750,61 @@ func _test_loops_close(id: String) -> void:
 		for b in a:
 			worst = maxf(worst, (a[b] as Vector3).distance_to(vis.bone_position(b)))
 		r.check(worst < 0.003, "chars: %s/%s fecha o loop (quadro final = inicial, desvio %.2f mm)" % [id, clip, worst * 1000])
+	root.queue_free()
+	await r.frames(1)
+
+
+## Olhos fechados num clipe (G1): fracao do tempo e maior trecho continuo com max(alegre, blink) >= 0,5, lidos das trilhas
+## de shape key do proprio clipe (amostra a 60 Hz). `alegre` e o sorriso de olhos fechados nos herois v2.
+static func eyes_closed_stats(anim: Animation) -> Vector2:
+	var tracks: Array[int] = []
+	for t in anim.get_track_count():
+		if anim.track_get_type(t) == Animation.TYPE_BLEND_SHAPE:
+			var key := str(anim.track_get_path(t)).get_slice(":", 1)
+			if key == "alegre" or key == "blink":
+				tracks.append(t)
+	var n := 0
+	var closed := 0
+	var run := 0.0
+	var longest := 0.0
+	var t := 0.0
+	while t <= anim.length:
+		var v := 0.0
+		for tr in tracks:
+			v = maxf(v, anim.blend_shape_track_interpolate(tr, t))
+		n += 1
+		if v >= 0.5:
+			closed += 1
+			run += 1.0 / 60.0
+			longest = maxf(longest, run)
+		else:
+			run = 0.0
+		t += 1.0 / 60.0
+	return Vector2(float(closed) / maxf(n, 1), longest)
+
+
+## G1 (RB-R1): nos lacos que ficam na tela (idle, andar, correr, timao) os herois estao de olhos abertos quase sempre e
+## piscam curto: no maximo 25% do ciclo e 0,6 s seguidos com o olho fechado (antes: idle da Leme 39% e 1,8 s).
+func _test_eyes_open_loops(id: String) -> void:
+	var root := await _spawn(id)
+	var vis := root.find_child("Model", false, false) as CharacterVisual
+	var player := vis.animation_player()
+	for clip in CHARS[id]["anims"]:
+		var st := eyes_closed_stats(player.get_animation(StringName(clip)))
+		if clip in LOOPS:
+			r.check(st.x <= 0.25 and st.y <= 0.6, "chars: %s/%s de olhos abertos (fechados %.0f%% do ciclo, maior trecho %.2f s)"
+				% [id, clip, st.x * 100.0, st.y])
+		else:
+			# Gestos (aceno, comemoracao, pose de equipe...): sorriso de olhos fechados so num aperto curto (antes ate 1,22 s).
+			r.check(st.y <= 0.65, "chars: %s/%s sorriso de olhos fechados curto (maior trecho %.2f s)" % [id, clip, st.y])
+			# Clipe sem laco fica parado no ultimo quadro (ex.: `point` no close da abertura): ele nao pode terminar de olho fechado.
+			var anim := player.get_animation(StringName(clip))
+			var end := 0.0
+			for t in anim.get_track_count():
+				var key := str(anim.track_get_path(t)).get_slice(":", 1)
+				if anim.track_get_type(t) == Animation.TYPE_BLEND_SHAPE and (key == "alegre" or key == "blink"):
+					end = maxf(end, anim.blend_shape_track_interpolate(t, anim.length))
+			r.check(end < 0.5, "chars: %s/%s termina de olhos abertos (olho fechado %.2f no ultimo quadro)" % [id, clip, end])
 	root.queue_free()
 	await r.frames(1)
 

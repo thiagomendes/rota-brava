@@ -221,6 +221,19 @@ RUN = hg.gait_cfg(17 / 30, 0.44, 3.2 * (17 / 30) / 1.15, center=-0.025, lift=0.1
                   arm_pump=0.3, blink_at=None, face={"alegre": 0.2, "fist_R": 0.85, "fist_L": 0.85})
 CLIPS["walk"] = hg.clip(WALK)
 CLIPS["run"] = hg.clip(RUN)
+
+
+def blink_once(fn, at):
+    """G1 (RB-R1): troca a piscada do clipe por uma so em `at`. O `pull_rope` (1,6 s, sem laco) piscava em 1,45 s e terminava
+    com o olho 62% fechado; parado no ultimo quadro, o Pico ficava de olho quase fechado."""
+    def g(R, F, t, T):
+        f = fn(R, F, t, T)
+        f["blink"] = blink_curve(t, at)
+        return f
+    return g
+
+
+CLIPS["pull_rope"] = (CLIPS["pull_rope"][0], CLIPS["pull_rope"][1], blink_once(CLIPS["pull_rope"][2], 1.20))
 CLIP_SET = list(ha.CLIP_SETS["pico"]) + ["point"]     # idle, walk, run, stop, jump, pull_rope, look_up, react_surprise, celebrate, wave, team_pose, point
 
 
