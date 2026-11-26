@@ -73,6 +73,9 @@ func _swap_to(path: String) -> Node:
 	r.tree.root.add_child(inst)
 	r.tree.current_scene = inst
 	await r.frames()
+	# G10: o menu como cena atual cobre com a tela de carregamento ate o palco 3D desenhar (abertura do jogo).
+	while SceneLoaderService.instance().is_busy():
+		await r.tree.process_frame
 	return inst
 
 
