@@ -514,3 +514,20 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
     - A esticagem da calça em `walk` caiu de 4,49 para 2,61.
     - Manifesto confere. `characters` 837 PASS, `assets` 276 PASS, `ep01_v3` 232 PASS.
   - **Ressalva fora do escopo:** `Captain_Hair` tem 194 arestas de borda (pode ser casca aberta de propósito).
+
+### G10 + G11 integrados (`feature/rb-r1-g-carregamento`, autor `gameplay`)
+- **Causa da demora** (medida em llvmpipe, que não vale como tempo de Windows): `load()` síncrono no `_ready` (vila, GLB, heróis) e o primeiro quadro compilando shader e pipeline na thread principal, sem redesenhar a janela.
+- **`SceneLoader`** (autoload, `game/systems/scene_loader/`):
+  - tela com a estrela no mesmo quadro do pedido, carregamento em segundo plano e mínimo de 450 ms;
+  - cena antiga em `PROCESS_MODE_DISABLED`, carregador como último nó, `MouseLock.block(&"loader")`;
+  - `_fail()` volta para a cena anterior;
+  - todas as trocas de cena passam por ele.
+- **Menu:** a tela de carregamento fica até o palco 3D desenhar 3 quadros (decisão de Thiago). Teto de 60 s; se estourar, o menu abre sobre a imagem parada `b_bg_16x9.jpg` (procedência registrada).
+- **G11:** "Ver abertura" volta sozinha ao menu. Na primeira vez, Jogar vai da abertura direto para o Ep01.
+- **Revisão** (`reviewer`, 2 rodadas):
+  - 1ª: REPROVADA (`test_ep01_v3:202`, entrada chegando à cena antiga, sem procedência do JPG).
+  - 2ª: APROVADA. `scene_loader` 39, `foundation` 72, `ui_` 176, `reference_demo` 27, `cutscene` 152, `keyart` 24, `ep01_v3` 232. As mutações de troca direta e de teto desligado falham.
+- **Ressalvas:**
+  - tempo em GPU real não medido (logs `[RB] loader` e `[RB] title key_art`);
+  - teto de 60 s é longo para criança;
+  - cena original ALWAYS sem teste no `_fail`.
