@@ -576,12 +576,6 @@
    "pace": "normal",
    "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
   },
-  "ep01.narrator.m3.ball": {
-   "emotion": "travessura divertida",
-   "energy": 2,
-   "pace": "normal",
-   "note": "conta a arte do filhote como quem ri, nada grave"
-  },
   "ep01.narrator.m3.no_water": {
    "emotion": "narração animada",
    "energy": 2,
@@ -599,12 +593,6 @@
    "energy": 2,
    "pace": "normal",
    "note": "narrador de desenho infantil, claro e caloroso, aponta o que aparece"
-  },
-  "ep01.narrator.m5.gull": {
-   "emotion": "travessura divertida",
-   "energy": 2,
-   "pace": "normal",
-   "note": "conta a arte do filhote como quem ri, nada grave"
   },
   "ep01.narrator.m5.feathers": {
    "emotion": "narração animada",

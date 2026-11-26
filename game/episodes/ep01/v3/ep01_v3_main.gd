@@ -699,6 +699,22 @@ func in_camera_view(feet: Vector3) -> bool:
 	return false
 
 
+## G9: fim da conversa da ponte (antes da cena seguinte). Durante a conversa o jogador anda livre e o teleporte de
+## seguidor pode deixar alguem num telhado ou no galpao (ex.: a Leme no telhado do M5, que o M6 nao alcanca); quem nao
+## esta no nivel do lider volta para o chao ao lado dele.
+func _regroup_followers() -> void:
+	var lead := controlled_node as MemberActor
+	if lead == null or lead.riding_on != null or not lead.is_on_floor():
+		return
+	for m: StringName in actors:
+		var a := actors[m] as MemberActor
+		if a == lead or a.riding_on != null or absf(a.global_position.y - lead.global_position.y) <= 0.6:
+			continue
+		var to: Variant = follower_teleport_point(lead, a, m)
+		a.teleport(to as Vector3 if to != null else lead.global_position + (TRIO_OFFSETS[m] as Vector3) + Vector3(0, 0.05, 0))
+		print("[RB] v3 ponte: %s volta ao chao junto de %s" % [m, active_member])
+
+
 ## Destino do teleporte de um seguidor (F1): em aneis em volta do lider, so pontos FORA do frustum da camera, com chao
 ## livre e linha reta ate o lider sem parede (`slot_clear`); prefere o mais perto e o lado do seguidor. null: nenhum
 ## lugar fora da vista serve, e o seguidor espera (nunca aparece na frente do jogador).
@@ -945,6 +961,8 @@ func _cutscene_run(queue: Array[StringName], index: int) -> void:
 	while index > 0 and hud.is_speaking() and waited < BRIDGE_WAIT_S and is_inside_tree():
 		await get_tree().process_frame
 		waited += get_process_delta_time()
+	if index > 0:
+		_regroup_followers()
 	for sid in queue:
 		await play_cutscene(sid)
 		if not is_inside_tree():
