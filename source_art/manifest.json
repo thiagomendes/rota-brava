@@ -4220,6 +4220,23 @@
       "data": "2026-11-26",
       "nota": "RB-R1 G4: Dona Amora refeita com proporcao de senhora (cabeca ~21% da altura; antes 27%, lia como crianca), olhos menores, linhas de sorriso e fios grisalhos pintados. Mesmos clipes (idle, wave, thanks, point, talk). G4 r2: rosto de senhora (mandibula mais longa, sem bochecha de bebe, olhos menores e caidos, sobrancelha fina, pes de galinha), pulso dentro da manga, idle relaxado.",
       "razao_cabeca_altura": 0.2109
+    },
+    {
+      "id": "keyart_b_bg_still",
+      "nome": "Imagem parada do fundo da arte-chave B (menu)",
+      "papel": "fundo do menu se o palco 3D faltar/falhar ou o carregamento estourar o teto (G10, plano B)",
+      "agente": "gameplay",
+      "status": "provisorio",
+      "processo": {
+        "script": "game/ui/title/keyart/keyart_capture.gd",
+        "cena": "game/ui/title/keyart/keyart_b.tscn (framing menu, sem logo)",
+        "comando": "xvfb-run -a -s \"-screen 0 2560x2048x24\" bash tools/godot.sh --path game --rendering-driver vulkan --script res://ui/title/keyart/keyart_capture.gd -- --proposal=b --out=<dir> --only=bg",
+        "ferramenta": "Godot 4.7.2 (Vulkan por software, llvmpipe) + PIL (PNG 1920x1080 -> JPEG qualidade 88)",
+        "data": "2026-11-26"
+      },
+      "arquivo": "game/ui/title/keyart/stills/b_bg_16x9.jpg",
+      "sha256": "f35d2f930b2c18a02468c2f439b0df5273c6eb9093c7a8d10a1606ad221c0f4c",
+      "origem": "render do proprio jogo (geometria 100% do projeto)"
     }
   ]
 }
