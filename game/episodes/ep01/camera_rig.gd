@@ -34,17 +34,19 @@ var occluders: Array[Vector4] = []
 const PROBE_RADIUS := 0.2
 const MIN_ARM := 0.9
 const ARM_MARGIN := 0.08
-## Encurtamento do ultimo quadro (m; 0 = livre), para testes e depuracao.
-var last_pull: float = 0.0
-var _probe: SphereShape3D
-## Encurtar ~0,25 s, voltar ~1,2 s (sem salto).
+## Braco (RB-R1): a mola (~ARM_IN_TIME s para encurtar, ~ARM_OUT_TIME s para voltar, histerese ARM_HYST) segue a zona
+## macia (esfera de SOFT_RADIUS e copas com a mesma folga), que ve a parede antes; se ainda assim a parede corta o
+## braco (esfera de PROBE_RADIUS), a camera encosta NA HORA, sem nunca ficar dentro ou atras dela.
+const SOFT_RADIUS := 0.9
 const ARM_IN_TIME := 0.25
 const ARM_OUT_TIME := 1.2
 const ARM_HYST := 0.04
+## Encurtamento do ultimo quadro (m; 0 = livre), para testes e depuracao.
+var last_pull: float = 0.0
+var _probe: SphereShape3D
+var _probe_soft: SphereShape3D
 var _arm: float = -1.0
 var _arm_vel: float = 0.0
-var _probe_frame: int = -1
-var _probe_len: float = INF
 var _follow_pos: Vector3 = Vector3.ZERO
 var _written: Vector3 = Vector3(INF, INF, INF)
 ## Orbita (C1, RB-R1): alavanca direita (`cam_left/right/up/down`) e mouse capturado giram em volta do heroi; guinada livre,
@@ -149,14 +151,8 @@ func _update(weight: float, delta: float) -> void:
 	var look := base + look_offset
 	var pos := _follow_pos
 	if collision_mask != 0:
-		# A consulta de fisica roda no maximo uma vez por quadro de render (com tempo acelerado ha varios passos por quadro).
-		var frame := Engine.get_process_frames()
-		if frame != _probe_frame or _arm < 0.0:
-			_probe_frame = frame
-			_probe_len = avoid(look, _follow_pos).distance_to(look)
-		var free_dir := _follow_pos - look
-		var allowed_pos := look + free_dir.normalized() * minf(_probe_len, free_dir.length()) if free_dir.length() > 0.01 else _follow_pos
-		pos = _smooth_arm(look, _follow_pos, allowed_pos, delta)
+		var soft := avoid(look, _follow_pos, SOFT_RADIUS, SOFT_RADIUS - PROBE_RADIUS)
+		pos = _smooth_arm(look, _follow_pos, avoid(look, _follow_pos), soft, delta)
 	camera.global_position = pos
 	_written = pos
 	if _shake_time > 0.0 and not reduced_motion:
@@ -169,13 +165,15 @@ func _update(weight: float, delta: float) -> void:
 		camera.look_at(look, Vector3.UP)
 
 
-## Braco suavizado: encurta rapido mas sem salto (ARM_IN_RATE) e volta devagar (ARM_OUT_RATE), com histerese de
-## ARM_HYST (a esfera/copa que liga e desliga a cada quadro nao faz o braco ir e voltar).
-func _smooth_arm(look: Vector3, free_pos: Vector3, allowed_pos: Vector3, delta: float) -> Vector3:
+## Braco suavizado: a mola encurta (ARM_IN_TIME) e volta devagar (ARM_OUT_TIME) rumo a zona macia, com histerese de
+## ARM_HYST (a esfera/copa que liga e desliga a cada quadro nao faz o braco ir e voltar); acima do limite duro
+## (`hard_pos`) encosta na hora e zera a velocidade.
+func _smooth_arm(look: Vector3, free_pos: Vector3, hard_pos: Vector3, soft_pos: Vector3, delta: float) -> Vector3:
 	var free_len := free_pos.distance_to(look)
 	if free_len < 0.01:
 		return free_pos
-	var want := allowed_pos.distance_to(look)
+	var hard := hard_pos.distance_to(look)
+	var want := minf(soft_pos.distance_to(look), hard)
 	if _arm < 0.0 or reduced_motion or delta <= 0.0:
 		_arm = want
 		_arm_vel = 0.0
@@ -185,6 +183,10 @@ func _smooth_arm(look: Vector3, free_pos: Vector3, allowed_pos: Vector3, delta: 
 		_arm = _damp(_arm, want, ARM_OUT_TIME, delta)
 	else:
 		_arm = _damp(_arm, _arm, ARM_OUT_TIME, delta)
+	if _arm > hard:
+		# Limite duro: a camera encosta na hora, nunca fica dentro ou atras do obstaculo.
+		_arm = hard
+		_arm_vel = 0.0
 	if _arm > free_len:
 		_arm_vel = minf(_arm_vel, 0.0)
 	_arm = clampf(_arm, minf(MIN_ARM, free_len), free_len)
@@ -204,7 +206,8 @@ func _damp(cur: float, want: float, smooth_time: float, delta: float) -> float:
 
 
 ## Posicao da camera sem obstaculo entre `from` (ponto de mira) e `to` (camera desejada).
-func avoid(from: Vector3, to: Vector3) -> Vector3:
+## `radius`/`grow`: esfera e folga nas copas maiores para a zona macia (a mola comeca a encurtar antes da parede).
+func avoid(from: Vector3, to: Vector3, radius: float = PROBE_RADIUS, grow: float = 0.0) -> Vector3:
 	last_pull = 0.0
 	var seg := to - from
 	var dist := seg.length()
@@ -215,8 +218,10 @@ func avoid(from: Vector3, to: Vector3) -> Vector3:
 	if _probe == null:
 		_probe = SphereShape3D.new()
 		_probe.radius = PROBE_RADIUS
+		_probe_soft = SphereShape3D.new()
+		_probe_soft.radius = SOFT_RADIUS
 	var q := PhysicsShapeQueryParameters3D.new()
-	q.shape = _probe
+	q.shape = _probe if radius <= PROBE_RADIUS else _probe_soft
 	q.transform = Transform3D(Basis(), from)
 	q.motion = seg
 	q.collision_mask = collision_mask
@@ -227,11 +232,12 @@ func avoid(from: Vector3, to: Vector3) -> Vector3:
 		allowed = minf(allowed, dist * res[0] - ARM_MARGIN)
 	for s in occluders:
 		var c := Vector3(s.x, s.y, s.z)
+		var w := s.w + grow
 		var oc := from - c
-		if oc.length() <= s.w:
+		if oc.length() <= w:
 			continue
 		var b := oc.dot(dir)
-		var disc := b * b - (oc.length_squared() - s.w * s.w)
+		var disc := b * b - (oc.length_squared() - w * w)
 		if disc < 0.0:
 			continue
 		var t := -b - sqrt(disc)
