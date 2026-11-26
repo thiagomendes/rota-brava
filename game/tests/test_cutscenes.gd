@@ -126,11 +126,22 @@ func _each_scene() -> void:
 			if (main.actors[m] as MemberActor).controlled:
 				during["nobody"] = false
 		var limit := 20000
+		var eye_n := 0
+		var eye_closed := 0
 		while not done[0] and limit > 0:
 			await r.tree.process_frame
 			limit -= 1
+			# G1: trio de olhos abertos durante a cena (amostra dos herois visiveis a cada quadro).
+			for m: StringName in main.actors:
+				var a := main.actors[m] as MemberActor
+				if a.visible and a.model != null:
+					eye_n += 1
+					if _eyes_closed_now(a.model) >= 0.5:
+						eye_closed += 1
 		Engine.time_scale = 1.0
 		await r.frames(2)
+		r.check(eye_n > 0 and float(eye_closed) / eye_n <= 0.3, "cutscene %s: trio de olhos abertos (fechados em %d de %d amostras)"
+			% [id, eye_closed, eye_n])
 		r.check(done[0] and not cs.playing and cs.shots_played == shots,
 			"cutscene %s: rodou %d/%d planos ate o fim (%.1f s reais)" % [id, cs.shots_played, shots, (Time.get_ticks_msec() - t0) / 1000.0])
 		r.check(during["blocked"] and during["nobody"] and not during["followers"] and during["cam"],
@@ -275,8 +286,21 @@ func _game_intro() -> void:
 	GameIntroScene.next_scene = GameIntroScene.EP01_SCENE
 
 
-## Closes da abertura (planos 2-7): cabeca do heroi apresentado entre 20% e 60% da altura da tela e nenhum outro ator
-## entre a camera e ele. Corre a cena em tempo acelerado.
+## Olho fechado agora: max(alegre, blink) no rosto (G1; `alegre` e o sorriso de olhos fechados nos herois v2).
+static func _eyes_closed_now(vis: CharacterVisual) -> float:
+	var face := vis.face_mesh()
+	if face == null:
+		return 0.0
+	var v := 0.0
+	for key in ["alegre", "blink"]:
+		var idx := face.find_blend_shape_by_name(key)
+		if idx >= 0:
+			v = maxf(v, face.get_blend_shape_value(idx))
+	return v
+
+
+## Closes da abertura (planos 2-7): cabeca do heroi apresentado entre 20% e 60% da altura da tela, nenhum outro ator
+## entre a camera e ele e olhos abertos. Corre a cena em tempo acelerado.
 func _intro_closes(intro: GameIntroScene) -> void:
 	var cs := intro.cutscene
 	var shots: Array = Ep01V3Cutscene.scene_data(&"game_intro")["shots"]
@@ -303,6 +327,16 @@ func _intro_closes(intro: GameIntroScene) -> void:
 				blocked = String(other)
 		r.check(not cam.is_position_behind(head) and y >= 0.2 and y <= 0.6 and absf(x - 0.5) < 0.2 and blocked == "",
 			"abertura plano %d (%s): cabeca a %.0f%% da altura, %.0f%% da largura, ninguem na frente %s" % [i, who, y * 100.0, x * 100.0, blocked])
+		# G1: o heroi apresentado esta de olhos abertos no close (antes a cena mantinha `alegre` 0,6 = olhos fechados).
+		var closed := 0
+		var samples := 0
+		while cs.playing and cs.shot_index == i and samples < 40:
+			if hero.model != null and _eyes_closed_now(hero.model) >= 0.5:
+				closed += 1
+			samples += 1
+			await r.tree.process_frame
+		r.check(samples > 0 and float(closed) / samples <= 0.4, "abertura plano %d (%s): olhos abertos (fechados em %d de %d quadros)"
+			% [i, who, closed, samples])
 	Engine.time_scale = 1.0
 
 
