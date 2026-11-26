@@ -87,3 +87,55 @@ Mesma situação do Gemini TTS (`d19_vozes.md`): páginas oficiais inacessíveis
 - Testar o `lyria-realtime-exp` (bidi) para variação contínua com a mesma base.
 - Normalização, loop e cortes finais só depois da escolha.
 - Mapa de seções no `audio_director.gd` pelo `gameplay`.
+
+## D20a · Escolha de Thiago e trilha no jogo (2026-11-26)
+
+Escolhas de Thiago: candidata 1 de cada cena, as 3 vinhetas geradas e o narrador Sadaltager, cru (`cast.json`).
+
+**Produção** (`tools/music/finalize.py` → `game/audio/music/*.ogg`, Vorbis q6, 44,1 kHz estéreo):
+- **Fim musical:** último quadro de 50 ms acima de (mediana − 12 dB), o que exclui o fade do modelo.
+- **Batida:** autocorrelação de onsets entre 0,5× e 2× o BPM da bíblia. Em 4 faixas saiu a metade do pedido, o meio-tempo. Isso não afeta a emenda, porque o loop fecha em blocos de 4 batidas medidas.
+- **Loop:** termina 1 batida antes do fim musical, e essa batida é dobrada sobre o início (crossfade equal power).
+- **Volume:** ganho estático para −18 LUFS (o alvo das músicas do catálogo), limitador com teto de −1,8 dBFS e conferência do pico verdadeiro no OGG.
+- **Vinhetas:** cortadas em (segundos da bíblia + 1,5 s), com fade de 0,6 s e silêncio nas pontas.
+
+| Faixa | Duração | LUFS | Pico (dBTP) | BPM medido (pedido) | Compassos | Salto na emenda | Diferença de energia na emenda |
+|---|---|---|---|---|---|---|---|
+| `music_v3_village` | 146,3 s | −18,0 | −5,2 | 52,5 (100) | 32 | 0,0053 | 0,26 dB |
+| `music_v3_mystery` | 168,0 s | −18,0 | −4,7 | 40,0 (80) | 28 | 0,0035 | 4,82 dB |
+| `music_v3_boat` | 169,1 s | −18,0 | −5,1 | 52,5 (100) | 37 | 0,0113 | 1,84 dB |
+| `music_v3_lighthouse` | 169,8 s | −18,0 | −4,0 | 82,0 (80) | 58 | 0,0052 | 6,45 dB |
+| `music_v3_festival` | 155,7 s | −18,0 | −5,1 | 60,1 (120) | 39 | 0,0089 | 1,71 dB |
+| `sting_v3_mission_win` | 5,55 s | −18,0 | −5,0 | — | — | — | — |
+| `sting_v3_badge` | 4,55 s | −18,0 | −4,1 | — | — | — | — |
+| `sting_v3_hero_switch` | 3,55 s | −18,8 | −1,7 | — | — | — | — |
+
+- O salto na emenda é medido no OGG decodificado; o limite do catálogo é 0,02.
+- A diferença de energia compara o RMS de 50 ms antes e depois da volta. Mistério (4,8 dB) e farol (6,5 dB) ficaram altos e pedem conferência de ouvido.
+- O farol "cresce" ao longo da faixa e volta ao começo esparso. Isso é inerente à forma pedida; se incomodar, a alternativa é fazer o loop só da parte final.
+
+**Ligação** (`audio_director.gd`):
+- Aliases `v3_*` e mapa `EP01_V3_MISSION_MUSIC`:
+
+| Missões | Música |
+|---|---|
+| M0, M4 | vila |
+| M1, M2, M3, M5 (pistas) | mistério |
+| M6 | barco |
+| M7 | farol |
+| M8 | festa |
+
+- `bind_episode_music(ep)` escuta `mission_started` e `mission_completed`.
+- Ganchos públicos para o `gameplay`:
+  - `play_scene_music(secao)`, por exemplo para voltar à vila quando a pista se resolve: hoje o mistério dura a missão inteira;
+  - `on_mission_music_started`;
+  - `on_mission_music_completed` (vitória);
+  - `play_badge_sting`;
+  - `play_hero_switch_sting`.
+- As vinhetas tocam por cima da seção e a abaixam 10 dB, como antes. O ducking da fala não mudou.
+- Em `ep01_v3_main.gd` mudaram 3 linhas de chamada: `bind_episode_music(self)`, `play_badge_sting()` no emblema e `play_hero_switch_sting()` no lugar do `team_call`.
+
+**Procedência:**
+- `sfx_catalog.json` traz sha256, modelo e data de cada faixa.
+- `source_audio/PROVENANCE.md` traz a licença "gerado (Lyria)", aceita no teste de procedência por decisão D20a.
+- O prompt inteiro está em `tools/music/final_tracks.json`.

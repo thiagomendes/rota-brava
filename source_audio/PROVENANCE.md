@@ -202,3 +202,20 @@ Nao usado (licenca diferente de CC0): `picture.jpg` do pacote World Percussion (
 | `res://audio/voice/ep01_river_pilot_start.wav` | original | Balbucio sintetizado (formantes) — nenhuma amostra de terceiros | `source_audio/babble/babble.py (sintese formante original)` |
 
 Total: 145 arquivos de audio. Data de download/geracao: 2026-11-23.
+
+## Musica gerada pelo Lyria (D20a)
+
+Gerada pela Gemini API (Lyria) com prompts da biblia `tools/music/music_bible.json`; escolha de Thiago (D20a: candidata 1 de cada cena + vinhetas).
+Loop, corte e volume por `tools/music/finalize.py`; dados completos (prompt inteiro) em `tools/music/final_tracks.json`.
+Termos de uso do audio gerado: NAO verificados (ver `docs/proposals/d20_trilhas.md`).
+
+| arquivo | licenca | fonte | ferramenta | sha256 (ogg / bruto) |
+|---|---|---|---|---|
+| `res://audio/music/music_v3_village.ogg` | gerado (Lyria) | cena village, lyria-3-pro-preview, 2026-11-25T23:50:26+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `5156a6b77bd9c7a3…` / `bb2187748894935e…` |
+| `res://audio/music/music_v3_mystery.ogg` | gerado (Lyria) | cena mystery, lyria-3-pro-preview, 2026-11-25T23:51:43+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `2f5bb282d79ce925…` / `0f4416255704dd50…` |
+| `res://audio/music/music_v3_boat.ogg` | gerado (Lyria) | cena boat, lyria-3-pro-preview, 2026-11-25T23:53:21+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `98398af1220eb687…` / `8fa965cd1f43d256…` |
+| `res://audio/music/music_v3_lighthouse.ogg` | gerado (Lyria) | cena lighthouse, lyria-3-pro-preview, 2026-11-25T23:54:52+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `651ab1aee4f661fe…` / `d0ca21692af49430…` |
+| `res://audio/music/music_v3_festival.ogg` | gerado (Lyria) | cena festival, lyria-3-pro-preview, 2026-11-25T23:56:14+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `bea8e9b31ee8b5ef…` / `b30722c9c5536148…` |
+| `res://audio/music/sting_v3_mission_win.ogg` | gerado (Lyria) | cena mission_win, lyria-3-clip-preview, 2026-11-25T23:57:21+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `f21ed1581b5497e5…` / `3747d6acf7318dea…` |
+| `res://audio/music/sting_v3_badge.ogg` | gerado (Lyria) | cena badge, lyria-3-clip-preview, 2026-11-25T23:57:39+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `2e8640244469b40a…` / `61ba4db1fc4cdf57…` |
+| `res://audio/music/sting_v3_hero_switch.ogg` | gerado (Lyria) | cena hero_switch, lyria-3-clip-preview, 2026-11-25T23:58:08+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `dab81161eda90c44…` / `8aec96682a658760…` |

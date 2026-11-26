@@ -84,14 +84,15 @@
   "narrador": {
    "speaker": "narrator",
    "preset": "raw",
-   "voice": null,
+   "voice": "Sadaltager",
    "candidates": {
     "Sulafat": "rotulo Warm (feminina, nao verificado): calor de contadora de historias",
     "Aoede": "rotulo Breezy (feminina, nao verificado): leve e sorridente",
     "Achird": "rotulo Friendly (masculina, nao verificado): amigavel, sem cara de locutor",
     "Sadaltager": "rotulo Knowledgeable (masculina, nao verificado): claro, de quem conta e explica"
    },
-   "style": "Narrador de desenho animado infantil, caloroso e claro, sorriso na voz, conta a historia como para criancas de 4 a 8 anos sentadas em roda; portugues do Brasil natural, nada de locutor de radio ou voz de assistente."
+   "style": "Narrador de desenho animado infantil, caloroso e claro, sorriso na voz, conta a historia como para criancas de 4 a 8 anos sentadas em roda; portugues do Brasil natural, nada de locutor de radio ou voz de assistente.",
+   "approved": "Thiago 2026-11-26, versao crua (D20a)"
   }
  }
 }
