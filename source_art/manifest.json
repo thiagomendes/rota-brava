@@ -880,8 +880,8 @@
         "source_art/characters/heroes/pup/pup.blend"
       ],
       "saida_glb": "game/assets/models/characters/pup.glb",
-      "glb_sha256": "dca979552c77e1f17f52ea81cc1e2fe3a7fb40d0757e2545a0919b8ced5d1496",
-      "triangulos": 8744,
+      "glb_sha256": "c0c6d75dca934c890a6122cd3ac9f822ab23779006b230b266796c9f9aa37e45",
+      "triangulos": 8784,
       "materiais": [
         "mat_pup_boca",
         "mat_pup_coleira",
@@ -939,8 +939,10 @@
         "bark": 0.8,
         "idle": 2.8,
         "jump_happy": 1.0,
+        "run": 0.6,
         "step_on_horn": 1.4,
-        "wag": 1.2
+        "wag": 1.2,
+        "walk": 1.0
       },
       "shape_keys": [
         "Basis",
@@ -959,16 +961,157 @@
         "look_right",
         "look_up"
       ],
-      "altura_m": 0.507,
+      "altura_m": 0.4922,
       "razao_cabeca_altura": 0.0,
-      "velocidade_walk_mps": 0.0,
-      "velocidade_run_mps": 0.0,
+      "velocidade_walk_mps": 0.569,
+      "velocidade_run_mps": 1.2745,
       "variacao": "pup",
       "status": "provisorio",
       "aprovacao": "pendente (Thiago, Portao 1 do RB-R1)",
       "originalidade": "geometria procedural propria (primitivas bmesh, SKIN, SUBSURF, metaballs, torno); rig e animacoes autorais por script; nenhum modelo, malha, rig, mocap, textura ou personagem-base de terceiros; nada copiado de series de TV",
       "data": "2026-11-23",
-      "nota": "RB-R1: filhote original (caramelo, focinho e mancha creme, orelhas caidas, coleira turquesa com pingente-emblema). Rig proprio de 22 ossos. Clipes idle, wag, jump_happy, bark, step_on_horn."
+      "nota": "RB-R1: filhote original (caramelo, focinho e mancha creme, orelhas caidas, coleira turquesa com pingente-emblema). Rig proprio de 22 ossos. Clipes idle, wag, jump_happy, bark, step_on_horn.",
+      "glb_bytes": 2012600,
+      "data_arte_cenas": "2026-11-26",
+      "nota_arte_cenas": "RB-R1 arte das cenas: clipes walk (1,0 s, 3 ciclos de passo lateral, 0.569 m/s) e run (0,6 s, 2 ciclos de meio-galope com fase aerea, 1.274 m/s) por IK de 2 ossos por pata, sem root motion; rabo passa a nascer dentro da garupa (antes ficava ~7 cm solto) e so pesa no quadril e nos ossos do rabo."
+    },
+    {
+      "id": "amora",
+      "nome": "Dona Amora",
+      "papel": "vendor",
+      "agente": "art3d",
+      "status": "provisorio",
+      "processo": {
+        "script": "source_art/characters/amora/build_amora.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, KHR_materials_clearcoat",
+        "tecnicas": "construtor procedural dos adultos (hero_lib, proporcao EL: SKIN + SUBSURF, metaballs, bmesh) + partes proprias (coque, lenco, saia por torno com pregas, avental por grade + solidify, amoras); pesos por distancia normalizada; cinematica FK/IK em Python; acabamento vinil por cor (Principled + coat)"
+      },
+      "origem": [
+        "source_art/characters/amora/build_amora.py",
+        "source_art/scripts/hero_lib.py",
+        "source_art/scripts/hero_face.py",
+        "source_art/scripts/hero_anim.py",
+        "source_art/scripts/char_lib.py",
+        "source_art/scripts/char_anim.py",
+        "source_art/scripts/rbart.py",
+        "source_art/characters/amora/amora.blend"
+      ],
+      "referencia_do_projeto": "game/ui/brand/icons/vendor.svg (retrato da E7: cores, coque, lenco com amoras, avental)",
+      "saida_glb": "game/assets/models/characters/amora.glb",
+      "cena": "game/actors/characters/amora_model.tscn",
+      "materiais": [
+        "mat_amora_amora",
+        "mat_amora_boca",
+        "mat_amora_botas",
+        "mat_amora_cabelo",
+        "mat_amora_calca",
+        "mat_amora_chapeu",
+        "mat_amora_creme",
+        "mat_amora_escuro",
+        "mat_amora_folha",
+        "mat_amora_iris",
+        "mat_amora_olhos",
+        "mat_amora_pele",
+        "mat_amora_rubor",
+        "mat_amora_uniforme"
+      ],
+      "objetos": [
+        "Amora_Apron",
+        "Amora_ApronBib",
+        "Amora_ApronDots",
+        "Amora_ApronTies",
+        "Amora_Berries",
+        "Amora_BibBerry",
+        "Amora_Blush",
+        "Amora_BootL",
+        "Amora_BootR",
+        "Amora_Bun",
+        "Amora_Collar",
+        "Amora_CuffL",
+        "Amora_CuffR",
+        "Amora_Face",
+        "Amora_Hair",
+        "Amora_HandL",
+        "Amora_HandR",
+        "Amora_Head",
+        "Amora_Jacket",
+        "Amora_Leaf",
+        "Amora_Neck",
+        "Amora_Nose",
+        "Amora_Pants",
+        "Amora_Scarf",
+        "Amora_Skirt",
+        "Amora_SoleL",
+        "Amora_SoleR"
+      ],
+      "ossos": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "neck",
+        "head",
+        "shoulder.R",
+        "upper_arm.R",
+        "forearm.R",
+        "hand.R",
+        "hand_tip.R",
+        "shoulder.L",
+        "upper_arm.L",
+        "forearm.L",
+        "hand.L",
+        "hand_tip.L",
+        "thigh.R",
+        "shin.R",
+        "foot.R",
+        "toe.R",
+        "toe_tip.R",
+        "heel.R",
+        "thigh.L",
+        "shin.L",
+        "foot.L",
+        "toe.L",
+        "toe_tip.L",
+        "heel.L"
+      ],
+      "quantidade_ossos": 28,
+      "shape_keys": [
+        "Basis",
+        "neutra",
+        "atenta",
+        "surpresa",
+        "alegre",
+        "triste",
+        "brava_leve",
+        "blink",
+        "mouth_A",
+        "mouth_E",
+        "mouth_O",
+        "mouth_M",
+        "look_left",
+        "look_right",
+        "look_up"
+      ],
+      "razao_cabeca_altura": 0.2734,
+      "variacao": "amora",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "geometria procedural propria; rig e animacoes autorais por script; nenhum modelo, malha, rig, mocap, textura ou personagem-base de terceiros",
+      "data": "2026-11-26",
+      "nota": "RB-R1 arte das cenas: feirante parada na barraca (marcador M4_Vendor). Clipes idle (loop), wave, thanks, point, talk (3,0 s, comeca e termina na mesma pose; o loop de talk depende de CharacterVisual.LOOPING, do gameplay). Sem walk.",
+      "glb_sha256": "85f0a93ec3e9ee0a31b3a24a7d1275fe9c0580e632ce7ee2d7fd53178b68b7b1",
+      "glb_bytes": 3584392,
+      "triangulos": 22574,
+      "animacoes_duracao_s": {
+        "idle": 3.6,
+        "point": 1.2,
+        "talk": 3.0,
+        "thanks": 2.0,
+        "wave": 1.6
+      },
+      "altura_m": 1.5641,
+      "velocidade_walk_mps": 0.0,
+      "velocidade_run_mps": 0.0
     },
     {
       "id": "rastro",
@@ -1455,8 +1598,8 @@
         "source_art/scripts/hero_gait_v2.py"
       ],
       "saida_glb": "game/assets/models/characters/pico_v2.glb",
-      "glb_sha256": "baaeac377ad902d7c6a2ffd8387d2f36cb0a183151551c1044f7a10bacb84798",
-      "glb_bytes": 6812108,
+      "glb_sha256": "285a950a9e307618453296bdf19fc5d6129201e055a8697a040406f60a3cc228",
+      "glb_bytes": 6876120,
       "triangulos": 24944,
       "materiais": [
         "mat_pico_v2_face_dark",
@@ -1514,6 +1657,7 @@
         "idle": 4.0,
         "jump": 1.0,
         "look_up": 2.0,
+        "point": 1.2,
         "pull_rope": 1.6,
         "react_surprise": 0.9,
         "run": 0.5667,
@@ -1589,8 +1733,8 @@
           2048
         ]
       },
-      "altura_m": 1.0602,
-      "razao_cabeca_altura": 0.3708,
+      "altura_m": 1.0581,
+      "razao_cabeca_altura": 0.3715,
       "velocidade_walk_mps": 1.1667,
       "velocidade_run_mps": 2.7826,
       "ciclos_v2": {
@@ -1615,7 +1759,8 @@
           "mps_jogo": 3.2
         },
         "nota": "RB-R1 ciclos v2 (2026-11-25): walk/run refeitos por source_art/scripts/hero_gait_v2.py com passada longa; escala do clipe no jogo ~1,1-1,2 a 1,4 e 3,2 m/s. PROVISORIO."
-      }
+      },
+      "nota_arte_cenas": "RB-R1 arte das cenas (2026-11-26): clipe point (1,2 s, sem loop) para as falas que apontam; demais clipes iguais."
     },
     {
       "id": "leme_v2",
@@ -2271,11 +2416,11 @@
       "saida": "game/worlds/village_v3",
       "arquivos_sha256": {
         "village_collision.tscn": "8f5fd910b7b85cd2c893c49ff8cf7bc73cd25e3d1b0984408bce0873631631a9",
-        "village_world.tscn": "d1e81aa1d18d6fc39ea8d5cae25904e5a5213e34be9485e2421b87da350cf8b3"
+        "village_world.tscn": "c86dc7e1a6bf826dd3165f999a9cc8794ba72311142b08c2e3812fabd36967c1"
       },
       "arquivos_bytes": {
         "village_collision.tscn": 193517,
-        "village_world.tscn": 9085
+        "village_world.tscn": 9770
       },
       "colisao": {
         "formas_por_corpo": {
@@ -2297,7 +2442,48 @@
           24.0
         ]
       },
-      "nota": "formas simples; camada 1, mascara 0; beira d'agua por contorno do nivel -0,3 m"
+      "nota": "formas simples; camada 1, mascara 0; beira d'agua por contorno do nivel -0,3 m",
+      "nota_arte_cenas": "RB-R1 arte das cenas (2026-11-26): marcadores M4_Vendor, Cut_VillageWide e Cut_LighthouseView (estes dois com metadata camera/look_at), tambem em wv3_collision.py EXTRA_MARKERS."
+    },
+    {
+      "id": "brand_icons_e7",
+      "nome": "Pictogramas da marca da E7: lua, peixe, flor (barquinhos da festa), Dona Amora e Farol 7 (retratos-icone da legenda), mosquetao redesenhado",
+      "agente": "ux",
+      "processo": {
+        "script": null,
+        "ferramenta": "SVG escrito a mao (texto), viewBox 100x100, 256 px, contorno #123A5E 6 u, mesmo estilo dos 28 pictogramas de 038be7b",
+        "exportador": "importador de textura SVG da Godot (svg/scale 1.0)"
+      },
+      "origem": [
+        "game/ui/brand/icons/moon.svg",
+        "game/ui/brand/icons/fish.svg",
+        "game/ui/brand/icons/flower.svg",
+        "game/ui/brand/icons/vendor.svg",
+        "game/ui/brand/icons/radio.svg",
+        "game/ui/brand/icons/carabiner.svg"
+      ],
+      "saida": "game/ui/brand/icons",
+      "arquivos_sha256": {
+        "moon.svg": "69dc2cd87fc34e4d793a6883c239cca54766e38630367bcce91a40f5056f0131",
+        "fish.svg": "2a24d427dbb0bf01a31038db46223417f433d401704ddd30d89cbbb11ce1db55",
+        "flower.svg": "185d2766ac18f392f01c6be40b80ad0676aa53f6c0867bb5f9ead0a64852f0eb",
+        "vendor.svg": "397a67a0ad12c7590f4e24a35d076e257912262cbb0b9c8dc04ba9aa80b0b3c5",
+        "radio.svg": "96c5754cf82e18b0f2adbd1f8c35c72b9b882e88ea45b9a1602b263522ffdb6f",
+        "carabiner.svg": "0b99327d537308edcb5ca141a4e254863fea5fed386cdcf091f11685d8eb1540"
+      },
+      "arquivos_bytes": {
+        "moon.svg": 484,
+        "fish.svg": 564,
+        "flower.svg": 565,
+        "vendor.svg": 1886,
+        "radio.svg": 692,
+        "carabiner.svg": 695
+      },
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "formas desenhadas no projeto, sem referencia, fonte ou imagem de terceiros; sem modelo de imagem",
+      "data": "2026-11-25",
+      "nota": "RB-R1 E7 (ux). carabiner.svg substitui o desenho de 038be7b (oval simetrica que lia como '0' cortado): forma de D inclinada 22 graus, trava prata e luva amarela. Prova: game/tests/test_ep01_v3_portraits.gd (48 px) e captures/e7_icones/prancha_icones_48_96.png (fora do Git)."
     },
     {
       "id": "props_v3_ball",
@@ -2639,12 +2825,12 @@
       ],
       "missao": "geral",
       "saida_glb": "game/assets/models/props_v3/emblem_carabiner.glb",
-      "glb_sha256": "cbec595289ddf4afafef24c8c442b5b1c0083b5853b69d3d06a1425ada75dbcd",
-      "glb_bytes": 140592,
+      "glb_sha256": "28ef053da3c730cb4ff068dedf0f50fe125fd860e7540d2fb16462944fc6633d",
+      "glb_bytes": 147700,
       "cena": "game/assets/models/props_v3/emblem_carabiner.tscn",
-      "cena_sha256": "2e8c8b1500184db83dacff56a60ff954bb686df80569cf73ba206dcadc65cedb",
+      "cena_sha256": "a045edacb2107043bb2ed921597f3bada4ef2bac4f9e23445bd2f8f6fe9928e7",
       "cena_bytes": 3660,
-      "triangulos": 2840,
+      "triangulos": 2984,
       "orcamento_tris": 3000,
       "materiais": [
         "wv2_glossy",
@@ -3123,46 +3309,6 @@
         "gull.gd": 2080,
         "tow_rope.gd": 1283
       }
-    },
-    {
-      "id": "brand_icons_e7",
-      "nome": "Pictogramas da marca da E7: lua, peixe, flor (barquinhos da festa), Dona Amora e Farol 7 (retratos-icone da legenda), mosquetao redesenhado",
-      "agente": "ux",
-      "processo": {
-        "script": null,
-        "ferramenta": "SVG escrito a mao (texto), viewBox 100x100, 256 px, contorno #123A5E 6 u, mesmo estilo dos 28 pictogramas de 038be7b",
-        "exportador": "importador de textura SVG da Godot (svg/scale 1.0)"
-      },
-      "origem": [
-        "game/ui/brand/icons/moon.svg",
-        "game/ui/brand/icons/fish.svg",
-        "game/ui/brand/icons/flower.svg",
-        "game/ui/brand/icons/vendor.svg",
-        "game/ui/brand/icons/radio.svg",
-        "game/ui/brand/icons/carabiner.svg"
-      ],
-      "saida": "game/ui/brand/icons",
-      "arquivos_sha256": {
-        "moon.svg": "69dc2cd87fc34e4d793a6883c239cca54766e38630367bcce91a40f5056f0131",
-        "fish.svg": "2a24d427dbb0bf01a31038db46223417f433d401704ddd30d89cbbb11ce1db55",
-        "flower.svg": "185d2766ac18f392f01c6be40b80ad0676aa53f6c0867bb5f9ead0a64852f0eb",
-        "vendor.svg": "397a67a0ad12c7590f4e24a35d076e257912262cbb0b9c8dc04ba9aa80b0b3c5",
-        "radio.svg": "96c5754cf82e18b0f2adbd1f8c35c72b9b882e88ea45b9a1602b263522ffdb6f",
-        "carabiner.svg": "0b99327d537308edcb5ca141a4e254863fea5fed386cdcf091f11685d8eb1540"
-      },
-      "arquivos_bytes": {
-        "moon.svg": 484,
-        "fish.svg": 564,
-        "flower.svg": 565,
-        "vendor.svg": 1886,
-        "radio.svg": 692,
-        "carabiner.svg": 695
-      },
-      "status": "provisorio",
-      "aprovacao": "pendente (Thiago)",
-      "originalidade": "formas desenhadas no projeto, sem referencia, fonte ou imagem de terceiros; sem modelo de imagem",
-      "data": "2026-11-25",
-      "nota": "RB-R1 E7 (ux). carabiner.svg substitui o desenho de 038be7b (oval simetrica que lia como '0' cortado): forma de D inclinada 22 graus, trava prata e luva amarela. Prova: game/tests/test_ep01_v3_portraits.gd (48 px) e captures/e7_icones/prancha_icones_48_96.png (fora do Git)."
     }
   ]
 }
