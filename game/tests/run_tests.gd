@@ -53,6 +53,7 @@ func _run() -> void:
 	# Nenhum teste grava no salvo real do jogador (user://missions.save.json): quem quer salvo define o proprio caminho.
 	Ep01V3Main.save_path = ""
 	Ep01V3Main.start_mission = &""
+	_reset_cutscenes()
 	for f in files:
 		print("== ", f)
 		var script := load("res://tests/" + f) as GDScript
@@ -74,7 +75,17 @@ func _reset_shared_state() -> void:
 	Engine.time_scale = 1.0
 	Ep01V3Main.save_path = ""
 	Ep01V3Main.start_mission = &""
+	_reset_cutscenes()
 	Ep01V3Dialogue.reset_picks()
 	for action: StringName in InputMap.get_actions():
 		Input.action_release(action)
 	paused = false
+
+
+## D21: cutscenes desligadas por padrao na suite (os testes de cena religam) e vistas so em memoria, nunca no salvo real.
+func _reset_cutscenes() -> void:
+	Ep01V3Cutscene.enabled = false
+	Ep01V3Cutscene.auto_skip = false
+	Ep01V3Cutscene.seen_path = ""
+	Ep01V3Cutscene.reset_seen()
+	GameIntroScene.next_scene = GameIntroScene.EP01_SCENE

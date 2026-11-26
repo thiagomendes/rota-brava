@@ -159,6 +159,9 @@ func request_look() -> void:
 func can_look() -> bool:
 	if main.current == null or not main.current.is_active() or main.land.sailing:
 		return false
+	# D21: nada de olhar durante a cena; logo depois dela, o exit_look ja mostrou o mesmo alvo.
+	if main.cutscene_blocks_look():
+		return false
 	if main.hud.handoff_open or main.hud.pause_open or main.posing or main.land.busy or main._pending_switch != &"":
 		return false
 	return main.controlled_node is MemberActor and main.help_target() != null

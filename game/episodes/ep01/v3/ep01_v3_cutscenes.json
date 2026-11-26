@@ -115,17 +115,17 @@
      "from": {
       "marker": "M0_RastroStart",
       "offset": [
-       -0.8,
-       1.3,
-       2.2
+       0,
+       1.0,
+       1.45
       ]
      },
      "look": {
       "marker": "M0_RastroStart",
       "offset": [
-       -0.8,
-       1.2,
-       0.6
+       0,
+       0.75,
+       0
       ]
      },
      "actors": [
@@ -133,16 +133,44 @@
        "who": "tracker",
        "marker": "M0_RastroStart",
        "offset": [
-        -0.8,
         0,
-        0.6
+        0,
+        0
        ],
        "anim": "inspect_touch"
+      },
+      {
+       "who": "climber",
+       "marker": "M0_RastroStart",
+       "offset": [
+        -1.7,
+        0,
+        1.4
+       ],
+       "anim": "idle"
+      },
+      {
+       "who": "pilot",
+       "marker": "M0_RastroStart",
+       "offset": [
+        1.7,
+        0,
+        1.4
+       ],
+       "anim": "idle"
       }
      ],
      "line": {
       "key": "ep01.narrator.intro.tracker",
       "speaker": "narrator"
+     },
+     "to": {
+      "marker": "M0_RastroStart",
+      "offset": [
+       0,
+       0.95,
+       1.2
+      ]
      }
     },
     {
@@ -151,17 +179,17 @@
      "from": {
       "marker": "M0_RastroStart",
       "offset": [
-       -0.8,
-       1.3,
-       2.0
+       0.25,
+       0.95,
+       1.2
       ]
      },
      "look": {
       "marker": "M0_RastroStart",
       "offset": [
-       -0.8,
-       1.3,
-       0.6
+       0,
+       0.78,
+       0
       ]
      },
      "actors": [
@@ -169,11 +197,31 @@
        "who": "tracker",
        "marker": "M0_RastroStart",
        "offset": [
-        -0.8,
         0,
-        0.6
+        0,
+        0
        ],
        "anim": "point"
+      },
+      {
+       "who": "climber",
+       "marker": "M0_RastroStart",
+       "offset": [
+        -1.7,
+        0,
+        1.4
+       ],
+       "anim": "idle"
+      },
+      {
+       "who": "pilot",
+       "marker": "M0_RastroStart",
+       "offset": [
+        1.7,
+        0,
+        1.4
+       ],
+       "anim": "idle"
       }
      ],
      "line": {
@@ -189,23 +237,23 @@
       "offset": [
        0,
        1.0,
-       2.6
+       1.45
       ]
      },
      "to": {
       "marker": "M0_RastroStart",
       "offset": [
        0,
-       0.7,
-       2.4
+       0.95,
+       1.2
       ]
      },
      "look": {
       "marker": "M0_RastroStart",
       "offset": [
        0,
-       1.4,
-       0.9
+       0.75,
+       0
       ]
      },
      "actors": [
@@ -215,9 +263,29 @@
        "offset": [
         0,
         0,
-        0.9
+        0
        ],
        "anim": "jump"
+      },
+      {
+       "who": "tracker",
+       "marker": "M0_RastroStart",
+       "offset": [
+        -1.7,
+        0,
+        1.4
+       ],
+       "anim": "idle"
+      },
+      {
+       "who": "pilot",
+       "marker": "M0_RastroStart",
+       "offset": [
+        1.7,
+        0,
+        1.4
+       ],
+       "anim": "idle"
       }
      ],
      "line": {
@@ -231,17 +299,17 @@
      "from": {
       "marker": "M0_RastroStart",
       "offset": [
-       0,
-       1.3,
-       2.3
+       0.25,
+       0.95,
+       1.2
       ]
      },
      "look": {
       "marker": "M0_RastroStart",
       "offset": [
        0,
-       1.3,
-       0.9
+       0.78,
+       0
       ]
      },
      "actors": [
@@ -251,9 +319,29 @@
        "offset": [
         0,
         0,
-        0.9
+        0
        ],
        "anim": "celebrate"
+      },
+      {
+       "who": "tracker",
+       "marker": "M0_RastroStart",
+       "offset": [
+        -1.7,
+        0,
+        1.4
+       ],
+       "anim": "idle"
+      },
+      {
+       "who": "pilot",
+       "marker": "M0_RastroStart",
+       "offset": [
+        1.7,
+        0,
+        1.4
+       ],
+       "anim": "idle"
       }
      ],
      "line": {
@@ -267,17 +355,17 @@
      "from": {
       "marker": "M0_RastroStart",
       "offset": [
-       0.8,
-       1.3,
-       2.2
+       0,
+       1.0,
+       1.45
       ]
      },
      "look": {
       "marker": "M0_RastroStart",
       "offset": [
-       0.8,
-       1.2,
-       0.6
+       0,
+       0.75,
+       0
       ]
      },
      "actors": [
@@ -285,16 +373,44 @@
        "who": "pilot",
        "marker": "M0_RastroStart",
        "offset": [
-        0.8,
         0,
-        0.6
+        0,
+        0
        ],
        "anim": "idle_wheel"
+      },
+      {
+       "who": "tracker",
+       "marker": "M0_RastroStart",
+       "offset": [
+        -1.7,
+        0,
+        1.4
+       ],
+       "anim": "idle"
+      },
+      {
+       "who": "climber",
+       "marker": "M0_RastroStart",
+       "offset": [
+        1.7,
+        0,
+        1.4
+       ],
+       "anim": "idle"
       }
      ],
      "line": {
       "key": "ep01.narrator.intro.pilot",
       "speaker": "narrator"
+     },
+     "to": {
+      "marker": "M0_RastroStart",
+      "offset": [
+       0,
+       0.95,
+       1.2
+      ]
      }
     },
     {
@@ -303,17 +419,17 @@
      "from": {
       "marker": "M0_RastroStart",
       "offset": [
-       0.8,
-       1.3,
-       2.0
+       0.25,
+       0.95,
+       1.2
       ]
      },
      "look": {
       "marker": "M0_RastroStart",
       "offset": [
-       0.8,
-       1.3,
-       0.6
+       0,
+       0.78,
+       0
       ]
      },
      "actors": [
@@ -321,11 +437,31 @@
        "who": "pilot",
        "marker": "M0_RastroStart",
        "offset": [
-        0.8,
         0,
-        0.6
+        0,
+        0
        ],
        "anim": "wave"
+      },
+      {
+       "who": "tracker",
+       "marker": "M0_RastroStart",
+       "offset": [
+        -1.7,
+        0,
+        1.4
+       ],
+       "anim": "idle"
+      },
+      {
+       "who": "climber",
+       "marker": "M0_RastroStart",
+       "offset": [
+        1.7,
+        0,
+        1.4
+       ],
+       "anim": "idle"
       }
      ],
      "line": {
@@ -914,7 +1050,19 @@
        0
       ]
      },
-     "actors": [],
+     "actors": [
+      {
+       "who": "vendor",
+       "marker": "M4_Vendor",
+       "offset": [
+        0,
+        0,
+        0
+       ],
+       "anim": "talk",
+       "fallback": "wave"
+      }
+     ],
      "line": {
       "key": "ep01.narrator.m4.vendor",
       "speaker": "narrator"
@@ -1324,9 +1472,9 @@
      "from": {
       "marker": "M7_Gallery",
       "offset": [
-       -2,
-       1.5,
-       2
+       -3.5,
+       2.0,
+       3.5
       ]
      },
      "look": {

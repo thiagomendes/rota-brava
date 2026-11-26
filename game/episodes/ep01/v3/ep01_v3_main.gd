@@ -164,6 +164,7 @@ func _ready() -> void:
 	if first != &"" and first != &"M0":
 		_place_trio_at(land.start_position(first))
 		_settle_trio.call_deferred()
+	_cutscene_setup()  # D21
 	_start_mission(_index_of(first) if first != &"" else 0)
 	_apply_dev_args()
 	if demo:
@@ -353,6 +354,8 @@ func _index_of(id: StringName) -> int:
 
 
 func _start_mission(index: int) -> void:
+	if _cutscene_gate(index):  # D21: cenas antes da missao (voltam aqui ao terminar)
+		return
 	if index >= missions.size():
 		_finish_episode()
 		return
@@ -477,7 +480,8 @@ func _process(delta: float) -> void:
 # ---------- acao contextual ----------
 
 func blocked() -> bool:
-	return hud.handoff_open or hud.pause_open or hud.complete_open or posing or land.busy or controlled_node == null
+	return hud.handoff_open or hud.pause_open or hud.complete_open or posing or land.busy or controlled_node == null \
+		or (cutscene != null and cutscene.playing)
 
 
 func _usable(it: Ep01Interactable) -> bool:
@@ -856,3 +860,134 @@ func _on_replay() -> void:
 func _on_menu() -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file(MENU_SCENE)
+
+
+# ---------- D21: cutscenes (RB-R1; player em episodes/ep01/v3/cutscene/) ----------
+# Abertura do episodio e intro de cada missao antes de `_start_mission`; transicoes por fim de passo ("M6.board.done")
+# e por fim de missao ("M7.done", "M8.done"). Durante a cena: seguidores desligados, ninguem em controle, camera da cena;
+# ao sair, a camera do jogo olha para o `exit_look` e o controle volta. --ep01-cutscenes=off|skip (dev/medicao).
+
+var cutscene: Ep01V3Cutscene
+var _cs_gate_index: int = -1
+## Ponto do ultimo exit_look ainda nao "gasto" pelo olhar dirigido (INF = nenhum).
+var _cs_exit: Vector3 = Vector3.INF
+## Olhares dirigidos cancelados porque a cena acabou de mostrar o mesmo alvo (testes).
+var cutscene_looks_skipped: int = 0
+
+
+func _cutscene_setup() -> void:
+	match _user_arg("--ep01-cutscenes"):
+		"off":
+			Ep01V3Cutscene.enabled = false
+		"skip":
+			Ep01V3Cutscene.auto_skip = true
+	if _has_flag("--ep01-demo") or _has_flag("--ep01-demo-human"):
+		Ep01V3Cutscene.seen_path = ""
+	cutscene = Ep01V3Cutscene.new()
+	cutscene.reduced_motion = Options.reduced_motion()
+	add_child(cutscene)
+	cutscene.setup(world, hud, {&"tracker": actors[&"tracker"], &"climber": actors[&"climber"],
+		&"pilot": actors[&"pilot"], &"captain": land.captain, &"pup": land.pup})
+	cutscene.on_step = _cutscene_hold_input
+	cutscene.exclude = camera_rig.exclude.duplicate()
+	cutscene.occluders = camera_rig.occluders
+	for m in missions:
+		m.step_done.connect(func(mid: StringName, _n: int, step: StringName) -> void:
+			var sid := Ep01V3Cutscene.scene_for("%s.%s.done" % [mid, step])
+			if sid != &"":
+				play_cutscene(sid, false))
+
+
+## true: ha cena(s) antes da missao `index`; `_start_mission(index)` e chamada de novo ao terminar.
+func _cutscene_gate(index: int) -> bool:
+	if cutscene == null or not Ep01V3Cutscene.enabled or index == _cs_gate_index:
+		return false
+	var queue: Array[StringName] = []
+	var whens: Array[String] = []
+	if index == 0:
+		whens.append("episode_start")
+	elif index - 1 < missions.size():
+		whens.append("%s.done" % missions[index - 1].id)
+	if index < missions.size():
+		whens.append("%s.start" % missions[index].id)
+	for w in whens:
+		var sid := Ep01V3Cutscene.scene_for(w)
+		if sid != &"":
+			queue.append(sid)
+	_cs_gate_index = index
+	if queue.is_empty():
+		return false
+	_cutscene_run(queue, index)
+	return true
+
+
+func _cutscene_run(queue: Array[StringName], index: int) -> void:
+	for sid in queue:
+		await play_cutscene(sid)
+		if not is_inside_tree():
+			return
+	_start_mission(index)
+
+
+## Toca uma cena (espera a que estiver tocando) e devolve o jogo apontando para o `exit_look` dela.
+func play_cutscene(sid: StringName, restore_members: bool = true) -> void:
+	while cutscene.playing:
+		await cutscene.finished
+	cutscene.restore_members = restore_members
+	if not is_inside_tree() or not Ep01V3Cutscene.enabled:
+		return
+	var orbit := camera_rig.orbit_enabled
+	set_followers_enabled(false)
+	camera_rig.orbit_enabled = false
+	camera_rig.release_mouse()
+	if cutscene.play(sid):
+		_cutscene_hold_input()
+		await cutscene.finished
+	if not is_inside_tree():
+		return
+	camera_rig.orbit_enabled = orbit
+	set_followers_enabled(true)
+	set_controlled(controlled_node)
+	_cutscene_exit_look(sid)
+
+
+## Ninguem em controle durante a cena (o jogo pode trocar o controle no meio, ex.: embarque no M6).
+func _cutscene_hold_input() -> void:
+	for m: StringName in actors:
+		(actors[m] as MemberActor).controlled = false
+	boat.controlled = false
+
+
+func _cutscene_exit_look(sid: StringName) -> void:
+	var p := cutscene.exit_point(sid)
+	_cs_exit = p
+	if controlled_node != null:
+		var d := p - controlled_node.global_position
+		d.y = 0.0
+		if d.length() > 0.3:
+			var yaw := atan2(d.x, d.z) + PI
+			if controlled_node == boat or land.sailing:
+				camera_rig.yaw = yaw
+			else:
+				camera_rig.set_low_view(yaw)
+		camera_rig.follow(controlled_node, true)
+	camera_rig.camera.current = true
+
+
+## Guia (F2) pergunta antes de olhar: cena tocando bloqueia; o primeiro olhar depois dela para perto do exit_look
+## (3 m) e cancelado, porque a cena ja deixou a camera apontando para la.
+func cutscene_blocks_look() -> bool:
+	if cutscene == null:
+		return false
+	if cutscene.playing:
+		return true
+	if _cs_exit == Vector3.INF:
+		return false
+	var t := help_target()
+	var near := t != null and t.global_position.distance_to(_cs_exit) < 3.0
+	_cs_exit = Vector3.INF
+	if near:
+		guide._pending_look = false
+		cutscene_looks_skipped += 1
+		print("[RB] cutscene: olhar dirigido coberto pelo exit_look")
+	return near
