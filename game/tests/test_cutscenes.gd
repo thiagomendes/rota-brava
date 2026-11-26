@@ -21,6 +21,7 @@ func run(runner) -> void:
 	await _skip_rules()
 	await _reduced_motion()
 	await _no_shot_inside()
+	await _guide_combo()
 	await _game_intro()
 	_menu_target()
 	await _bot_with_cutscenes()
@@ -322,6 +323,34 @@ func _no_shot_inside() -> void:
 	var raw: Vector3 = cs.shot_pose(sh, 0.0)[0]
 	r.check(cs.inside_obstacle(raw) == false or not cs.inside_obstacle(cs.camera_pose(sh, 0.0)[0]),
 		"cutscene: nightfall 2o plano sai de dentro da copa (cru dentro=%s)" % cs.inside_obstacle(raw))
+	await _free(main)
+
+
+## Cena + olhar dirigido (F2): nenhum olhar durante a cena; o primeiro olhar do M1 (pegada no cais, mesmo alvo do
+## exit_look da intro) e cancelado; a camera ja aponta para la.
+func _guide_combo() -> void:
+	Ep01V3Cutscene.reset_seen()
+	Ep01V3Cutscene.auto_skip = false
+	Ep01V3Main.start_mission = &"M1"
+	var main := await _new_main(true)
+	Ep01V3Main.start_mission = &""
+	var during := [0]
+	main.guide.look_started.connect(func(_p: Vector3) -> void:
+		if main.cutscene.playing:
+			during[0] += 1)
+	r.check(main.cutscene.playing, "cena+guia: intro do M1 toca ao comecar a missao")
+	Engine.time_scale = TIME_SCALE
+	var limit := 20000
+	while limit > 0 and (main.cutscene.playing or main.current == null or main.current.id != &"M1"):
+		await r.tree.process_frame
+		limit -= 1
+	await r.frames(60)
+	Engine.time_scale = 1.0
+	r.check(main.current != null and main.current.id == &"M1" and not main.cutscene.playing, "cena+guia: M1 comeca depois da m1_intro")
+	r.check(during[0] == 0, "cena+guia: nenhum olhar dirigido durante a cena (%d)" % during[0])
+	r.check(main.cutscene_looks_skipped >= 1 and not main.guide.looking and not main.guide._pending_look,
+		"cena+guia: olhar logo depois da cena para o mesmo alvo cancelado (%d)" % main.cutscene_looks_skipped)
+	r.check((main.controlled_node as MemberActor).controlled and not main.blocked(), "cena+guia: controle com o jogador")
 	await _free(main)
 
 

@@ -217,7 +217,11 @@
    "ep01.narrator.night.lanterns",
    "ep01.festival.captain.thanks_team",
    "ep01.narrator.end.saved",
-   "ep01.narrator.end.bye"
+   "ep01.narrator.end.bye",
+   "ep01.team.tracker.call_climber_3",
+   "ep01.team.climber.call_pilot_3",
+   "ep01.team.tracker.call_climber_2",
+   "ep01.team.pilot.call_climber_2"
   ]
  },
  "lines": [
