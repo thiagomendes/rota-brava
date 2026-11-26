@@ -88,6 +88,7 @@ var _clock: float = 0.0
 
 func _ready() -> void:
 	name = "Ep01V3Main"
+	MouseLock.reset()  # G5: nada de bloqueio/captura herdado de outra cena
 	world = (load(WORLD_SCENE) as PackedScene).instantiate() as VillageWorld
 	world.name = "World"
 	add_child(world)
@@ -849,6 +850,12 @@ static func surface_at(pos: Vector3) -> StringName:
 func _on_footstep(speed: float, pos: Vector3) -> void:
 	if audio != null:
 		audio.play_footstep(speed, surface_at(pos), pos)
+
+
+## G5: sair da arvore (inclusive no meio de uma cutscene) nao deixa bloqueio nem captura para a cena seguinte.
+func _exit_tree() -> void:
+	MouseLock.unblock(&"cutscene")
+	MouseLock.reset()
 
 
 func _pause() -> void:

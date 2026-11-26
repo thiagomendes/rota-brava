@@ -25,10 +25,12 @@ func run(runner) -> void:
 	await r.frames(3)
 	await _g5_mouse()
 	await _g7_first_e()
+	await _g5_cutscene()
 	main.get_tree().paused = false
 	main.queue_free()
 	await r.frames(2)
 	r.tree.current_scene = null
+	await _g5_cutscene_exit()
 	r.check(not MouseLock.blocked() and not MouseLock.captured(), "G5: cena descarregada nao deixa mouse preso nem bloqueio")
 	MouseLock.reset()
 
@@ -107,6 +109,63 @@ func _g5_mouse() -> void:
 	main.hud.close_choice()
 	await r.frames(1)
 	r.check(not _captured(), "G5: mouse solto antes do painel continua solto depois")
+
+
+## Cutscene: solta o mouse enquanto toca e devolve a captura ao terminar.
+func _g5_cutscene() -> void:
+	var was_enabled := Ep01V3Cutscene.enabled
+	var was_auto := Ep01V3Cutscene.auto_skip
+	Ep01V3Cutscene.enabled = true
+	Ep01V3Cutscene.auto_skip = false
+	Ep01V3Cutscene.reset_seen()
+	MouseLock.reset()
+	MouseLock.capture()
+	main.play_cutscene(&"m2_intro")
+	await r.frames(5)
+	r.check(main.cutscene.playing and MouseLock.blocked() and not _captured(), "G5: cutscene tocando solta o mouse")
+	Engine.time_scale = 8.0
+	var n := 0
+	while main.cutscene.playing and n < 4000:
+		await r.frames(1)
+		n += 1
+	Engine.time_scale = 1.0
+	await r.frames(2)
+	r.check(not main.cutscene.playing and not MouseLock.blocked() and _captured(), "G5: cutscene terminada devolve a captura")
+	Ep01V3Cutscene.enabled = was_enabled
+	Ep01V3Cutscene.auto_skip = was_auto
+
+
+## Cena sai da arvore no meio da cutscene: nao sobra bloqueio nem captura; o proximo episodio comeca limpo.
+func _g5_cutscene_exit() -> void:
+	var was_enabled := Ep01V3Cutscene.enabled
+	var was_auto := Ep01V3Cutscene.auto_skip
+	Ep01V3Cutscene.enabled = true
+	Ep01V3Cutscene.auto_skip = false
+	Ep01V3Cutscene.reset_seen()
+	var m := (load("res://episodes/ep01/v3/ep01_v3_main.tscn") as PackedScene).instantiate() as Ep01V3Main
+	r.tree.root.add_child(m)
+	r.tree.current_scene = m
+	await r.frames(3)
+	MouseLock.capture()
+	m.play_cutscene(&"m2_intro")
+	await r.frames(5)
+	r.check(m.cutscene.playing and MouseLock.blocked(), "G5: cutscene em curso bloqueia o mouse")
+	m.queue_free()
+	await r.frames(2)
+	r.tree.current_scene = null
+	r.check(not MouseLock.blocked() and not MouseLock.captured(), "G5: saindo da arvore no meio da cutscene, sem bloqueio nem captura")
+	MouseLock.block(&"cutscene")
+	MouseLock.capture()
+	var m2 := (load("res://episodes/ep01/v3/ep01_v3_main.tscn") as PackedScene).instantiate() as Ep01V3Main
+	Ep01V3Cutscene.enabled = false  # sem a cena de abertura, que bloquearia de proposito
+	r.tree.root.add_child(m2)
+	await r.frames(3)
+	r.check(not MouseLock.blocked() and not MouseLock.captured(), "G5: episodio novo zera o MouseLock ao carregar (heranca: bloqueio cutscene + captura)")
+	m2.queue_free()
+	await r.frames(2)
+	Ep01V3Cutscene.enabled = was_enabled
+	Ep01V3Cutscene.auto_skip = was_auto
+	MouseLock.reset()
 
 
 func _press_e() -> void:
