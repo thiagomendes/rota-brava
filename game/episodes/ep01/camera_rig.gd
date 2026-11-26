@@ -37,6 +37,16 @@ const ARM_MARGIN := 0.08
 ## Encurtamento do ultimo quadro (m; 0 = livre), para testes e depuracao.
 var last_pull: float = 0.0
 var _probe: SphereShape3D
+## Encurtar ~0,25 s, voltar ~1,2 s (sem salto).
+const ARM_IN_TIME := 0.25
+const ARM_OUT_TIME := 1.2
+const ARM_HYST := 0.04
+var _arm: float = -1.0
+var _arm_vel: float = 0.0
+var _probe_frame: int = -1
+var _probe_len: float = INF
+var _follow_pos: Vector3 = Vector3.ZERO
+var _written: Vector3 = Vector3(INF, INF, INF)
 ## Orbita (C1, RB-R1): alavanca direita (`cam_left/right/up/down`) e mouse capturado giram em volta do heroi; guinada livre,
 ## inclinacao limitada. `pitch` 0 = enquadramento baixo aprovado (positivo sobe a camera). Desligada por padrao (fluxo antigo).
 var orbit_enabled: bool = false
@@ -62,6 +72,7 @@ func _ready() -> void:
 	camera.fov = 55.0
 	camera.current = true
 	add_child(camera)
+	_ready_priority()
 
 
 ## look_y: altura do ponto de mira acima do alvo (0,75 = peito de crianca de ~1,14 m).
@@ -97,6 +108,7 @@ func follow(node: Node3D, snap: bool = false) -> void:
 		lead = Vector3.ZERO
 	target = node
 	if snap:
+		_arm = -1.0
 		_update(1.0, 0.0)
 
 
@@ -108,10 +120,17 @@ func shake(amplitude: float = 0.12, duration: float = 0.25) -> void:
 	_shake_time = maxf(_shake_time, duration)
 
 
-func _process(delta: float) -> void:
+## RB-R1 (tremor na corrida): o heroi anda em _physics_process sem interpolacao; a camera seguia em _process e, com
+## render != 60 Hz, ora avancava sem o heroi ter andado, ora o alcancava aos saltos (serrilhado). Agora a camera anda no
+## MESMO passo de fisica, depois dos atores (prioridade alta), com suavizacao exponencial (independente do delta).
+func _ready_priority() -> void:
+	process_physics_priority = 100
+
+
+func _physics_process(delta: float) -> void:
 	if orbit_enabled:
 		orbit_step(delta)
-	_update(1.0 if reduced_motion else clampf(smooth * delta, 0.0, 1.0), delta)
+	_update(1.0 if reduced_motion else 1.0 - exp(-smooth * delta), delta)
 
 
 func _update(weight: float, delta: float) -> void:
@@ -123,10 +142,23 @@ func _update(weight: float, delta: float) -> void:
 	var base := focus + (lead if not framing_world else Vector3.ZERO)
 	var rel := offset if framing_world else Basis(Vector3.UP, yaw) * (Basis(Vector3.RIGHT, -pitch) * offset)
 	var wanted := base + rel
-	camera.global_position = camera.global_position.lerp(wanted, weight)
+	# Alguem moveu a camera por fora (captura, cena): parte de onde ela esta.
+	if camera.global_position.distance_to(_written) > 0.0001:
+		_follow_pos = camera.global_position
+	_follow_pos = _follow_pos.lerp(wanted, weight)
 	var look := base + look_offset
+	var pos := _follow_pos
 	if collision_mask != 0:
-		camera.global_position = avoid(look, camera.global_position)
+		# A consulta de fisica roda no maximo uma vez por quadro de render (com tempo acelerado ha varios passos por quadro).
+		var frame := Engine.get_process_frames()
+		if frame != _probe_frame or _arm < 0.0:
+			_probe_frame = frame
+			_probe_len = avoid(look, _follow_pos).distance_to(look)
+		var free_dir := _follow_pos - look
+		var allowed_pos := look + free_dir.normalized() * minf(_probe_len, free_dir.length()) if free_dir.length() > 0.01 else _follow_pos
+		pos = _smooth_arm(look, _follow_pos, allowed_pos, delta)
+	camera.global_position = pos
+	_written = pos
 	if _shake_time > 0.0 and not reduced_motion:
 		_shake_time = maxf(0.0, _shake_time - delta)
 		var a := _shake_amp * (_shake_time / maxf(_shake_time + delta, 0.001))
@@ -135,6 +167,40 @@ func _update(weight: float, delta: float) -> void:
 			_shake_amp = 0.0
 	if camera.global_position.distance_to(look) > 0.01:
 		camera.look_at(look, Vector3.UP)
+
+
+## Braco suavizado: encurta rapido mas sem salto (ARM_IN_RATE) e volta devagar (ARM_OUT_RATE), com histerese de
+## ARM_HYST (a esfera/copa que liga e desliga a cada quadro nao faz o braco ir e voltar).
+func _smooth_arm(look: Vector3, free_pos: Vector3, allowed_pos: Vector3, delta: float) -> Vector3:
+	var free_len := free_pos.distance_to(look)
+	if free_len < 0.01:
+		return free_pos
+	var want := allowed_pos.distance_to(look)
+	if _arm < 0.0 or reduced_motion or delta <= 0.0:
+		_arm = want
+		_arm_vel = 0.0
+	elif want < _arm:
+		_arm = _damp(_arm, want, ARM_IN_TIME, delta)
+	elif want > _arm + ARM_HYST:
+		_arm = _damp(_arm, want, ARM_OUT_TIME, delta)
+	else:
+		_arm = _damp(_arm, _arm, ARM_OUT_TIME, delta)
+	if _arm > free_len:
+		_arm_vel = minf(_arm_vel, 0.0)
+	_arm = clampf(_arm, minf(MIN_ARM, free_len), free_len)
+	last_pull = free_len - _arm
+	return look + (free_pos - look) / free_len * _arm
+
+
+## Mola criticamente amortecida (sem salto de velocidade): `smooth_time` ~ tempo para chegar ao alvo.
+func _damp(cur: float, want: float, smooth_time: float, delta: float) -> float:
+	var omega := 2.0 / smooth_time
+	var x := omega * delta
+	var e := 1.0 / (1.0 + x + 0.48 * x * x + 0.235 * x * x * x)
+	var change := cur - want
+	var temp := (_arm_vel + omega * change) * delta
+	_arm_vel = (_arm_vel - omega * temp) * e
+	return want + (change + temp) * e
 
 
 ## Posicao da camera sem obstaculo entre `from` (ponto de mira) e `to` (camera desejada).
