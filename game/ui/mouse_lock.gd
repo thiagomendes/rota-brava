@@ -8,6 +8,8 @@ extends RefCounted
 
 static var _want_capture: bool = false
 static var _blockers: Dictionary = {}
+## G14: quadro de fisica em que o ultimo bloqueio saiu (o A que fecha um painel nao vira pulo nesse quadro).
+static var _unblocked_physics_frame: int = -100
 
 
 static func capture() -> void:
@@ -26,12 +28,19 @@ static func block(id: StringName) -> void:
 
 
 static func unblock(id: StringName) -> void:
-	_blockers.erase(id)
+	if _blockers.erase(id) and _blockers.is_empty():
+		_unblocked_physics_frame = Engine.get_physics_frames()
 	_apply()
 
 
 static func blocked() -> bool:
 	return not _blockers.is_empty()
+
+
+## G14: regra central do pulo. Enquanto algum painel com botoes bloqueia, o A (e o Espaco) so confirma; e no quadro
+## em que o ultimo painel fecha (e no seguinte) o mesmo aperto tambem nao vira pulo.
+static func jump_suppressed() -> bool:
+	return blocked() or Engine.get_physics_frames() - _unblocked_physics_frame <= 1
 
 
 ## O mouse esta (ou deve estar) preso para a camera agora.
@@ -43,6 +52,7 @@ static func captured() -> bool:
 static func reset() -> void:
 	_want_capture = false
 	_blockers.clear()
+	_unblocked_physics_frame = -100
 	_apply()
 
 

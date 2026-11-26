@@ -448,8 +448,8 @@ func _show_hint(slot: int, seconds: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
-	# Controle: a Input Map nao poe botao de controle em ui_accept; `interact` (E / X) aperta o botao em foco.
-	# (O Apagar trata `interact` sozinho, segurando.)
+	# G14: o A do controle esta em ui_accept (a GUI aperta o botao em foco). `interact` (E / X) continua apertando o
+	# botao em foco, por coerencia com o resto do jogo (E/X e "agir"). (O Apagar trata `interact` sozinho, segurando.)
 	if event.is_action_pressed(&"interact") and not event.is_echo():
 		var f := get_viewport().gui_get_focus_owner() as BaseButton
 		if f != null and is_ancestor_of(f) and not f is HoldButton and not f.disabled:

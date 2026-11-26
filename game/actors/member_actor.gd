@@ -310,7 +310,7 @@ func _physics_process(delta: float) -> void:
 	var planar_v := step_planar(Vector3(velocity.x, 0.0, velocity.z), want, delta)
 	velocity.x = planar_v.x
 	velocity.z = planar_v.z
-	if controlled and Input.is_action_just_pressed(&"jump") and can_jump():
+	if controlled and Input.is_action_just_pressed(&"jump") and not MouseLock.jump_suppressed() and can_jump():
 		velocity.y = JUMP_VELOCITY
 		jumping = true
 		jumps += 1
