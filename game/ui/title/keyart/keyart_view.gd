@@ -127,7 +127,11 @@ func _raster_logo(px_w: int) -> Texture2D:
 
 ## Textura do logo em `px_w` pixels de largura (para o menu de demonstracao trocar o logo antigo).
 static func logo_texture(id: StringName, px_w: int) -> Texture2D:
-	var path := String(KeyArtPresets.LOGOS[id])
+	return logo_texture_path(String(KeyArtPresets.LOGOS[id]), px_w)
+
+
+## Idem, por caminho do SVG.
+static func logo_texture_path(path: String, px_w: int) -> Texture2D:
 	var src := FileAccess.get_file_as_string(path)
 	var m := RegEx.create_from_string("<svg[^>]*\\swidth=\"([0-9.]+)\"").search(src)
 	var img := Image.new()

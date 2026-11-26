@@ -66,6 +66,10 @@ func _shot(n: String) -> Image:
 
 func _run() -> void:
 	var t0 := Time.get_ticks_msec()
+	if OS.get_cmdline_user_args().has("--real-menu"):
+		await _real_menu()
+		quit(0)
+		return
 	await _size(Vector2i(1920, 1080))
 	view = (load("res://ui/title/keyart/keyart_%s.tscn" % proposal) as PackedScene).instantiate() as KeyArtView
 	view.animate = false   # quadro deterministico (sem respiracao da camera nem balanco do barco)
@@ -138,3 +142,22 @@ func _debug_env() -> void:
 	await _shot("dbg3_nossil")
 	e.adjustment_enabled = false
 	await _shot("dbg4_noadj")
+
+
+## O menu do jogo como esta (ui/main_menu.tscn com a arte-chave aplicada), nas 3 proporcoes, com animacao ligada.
+func _real_menu() -> void:
+	await _size(MENU_SIZES["menu169"])
+	var menu := (load("res://ui/main_menu.tscn") as PackedScene).instantiate() as MainMenu
+	root.add_child(menu)
+	while menu.key_art == null or not menu.key_art.stage.ready_to_shoot:
+		await process_frame
+	await create_timer(2.0).timeout
+	var fo := root.gui_get_focus_owner()
+	print("[RB] real menu focus=%s" % (fo.name if fo != null else "<nenhum>"))
+	for k: String in MENU_SIZES:
+		if not _want(k):
+			continue
+		await _size(MENU_SIZES[k])
+		await _shot("game_menu_" + k.trim_prefix("menu").insert(2 if k != "menu43" else 1, "x"))
+		var b := menu.play_button.get_global_rect()
+		print("[RB] %s Jogar=%s logo=%s" % [k, b, menu.logo.get_global_rect()])

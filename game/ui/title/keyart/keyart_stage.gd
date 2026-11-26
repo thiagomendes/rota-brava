@@ -53,14 +53,16 @@ func _ready() -> void:
 	boat.global_position = bp[0]
 	boat.rotation = Vector3(deg_to_rad(float(bp[2])), deg_to_rad(float(bp[1])), deg_to_rad(float(bp[3])))
 	_boat_base = boat.transform
+	# trio montado na hora (quem usa a cena ja encontra `heroes` cheio); a altura do chao vem depois
+	_mount_heroes()
 	# chao vem da colisao da vila: espera a fisica registrar as formas
 	await get_tree().physics_frame
 	await get_tree().physics_frame
+	_ground_heroes()
 	# o ceu so pega os parametros novos depois que a vila desenhou o primeiro quadro: aplica de novo e troca o
 	# material do ceu (forca o mapa de radiancia/ambiente a refazer com as cores da proposta)
 	await get_tree().process_frame
 	_apply_sky()
-	_mount_heroes()
 	set_framing(framing)
 	get_viewport().size_changed.connect(_update_camera)
 	ready_to_shoot = true
@@ -160,8 +162,7 @@ func _mount_heroes() -> void:
 		else:
 			add_child(holder)
 			var p: Vector3 = h["pos"]
-			var gy := p.y if bool(h.get("abs_y", false)) else _ground(p.x, p.z)
-			holder.global_position = Vector3(p.x, gy + float(h.get("lift", 0.0)), p.z)
+			holder.global_position = Vector3(p.x, p.y + float(h.get("lift", 0.0)), p.z)
 		# frente dos modelos em -Z; yaw em graus no espaco do pai (barco ou mundo)
 		holder.rotation.y = deg_to_rad(float(h.get("yaw", 0.0)))
 		holder.add_child(visual)
@@ -176,6 +177,17 @@ func _mount_heroes() -> void:
 		heroes[id] = visual
 		holders[id] = holder
 	# olhar: depois de todos montados (alguns olham para a camera, que so existe enquadrada depois)
+
+
+## Poe no chao (colisao da vila) os herois "world" sem altura fixa (`abs_y`).
+func _ground_heroes() -> void:
+	for id: StringName in holders:
+		var h: Dictionary = preset["heroes"][id]
+		if String(h.get("on", "world")) == "boat" or bool(h.get("abs_y", false)):
+			continue
+		var n := holders[id] as Node3D
+		var p := n.global_position
+		n.global_position = Vector3(p.x, _ground(p.x, p.z) + float(h.get("lift", 0.0)), p.z)
 
 
 ## Alguns clipes fecham os olhos (sorriso) no quadro segurado; zera piscar/alegre do rosto para olhar a crianca.
@@ -256,6 +268,14 @@ func _update_camera() -> void:
 		var aspect := vp.x / maxf(vp.y, 1.0)
 		var half_w := depth * tan(deg_to_rad(cam.fov) * 0.5) * aspect
 		cam.h_offset = local.x - (want - 0.5) * 2.0 * half_w
+		# telas estreitas (4:3): ninguem do trio encosta na borda esquerda (margem de 5% da largura)
+		var worst := 0.0
+		for id: StringName in holders:
+			var hl := cam.global_transform.affine_inverse() * ((holders[id] as Node3D).global_position + Vector3(0, 0.6, 0))
+			var hw := maxf(-hl.z, 0.5) * tan(deg_to_rad(cam.fov) * 0.5) * aspect
+			var left := 0.5 + (hl.x - 0.4 - cam.h_offset) / (2.0 * hw)
+			worst = minf(worst, (left - 0.05) * 2.0 * hw)
+		cam.h_offset += worst
 
 
 # ---------------------------------------------------------------- movimento leve

@@ -9,21 +9,21 @@ extends RefCounted
 
 const LOGOS := {
 	&"a": "res://ui/title/keyart/logos/logo_a.svg",
-	&"b": "res://ui/title/keyart/logos/logo_b.svg",
+	&"b": "res://ui/title/keyart/logos/logo_c_noite.svg",   # escolha de Thiago: cena B + logo C (versao noite)
 	&"c": "res://ui/title/keyart/logos/logo_c.svg",
 }
 
 ## Paletas (hex) de cada proposta, na ordem: dominante, apoio, acento, sombra, luz.
 const PALETTES := {
 	&"a": ["FF9A4D", "2E3A8C", "FFD23A", "14213D", "FFF1D6"],
-	&"b": ["1A1440", "FFB347", "E8504A", "2A1745", "FFF4D6"],
+	&"b": ["1A1440", "FFB347", "E2453A", "102A43", "FFF4D6"],
 	&"c": ["8FB8F0", "FFC3A0", "E2453A", "102A43", "FFFFFF"],
 }
 
 ## Lugar do logo por enquadramento: [centro x, centro y, largura] em fracoes da tela (KeyArtView).
 const LOGO_LAYOUT := {
 	&"a": {&"wide": [0.3, 0.15, 0.5], &"portrait": [0.5, 0.11, 0.9], &"capsule": [0.3, 0.42, 0.52], &"menu": [0.3, 0.15, 0.44]},
-	&"b": {&"wide": [0.5, 0.17, 0.36], &"portrait": [0.5, 0.13, 0.7], &"capsule": [0.2, 0.5, 0.34], &"menu": [0.3, 0.17, 0.34]},
+	&"b": {&"wide": [0.5, 0.19, 0.3], &"portrait": [0.42, 0.14, 0.64], &"capsule": [0.74, 0.3, 0.27], &"menu": [0.3, 0.17, 0.28]},
 	&"c": {&"wide": [0.72, 0.19, 0.36], &"portrait": [0.5, 0.12, 0.72], &"capsule": [0.74, 0.5, 0.42], &"menu": [0.3, 0.16, 0.34]},
 }
 
@@ -102,18 +102,18 @@ static func _b() -> Dictionary:
 		],
 		"boat": [Vector3(2.6, -0.4, -5.4), 80.0, 0.0, 0.0],
 		"heroes": {
-			&"leme": {"on": "world", "pos": Vector3(-3.7, 0.0, -2.3), "anim": "point", "t": 0.54, "yaw": 150.0,
-				"look": "camera", "expr": "atenta", "expr_w": 0.4},
-			&"rastro": {"on": "world", "pos": Vector3(-2.45, 0.0, -2.0), "anim": "react_surprise", "t": 0.4, "yaw": 165.0,
-				"look": "camera", "expr": "atenta", "expr_w": 0.4},
+			&"leme": {"on": "world", "pos": Vector3(-3.7, 0.0, -2.3), "anim": "team_pose", "t": 0.45, "yaw": 150.0,
+				"look": "camera", "expr": "neutra", "expr_w": 1.0},
+			&"rastro": {"on": "world", "pos": Vector3(-2.45, 0.0, -2.0), "anim": "team_pose", "t": 1.12, "yaw": 165.0,
+				"look": "camera", "expr": "neutra", "expr_w": 1.0},
 			&"pico": {"on": "world", "pos": Vector3(-1.2, 0.0, -2.45), "anim": "celebrate", "t": 0.78, "yaw": 185.0,
-				"look": "camera", "expr": "surpresa", "expr_w": 0.3},
+				"look": "camera", "expr": "neutra", "expr_w": 1.0},
 		},
 		"cameras": {
 			&"wide": {"pos": Vector3(-3.5, 0.42, 1.3), "look": Vector3(3.0, 2.7, -14.0), "fov": 48.0},
-			&"portrait": {"pos": Vector3(-3.4, 0.42, 1.2), "look": Vector3(3.0, 3.9, -14.0), "fov": 66.0, "subject_x": 0.45},
-			&"capsule": {"pos": Vector3(-3.6, 0.55, 1.5), "look": Vector3(2.0, 2.2, -14.0), "fov": 36.0, "subject_x": 0.7},
-			&"menu": {"pos": Vector3(-3.2, 0.6, 2.8), "look": Vector3(3.0, 2.4, -14.0), "fov": 48.0, "subject_x": 0.27},
+			&"portrait": {"pos": Vector3(-3.4, 0.5, 2.0), "look": Vector3(2.6, 5.6, -11.6), "fov": 70.0, "keep_width": true},
+			&"capsule": {"pos": Vector3(-3.4, 0.5, 2.0), "look": Vector3(2.5, 2.8, -11.7), "fov": 38.0},
+			&"menu": {"pos": Vector3(-3.3, 0.55, 2.0), "look": Vector3(3.0, 2.4, -14.0), "fov": 48.0, "subject_x": 0.27},
 		},
 	}
 
