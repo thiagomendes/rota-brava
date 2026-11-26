@@ -66,7 +66,7 @@ func _test_collision_and_markers() -> void:
 			if not hw.is_empty() and String((hw.collider as Node).name) == "Ground" and (hw.position as Vector3).y > -0.3:
 				bad.append(String(m.name) + "(agua com chao seco)")
 			continue
-		if String(m.name) == "M7_LanternPivot":
+		if String(m.name) == "M7_LanternPivot" or bool(m.get_meta("camera", false)):
 			continue
 		land += 1
 		var h := _ray(space, p + Vector3(0, 1.0, 0), p + Vector3(0, -3.0, 0))
@@ -75,6 +75,13 @@ func _test_collision_and_markers() -> void:
 		elif absf((h.position as Vector3).y - p.y) > 0.3:
 			bad.append("%s(chao %.2f vs %.2f)" % [m.name, (h.position as Vector3).y, p.y])
 	r.check(land >= 30, "village: marcadores em terra (%d)" % land)
+	# RB-R1 arte das cenas: marcadores de camera dos planos amplos (olham um marcador que existe) e Dona Amora na barraca
+	for cn: StringName in [&"Cut_VillageWide", &"Cut_LighthouseView"]:
+		var cm := w.marker(cn)
+		r.check(cm != null and bool(cm.get_meta("camera", false)) and w.marker(StringName(String(cm.get_meta("look_at", "")))) != null,
+			"village: %s e marcador de camera com look_at valido" % cn)
+	var vend := w.marker(&"M4_Vendor")
+	r.check(vend != null and (-vend.global_transform.basis.z).dot(Vector3.LEFT) > 0.99, "village: M4_Vendor atras da barraca, virada para o cliente (-X)")
 	r.check(bad.is_empty(), "village: raycast para baixo em cada marcador acha chao na altura certa %s" % [bad])
 	# beira d'agua: andar do cais de pedra para a bacia bate numa parede invisivel antes de cair
 	var hq := _ray(space, Vector3(0, 0.8, -15.0), Vector3(0, 0.8, -10.0))

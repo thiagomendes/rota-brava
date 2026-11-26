@@ -238,3 +238,20 @@ metadata/mission = "M8"
 [node name="M8_CaptainDock" type="Marker3D" parent="Markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 0.5)
 metadata/mission = "M8"
+
+[node name="M4_Vendor" type="Marker3D" parent="Markers"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -18.1, 0, -6.4)
+metadata/mission = "M4"
+metadata/note = "Dona Amora atras da barraca azul (uvas), virada para o cliente (-X)"
+
+[node name="Cut_VillageWide" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 20, 8)
+metadata/mission = "cut"
+metadata/camera = true
+metadata/look_at = "M8_FestaPlaza"
+
+[node name="Cut_LighthouseView" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 2.5, -2)
+metadata/mission = "cut"
+metadata/camera = true
+metadata/look_at = "M7_LanternPivot"

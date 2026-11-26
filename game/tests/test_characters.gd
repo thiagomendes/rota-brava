@@ -14,7 +14,8 @@ const FULL_SHAPES := ["neutra", "atenta", "surpresa", "alegre", "triste", "brava
 const RASTRO_SHAPES := FULL_SHAPES
 const RASTRO_ANIMS := ["idle", "walk", "run", "stop", "crouch", "inspect_touch", "look_to_leme", "react_surprise", "point", "wave",
 	"celebrate", "team_pose"]
-const PICO_ANIMS := ["idle", "walk", "run", "stop", "jump", "pull_rope", "look_up", "react_surprise", "celebrate", "wave", "team_pose"]
+const PICO_ANIMS := ["idle", "walk", "run", "stop", "jump", "pull_rope", "look_up", "react_surprise", "celebrate", "wave", "team_pose",
+	"point"]
 const LEME_ANIMS := ["idle", "walk", "run", "stop", "idle_wheel", "steer_left", "steer_right", "react_horn", "celebrate", "wave", "point",
 	"team_pose"]
 const PUP_BONES := ["root", "hips", "spine", "chest", "neck", "head", "tail1", "fl_paw.L", "fl_paw.R", "bl_paw.L", "bl_paw.R"]
@@ -34,8 +35,12 @@ const CHARS := {
 		"anims": ["idle", "walk", "wave", "thanks"], "shapes": FULL_SHAPES, "height": [1.55, 1.95],
 		"materials": ["mat_captain_pele", "mat_captain_chapeu", "mat_captain_uniforme", "mat_captain_ouro"]},
 	"pup": {"scene": "pup_model", "glb": "res://assets/models/characters/pup.glb", "root": "Pup", "prefix": "Pup", "bones": PUP_BONES, "face_ahead": 0.04,
-		"anims": ["idle", "wag", "jump_happy", "bark", "step_on_horn"], "shapes": FULL_SHAPES, "height": [0.35, 0.65],
+		"anims": ["idle", "wag", "jump_happy", "bark", "step_on_horn", "walk", "run"], "shapes": FULL_SHAPES, "height": [0.35, 0.65],
 		"materials": ["mat_pup_pelo", "mat_pup_creme", "mat_pup_coleira", "mat_pup_emblema", "mat_pup_olhos", "mat_pup_iris"]},
+	"amora": {"scene": "amora_model", "glb": "res://assets/models/characters/amora.glb", "root": "Amora", "prefix": "Amora",
+		"anims": ["idle", "wave", "thanks", "point", "talk"], "shapes": FULL_SHAPES, "height": [1.45, 1.75], "tris": [12000, 23999],
+		"materials": ["mat_amora_pele", "mat_amora_cabelo", "mat_amora_uniforme", "mat_amora_creme", "mat_amora_chapeu", "mat_amora_amora",
+			"mat_amora_folha", "mat_amora_olhos", "mat_amora_iris"]},
 	"villager_a": {"scene": "villager_a", "glb": "res://assets/models/characters/villager_a.glb", "root": "VillagerA", "prefix": "VillagerA",
 		"anims": ["idle", "walk", "wave", "chat"], "shapes": FULL_SHAPES, "height": [1.45, 1.9],
 		"materials": ["mat_villager_a_pele", "mat_villager_a_uniforme", "mat_villager_a_cabelo"]},
@@ -66,6 +71,9 @@ func run(runner) -> void:
 		await _test_idle_upright(id)
 	await _test_pico()
 	await _test_pup()
+	await _test_pup_gaits()
+	await _test_point_gestures()
+	await _test_amora()
 	await _test_member_actor_idle()
 	await _test_inspect_real_pawmark()
 	await _test_leme_wheel()
@@ -517,6 +525,129 @@ func _test_pup() -> void:
 	root.queue_free()
 	await r.frames(1)
 
+## RB-R1 arte das cenas: walk/run do filhote. Patas de apoio no chao (tornozelo a 3 cm), pata de balanco sobe, pata de apoio
+## recua na velocidade nominal do .tscn (sem deslizar), run com fase aerea curta e mais rapido que o walk.
+func _test_pup_gaits() -> void:
+	var root := await _spawn("pup")
+	var vis := root.find_child("Model", false, false) as CharacterVisual
+	var paws := [&"fl_paw.L", &"fl_paw.R", &"bl_paw.L", &"bl_paw.R"]
+	r.check(vis.run_speed_mps > vis.walk_speed_mps and vis.walk_speed_mps > 0.3, "chars: filhote com walk %.3f e run %.3f m/s" % [vis.walk_speed_mps, vis.run_speed_mps])
+	r.check(absf(vis.animation_length(&"run") - 0.6) < 0.01 and vis.is_looping(&"run") and vis.is_looping(&"walk"), "chars: run do filhote 0,6 s, walk e run em loop")
+	for clip: StringName in [&"walk", &"run"]:
+		var nominal := vis.walk_speed_mps if clip == &"walk" else vis.run_speed_mps
+		var len := vis.animation_length(clip)
+		var n := 60
+		var pts: Array = []
+		var min_down := 9
+		var lift := 0.0
+		var airborne := 0
+		for i in n + 1:
+			vis.seek_clip(clip, minf(len * i / n, len - 0.0005))
+			var fr := {}
+			var down := 0
+			for b in paws:
+				var p := vis.bone_position(b)
+				fr[b] = p
+				if p.y < 0.036:
+					down += 1
+				lift = maxf(lift, p.y - 0.03)
+			min_down = mini(min_down, down)
+			if down == 0:
+				airborne += 1
+			pts.append(fr)
+		var errs: Array = []
+		for i in n:
+			for b in paws:
+				var pa: Vector3 = pts[i][b]
+				var pb: Vector3 = pts[i + 1][b]
+				if pa.y < 0.034 and pb.y < 0.034:
+					errs.append(absf((pb.z - pa.z) / (len / n) - nominal))
+		var mean := 0.0
+		for e in errs:
+			mean += e
+		mean /= maxf(errs.size(), 1.0)
+		r.check(lift > 0.025, "chars: %s do filhote levanta a pata (%.1f cm)" % [clip, lift * 100])
+		r.check(errs.size() >= 40 and mean < 0.08 * maxf(nominal / 0.5, 1.0), "chars: pata de apoio do filhote no %s sem deslizar (%d amostras, erro %.3f m/s vs %.3f)" % [clip, errs.size(), mean, nominal])
+		if clip == &"walk":
+			r.check(min_down >= 2, "chars: walk do filhote sempre com 2+ patas no chao (min %d)" % min_down)
+		else:
+			r.check(airborne >= 1 and airborne <= n / 3, "chars: run do filhote tem fase aerea curta (%d de %d quadros)" % [airborne, n])
+		vis.seek_clip(clip, 0.0)
+		var p0 := vis.bone_position(&"hips")
+		vis.seek_clip(clip, len - 0.0005)
+		r.check(p0.distance_to(vis.bone_position(&"hips")) < 0.01, "chars: %s do filhote fecha o ciclo (quadril)" % clip)
+		print("  medida pup %s: %.3f m/s, pata sobe %.1f cm, deslize %.3f m/s, patas no chao min %d, quadros no ar %d/%d" % [clip, nominal, lift * 100, mean, min_down, airborne, n])
+	root.queue_free()
+	await r.frames(1)
+
+
+## RB-R1 arte das cenas: `point` de Pico (novo), Rastro e Leme (existentes): ~1,2 s, sem loop, a mao direita vai para a frente
+## (-Z) e para fora na altura do peito e volta para perto da pose inicial.
+func _test_point_gestures() -> void:
+	for id in ["pico", "rastro", "leme", "amora"]:
+		var root := await _spawn(id)
+		var vis := root.find_child("Model", false, false) as CharacterVisual
+		var len := vis.animation_length(&"point")
+		r.check(absf(len - 1.2) < 0.02 and not vis.is_looping(&"point"), "chars: point de %s com 1,2 s e sem loop (%.3f)" % [id, len])
+		vis.seek_clip(&"point", 0.0)
+		var h0 := vis.bone_position(&"hand.R")
+		var hips := vis.bone_position(&"hips")
+		var sh := vis.bone_position(&"upper_arm.R")
+		vis.seek_clip(&"point", 0.7)
+		var h1 := vis.bone_position(&"hand.R")
+		vis.seek_clip(&"point", len - 0.001)
+		var h2 := vis.bone_position(&"hand.R")
+		r.check(h1.z - hips.z < -0.15 and h1.z < h0.z - 0.12, "chars: point de %s leva a mao direita para a frente (z %.2f -> %.2f)" % [id, h0.z - hips.z, h1.z - hips.z])
+		r.check(absf(h1.y - sh.y) < 0.22, "chars: point de %s na altura do ombro (mao %.2f, ombro %.2f)" % [id, h1.y, sh.y])
+		r.check(h2.distance_to(h0) < 0.08, "chars: point de %s volta perto do inicio (%.3f m)" % [id, h2.distance_to(h0)])
+		root.queue_free()
+		await r.frames(1)
+
+
+## RB-R1 arte das cenas: Dona Amora. PBR (vinil), mais baixa que o orcamento dos herois, clipes, talk mexe a boca.
+func _test_amora() -> void:
+	var root := await _spawn("amora")
+	var vis := root.find_child("Model", false, false) as CharacterVisual
+	r.check(vis.is_pbr(), "chars: Dona Amora marcada PBR (acabamento vinil dos v2)")
+	r.check(_tri_count(root) < 24000, "chars: Dona Amora abaixo do orcamento dos herois (%d < 24000)" % _tri_count(root))
+	# verniz declarado no GLB (KHR_materials_clearcoat), como nos herois v2
+	var coat := 0
+	for m in _glb_json("res://assets/models/characters/amora.glb").get("materials", []):
+		if ((m as Dictionary).get("extensions", {}) as Dictionary).has("KHR_materials_clearcoat"):
+			coat += 1
+	r.check(coat >= 8, "chars: Dona Amora com verniz (clearcoat no GLB) em %d materiais" % coat)
+	r.check(absf(vis.animation_length(&"talk") - 3.0) < 0.02 and absf(vis.animation_length(&"thanks") - 2.0) < 0.02
+		and absf(vis.animation_length(&"wave") - 1.6) < 0.02, "chars: talk 3,0 s, thanks 2,0 s, wave 1,6 s")
+	vis.seek_clip(&"wave", 0.0)
+	var h0 := vis.bone_position(&"hand.R")
+	vis.seek_clip(&"wave", 0.8)
+	r.check(vis.bone_position(&"hand.R").y > vis.bone_position(&"head").y - 0.15, "chars: wave da Amora ergue a mao a altura da cabeca")
+	vis.seek_clip(&"wave", 1.6 - 0.001)
+	r.check(vis.bone_position(&"hand.R").distance_to(h0) < 0.06, "chars: wave da Amora volta a pose inicial")
+	vis.seek_clip(&"thanks", 1.0)
+	var hl := vis.bone_position(&"hand.L")
+	var hr := vis.bone_position(&"hand.R")
+	r.check(hl.distance_to(hr) < 0.16, "chars: thanks da Amora junta as maos (%.2f m)" % hl.distance_to(hr))
+	# talk: a boca abre (shape key mouth_* animada no clipe)
+	var player := vis.animation_player()
+	var anim := player.get_animation(&"talk")
+	var mouth_tracks := 0
+	for i in anim.get_track_count():
+		if anim.track_get_type(i) == Animation.TYPE_BLEND_SHAPE and String(anim.track_get_path(i)).contains("mouth_"):
+			var mx := 0.0
+			for k in anim.track_get_key_count(i):
+				mx = maxf(mx, float(anim.track_get_key_value(i, k)))
+			if mx > 0.3:
+				mouth_tracks += 1
+	r.check(mouth_tracks >= 2, "chars: talk da Amora abre a boca (visemas animados: %d)" % mouth_tracks)
+	vis.seek_clip(&"talk", 0.0)
+	var t0 := vis.bone_position(&"hand.R")
+	vis.seek_clip(&"talk", 3.0 - 0.001)
+	r.check(vis.bone_position(&"hand.R").distance_to(t0) < 0.02, "chars: talk da Amora termina na pose do inicio (pode repetir sem salto)")
+	root.queue_free()
+	await r.frames(1)
+
+
 ## Ator de verdade (MemberActor) parado no chao: toca idle, em pe, pes no chao (reproduz o caso do figurante/Pico tombado no jogo).
 func _test_member_actor_idle() -> void:
 	var floor_body := StaticBody3D.new()
@@ -661,7 +792,7 @@ func _test_no_foreign_models() -> void:
 	for f in files:
 		if f.ends_with(".import") or f.ends_with(".uid"):
 			continue
-		if not (f in ["rastro.glb", "leme.glb", "pico.glb", "captain.glb", "pup.glb", "villager_a.glb", "villager_b.glb", "villager_c.glb", "rastro_v2.glb", "pico_v2.glb", "leme_v2.glb"]):
+		if not (f in ["rastro.glb", "leme.glb", "pico.glb", "captain.glb", "pup.glb", "villager_a.glb", "villager_b.glb", "villager_c.glb", "rastro_v2.glb", "pico_v2.glb", "leme_v2.glb", "amora.glb"]):
 			foreign.append(f)
 	r.check(foreign.is_empty(), "chars: pasta de personagens so tem GLB do manifesto %s" % [foreign])
 	var man: Variant = JSON.parse_string(FileAccess.get_file_as_string(ProjectSettings.globalize_path("res://").path_join("../source_art/manifest.json")))

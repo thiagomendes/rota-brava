@@ -123,6 +123,7 @@ func _ready() -> void:
 	audio = AudioDirector.new()
 	audio.name = "AudioDirector"
 	add_child(audio)
+	audio.bind_episode_music(self)
 	audio.start_ambience()
 	audio.set_ambience_zone(&"dock")
 	_setup_speech()
@@ -535,6 +536,7 @@ func _on_emblem_found(_mission: StringName, emblem_id: StringName, _found: int, 
 	emblems_found += 1
 	print("[RB] v3 emblem %s %d/%d" % [emblem_id, emblems_found, emblems_total])
 	hud.set_collectibles(emblems_found, emblems_total)
+	audio.play_badge_sting()
 
 
 ## Objetivo por icone: o icone do cartao segue o passo atual (pata, corda, folha, leme...). F2: ajuda mais cedo no 1o
@@ -610,7 +612,7 @@ func _on_handoff_confirmed() -> void:
 			a.play_action(anim)
 			break
 	FeedbackFx.sparkle(world, a.global_position + Vector3(0, 1.0, 0))
-	audio.play_music("team_call", 0.1)
+	audio.play_hero_switch_sting()
 	if current != null:
 		say(Ep01V3Dialogue.pick("switch.to_%s" % hero, Ep01V3Dialogue.switch_line(current.id, hero)))
 	print("[RB] v3 control %s" % hero)

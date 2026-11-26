@@ -125,17 +125,17 @@
   },
   "emblem_carabiner": {
    "glb": "game/assets/models/props_v3/emblem_carabiner.glb",
-   "glb_bytes": 140592,
+   "glb_bytes": 147700,
    "materiais": [
     "wv2_glossy",
     "wv2_metal"
    ],
    "objetos": {
-    "pv3_emblem_carabiner": 2840
+    "pv3_emblem_carabiner": 2984
    },
    "orcamento_tris": 3000,
    "pivo": "centro da moeda",
-   "triangulos": 2840
+   "triangulos": 2984
   },
   "emblem_compass": {
    "glb": "game/assets/models/props_v3/emblem_compass.glb",

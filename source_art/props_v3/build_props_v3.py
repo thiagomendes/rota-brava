@@ -831,14 +831,29 @@ def _emb_icon(m, f, icon, col):
         for x, y, r in ((-0.06, 0.025, 0.021), (-0.022, 0.06, 0.022), (0.022, 0.06, 0.022), (0.06, 0.025, 0.021)):
             m.sphere((0, 0, 0), 1.0, "wv2_glossy", c, subd=2, scale=(r * 0.9, r * 1.1, 0.011), rot=f @ T(x, y, 0))
     elif icon == "carabiner":
-        pts = []
-        for k in range(29):
-            a = k / 28 * 2 * math.pi
-            x, y = math.cos(a) * 0.045, math.sin(a) * 0.075
-            x = x * (1.0 + 0.25 * (y / 0.075))   # mais largo em cima (forma de D)
-            pts.append(f @ R(rz=-20) @ Vector((x, y, 0.0)))
-        m.tube([tuple(p) for p in pts], 0.011, "wv2_glossy", c, seg=8, caps=False)
-        m.box((0, 0, 0), (0.012, 0.075, 0.014), "wv2_glossy", hexc(GOLD), 0.003, 1, rot=f @ R(rz=-20) @ T(0.048, 0.0, 0.004))
+        # RB-R1 arte das cenas: mosquetao em D inclinado, igual a game/ui/brand/icons/carabiner.svg (corpo em D aberto,
+        # gatilho reto cinza-claro e trava amarela); antes era um anel fechado que lia como um "0" cortado.
+        # Curvas do SVG (viewBox 100, rotate 22 em torno de 50,50; y da tela para baixo) amostradas aqui.
+        s = 0.00185
+
+        def P(X, Y, z=0.0):
+            return tuple(f @ R(rz=-22) @ Vector(((X - 50.0) * s, (50.0 - Y) * s, z)))
+
+        def quad(a, b, c_, n):
+            return [((1 - t) ** 2 * a[0] + 2 * (1 - t) * t * b[0] + t * t * c_[0], (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * b[1] + t * t * c_[1])
+                    for t in [k / n for k in range(n + 1)]]
+
+        def cub(a, b, c_, d, n):
+            return [((1 - t) ** 3 * a[0] + 3 * (1 - t) ** 2 * t * b[0] + 3 * (1 - t) * t * t * c_[0] + t ** 3 * d[0],
+                     (1 - t) ** 3 * a[1] + 3 * (1 - t) ** 2 * t * b[1] + 3 * (1 - t) * t * t * c_[1] + t ** 3 * d[1])
+                    for t in [k / n for k in range(n + 1)]]
+
+        # M63 79 Q53 92 41 88 Q30 84 30 70 V30 C30 6 74 6 72 30 V36
+        path = (quad((63, 79), (53, 92), (41, 88), 6) + quad((41, 88), (30, 84), (30, 70), 6)[1:]
+                + [(30, 70 - 10 * k) for k in range(1, 5)] + cub((30, 30), (30, 6), (74, 6), (72, 30), 12)[1:] + [(72, 36)])
+        m.tube([P(x, y) for x, y in path], 0.0095, "wv2_glossy", c, seg=8, caps=True)
+        m.tube([P(63, 79, 0.002), P(71, 40, 0.002)], 0.0068, "wv2_metal", hexc("#C9D3E0"), seg=8, caps=True)      # gatilho
+        m.tube([P(60, 64, 0.004), P(72, 66.5, 0.004)], 0.0080, "wv2_glossy", hexc(GOLD), seg=8, caps=True)        # trava
     elif icon == "helm":
         ring = [tuple(f @ Vector((math.cos(a) * 0.06, math.sin(a) * 0.06, 0.0))) for a in [k / 16 * 2 * math.pi for k in range(17)]]
         m.tube(ring, 0.011, "wv2_glossy", c, seg=6, caps=False)
