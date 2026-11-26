@@ -111,15 +111,15 @@ static func _b() -> Dictionary:
 		},
 		"cameras": {
 			&"wide": {"pos": Vector3(-3.5, 0.42, 1.3), "look": Vector3(3.0, 2.7, -14.0), "fov": 48.0},
-			&"portrait": {"pos": Vector3(-4.6, 0.45, 2.8), "look": Vector3(4.0, 3.8, -14.0), "fov": 64.0, "subject_x": 0.42},
-			&"capsule": {"pos": Vector3(-3.6, 0.55, 1.8), "look": Vector3(2.0, 2.2, -14.0), "fov": 36.0, "subject_x": 0.7},
+			&"portrait": {"pos": Vector3(-3.4, 0.42, 1.2), "look": Vector3(3.0, 3.9, -14.0), "fov": 66.0, "subject_x": 0.45},
+			&"capsule": {"pos": Vector3(-3.6, 0.55, 1.5), "look": Vector3(2.0, 2.2, -14.0), "fov": 36.0, "subject_x": 0.7},
 			&"menu": {"pos": Vector3(-3.2, 0.6, 2.8), "look": Vector3(3.0, 2.4, -14.0), "fov": 48.0, "subject_x": 0.27},
 		},
 	}
 
 
 ## C · "Amanhecer no farol": o trio na ponta do promontorio, rente ao mar; Pico comemora, Leme acena, Rastro aponta o
-## sol nascendo; camera baixa sobre a agua; farol listrado e casa do faroleiro atras, barco amarelo encostado na
+## sol nascendo; camera baixa sobre a agua; farol listrado e casa do faroleiro atras, barco amarelo atracado na
 ## pedra a direita; luz rosada e dourada vindo do leste.
 static func _c() -> Dictionary:
 	return {
@@ -136,9 +136,9 @@ static func _c() -> Dictionary:
 			{"type": "spot", "pos": Vector3(41.5, 4.5, -8.5), "look": Vector3(36.3, 1.0, -12.8), "color": "ffd8c0",
 				"energy": 5.0, "range": 12.0, "angle": 24.0},
 			{"type": "omni", "pos": Vector3(33.5, 2.6, -11.0), "color": "ff9fb8", "energy": 1.4, "range": 4.5},
-			{"type": "omni", "pos": Vector3(40.5, 2.6, -8.5), "color": "ffd0a0", "energy": 1.6, "range": 5.0},
+			{"type": "omni", "pos": Vector3(42.5, 2.6, -10.5), "color": "ffd0a0", "energy": 1.8, "range": 5.0},
 		],
-		"boat": [Vector3(39.4, -0.45, -10.6), 35.0, 0.0, 1.5],
+		"boat": [Vector3(41.2, -0.45, -13.2), 8.0, 0.0, 1.5],
 		"heroes": {
 			&"leme": {"on": "world", "pos": Vector3(34.8, 0.0, -12.7), "anim": "wave", "t": 1.04,
 				"yaw": 205.0, "look": "camera", "expr": "atenta", "expr_w": 0.4},
@@ -148,9 +148,9 @@ static func _c() -> Dictionary:
 				"yaw": -100.0, "look": Vector3(70.0, 3.0, 5.0), "expr": "surpresa", "expr_w": 0.25},
 		},
 		"cameras": {
-			&"wide": {"pos": Vector3(37.4, 0.55, -7.6), "look": Vector3(35.2, 5.0, -20.0), "fov": 54.0, "roll": 2.0},
+			&"wide": {"pos": Vector3(37.4, 0.55, -7.2), "look": Vector3(36.4, 5.0, -20.0), "fov": 54.0, "roll": 2.0},
 			&"portrait": {"pos": Vector3(37.4, 0.5, -6.6), "look": Vector3(34.8, 6.8, -20.0), "fov": 64.0, "roll": 1.5},
-			&"capsule": {"pos": Vector3(38.0, 0.6, -6.6), "look": Vector3(35.0, 4.0, -20.0), "fov": 40.0, "subject_x": 0.33},
+			&"capsule": {"pos": Vector3(38.0, 0.6, -6.4), "look": Vector3(36.0, 4.0, -20.0), "fov": 40.0, "subject_x": 0.36},
 			&"menu": {"pos": Vector3(38.2, 0.65, -5.6), "look": Vector3(34.4, 4.8, -20.0), "fov": 52.0, "subject_x": 0.27},
 		},
 	}
