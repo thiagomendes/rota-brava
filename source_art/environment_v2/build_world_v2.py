@@ -716,6 +716,220 @@ def scatter_vegetation():
         put(rng.choice(["bush_a", "bush_c"]), x, head_h(x, z) - 0.05, z, rng.uniform(0, 360), rng.uniform(0.9, 1.4))
 
 
+# G6 (RB-R1): objetos que se atravessavam ou flutuavam, achados por tools/prop-overlap.sh (criterios em
+# game/tests/prop_overlap.gd). Correcao DEPOIS de toda a dispersao, por (tipo, indice), para nao mudar a ordem dos sorteios
+# nem os indices (a colisao e os testes usam o indice). y None = mesma regra de altura da origem do objeto.
+G6_MOVES = {
+    # covos empilhados: a rede (casca cilindrica) desce 0,18 m abaixo do fundo e atravessava o covo de baixo (9,8 e
+    # 9,1 cm); o de cima vai para o chao ao lado
+    ("lobster_trap", 1): (6.72, 0.0, -1.45),
+    ("lobster_trap", 6): (23.45, 0.0, -16.05),
+    ("sack", 1): (5.70, 0.0, 0.12),                # sacos 10,7 cm um dentro do outro
+    ("crate", 0): (-6.65, 0.0, -1.9),              # caixotes encostados 2,9 cm um no outro
+    ("crate", 8): (-15.05, 0.0, -16.2),            # 2,0 e 2,5 cm
+    ("crate", 9): (-14.4, 0.0, -15.85),
+    ("crate", 10): (8.55, "bank", 6.2),            # 2,2 cm no covo da margem
+    # barris em cima do degrau da porta (x -10,33..-8,73; 0,16 m de altura): 14 cm enterrados nele; um de cada lado
+    ("barrel_lid", 2): (-10.7, 0.0, -17.2),
+    ("barrel", 5): (-8.38, 0.0, -17.05),
+    # vaso 14 cm dentro do canteiro; canteiro e vasos em cima do degrau da porta (x 10,9..12,5): vaso de cada lado da
+    # porta, canteiro depois do vaso da direita
+    ("pot_c", 1): (10.6, 0.0, -17.3),
+    ("pot_a", 3): (12.78, 0.0, -17.3),
+    ("planter", 2): (13.72, 0.0, -17.3),
+    # caixotes do cais norte com a frente 3 cm dentro da faixa de pedra do meio-fio (z > -16,75): recuam
+    ("crate_fish", 5): (-12.4, 0.0, -17.1),
+    ("crate_fish", 6): (-11.7, 0.0, -17.12),
+    ("crate_fruit", 1): (1.2, 0.0, -17.1),
+    ("crate_fruit", 2): (0.5, 0.0, -17.1),         # (em x 1,85 batia no degrau da porta)
+    ("rock_b", 27): (24.76, "head", -15.35),       # pedra 30 cm dentro do poste
+    ("barrel", 6): (22.4, 0.0, -17.2),             # barril 25 cm na pedra e 23 cm na parede da casa: para a rua
+    ("tree_b", 102): (25.0, "head_tree", -26.6),   # tronco 46 cm dentro de duas pedras
+    ("tree_b", 103): (35.8, "head_tree", -18.6),   # tronco 38 cm dentro da pedra
+    ("pot_b", 3): (-27.6, 0.0, -12.6),             # vaso sem chao embaixo (1,5 m no vazio)
+    ("parasol", 1): (19.95, 0.0, -15.5),           # lonas dos dois guarda-sois do cafe 8 cm uma na outra
+    ("cafe_set", 1): (19.95, 0.0, -15.5),
+    ("crate", 13): (-16.44, 0.0, -8.94),           # 2,7 cm no barril da praca
+    ("rope_coil", 1): (1.66, 0.0, 2.34),           # 2,5 cm no monte de rede
+    # revisao G6: caixote e covo da margem 45 e 11 cm dentro da moita; barril 16 cm dentro de outra: as moitas saem
+    ("bush_a", 32): (8.45, "bank", 7.35),
+    ("bush_c", 3): (11.2, "bank", 6.75),
+}
+# Pilha de caixote + caixote de fruta junto ao carrinho do M4: o canto do carrinho (x ~ -18,6) atravessava a pilha; ela
+# sai 25 cm para oeste.
+G6_STACK_NEAR_CART = ((-18.75, 1.55), (-19.0, 1.6))
+# Moitas: base arredondada ficava 3-5 cm acima do chao plano; todas descem 5 cm.
+G6_BUSH_SINK = 0.05
+
+
+def g6_fixes():
+    moved = 0
+    for (kind, i), to in G6_MOVES.items():
+        x, y, z = to
+        if y == "bank":
+            y = bank_h(x, z)
+        elif y == "head":
+            y = head_h(x, z) - 0.2
+        elif y == "head_tree":
+            y = head_h(x, z) - 0.1
+        row = inst[kind][i]
+        row[0], row[1], row[2] = round(x, 3), round(y, 3), round(z, 3)
+        moved += 1
+    (ox, oz), (nx, nz) = G6_STACK_NEAR_CART
+    for kind in ("crate", "crate_fruit"):
+        for row in inst[kind]:
+            if abs(row[0] - ox) < 1e-6 and abs(row[2] - oz) < 1e-6:
+                row[0], row[2] = nx, nz
+                moved += 1
+    for kind in ("bush_a", "bush_b", "bush_c"):
+        for row in inst[kind]:
+            row[1] = round(row[1] - G6_BUSH_SINK, 3)
+    moved += g6_rocks_out_of_town()
+    moved += g6_rocks_apart()
+    g6_rocks_settle()
+    return moved
+
+
+# Revisao G6: pedras do promontorio sorteadas no lado da cidade (x < 25) caiam dentro de casas, da escada do farol e da
+# mureta (ate 1,4 m dentro de parede). Retangulos (x0, z0, x1, z1) que pedra nao pode tocar alem das casas: escada e
+# muros da escada, mureta de contencao em z -23 e patamar.
+G6_ROCK_KEEP_OUT = [(22.0, -23.6, 25.9, -16.0), (16.6, -23.4, 23.4, -22.7)]
+
+
+def _rock_rects():
+    rects = list(G6_ROCK_KEEP_OUT)
+    for pos, ry, W, D, H in houses:
+        b = COL.rot_y(ry)
+        xs, zs = [], []
+        for lx, lz in ((0, 0), (W, 0), (0, -D), (W, -D)):
+            v = b @ Vector((lx, 0, lz))
+            xs.append(pos[0] + v.x)
+            zs.append(pos[2] + v.z)
+        rects.append((min(xs), min(zs), max(xs), max(zs)))
+    return rects
+
+
+def _rock_hits(x, z, rad, rects):
+    for x0, z0, x1, z1 in rects:
+        dx = max(x0 - x, 0.0, x - x1)
+        dz = max(z0 - z, 0.0, z - z1)
+        if dx * dx + dz * dz < rad * rad:
+            return True
+    return False
+
+
+def _near_trunk(x, z, rad):
+    for kind in ("tree_a", "tree_b", "tree_c"):
+        for tx, _, tz, _, ts in inst.get(kind, []):
+            if math.hypot(x - tx, z - tz) < rad + 0.35 * ts:
+                return True
+    return False
+
+
+# Revisao G6 (3): pedras do sorteio original que se atravessam (mais que ~15 cm) sao separadas mexendo pouco (ate
+# G6_ROCK_NUDGE m) ou saem. Raio no chao = raio do kit x escala x G6_ROCK_FOOT (a pedra e achatada e enterrada 0,15-0,2 m:
+# no chao ela e menor que o raio circunscrito); duas pedras ficam a pelo menos (r1 + r2) uma da outra.
+G6_ROCK_R = {"rock_a": 0.62, "rock_b": 1.1}
+G6_ROCK_FOOT = 0.9
+G6_ROCK_NUDGE = 0.6
+
+
+def _rock_rule(x, y, z):
+    """Regra de altura da pedra: 'head' (promontorio, -0,2), 'bank' (margem, -0,15); None se outra."""
+    if abs(head_h(x, z) - 0.2 - y) <= 0.002:
+        return "head"
+    if abs(bank_h(x, z) - 0.15 - y) <= 0.002:
+        return "bank"
+    return None
+
+
+def _rock_y(rule, x, z):
+    return head_h(x, z) - 0.2 if rule == "head" else bank_h(x, z) - 0.15
+
+
+def _drop_rows(kind, idx):
+    if idx:
+        print("G6: pedras fora do mapa:", kind, sorted(idx))
+        inst[kind] = [row for i, row in enumerate(inst[kind]) if i not in idx]
+
+
+def g6_rocks_apart():
+    """Pedra (na ordem do sorteio) que atravessa outra ja posta: empurrada ate G6_ROCK_NUDGE m (mesmas regras de casa,
+    escada, mureta, corredor do farol, tronco e terra); sem lugar tao perto, sai. Postes, cabecos, bancos e barris tambem
+    contam como obstaculo."""
+    rects = _rock_rects()
+    fixed = [(row[0], row[2], rad * row[4]) for kind, rad in (("lamp_post", 0.22), ("bollard", 0.2), ("bench", 0.8),
+                                                             ("barrel", 0.34), ("barrel_lid", 0.34))
+             for row in inst.get(kind, [])]
+    placed = []
+    drop = {"rock_a": set(), "rock_b": set()}
+    moved = 0
+
+    def free(x, z, r):
+        return all(math.hypot(x - px, z - pz) >= r + pr for px, pz, pr in placed + fixed)
+
+    for kind in ("rock_a", "rock_b"):
+        for i, row in enumerate(inst[kind]):
+            x, y, z, ry, s = row
+            r = G6_ROCK_R[kind] * s * G6_ROCK_FOOT
+            if free(x, z, r):
+                placed.append((x, z, r))
+                continue
+            rule = _rock_rule(x, y, z)
+            done = False
+            if rule is not None:
+                for k in range(1, int(G6_ROCK_NUDGE / 0.1) + 1):
+                    for j in range(12):
+                        cx = x + math.cos(j * math.pi / 6) * 0.1 * k
+                        cz = z + math.sin(j * math.pi / 6) * 0.1 * k
+                        if rule == "head":
+                            cx, cz = clear_head_path(cx, cz, r)
+                            if cx is None or head_h(cx, cz) < 0.4:
+                                continue
+                        if _rock_hits(cx, cz, r, rects) or _near_trunk(cx, cz, r) or not free(cx, cz, r):
+                            continue
+                        row[0], row[1], row[2] = round(cx, 3), round(_rock_y(rule, cx, cz), 3), round(cz, 3)
+                        placed.append((cx, cz, r))
+                        moved += 1
+                        done = True
+                        break
+                    if done:
+                        break
+            if not done:
+                drop[kind].add(i)
+    for kind, idx in drop.items():
+        _drop_rows(kind, idx)
+    return moved
+
+
+# Pedras do promontorio pareciam ovos pousados no capim: afundam mais G6_ROCK_SINK (assentadas na encosta). Por ultimo,
+# depois de separar (enterrar mais so diminui o que aparece de cada uma).
+G6_ROCK_SINK = 0.12
+
+
+def g6_rocks_settle():
+    for kind in ("rock_a", "rock_b"):
+        for row in inst[kind]:
+            if _rock_rule(row[0], row[1], row[2]) == "head":
+                row[1] = round(row[1] - G6_ROCK_SINK, 3)
+
+
+def g6_rocks_out_of_town():
+    """Pedra do promontorio (y = head_h - 0,2) sorteada dentro de casa, escada ou mureta: nunca foi vista (as paredes a
+    escondiam), entao sai do mapa em vez de ser realocada."""
+    rects = _rock_rects()
+    n = 0
+    for kind in ("rock_a", "rock_b"):
+        idx = set()
+        for i, row in enumerate(inst[kind]):
+            x, y, z, ry, s = row
+            if abs(head_h(x, z) - 0.2 - y) <= 0.002 and _rock_hits(x, z, (0.62 if kind == "rock_a" else 1.15) * s * 0.9, rects):
+                idx.add(i)
+        _drop_rows(kind, idx)
+        n += len(idx)
+    return n
+
+
 def build_bank():
     m = MB("wv2_bank")
     rng = random.Random(61)
@@ -1112,6 +1326,7 @@ def main():
     terrain = build_terrain()
     scatter_vegetation()
     street_props()
+    g6_fixes()
     info = {"gerado_por": "source_art/environment_v2/build_world_v2.py", "provisorio": True, "texturas": tex_info,
             "estatico": {}, "kit": {}}
     for mb in (dock, quay, street, plaza, back, lighthouse, bank, terrain):

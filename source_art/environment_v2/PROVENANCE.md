@@ -112,3 +112,17 @@ Mesmas regras de originalidade (tudo por script). Mudancas, todas no mesmo build
   bit); `wv2_static.glb` regravado (mesmo numero de triangulos, so o terreno do promontorio muda).
 - **Ferramentas de prova:** `tools/probe_walkmap.gd` (mapa de caminhabilidade da colisao) e `tools/probe_profile.gd` (perfil de
   altura e degraus ao longo de uma linha). Capturas em `captures/e3b/` (fora do Git).
+
+## G6 · objetos que se atravessavam ou flutuavam (RB-R1, art3d, 2026-11-26) — PROVISORIO
+- **Achados por** `bash tools/prop-overlap.sh` (criterios em `game/tests/prop_overlap.gd`; guarda em
+  `game/tests/test_prop_overlap.gd`). Geometria continua 100% procedural, sem nada de terceiros.
+- **Kit (`wv2_kit.py`):** carrinho com pe de apoio sob o fundo e calcos do eixo ao fundo (o fundo flutuava 0,2 m), sem as 5
+  frutas soltas no ar (o fundo recebe os caixotes do M4); covo so com a metade de cima da rede (a de baixo descia 0,18 m pelo
+  cais); guarda-sol com mastro ate a lona; encosto do conjunto do cafe e do banco encostados nos montantes; flores do canteiro
+  e boias do monte de rede pousadas.
+- **Disposicao (`build_world_v2.py`, `g6_fixes()` depois de toda a dispersao, por tipo e indice, sem mudar sorteios nem
+  indices):** covos empilhados para o chao, sacos, caixotes, barris, vasos e canteiro fora de degraus de porta, meio-fio e uns
+  dos outros, pilha junto ao carrinho do M4 25 cm para oeste, pedras fora de tronco/poste/barril e para dentro do barranco,
+  duas arvores do promontorio fora das pedras, vaso sem chao para o chao, guarda-sois afastados, moitas 5 cm mais baixas.
+- **Pesos:** `wv2_kit.glb` regravado; `wv2_static.glb`, `wv3_props.glb` sem mudanca; `wv2_boat.glb` e `village_world.tscn`
+  restaurados do Git (o build nao os refaz bit a bit). `village_collision.tscn` regravada (caixas dos kits movidos).

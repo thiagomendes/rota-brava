@@ -268,6 +268,10 @@ func _layout() -> void:
 	menu.reset_size()
 	menu.position = Vector2(area.x - menu_w - 12.0, (area.y - menu.get_combined_minimum_size().y) * 0.5 + area.y * 0.06)
 	var left_w := area.x - menu_w - 60.0
+	if key_art != null:
+		# o trio da arte-chave fica todo a esquerda da coluna de botoes (retangulo real, com 24 px de folga)
+		var free_right := menu.get_global_rect().position.x - 24.0 - key_art.get_global_rect().position.x
+		key_art.set_free_rect_local(Rect2(0, 0, free_right, key_art.size.y))
 	var tex := logo.texture
 	var ratio := float(tex.get_width()) / float(tex.get_height()) if tex != null else 1632.0 / 340.0
 	# logo no alto do lado esquerdo, sem passar de LOGO_MAX_H da altura (o trio fica abaixo dele)

@@ -31,16 +31,22 @@ const CHARS := {
 	"leme": {"scene": "leme_model", "glb": "res://assets/models/characters/leme_v2.glb", "v2": true, "head_part": "Leme_Hair", "root": "Leme", "prefix": "Leme",
 		"anims": LEME_ANIMS, "shapes": FULL_SHAPES, "height": [1.0, 1.2], "tris": [20000, 25000],
 		"materials": ["mat_leme_v2_face_eye", "mat_leme_v2_face_iris", "mat_leme_v2_face_dark", "mat_leme_v2_face_skin", "mat_leme_v2_face_mouth", "mat_leme_v2_gear", "mat_leme_v2_hair", "mat_leme_v2_skin", "mat_leme_v2_suit", "mat_leme_v2_glass", "mat_leme_v2_acc_lifevest"]},
-	"captain": {"scene": "captain_model", "glb": "res://assets/models/characters/captain.glb", "root": "Captain", "prefix": "Captain",
-		"anims": ["idle", "walk", "wave", "thanks"], "shapes": FULL_SHAPES, "height": [1.55, 1.95],
-		"materials": ["mat_captain_pele", "mat_captain_chapeu", "mat_captain_uniforme", "mat_captain_ouro"]},
-	"pup": {"scene": "pup_model", "glb": "res://assets/models/characters/pup.glb", "root": "Pup", "prefix": "Pup", "bones": PUP_BONES, "face_ahead": 0.04,
-		"anims": ["idle", "wag", "jump_happy", "bark", "step_on_horn", "walk", "run"], "shapes": FULL_SHAPES, "height": [0.35, 0.65],
-		"materials": ["mat_pup_pelo", "mat_pup_creme", "mat_pup_coleira", "mat_pup_emblema", "mat_pup_olhos", "mat_pup_iris"]},
-	"amora": {"scene": "amora_model", "glb": "res://assets/models/characters/amora.glb", "root": "Amora", "prefix": "Amora",
-		"anims": ["idle", "wave", "thanks", "point", "talk"], "shapes": FULL_SHAPES, "height": [1.45, 1.75], "tris": [12000, 23999],
-		"materials": ["mat_amora_pele", "mat_amora_cabelo", "mat_amora_uniforme", "mat_amora_creme", "mat_amora_chapeu", "mat_amora_amora",
-			"mat_amora_folha", "mat_amora_olhos", "mat_amora_iris"]},
+	# RB-R1 G4: secundarios v2 (padrao do trio: malha por grupo de material, atlas assada, PBR com verniz)
+	"captain": {"scene": "captain_model", "glb": "res://assets/models/characters/captain_v2.glb", "v2": true, "skinned": 5, "head_part": "Captain_Hair",
+		"root": "Captain", "prefix": "Captain", "anims": ["idle", "walk", "wave", "thanks"], "shapes": FULL_SHAPES, "height": [1.55, 1.95],
+		"tris": [15000, 25000],
+		"materials": ["mat_captain_v2_face_eye", "mat_captain_v2_face_iris", "mat_captain_v2_face_dark", "mat_captain_v2_face_skin", "mat_captain_v2_face_mouth",
+			"mat_captain_v2_cloth", "mat_captain_v2_skin", "mat_captain_v2_hair", "mat_captain_v2_gear"]},
+	"pup": {"scene": "pup_model", "glb": "res://assets/models/characters/pup_v2.glb", "v2": true, "skinned": 4, "root": "Pup", "prefix": "Pup",
+		"bones": PUP_BONES, "face_ahead": 0.04, "anims": ["idle", "wag", "jump_happy", "bark", "step_on_horn", "walk", "run"], "shapes": FULL_SHAPES,
+		"height": [0.35, 0.65], "tris": [10000, 25000],
+		"materials": ["mat_pup_v2_face_eye", "mat_pup_v2_face_iris", "mat_pup_v2_face_dark", "mat_pup_v2_face_skin", "mat_pup_v2_face_mouth",
+			"mat_pup_v2_fur_body", "mat_pup_v2_fur_head", "mat_pup_v2_gear"]},
+	"amora": {"scene": "amora_model", "glb": "res://assets/models/characters/amora_v2.glb", "v2": true, "skinned": 5, "head_part": "Amora_Hair",
+		"root": "Amora", "prefix": "Amora", "anims": ["idle", "wave", "thanks", "point", "talk"], "shapes": FULL_SHAPES, "height": [1.45, 1.75],
+		"tris": [12000, 23999],
+		"materials": ["mat_amora_v2_face_eye", "mat_amora_v2_face_iris", "mat_amora_v2_face_dark", "mat_amora_v2_face_skin", "mat_amora_v2_face_mouth",
+			"mat_amora_v2_cloth", "mat_amora_v2_skin", "mat_amora_v2_hair", "mat_amora_v2_gear"]},
 	"villager_a": {"scene": "villager_a", "glb": "res://assets/models/characters/villager_a.glb", "root": "VillagerA", "prefix": "VillagerA",
 		"anims": ["idle", "walk", "wave", "chat"], "shapes": FULL_SHAPES, "height": [1.45, 1.9],
 		"materials": ["mat_villager_a_pele", "mat_villager_a_uniforme", "mat_villager_a_cabelo"]},
@@ -179,7 +185,7 @@ func _test_static(id: String) -> void:
 	for n in root.find_children("*", "MeshInstance3D", true, false):
 		if (n as MeshInstance3D).skin != null:
 			skinned += 1
-	r.check(skinned >= (6 if d.get("v2", false) else 8), "chars: malhas de %s com skin (%d)" % [id, skinned])
+	r.check(skinned >= int(d.get("skinned", 6 if d.get("v2", false) else 8)), "chars: malhas de %s com skin (%d)" % [id, skinned])
 	for a in d["anims"]:
 		r.check(vis.has_animation(StringName(a)), "chars: %s tem a animacao %s" % [id, a])
 		r.check(vis.animation_length(StringName(a)) > 0.0, "chars: %s/%s tem duracao > 0 (%.3f s)" % [id, a, vis.animation_length(StringName(a))])
@@ -613,7 +619,7 @@ func _test_amora() -> void:
 	r.check(_tri_count(root) < 24000, "chars: Dona Amora abaixo do orcamento dos herois (%d < 24000)" % _tri_count(root))
 	# verniz declarado no GLB (KHR_materials_clearcoat), como nos herois v2
 	var coat := 0
-	for m in _glb_json("res://assets/models/characters/amora.glb").get("materials", []):
+	for m in _glb_json("res://assets/models/characters/amora_v2.glb").get("materials", []):
 		if ((m as Dictionary).get("extensions", {}) as Dictionary).has("KHR_materials_clearcoat"):
 			coat += 1
 	r.check(coat >= 8, "chars: Dona Amora com verniz (clearcoat no GLB) em %d materiais" % coat)
@@ -848,7 +854,8 @@ func _test_no_foreign_models() -> void:
 	for f in files:
 		if f.ends_with(".import") or f.ends_with(".uid"):
 			continue
-		if not (f in ["rastro.glb", "leme.glb", "pico.glb", "captain.glb", "pup.glb", "villager_a.glb", "villager_b.glb", "villager_c.glb", "rastro_v2.glb", "pico_v2.glb", "leme_v2.glb", "amora.glb"]):
+		if not (f in ["rastro.glb", "leme.glb", "pico.glb", "captain.glb", "pup.glb", "villager_a.glb", "villager_b.glb", "villager_c.glb", "rastro_v2.glb", "pico_v2.glb", "leme_v2.glb", "amora.glb",
+				"captain_v2.glb", "pup_v2.glb", "amora_v2.glb"]):
 			foreign.append(f)
 	r.check(foreign.is_empty(), "chars: pasta de personagens so tem GLB do manifesto %s" % [foreign])
 	var man: Variant = JSON.parse_string(FileAccess.get_file_as_string(ProjectSettings.globalize_path("res://").path_join("../source_art/manifest.json")))
@@ -875,9 +882,11 @@ func _test_pbr_and_accessories() -> void:
 		var vis := root.find_child("Model", false, false) as CharacterVisual
 		r.check(vis.is_pbr(), "chars: %s v2 marcado metadata/pbr no Model" % id)
 		root.queue_free()
-	var cap := await _spawn("captain")
-	r.check(not (cap.find_child("Model", false, false) as CharacterVisual).is_pbr(), "chars: capitao antigo nao e PBR")
-	cap.queue_free()
+	# RB-R1 G4: capitao, filhote e Dona Amora v2 sao PBR (sem Stylize/contorno); os moradores antigos seguem toon
+	for id in ["captain", "pup", "amora"]:
+		var sec := await _spawn(id)
+		r.check((sec.find_child("Model", false, false) as CharacterVisual).is_pbr(), "chars: %s v2 marcado PBR" % id)
+		sec.queue_free()
 	for member: StringName in [&"tracker", &"pilot", &"climber"]:
 		var a := MemberActor.new()
 		a.setup(member)
@@ -894,7 +903,18 @@ func _test_pbr_and_accessories() -> void:
 						outlined += 1
 			r.check(outlined == 0, "chars: %s v2 montado sem Stylize/contorno (%d superficies com next_pass)" % [member, outlined])
 		a.queue_free()
-	var fig := StoryFigure.spawn(r.tree.root, "captain_model", "CaptainProbe")
+	for id in ["captain_model", "pup_model", "amora_model"]:
+		var sf := StoryFigure.spawn(r.tree.root, id, "SecondaryProbe")
+		var passes := 0
+		for n in sf.find_children("*", "MeshInstance3D", true, false):
+			var mi := n as MeshInstance3D
+			for i in mi.mesh.get_surface_count():
+				var ov := mi.get_surface_override_material(i)
+				if ov != null and ov.next_pass != null:
+					passes += 1
+		r.check(passes == 0, "chars: %s v2 via StoryFigure sem Stylize/contorno (%d superficies com next_pass)" % [id, passes])
+		sf.queue_free()
+	var fig := StoryFigure.spawn(r.tree.root, "villager_a", "VillagerProbe")
 	var with_pass := 0
 	for n in fig.find_children("*", "MeshInstance3D", true, false):
 		var mi := n as MeshInstance3D
@@ -902,7 +922,7 @@ func _test_pbr_and_accessories() -> void:
 			var ov := mi.get_surface_override_material(i)
 			if ov != null and ov.next_pass != null:
 				with_pass += 1
-	r.check(with_pass > 0, "chars: capitao antigo via StoryFigure recebe Stylize/contorno (%d superficies com next_pass)" % with_pass)
+	r.check(with_pass > 0, "chars: morador antigo via StoryFigure recebe Stylize/contorno (%d superficies com next_pass)" % with_pass)
 	fig.queue_free()
 	var leme := await _spawn("leme")
 	var lv := leme.find_child("Model", false, false) as CharacterVisual

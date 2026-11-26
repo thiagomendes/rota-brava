@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3]
 
-[ext_resource type="PackedScene" path="res://assets/models/characters/captain.glb" id="1_glb"]
+[ext_resource type="PackedScene" path="res://assets/models/characters/captain_v2.glb" id="1_glb"]
 [ext_resource type="Script" path="res://actors/characters/character_visual.gd" id="2_cv"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
@@ -14,8 +14,9 @@ metadata/provisional = true
 
 [node name="Model" type="Node3D" parent="."]
 script = ExtResource("2_cv")
-walk_speed_mps = 0.9246
-run_speed_mps = 1.9643
+metadata/pbr = true
+walk_speed_mps = 1.1347
+run_speed_mps = 2.4107
 
 [node name="Rig" parent="Model" instance=ExtResource("1_glb")]
 
@@ -24,4 +25,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
 shape = SubResource("CapsuleShape3D_body")
 
 [node name="HeadAnchor" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.445, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.53, 0)

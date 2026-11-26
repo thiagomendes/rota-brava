@@ -80,48 +80,48 @@
   },
   "crate_apple": {
    "glb": "game/assets/models/props_v3/crate_apple.glb",
-   "glb_bytes": 74176,
+   "glb_bytes": 75212,
    "materiais": [
     "wv2_glossy",
     "wv2_paint",
     "wv2_wood"
    ],
    "objetos": {
-    "pv3_crate_apple": 1404
+    "pv3_crate_apple": 1416
    },
    "orcamento_tris": 4500,
    "pivo": "centro do fundo",
-   "triangulos": 1404
+   "triangulos": 1416
   },
   "crate_grapes": {
    "glb": "game/assets/models/props_v3/crate_grapes.glb",
-   "glb_bytes": 92964,
+   "glb_bytes": 93996,
    "materiais": [
     "wv2_glossy",
     "wv2_paint",
     "wv2_wood"
    ],
    "objetos": {
-    "pv3_crate_grapes": 1948
+    "pv3_crate_grapes": 1960
    },
    "orcamento_tris": 4500,
    "pivo": "centro do fundo",
-   "triangulos": 1948
+   "triangulos": 1960
   },
   "crate_lemon": {
    "glb": "game/assets/models/props_v3/crate_lemon.glb",
-   "glb_bytes": 75032,
+   "glb_bytes": 76068,
    "materiais": [
     "wv2_glossy",
     "wv2_paint",
     "wv2_wood"
    ],
    "objetos": {
-    "pv3_crate_lemon": 1708
+    "pv3_crate_lemon": 1720
    },
    "orcamento_tris": 4500,
    "pivo": "centro do fundo",
-   "triangulos": 1708
+   "triangulos": 1720
   },
   "emblem_carabiner": {
    "glb": "game/assets/models/props_v3/emblem_carabiner.glb",

@@ -434,12 +434,17 @@ def crate(fruit):
         m.cyl((0, 0, 0), 0.098, 0.012, "wv2_paint", tuple(c * 0.7 for c in col), seg=22, rot=f @ R(rx=90), bevel=0.003)
         m.cyl((0, 0, 0), 0.086, 0.016, "wv2_paint", hexc("#FFF4E0"), seg=22, rot=f @ R(rx=90))
         fruit_icon(m, f @ T(0, 0, 0.012) @ S(0.27), fruit)
-    # frutas por cima (monte)
+    # G6: fundo falso (camada de palha) a 5 cm da borda; as frutas pousam nele (antes ficavam soltas 21 cm acima do
+    # fundo do caixote, com o vao vazio a vista entre elas).
+    FT = H - 0.05
+    m.box((0, FT - 0.01, 0), (W - 2 * b + 0.004, 0.02, D - 2 * b + 0.004), "wv2_wood", hexc("#C9A86A"), 0.0, 1,
+          rng=random.Random(64))
+    rest = {"apple": 0.042 * 0.9, "lemon": 0.036 * 0.95, "grapes": 0.042}[fruit]
     pts = []
     for k in range(9):
         x, z = rng.uniform(-0.15, 0.15), rng.uniform(-0.1, 0.1)
         if all(math.hypot(x - a, z - c) > 0.07 for a, _, c in pts):
-            pts.append((x, H - 0.03 + rng.uniform(0, 0.02), z))
+            pts.append((x, FT + rest - 0.006 * rng.uniform(0, 1), z))
     for p in pts:
         fruit_ball(m, p, fruit, rng)
     return m

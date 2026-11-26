@@ -426,3 +426,83 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 |---|---|---|---|
 | G10 | Ao apertar um botão do menu (ou ir a outro lugar), o jogo "fica pensando um tempão" antes de trocar de tela | Medir o tempo de cada troca (menu → jogo, menu → abertura, etc.) e achar a causa; carregar em segundo plano com tela de carregamento animada na identidade do jogo (estrela-guia do logo C); a resposta ao clique aparece em < 100 ms; sem travar quadro na tela de carregamento | `gameplay` |
 | G11 | No fim da abertura do jogo a tela trava e precisa de clique | Fim da abertura leva ao menu sozinho, com transição suave; pular continua possível | `gameplay` |
+### G6 · objetos atravessando outros (art3d, 2026-11-26, branch `feature/rb-r1-g-interpenetracao`)
+- **Ferramenta:** `bash tools/prop-overlap.sh [--missions=M4] [--json=<abs>]` monta `ep01_v3_main.tscn` com as peças de cada missão (M1–M8, via Land/Late) e audita ~620 objetos: instâncias do kit (lidas do layout), peças `wv3_*`, barco e peças de missão (personagens, decalques e sprites fora). Critérios em `game/tests/prop_overlap.gd`:
+  - **Interpenetração > 2 cm:** AABB, depois cada par de peças conexas dos dois objetos pela menor translação que as separa (SAT nas normais das faces), confirmada na malha por uma grade de 1 cm (número de voltas). Também contra peças pequenas do cenário fixo (≤ 4 m: tábua, degrau, meio-fio). Ignorados de propósito: grama, flores, juncos; arbustos; copas entre si; rochas entre si; guarda-sol × mesa do café; cordão de lanternas × poste; defensa × barco; poste, cabeço e barraca × cenário (chumbados/mastro da placa). Chão, rua e encosta inteiros não entram (chão sob objetos). O que está dentro de cesto/carrinho/caixote não toca as paredes (oco), então não conta.
+  - **Flutuando > 3 cm:** raio vertical de cada ponto da faixa de baixo do objeto (20% da altura, 2–10 cm) contra cenário e outros objetos (corpos de malha exata numa camada de física só da sondagem); flutua se nenhum ponto tem folga ≤ 3 cm. Não apoiados: água, pendurados, emblemas, seta, gaivota.
+  - **Parte solta no modelo > 3 cm:** peças conexas de um mesmo modelo que não se ligam, por contato (≤ 1 cm), à base do modelo (ex.: fruta no ar dentro do carrinho).
+- **Antes** (`f7b03d7`, ferramenta final): **44 pares, 14 flutuando, 10 modelos com partes soltas** (lista em `captures/g6/before.txt`/`.json`). Principais: pedras atravessando troncos (64 e 47 cm) e poste (38 cm); vaso 38 cm dentro do canteiro; pilha de caixotes junto ao carrinho do M4 23 cm dentro dele; covos empilhados 18 cm e com a rede 17 cm abaixo do cais; vasos, canteiro e barril em cima de degraus de porta (até 16 cm); caixotes 3 cm no meio-fio do cais norte; guarda-sóis 8 cm um no outro; vaso sem chão (1,5 m); pedra 76 cm para fora do barranco; 11 moitas 3–5 cm no ar; bola do M3 4,1 cm no ar; carrinho com o fundo 0,2 m solto sobre o eixo e 5 frutas no ar; caixotes do M4 com as frutas 21 cm acima do fundo e uma fruta 2,2 cm no caixote de cima.
+- **Depois:** **0 pares, 0 flutuando, 0 partes soltas** (`captures/g6/after.txt`/`.json`). Correções: M4 com os 3 caixotes em fila no fundo do carrinho (escala 0,92, `Ep01V3Land.CARGO_*`); bola do M3 com origem no chão (`BALL_GRATE_TOP`, gira no filho `Spin`); kit (`wv2_kit.py`): carrinho com pé e calços e sem frutas soltas, rede do covo só em cima, mastro do guarda-sol até a lona, encostos do banco e do café nos montantes, flores e boias pousadas; caixotes `crate_*` com fundo falso; disposição em `g6_fixes()` de `build_world_v2.py` (28 objetos movidos por tipo e índice, sem mudar sorteios nem índices; 74 moitas −5 cm). Nenhum marcador de missão mudou.
+- **Teste:** `game/tests/test_prop_overlap.gd` (M1–M8: peças da missão + adereços a ≤ 4 m dos marcadores/peças; mais a bola parada nas barracas e um caso de dente: pilha antiga de caixotes é detectada). `bash tools/test.sh prop_overlap`: `OK (34 PASS)` em ~46 s. Afetados: `ep01_v3` `OK (193 PASS)`, `village_world` `OK (74)`, `props_v3` `OK (254)`, `world_v2` `OK (36)`, `test_assets` `OK (261)`, `clues_v3` `OK (96)`, `stage_dock` `OK (75)`. Suíte inteira não rodada (já estava a 4 s do limite de 900 s; este teste soma ~40 s).
+- **Capturas** (fora do Git, `captures/g6/before_<ponto>/` e `after_<ponto>/`; quadro 19 = câmera de perto, 39 = câmera do jogo com o herói ao lado): `cart` (carrinho do M4), `lobster` (covos do cais), `planter_pot` (vaso/canteiro na porta da rua norte), `head_tree` (pedra e árvore no promontório).
+- **Limites:** métrica geométrica, não visual; peças grandes do cenário (chão, paredes inteiras) e a folhagem não são auditadas; contato aresta-com-aresta pode superestimar a profundidade (SAT só nas normais das faces); o estado auditado é o da montagem de cada missão (caixote entregue voando para a barraca e outros estados intermediários não).
+
+#### G6 · revisão 1 (art3d, 2026-11-26): exceções e pedras
+- **Mudou na auditoria:** pedra agora entra contra o cenário fixo; peças grandes fechadas e altas do cenário (casa, parede) também entram (antes só ≤ 4 m); moita contra objeto duro (caixote, barril, vaso, canteiro, cesto, balde, saco, covo, banco, carrinho) conta acima de 10 cm.
+- **Corrigido:** 17 pedras do promontório que o sorteio pôs no lado da cidade (dentro de casas, da escada do farol e da mureta; até 1,4 m, inclusive `rock_b#19` e `#40`) foram espelhadas no promontório (na revisão 3 elas saem do mapa); barril `#6` 23 cm na parede da casa vai para a rua; moitas `bush_a#32` e `bush_c#3` saem de cima do caixote `#10`, do covo `#4` e do barril `#4`; rosa dos ventos do M7 0,6 m para fora da base da casa do faroleiro (o ponto `aim` vai junto: `Ep01V3Late`, `points[&"Compass"]`).
+- **Exceções que sobram (uma linha cada):**
+  - grama, flores e juncos: não auditados (vegetação rasteira atravessa tudo de propósito);
+  - copa × copa: copas se misturam;
+  - pedra × pedra até 15 cm (`ROCK_TOL`): pedras de costeira encostadas de leve; acima disso conta (revisão 2);
+  - moita × o que não é duro (copa, pedra, poste) e objeto duro × moita até 10 cm: folhagem macia encosta e cobre;
+  - `bush_*` × `wv3_lens`: lente caída no capim, meio tapada (pista do M7);
+  - `cafe_set` × `parasol`: mastro no furo da mesa;
+  - `lamp_post` × `wv3_festa_lanterns`: cordão de lanternas amarrado no topo do poste;
+  - `fender` × barco: defensa encosta no barco atracado;
+  - `lamp_post`, `bollard`, `stall_*` × cenário fixo: poste e cabeço chumbados no chão, cordão de bandeirolas no topo do poste, mastro da placa encaixado no telhado da barraca;
+  - chão, encosta (abertos) e lajes baixas grandes (≤ 0,5 m: cais, base da rua): superfície de apoio, objeto assentado nelas não conta.
+
+#### G6 · revisão 2 (art3d, 2026-11-26): pedras que se fundiam
+- **Auditoria:** pedra × pedra conta acima de 15 cm (antes ignorada). No estado `2541d0f` ela achou 51 pares (18 a 118 cm), a maioria no aglomerado das pedras espelhadas na costa leste e o resto em pares do próprio sorteio do promontório e da margem.
+- **Correção:** `g6_rocks_apart()` em `build_world_v2.py` põe as pedras uma a uma (originais primeiro, espelhadas por último) a ≥ r1 + r2 − 8 cm uma da outra (raio circunscrito do kit × escala) e longe de poste, cabeço, banco e barril; a que bate procura lugar no anel do promontório ou em espiral na margem, com as mesmas regras de casa, escada, mureta, corredor do farol, tronco e terra. 26 pedras mudaram de lugar e 7 `rock_b` sem lugar saíram do mapa (41 → 34; layout 3009 → 3002 instâncias).
+- **Depois:** `bash tools/prop-overlap.sh`: 0 pares, 0 flutuando, 0 partes soltas. Capturas em `captures/g6/r3/` (fora do Git).
+
+#### G6 · revisão 3 (art3d, 2026-11-26): sem pedras realocadas
+- As 17 pedras sorteadas dentro de casa, escada ou mureta (nunca vistas) **saem do mapa** em vez de ir para a costa leste (`g6_rocks_out_of_town()`); o promontório volta à composição do sorteio original.
+- `g6_rocks_apart()` só separa pares do sorteio original que se fundiam (15 pares, 18–105 cm): empurra até 0,6 m (5 pedras) ou tira a pedra (10 `rock_b`). Pedras do promontório afundam mais 12 cm (`G6_ROCK_SINK`) para assentar na encosta; escala e rotação são as do sorteio.
+- Pedras: `rock_a` 21 → 20, `rock_b` 41 → 15 (17 escondidas + 10 fundidas fora); layout 3009 → 2982 instâncias. `bash tools/prop-overlap.sh`: 0 pares, 0 flutuando, 0 partes soltas. Capturas em `captures/g6/r4/` (fora do Git).
+
+### G6 integrado (`feature/rb-r1-g-interpenetracao`, autor `art3d`)
+- Ferramenta `tools/prop-overlap.sh` e teste `test_prop_overlap`. Contagem: 44 pares, 14 objetos flutuando e 10 com partes soltas viraram 0/0/0. A auditoria ficou mais rígida em mais 2 rodadas (pedra × cenário, moita × objeto duro > 10 cm, pedra × pedra > 15 cm), sempre terminando em 0.
+- Correções: carrinho do M4, bola do M3, covos, vaso e canteiro, barril, moitas e rosa dos ventos do M7 (−0,6 m em z, com o `aim` junto). Saíram 17 pedras escondidas em casas e 10 que se fundiam com outras.
+- Revisão (`reviewer`, 3 rodadas): 1ª REPROVADA (exceções largas), 2ª APROVADA, 3ª APROVADA (`prop_overlap` falha nas bases antigas, marcadores intactos, colisão bate com o manifesto). O lead olhou as capturas `g6/after_cart` e `g6/r4/after_cluster_a`.
+- Ressalvas: a ferramenta não julga estética; as pedras continuam do mesmo modelo arredondado; lajes baixas contam como chão sem auditoria. `ep01_v3` falhou uma vez em 3 checagens de salvamento e passou ao repetir. Suspeita, não verificada: agentes rodando testes em paralelo dividem o mesmo `user://`.
+### G4 · secundários v2 (`art3d`, branch `feature/rb-r1-g-secundarios`, 2026-11-26) — aguardando revisão
+- **Inventário (Ep01 v3):** em cena só capitão (`captain_model`, `Ep01V3Late` M6/M8 e cutscenes), filhote (`pup_model`, M7/M8 e cutscenes) e Dona Amora (`amora_model`, cutscene `m4_intro`). Os moradores `villager_a/b/c` só aparecem nos estágios antigos (`harbor_slice`/`dock_stage`), não no v3: ficaram como estão.
+- **O que separava o trio:** malha inteiriça SKIN + SUBSURF 3 com forma modelada (secundários: peças separadas por torno, tubos, anel de cinto solto); atlas assada e pintada com tecido, pespontos, AO e normal map (secundários: cor chapada por material); PBR com verniz e sem contorno (secundários: toon + contorno); proporção e olhos do trio (adultos com cabeça de 27%, cara de criança); rig e clipes iguais em todos.
+- **Feito:** capitão, filhote e Dona Amora refeitos em `source_art/characters/secondary_v2/` sobre o pipeline do trio (`rv2_tex`, só leitura), GLB `{captain,pup,amora}_v2.glb` (24 414 / 16 892 / 23 510 tris; 4,26 / 2,57 / 4,20 MB), cenas antigas apontando para eles com `metadata/pbr`. Mesmos ossos, nós `Model`/`HeadAnchor`, clipes e velocidades (capitão recalculadas pela proporção nova). Capitão e Dona Amora com cabeça a 21% da altura. Manifesto (`captain_v2`, `pup_v2`, `amora_v2`) e PROVENANCE.
+- **Provas:** `bash tools/test.sh characters` OK (775), `assets` OK (276), `ep01_v3` OK (193), `cutscenes` OK (134; uma 1ª rodada com captura em paralelo falhou 1 checagem do bot com cenas puladas, a 2ª passou). Capturas antes/depois ao lado do trio na câmera do jogo e de perto em `captures/g4/` (fora do Git, `game/tests/capture_g4.tscn`), provas do Blender em `captures/g4/blender/`.
+- **Fraco / pendente:** retratos do HUD do capitão e do filhote ainda são da geração anterior; rosto da Dona Amora ainda redondo (lê melhor como adulta pelo corpo do que pelo rosto); pose `idle` dos adultos em A rígido (clipe antigo); pelo do filhote quase liso (vinil, como o trio); moradores antigos sem refazer.
+- **G4 rodada 2 (`art3d`, 2026-11-26):** mãos encaixadas na manga (vão manga-mão no idle: capitão +18,8 → −59,4 mm,
+  Dona Amora +15,4 → −53,3 mm, medido separando as ilhas de `*_Skin` e `*_Cloth` no .blend; idem `wave`), idle adulto
+  relaxado (braços soltos, respiração), rosto de senhora da Dona Amora, pelo curto no filhote, retratos do HUD do capitão e do
+  filhote regerados dos modelos v2. Capturas antes/depois em `captures/g4/r2/`.
+
+### G4 integrado (`feature/rb-r1-g-secundarios`, autor `art3d`)
+- Capitão, filhote e Dona Amora foram refeitos no pipeline do trio: SKIN + SUBSURF, atlas assada em PBR e sem contorno (`source_art/characters/secondary_v2/`).
+- Rodada 2, depois do retorno de Thiago:
+  - mãos dentro da manga (o vão no pulso era de 15–19 mm; agora a mão entra 54–60 mm na manga);
+  - `pose_idle_adult`;
+  - rosto de senhora para a Amora;
+  - pelo do filhote;
+  - 6 retratos novos.
+- Revisão (`reviewer`, 2 rodadas):
+  - 1ª: REPROVADO por causa das mãos soltas.
+  - 2ª: APROVADO. O pulso foi medido de novo, o manifesto confere, o idle de 3,6 s não quebra ninguém. Num merge local com G1, a Amora aparece de olhos abertos no `m4_intro` aos 4,5 s.
+  - `characters`: 837 PASS; `assets`: 276; `ep01_v3`: 232.
+- Ressalvas abertas: há uma costura no topo do lenço da Amora (`build_amora_v2.py:115`); o grisalho nas têmporas lê como halo; falta ver o vão entre as pernas num ângulo baixo; moradores `villager_*` não foram refeitos porque não aparecem no v3.
+- `tools/test.sh` agora isola `user://` por checkout (`XDG_DATA_HOME`). Revisado e aprovado.
+| G12 | "Ver abertura" e "Referências" no menu principal não fazem sentido para a criança; "quanto mais simples, melhor" | Menu principal com **Jogar, Opções e Sair**. "Rever abertura" passa para dentro de Opções. "Referências" (demo antiga `reference_demo`) sai da interface e fica só pelo argumento de linha de comando `--ref-demo`. Testes do menu atualizados | `ux` |
+| G13 | "Jogar" sempre volta ao ponto salvo; falta como começar de novo, "como um memory card" | **3 espaços de jogo**, cada um com um cartão grande: missão atual (ícone e nome), emblemas e retrato do herói. Vazio = "Novo jogo". Apagar só com confirmação segurando o botão, para evitar apagar sem querer. Os saves atuais migram para o espaço 1. Funciona com mouse, teclado e controle. Testes de salvar, carregar, apagar e migrar | `ux` + `gameplay` |
+
+### G8 integrado (`feature/rb-r1-g-capa`, autor `ux`)
+- Escolha de Thiago: cena B (Noite das lanternas) com o logo C, numa versão noite (`logo_c_noite.svg`). O lettering é próprio e sai de `make_logos.py`, sem fonte de terceiros.
+- A tela inicial mostra `keyart_b.tscn` animada de leve atrás dos botões. O trio fica fora da coluna de botões pela projeção real. "Opções" e "Sair" ganharam texto `0B2440`, com contraste de cerca de 6,5:1. O filtro de exportação inclui os SVG.
+- Revisão (`reviewer`, 2 rodadas):
+  - 1ª: REPROVADO. O Pico ficava atrás dos botões em 4:3 e faltavam testes.
+  - 2ª: APROVADO. `test_keyart` com 24 PASS; o teste falha com o palco antigo; `ui_brand` 73; `test_ep01_v3.gd` 47.
+- Ressalvas:
+  - A ligação dos botões com `free_rect` não tem teste próprio, porque o padrão já cobre o caso.
+  - Na capa 3:4 sobra céu e cais.
+  - O estilo padrão de `Button` (branco sobre `2F8CFF`) tem contraste de 3,32:1, abaixo de 4,5.
+  - O menu instancia a vila inteira (17–37 s medidos em llvmpipe); quem resolve é o G10.
