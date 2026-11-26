@@ -233,16 +233,21 @@ class Adult(hero_lib.Builder):
         F, v = self.F, self.v
         hz = F.hz
         lk = (v["limb"] / 0.050)
-        # G4 r2: duas pernas sem no de juncao (o casco do SKIN inchava na bifurcacao e uma lasca furava a frente do
-        # casaco/vestido no quadril); o topo de cada perna fica escondido por dentro da roupa de cima
-        nodes, edges, roots = [], [], []
-        for sx in (1, -1):
-            i0 = len(nodes)
-            roots.append(i0)
+        # G4 r3: as pernas formam UMA corrente em U (tornozelo E -> quadril E -> fundilho -> quadril D -> tornozelo D), sem no de
+        # bifurcacao: o casco do SKIN nao incha (a lasca do r1 furava a roupa de cima no quadril) e o fundilho fecha o vao
+        # escuro entre as coxas visto de baixo da barra do casaco (r2 tinha duas pernas soltas).
+        chain = []
+        for sx in (-1, 1):
             x = sx * F.hip_x
-            nodes += [((x * 0.85, 0, hz + 0.02), 0.058 * lk), ((x, 0, hz - 0.10), 0.064 * lk), ((x, 0.004, F.knee_z + 0.03), 0.063 * lk),
-                      ((x, 0.006, F.knee_z - 0.02), 0.060 * lk), ((x, -0.002, F.ankle_z + hem_up), 0.058 * lk)]
-            edges += [(i0, i0 + 1), (i0 + 1, i0 + 2), (i0 + 2, i0 + 3), (i0 + 3, i0 + 4)]
+            leg = [((x, -0.002, F.ankle_z + hem_up), 0.058 * lk), ((x, 0.006, F.knee_z - 0.02), 0.060 * lk),
+                   ((x, 0.004, F.knee_z + 0.03), 0.063 * lk), ((x * 0.95, 0, hz - 0.11), 0.066 * lk)]
+            chain += leg if sx < 0 else list(reversed(leg))
+            if sx < 0:
+                # fundilho baixo e cheio (o vao escuro entre as coxas sob a barra do casaco fica preenchido de tecido)
+                chain.append(((0, -0.004, hz - 0.125), 0.062 * lk))
+        nodes = chain
+        edges = [(i, i + 1) for i in range(len(chain) - 1)]
+        roots = [4]
         ob = cl.skin_obj(self.name(part.capitalize()), nodes, edges, self.M["calca"], levels=3, scale=(1, 0.92, 1), roots=tuple(roots))
         self.pants = ob
         P = S.verts_np(ob)
