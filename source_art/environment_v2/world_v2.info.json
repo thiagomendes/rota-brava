@@ -25,13 +25,13 @@
   "triangulos": 12817
  },
  "colisao": {
-  "aderecos_com_colisao": 492,
+  "aderecos_com_colisao": 472,
   "contornos_agua": 2,
   "formas_por_corpo": {
    "AccessRamps": 2,
    "Ground": 12,
    "MapBounds": 4,
-   "Props": 492,
+   "Props": 472,
    "Structures": 79,
    "WaterLimits": 36
   },
@@ -177,7 +177,7 @@
   }
  },
  "gerado_por": "source_art/environment_v2/build_world_v2.py",
- "instancias": 3002,
+ "instancias": 2982,
  "kit": {
   "barrel": {
    "instancias": 8,
@@ -568,7 +568,7 @@
    "triangulos": 304
   },
   "rock_a": {
-   "instancias": 21,
+   "instancias": 20,
    "materiais": [
     "wv2_rock"
    ],
@@ -580,7 +580,7 @@
    "triangulos": 320
   },
   "rock_b": {
-   "instancias": 34,
+   "instancias": 15,
    "materiais": [
     "wv2_rock"
    ],
@@ -1379,5 +1379,5 @@
   }
  },
  "triangulos_estatico": 206126,
- "triangulos_instancias": 2037916
+ "triangulos_instancias": 2031516
 }

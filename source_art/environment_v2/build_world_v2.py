@@ -786,6 +786,7 @@ def g6_fixes():
             row[1] = round(row[1] - G6_BUSH_SINK, 3)
     moved += g6_rocks_out_of_town()
     moved += g6_rocks_apart()
+    g6_rocks_settle()
     return moved
 
 
@@ -825,15 +826,16 @@ def _near_trunk(x, z, rad):
     return False
 
 
-# Revisao G6 (2): pedras nao se fundem. Raio de cada pedra no chao = raio circunscrito do kit (rock_a 0,62, rock_b 1,1)
-# x escala; duas pedras ficam a pelo menos (r1 + r2 - G6_ROCK_TOUCH) uma da outra (encostam de leve, nao se atravessam).
+# Revisao G6 (3): pedras do sorteio original que se atravessam (mais que ~15 cm) sao separadas mexendo pouco (ate
+# G6_ROCK_NUDGE m) ou saem. Raio no chao = raio do kit x escala x G6_ROCK_FOOT (a pedra e achatada e enterrada 0,15-0,2 m:
+# no chao ela e menor que o raio circunscrito); duas pedras ficam a pelo menos (r1 + r2) uma da outra.
 G6_ROCK_R = {"rock_a": 0.62, "rock_b": 1.1}
-G6_ROCK_TOUCH = 0.08
-G6_HEAD_C = (31.5, -23.0)
+G6_ROCK_FOOT = 0.9
+G6_ROCK_NUDGE = 0.6
 
 
 def _rock_rule(x, y, z):
-    """Regra de altura da pedra: ('head', -0,2) no promontorio, ('bank', -0,15) na margem; None se outra."""
+    """Regra de altura da pedra: 'head' (promontorio, -0,2), 'bank' (margem, -0,15); None se outra."""
     if abs(head_h(x, z) - 0.2 - y) <= 0.002:
         return "head"
     if abs(bank_h(x, z) - 0.15 - y) <= 0.002:
@@ -845,96 +847,87 @@ def _rock_y(rule, x, z):
     return head_h(x, z) - 0.2 if rule == "head" else bank_h(x, z) - 0.15
 
 
+def _drop_rows(kind, idx):
+    if idx:
+        print("G6: pedras fora do mapa:", kind, sorted(idx))
+        inst[kind] = [row for i, row in enumerate(inst[kind]) if i not in idx]
+
+
 def g6_rocks_apart():
-    """Pedra que atravessa outra ja posta (na ordem: originais, depois as espelhadas) procura lugar: no promontorio, no
-    anel do sorteio (raio 7,5-11 em volta de (31,5, -23), x esticado 1,25), do angulo atual para os lados; na margem, em
-    espiral ate 2,5 m. Mesmas regras (fora de casa, escada, mureta, corredor do farol e tronco; em terra). Sem lugar: a
-    pedra sai do mapa (a lista fica menor)."""
+    """Pedra (na ordem do sorteio) que atravessa outra ja posta: empurrada ate G6_ROCK_NUDGE m (mesmas regras de casa,
+    escada, mureta, corredor do farol, tronco e terra); sem lugar tao perto, sai. Postes, cabecos, bancos e barris tambem
+    contam como obstaculo."""
     rects = _rock_rects()
-    order = []
-    for kind in ("rock_a", "rock_b"):
-        for i, row in enumerate(inst[kind]):
-            order.append((row[0] > 33.0 and row[2] > -34.0, kind, i, row))   # espelhadas (x > 33) por ultimo
-    order.sort(key=lambda t: (t[0], t[1], t[2]))
+    fixed = [(row[0], row[2], rad * row[4]) for kind, rad in (("lamp_post", 0.22), ("bollard", 0.2), ("bench", 0.8),
+                                                             ("barrel", 0.34), ("barrel_lid", 0.34))
+             for row in inst.get(kind, [])]
     placed = []
     drop = {"rock_a": set(), "rock_b": set()}
     moved = 0
 
-    # postes, cabecos, bancos e barris tambem sao obstaculos (raio aproximado no chao)
-    fixed = [(row[0], row[2], rad * row[4]) for kind, rad in (("lamp_post", 0.22), ("bollard", 0.2), ("bench", 0.8),
-                                                             ("barrel", 0.34), ("barrel_lid", 0.34))
-             for row in inst.get(kind, [])]
-
     def free(x, z, r):
-        return all(math.hypot(x - px, z - pz) >= r + pr - G6_ROCK_TOUCH for px, pz, pr in placed) and \
-            all(math.hypot(x - px, z - pz) >= r + pr for px, pz, pr in fixed)
+        return all(math.hypot(x - px, z - pz) >= r + pr for px, pz, pr in placed + fixed)
 
-    for _, kind, i, row in order:
-        x, y, z, ry, s = row
-        r = G6_ROCK_R[kind] * s
-        if free(x, z, r):
-            placed.append((x, z, r))
-            continue
-        rule = _rock_rule(x, y, z)
-        cands = []
-        if rule == "head":
-            a0 = math.atan2(z - G6_HEAD_C[1], (x - G6_HEAD_C[0]) / 1.25)
-            r0 = math.hypot((x - G6_HEAD_C[0]) / 1.25, z - G6_HEAD_C[1])
-            for k in range(1, 72):
-                da = math.radians(5.0 * ((k + 1) // 2)) * (1 if k % 2 else -1)
-                for rr in (r0, 7.5, 9.25, 11.0):
-                    cands.append((G6_HEAD_C[0] + math.cos(a0 + da) * rr * 1.25, G6_HEAD_C[1] + math.sin(a0 + da) * rr))
-        elif rule == "bank":
-            for k in range(1, 26):
-                for j in range(12):
-                    cands.append((x + math.cos(j * math.pi / 6) * 0.1 * k, z + math.sin(j * math.pi / 6) * 0.1 * k))
-        done = False
-        for cx, cz in cands:
-            if rule == "head":
-                cx, cz = clear_head_path(cx, cz, r)
-                if cx is None or head_h(cx, cz) < 0.4:
-                    continue
-            elif bank_h(cx, cz) < -0.3:
+    for kind in ("rock_a", "rock_b"):
+        for i, row in enumerate(inst[kind]):
+            x, y, z, ry, s = row
+            r = G6_ROCK_R[kind] * s * G6_ROCK_FOOT
+            if free(x, z, r):
+                placed.append((x, z, r))
                 continue
-            if _rock_hits(cx, cz, r * 0.9, rects) or _near_trunk(cx, cz, r * 0.9) or not free(cx, cz, r):
-                continue
-            row[0], row[1], row[2] = round(cx, 3), round(_rock_y(rule, cx, cz), 3), round(cz, 3)
-            placed.append((cx, cz, r))
-            moved += 1
-            done = True
-            break
-        if not done:
-            drop[kind].add(i)
+            rule = _rock_rule(x, y, z)
+            done = False
+            if rule is not None:
+                for k in range(1, int(G6_ROCK_NUDGE / 0.1) + 1):
+                    for j in range(12):
+                        cx = x + math.cos(j * math.pi / 6) * 0.1 * k
+                        cz = z + math.sin(j * math.pi / 6) * 0.1 * k
+                        if rule == "head":
+                            cx, cz = clear_head_path(cx, cz, r)
+                            if cx is None or head_h(cx, cz) < 0.4:
+                                continue
+                        if _rock_hits(cx, cz, r, rects) or _near_trunk(cx, cz, r) or not free(cx, cz, r):
+                            continue
+                        row[0], row[1], row[2] = round(cx, 3), round(_rock_y(rule, cx, cz), 3), round(cz, 3)
+                        placed.append((cx, cz, r))
+                        moved += 1
+                        done = True
+                        break
+                    if done:
+                        break
+            if not done:
+                drop[kind].add(i)
     for kind, idx in drop.items():
-        if idx:
-            print("G6: pedras sem lugar, fora do mapa:", kind, sorted(idx))
-            inst[kind] = [row for i, row in enumerate(inst[kind]) if i not in idx]
+        _drop_rows(kind, idx)
     return moved
+
+
+# Pedras do promontorio pareciam ovos pousados no capim: afundam mais G6_ROCK_SINK (assentadas na encosta). Por ultimo,
+# depois de separar (enterrar mais so diminui o que aparece de cada uma).
+G6_ROCK_SINK = 0.12
+
+
+def g6_rocks_settle():
+    for kind in ("rock_a", "rock_b"):
+        for row in inst[kind]:
+            if _rock_rule(row[0], row[1], row[2]) == "head":
+                row[1] = round(row[1] - G6_ROCK_SINK, 3)
 
 
 def g6_rocks_out_of_town():
-    """Pedra do promontorio (y = head_h - 0,2) que toca casa, escada ou mureta: espelhada no promontorio (x em torno de
-    31,5; depois z em torno de -23; depois os dois), no mesmo anel do sorteio, fora do corredor do farol e em terra."""
+    """Pedra do promontorio (y = head_h - 0,2) sorteada dentro de casa, escada ou mureta: nunca foi vista (as paredes a
+    escondiam), entao sai do mapa em vez de ser realocada."""
     rects = _rock_rects()
-    moved = 0
+    n = 0
     for kind in ("rock_a", "rock_b"):
-        for row in inst[kind]:
+        idx = set()
+        for i, row in enumerate(inst[kind]):
             x, y, z, ry, s = row
-            if abs(head_h(x, z) - 0.2 - y) > 0.002:
-                continue
-            rad = (0.62 if kind == "rock_a" else 1.15) * s * 0.9
-            if not _rock_hits(x, z, rad, rects):
-                continue
-            for nx, nz in ((63.0 - x, z), (x, -46.0 - z), (63.0 - x, -46.0 - z)):
-                cx, cz = clear_head_path(nx, nz, (0.62 if kind == "rock_a" else 1.15) * s)
-                if cx is None or head_h(cx, cz) < 0.4 or _rock_hits(cx, cz, rad, rects) or _near_trunk(cx, cz, rad):
-                    continue
-                row[0], row[1], row[2] = round(cx, 3), round(head_h(cx, cz) - 0.2, 3), round(cz, 3)
-                moved += 1
-                break
-            else:
-                print("G6: pedra sem lugar livre", kind, row)
-    return moved
+            if abs(head_h(x, z) - 0.2 - y) <= 0.002 and _rock_hits(x, z, (0.62 if kind == "rock_a" else 1.15) * s * 0.9, rects):
+                idx.add(i)
+        _drop_rows(kind, idx)
+        n += len(idx)
+    return n
 
 
 def build_bank():
