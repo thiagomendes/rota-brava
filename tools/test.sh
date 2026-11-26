@@ -4,6 +4,9 @@
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 LIMIT="${RB_TEST_TIMEOUT:-900}"
+# user:// isolado por checkout: worktrees rodando testes ao mesmo tempo nao dividem saves (G, 2026-11-26)
+export XDG_DATA_HOME="${RB_TEST_XDG:-$ROOT/logs/test-xdg}"
+mkdir -p "$XDG_DATA_HOME"
 bash "$ROOT/tools/godot.sh" --headless --path "$ROOT/game" --import >/dev/null 2>&1 || true
 ARGS=(--headless --path "$ROOT/game" --script res://tests/run_tests.gd)
 [ -n "${1:-}" ] && ARGS+=(-- "--only=$1")
