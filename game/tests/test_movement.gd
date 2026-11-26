@@ -41,12 +41,12 @@ func _static_rules() -> void:
 	r.check(MemberActor.target_speed(0.05, true) == 0.0, "mov: zona morta do analogico para")
 	var a := MemberActor.new()
 	a.setup(&"tracker")
-	var w1: Dictionary = a.gait(0.7)
+	var w1: Dictionary = a.gait(0.9)
 	var w2: Dictionary = a.gait(1.4)
 	var r1: Dictionary = a.gait(2.6)
 	var r2: Dictionary = a.gait(3.2)
 	r.check(w1["anim"] == &"walk" and r2["anim"] == &"run", "mov: 1,4 m/s toca walk e 3,2 m/s toca run")
-	r.check(absf(float(w2["scale"]) / float(w1["scale"]) - 2.0) < 0.001 and absf(float(r2["scale"]) / float(r1["scale"]) - 3.2 / 2.6) < 0.001,
+	r.check(absf(float(w2["scale"]) / float(w1["scale"]) - 1.4 / 0.9) < 0.001 and absf(float(r2["scale"]) / float(r1["scale"]) - 3.2 / 2.6) < 0.001,
 		"mov: escala do clipe proporcional a velocidade (walk x%.2f/x%.2f, run x%.2f/x%.2f)" % [w1["scale"], w2["scale"], r1["scale"], r2["scale"]])
 	r.check(absf(float(r2["scale"]) * a.model.run_speed_mps - 3.2) < 0.01 and absf(float(w2["scale"]) * a.model.walk_speed_mps - 1.4) < 0.01,
 		"mov: pe de apoio anda na velocidade do corpo (escala x avanco do pe = velocidade)")
@@ -444,8 +444,8 @@ func _followers_height_and_teleport() -> void:
 	rel.y = 0.0
 	to_cam.y = 0.0
 	var p := climber.global_position
-	r.check(rel.length() < 3.0, "mov seguidor: preso a 12 m foi teleportado para perto do lider (%.2f m)" % rel.length())
-	r.check(rel.dot(to_cam) < 0.0, "mov seguidor: teleporte do lado oposto a camera (atras do lider na vista)")
+	r.check(rel.length() <= 6.0 + 0.2, "mov seguidor: preso a 12 m foi teleportado para no maximo 6 m do lider (%.2f m)" % rel.length())
+	r.check(not main.in_camera_view(climber.global_position), "mov seguidor: teleporte cai fora do enquadramento da camera (F1)")
 	r.check(climber.slot_clear(lead.global_position, Vector3(p.x, lead.global_position.y, p.z)), "mov seguidor: destino do teleporte com chao e sem parede")
 	await _physics(5)
 
