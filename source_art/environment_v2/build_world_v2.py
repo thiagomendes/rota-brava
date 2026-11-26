@@ -785,6 +785,7 @@ def g6_fixes():
         for row in inst[kind]:
             row[1] = round(row[1] - G6_BUSH_SINK, 3)
     moved += g6_rocks_out_of_town()
+    moved += g6_rocks_apart()
     return moved
 
 
@@ -822,6 +823,93 @@ def _near_trunk(x, z, rad):
             if math.hypot(x - tx, z - tz) < rad + 0.35 * ts:
                 return True
     return False
+
+
+# Revisao G6 (2): pedras nao se fundem. Raio de cada pedra no chao = raio circunscrito do kit (rock_a 0,62, rock_b 1,1)
+# x escala; duas pedras ficam a pelo menos (r1 + r2 - G6_ROCK_TOUCH) uma da outra (encostam de leve, nao se atravessam).
+G6_ROCK_R = {"rock_a": 0.62, "rock_b": 1.1}
+G6_ROCK_TOUCH = 0.08
+G6_HEAD_C = (31.5, -23.0)
+
+
+def _rock_rule(x, y, z):
+    """Regra de altura da pedra: ('head', -0,2) no promontorio, ('bank', -0,15) na margem; None se outra."""
+    if abs(head_h(x, z) - 0.2 - y) <= 0.002:
+        return "head"
+    if abs(bank_h(x, z) - 0.15 - y) <= 0.002:
+        return "bank"
+    return None
+
+
+def _rock_y(rule, x, z):
+    return head_h(x, z) - 0.2 if rule == "head" else bank_h(x, z) - 0.15
+
+
+def g6_rocks_apart():
+    """Pedra que atravessa outra ja posta (na ordem: originais, depois as espelhadas) procura lugar: no promontorio, no
+    anel do sorteio (raio 7,5-11 em volta de (31,5, -23), x esticado 1,25), do angulo atual para os lados; na margem, em
+    espiral ate 2,5 m. Mesmas regras (fora de casa, escada, mureta, corredor do farol e tronco; em terra). Sem lugar: a
+    pedra sai do mapa (a lista fica menor)."""
+    rects = _rock_rects()
+    order = []
+    for kind in ("rock_a", "rock_b"):
+        for i, row in enumerate(inst[kind]):
+            order.append((row[0] > 33.0 and row[2] > -34.0, kind, i, row))   # espelhadas (x > 33) por ultimo
+    order.sort(key=lambda t: (t[0], t[1], t[2]))
+    placed = []
+    drop = {"rock_a": set(), "rock_b": set()}
+    moved = 0
+
+    # postes, cabecos, bancos e barris tambem sao obstaculos (raio aproximado no chao)
+    fixed = [(row[0], row[2], rad * row[4]) for kind, rad in (("lamp_post", 0.22), ("bollard", 0.2), ("bench", 0.8),
+                                                             ("barrel", 0.34), ("barrel_lid", 0.34))
+             for row in inst.get(kind, [])]
+
+    def free(x, z, r):
+        return all(math.hypot(x - px, z - pz) >= r + pr - G6_ROCK_TOUCH for px, pz, pr in placed) and \
+            all(math.hypot(x - px, z - pz) >= r + pr for px, pz, pr in fixed)
+
+    for _, kind, i, row in order:
+        x, y, z, ry, s = row
+        r = G6_ROCK_R[kind] * s
+        if free(x, z, r):
+            placed.append((x, z, r))
+            continue
+        rule = _rock_rule(x, y, z)
+        cands = []
+        if rule == "head":
+            a0 = math.atan2(z - G6_HEAD_C[1], (x - G6_HEAD_C[0]) / 1.25)
+            r0 = math.hypot((x - G6_HEAD_C[0]) / 1.25, z - G6_HEAD_C[1])
+            for k in range(1, 72):
+                da = math.radians(5.0 * ((k + 1) // 2)) * (1 if k % 2 else -1)
+                for rr in (r0, 7.5, 9.25, 11.0):
+                    cands.append((G6_HEAD_C[0] + math.cos(a0 + da) * rr * 1.25, G6_HEAD_C[1] + math.sin(a0 + da) * rr))
+        elif rule == "bank":
+            for k in range(1, 26):
+                for j in range(12):
+                    cands.append((x + math.cos(j * math.pi / 6) * 0.1 * k, z + math.sin(j * math.pi / 6) * 0.1 * k))
+        done = False
+        for cx, cz in cands:
+            if rule == "head":
+                cx, cz = clear_head_path(cx, cz, r)
+                if cx is None or head_h(cx, cz) < 0.4:
+                    continue
+            elif bank_h(cx, cz) < -0.3:
+                continue
+            if _rock_hits(cx, cz, r * 0.9, rects) or _near_trunk(cx, cz, r * 0.9) or not free(cx, cz, r):
+                continue
+            row[0], row[1], row[2] = round(cx, 3), round(_rock_y(rule, cx, cz), 3), round(cz, 3)
+            placed.append((cx, cz, r))
+            moved += 1
+            done = True
+            break
+        if not done:
+            drop[kind].add(i)
+    for kind, idx in drop.items():
+        if idx:
+            print("G6: pedras sem lugar, fora do mapa:", kind, sorted(idx))
+            inst[kind] = [row for i, row in enumerate(inst[kind]) if i not in idx]
+    return moved
 
 
 def g6_rocks_out_of_town():

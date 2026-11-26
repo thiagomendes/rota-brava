@@ -391,7 +391,8 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 - **Corrigido:** 17 pedras do promontório que o sorteio pôs no lado da cidade (dentro de casas, da escada do farol e da mureta; até 1,4 m, inclusive `rock_b#19` e `#40`) são espelhadas no promontório por `g6_rocks_out_of_town()` (mesmo anel, fora do corredor do farol, longe de tronco); barril `#6` 23 cm na parede da casa vai para a rua; moitas `bush_a#32` e `bush_c#3` saem de cima do caixote `#10`, do covo `#4` e do barril `#4`; rosa dos ventos do M7 0,6 m para fora da base da casa do faroleiro (o ponto `aim` vai junto: `Ep01V3Late`, `points[&"Compass"]`).
 - **Exceções que sobram (uma linha cada):**
   - grama, flores e juncos: não auditados (vegetação rasteira atravessa tudo de propósito);
-  - copa × copa, pedra × pedra: aglomerados naturais;
+  - copa × copa: copas se misturam;
+  - pedra × pedra até 15 cm (`ROCK_TOL`): pedras de costeira encostadas de leve; acima disso conta (revisão 2);
   - moita × o que não é duro (copa, pedra, poste) e objeto duro × moita até 10 cm: folhagem macia encosta e cobre;
   - `bush_*` × `wv3_lens`: lente caída no capim, meio tapada (pista do M7);
   - `cafe_set` × `parasol`: mastro no furo da mesa;
@@ -399,3 +400,8 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - `fender` × barco: defensa encosta no barco atracado;
   - `lamp_post`, `bollard`, `stall_*` × cenário fixo: poste e cabeço chumbados no chão, cordão de bandeirolas no topo do poste, mastro da placa encaixado no telhado da barraca;
   - chão, encosta (abertos) e lajes baixas grandes (≤ 0,5 m: cais, base da rua): superfície de apoio, objeto assentado nelas não conta.
+
+#### G6 · revisão 2 (art3d, 2026-11-26): pedras que se fundiam
+- **Auditoria:** pedra × pedra conta acima de 15 cm (antes ignorada). No estado `2541d0f` ela achou 51 pares (18 a 118 cm), a maioria no aglomerado das pedras espelhadas na costa leste e o resto em pares do próprio sorteio do promontório e da margem.
+- **Correção:** `g6_rocks_apart()` em `build_world_v2.py` põe as pedras uma a uma (originais primeiro, espelhadas por último) a ≥ r1 + r2 − 8 cm uma da outra (raio circunscrito do kit × escala) e longe de poste, cabeço, banco e barril; a que bate procura lugar no anel do promontório ou em espiral na margem, com as mesmas regras de casa, escada, mureta, corredor do farol, tronco e terra. 26 pedras mudaram de lugar e 7 `rock_b` sem lugar saíram do mapa (41 → 34; layout 3009 → 3002 instâncias).
+- **Depois:** `bash tools/prop-overlap.sh`: 0 pares, 0 flutuando, 0 partes soltas. Capturas em `captures/g6/r3/` (fora do Git).

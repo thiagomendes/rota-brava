@@ -19,8 +19,8 @@ extends RefCounted
 ##      carrinho e caixote abertos sao ocos (o que esta dentro deles nao toca as paredes). O par conta se passa de TOL_PEN.
 ##   O mesmo contra as pecas pequenas do cenario fixo (`structure_hits`: tabua, degrau, meio-fio, toldo).
 ##   Ignorados de proposito: vegetacao rasteira (IGNORE_KINDS: grama, flores, juncos); copas entre si; moita contra o que
-##   nao e duro (copa, pedra, poste); rochas entre si; pares montados de proposito (INTENTIONAL_PAIRS: guarda-sol na
-##   mesa, cordao de lanternas no poste, defensa no barco, lente do M7 no capim). Objeto duro (BUSH_HARD: caixote,
+##   nao e duro (copa, pedra, poste); pedra x pedra ate ROCK_TOL (15 cm); pares montados de proposito
+##   (INTENTIONAL_PAIRS: guarda-sol na mesa, cordao de lanternas no poste, defensa no barco, lente do M7 no capim). Objeto duro (BUSH_HARD: caixote,
 ##   barril, vaso, cesto...) contra moita conta acima de BUSH_TOL (10 cm: folhagem macia encosta e cobre um pouco).
 ##
 ## Flutuando (so props "apoiados"): de cada ponto da faixa de baixo da malha (ate 20% da altura acima do menor y, entre
@@ -48,6 +48,8 @@ const BUSHES := ["bush_a", "bush_b", "bush_c"]
 ## cobre um pouco; mais que isso e caixote dentro do arbusto). Prefixo do tipo.
 const BUSH_HARD := ["crate", "barrel", "pot_", "planter", "basket", "bucket", "sack", "lobster_trap", "bench", "cart"]
 const BUSH_TOL := 0.10
+## Pedra x pedra: pedras de costeira encostadas/encaixadas de leve sao aceitas; mais que isto e bolha fundida.
+const ROCK_TOL := 0.15
 const ROCKS := ["rock_a", "rock_b"]
 ## guarda-sol no furo da mesa; cordao das lanternas da festa amarrado no topo do poste; defensa do cais encostada no barco
 ## atracado (e para isso que ela existe).
@@ -305,8 +307,10 @@ static func _hard(kind: String) -> bool:
 	return false
 
 
-## Tolerancia do par: BUSH_TOL para objeto duro x moita; TOL_PEN no resto.
+## Tolerancia do par: ROCK_TOL para pedra x pedra, BUSH_TOL para objeto duro x moita; TOL_PEN no resto.
 static func pair_tol(a: Dictionary, b: Dictionary) -> float:
+	if a["kind"] in ROCKS and b["kind"] in ROCKS:
+		return ROCK_TOL
 	return BUSH_TOL if (a["kind"] in BUSHES or b["kind"] in BUSHES) else TOL_PEN
 
 
@@ -316,8 +320,6 @@ func _skip_pair(a: Dictionary, b: Dictionary) -> bool:
 	if ka in BUSHES or kb in BUSHES:
 		return not (_hard(ka) or _hard(kb))
 	if ka in FOLIAGE and kb in FOLIAGE:
-		return true
-	if ka in ROCKS and kb in ROCKS:
 		return true
 	for pair: Array in INTENTIONAL_PAIRS:
 		if (ka == pair[0] and kb == pair[1]) or (ka == pair[1] and kb == pair[0]):

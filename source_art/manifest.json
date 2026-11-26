@@ -2015,7 +2015,7 @@
         "kit_tree_b",
         "kit_tree_c"
       ],
-      "nota": "44 pecas, 3009 instancias no layout (game/lookdev/world_v2/world_v2_layout.json)"
+      "nota": "44 pecas, 3002 instancias no layout (game/lookdev/world_v2/world_v2_layout.json)"
     },
     {
       "id": "world_v2_boat",
@@ -2277,23 +2277,23 @@
       },
       "saida": "game/worlds/village_v3",
       "arquivos_sha256": {
-        "village_collision.tscn": "4c6d20c7d0657592dbc4cc8016651a0188ea5f9d7c9afaaf693e966710cd0336",
+        "village_collision.tscn": "24e9c84ad63a45acffda764baf5a667a739617b3b9169f89e0071c73c6fc1b48",
         "village_world.tscn": "c86dc7e1a6bf826dd3165f999a9cc8794ba72311142b08c2e3812fabd36967c1"
       },
       "arquivos_bytes": {
-        "village_collision.tscn": 193522,
+        "village_collision.tscn": 191448,
         "village_world.tscn": 9770
       },
       "colisao": {
         "formas_por_corpo": {
           "Ground": 12,
           "Structures": 79,
-          "Props": 499,
+          "Props": 492,
           "AccessRamps": 2,
           "WaterLimits": 36,
           "MapBounds": 4
         },
-        "aderecos_com_colisao": 499,
+        "aderecos_com_colisao": 492,
         "paredes_beira_agua": 36,
         "contornos_agua": 2,
         "marcadores": 54,
