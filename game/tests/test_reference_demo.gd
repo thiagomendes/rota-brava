@@ -127,8 +127,7 @@ func run(runner) -> void:
 	await _press(&"pause")
 	await r.frames(3)
 	# G10: a troca passa pelo SceneLoader (assincrona); espera ele terminar.
-	while SceneLoaderService.instance().is_busy():
-		await r.tree.process_frame
+	await _wait_loader()
 	var menu := r.tree.current_scene as MainMenu
 	r.check(menu != null, "Esc volta ao menu principal")
 	if menu:
@@ -136,3 +135,13 @@ func run(runner) -> void:
 		r.tree.current_scene.queue_free()
 		await r.frames(2)
 		r.tree.current_scene = null
+
+
+## G10: espera o SceneLoader terminar a troca, com teto e FAIL claro (nunca trava a suite).
+func _wait_loader() -> void:
+	var n := 0
+	while SceneLoaderService.instance().is_busy() and n < 6000:
+		await r.tree.process_frame
+		n += 1
+	if n >= 6000:
+		r.check(false, "G10: SceneLoader nao terminou a troca em 6000 quadros")
