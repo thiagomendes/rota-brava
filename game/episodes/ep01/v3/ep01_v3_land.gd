@@ -30,6 +30,15 @@ const STALL_COLORS := {&"M4_Stall_Apple": Color("e0412b"), &"M4_Stall_Lemon": Co
 const CARGO_ORDER: Array[StringName] = [&"M4_Stall_Apple", &"M4_Stall_Lemon", &"M4_Stall_Grapes"]
 const CART_STATIC_SHAPE := "Collision/Props/cart_1_0"
 const CART_KIT_INDEX := 1
+## F2 (M1): bota do capitao junto a amarra vazia (lugar testado pelo art3d em clues_v3_capture.gd) e trilha da pata do
+## cais ate a margem (rota andavel da grade do bot, tabua -> terra). As 4 pegadinhas automaticas ficam na trilha: a 1a a
+## 1,7 m da pata do cais.
+const BOOT_FROM_MOORING := Vector3(2.3, 0.0, 1.4)
+const BOOT_YAW_DEG := 300.0
+const M1_PAW_PATH: Array[Vector3] = [Vector3(1.0, 0.0, -1.0), Vector3(0.75, 0.0, -0.5), Vector3(-0.25, -0.05, 3.5),
+	Vector3(1.0, 0.01, 4.0), Vector3(0.5, 0.02, 5.25), Vector3(5.2, 0.0, 7.3), Vector3(7.6, -0.01, 8.3)]
+const M1_PAW_SPOTS: Array[int] = [0, 3, 5, 6]
+const DECAL_DIR := "res://worlds/village_v3/decals/%s.tscn"
 
 var main: Ep01V3Main
 var world: VillageWorld
@@ -179,16 +188,71 @@ func _enable(id: StringName, on: bool) -> void:
 		(spots[id] as Ep01Interactable).enabled = on
 
 
-func _paw_decal(pos: Vector3, tint: Color = Color("6b4a2f")) -> Sprite3D:
-	var s := Sprite3D.new()
-	s.texture = IconView.texture_for(&"paw")
-	s.pixel_size = 0.0016
-	s.modulate = tint
-	s.rotation.x = -PI / 2.0
-	s.set_meta(PROVISIONAL, true)
-	_root.add_child(s)
-	s.global_position = pos + Vector3(0, 0.03, 0)
-	return s
+## Posicao real da pista de um marcador (F2): a bota do M1 fica junto a amarra vazia; o resto e o proprio marcador.
+func clue_point(marker: StringName) -> Vector3:
+	match marker:
+		&"M1_BootPrint":
+			return _mk(&"M1_EmptyMooring") + BOOT_FROM_MOORING
+		&"M1_PawTrail_4":
+			return M1_PAW_PATH[M1_PAW_PATH.size() - 1]
+	return _mk(marker)
+
+
+static func m1_paw_points() -> Array[Vector3]:
+	var out: Array[Vector3] = []
+	for i in M1_PAW_SPOTS:
+		out.append(M1_PAW_PATH[i])
+	return out
+
+
+## Chao sob `p` (camada 1, de 0,9 m acima para baixo: tabua, terra, pedra; nao telhado nem copa). Sem fisica pronta
+## (montagem no _ready), fica a altura dada.
+func _floor_at(p: Vector3) -> Vector3:
+	if not is_inside_tree():
+		return p
+	var q := PhysicsRayQueryParameters3D.create(p + Vector3(0, 0.9, 0), p + Vector3(0, -3.0, 0), 1)
+	var hit := get_world_3d().direct_space_state.intersect_ray(q)
+	return hit.position if not hit.is_empty() else p
+
+
+## Decalque do art3d (pegada, pena, bota) no chao com a frente (-Z) para `toward`.
+func _decal(id: String, pos: Vector3, toward: Vector3, parent: Node = null) -> Node3D:
+	var path := DECAL_DIR % id
+	if not ResourceLoader.exists(path):
+		return null
+	var d := (load(path) as PackedScene).instantiate() as Node3D
+	(parent if parent != null else _root).add_child(d)
+	d.global_position = _floor_at(pos)
+	var dir := Vector3(toward.x - pos.x, 0.0, toward.z - pos.z)
+	if dir.length() > 0.01:
+		d.rotation.y = atan2(-dir.x, -dir.z)
+	d.add_to_group(&"ep01v3_clue")
+	return d
+
+
+## Rastro de decalques ao longo de uma linha (um a cada `gap` m, alternando esquerda/direita), virados para a frente.
+func trail_decals(parent: Node, id: String, path: Array[Vector3], gap: float) -> Array[Node3D]:
+	var out: Array[Node3D] = []
+	var left := true
+	var carry := 0.0
+	for i in path.size() - 1:
+		var a := path[i]
+		var b := path[i + 1]
+		var seg := Vector3(b.x - a.x, 0, b.z - a.z)
+		var length := seg.length()
+		if length < 0.01:
+			continue
+		var dir := seg / length
+		var t := carry
+		while t <= length:
+			var p := a.lerp(b, t / length) + Vector3(-dir.z, 0, dir.x) * (0.14 if left else -0.14)
+			var d := _decal(id, p, p + dir, parent)
+			if d != null:
+				out.append(d)
+			left = not left
+			t += gap
+		carry = t - length
+	return out
 
 
 func _emblem(id: StringName, pos: Vector3, member: StringName) -> void:
@@ -204,14 +268,30 @@ func _cloth(pos: Vector3, color: Color, n: String) -> Node3D:
 	return c
 
 
-# M1: pata no banco, bota na margem, 4 pegadinhas ate a margem (Rastro).
+# M1 (F2, auditoria 2.1): pata de lama na tabua junto ao barco, 3 pegadas de bota ate a bota do capitao caida junto a
+# amarra vazia, e as pegadinhas grandes saindo da pata do cais ate a margem (Rastro). Os marcadores do mundo nao mudam:
+# a bota e a trilha sao deslocadas aqui (`clue_point`, M1_PAWS).
 func _build_m1() -> void:
-	_spot(&"bench", _mk(&"M1_BenchClue"), &"paw", "ui.action.examine", &"tracker")
-	_spot(&"boot", _mk(&"M1_BootPrint"), &"boot", "ui.action.examine", &"tracker")
-	for i in 4:
-		var p := _mk(StringName("M1_PawTrail_%d" % (i + 1)))
-		_paw_decal(p)
-		_spot(StringName("paw_%d" % (i + 1)), p, &"paw", "", &"tracker", 0.9, true)
+	var bench := _mk(&"M1_BenchClue")
+	var boot := clue_point(&"M1_BootPrint")
+	_spot(&"bench", bench, &"paw", "ui.action.examine", &"tracker")
+	_spot(&"boot", boot, &"boot", "ui.action.examine", &"tracker")
+	_decal("decal_paw_dock", bench + Vector3(0, 0, 0.3), bench + Vector3(-1, 0, 2))
+	var b := Ep01V3Pieces.final(_root, "captain_boot", "CaptainBoot")
+	if b == null:
+		b = Blocks.box(_root, "CaptainBoot", Vector3(0.3, 0.3, 0.14), Vector3(0, 0.15, 0), Color("3a2a20"))
+		b.set_meta(PROVISIONAL, true)
+	b.global_position = _floor_at(boot)
+	b.rotation.y = deg_to_rad(BOOT_YAW_DEG)
+	b.add_to_group(&"ep01v3_clue")
+	var east := Vector3(bench.x - boot.x, 0.0, bench.z - boot.z).normalized()
+	for i in 3:
+		var side := Vector3(-east.z, 0, east.x) * (0.18 if i % 2 == 0 else -0.18)
+		_decal("decal_boot_print_%s" % ("l" if i % 2 == 0 else "r"), boot + east * (1.0 + 1.6 * i) + side, boot)
+	var paws := m1_paw_points()
+	trail_decals(_root, "decal_paw_big", M1_PAW_PATH, 1.7)
+	for i in paws.size():
+		_spot(StringName("paw_%d" % (i + 1)), paws[i], &"paw", "", &"tracker", 0.9, true)
 	_emblem(&"emb_m1_mooring", _mk(&"M1_EmptyMooring"), &"tracker")
 
 
@@ -230,7 +310,7 @@ func _build_m2() -> void:
 	var a: Vector3 = points[&"Basket"]
 	var b := _mk(&"M2_ReedsPiece")
 	for i in 3:
-		_paw_decal(a.lerp(b, 0.25 + i * 0.25), Color("3b6f9c"))
+		_decal("decal_paw_wet_big", a.lerp(b, 0.25 + i * 0.25), b)
 	_emblem(&"emb_m2_shed", _mk(&"M2_ShedTop") + Vector3(-0.55, 0, -0.25), &"climber")
 	_emblem(&"emb_m2_reeds", b + Vector3(0.9, 0, 0.3), &"tracker")
 
@@ -511,7 +591,7 @@ func _on_spot(id: StringName, actor: Node3D) -> void:
 func _deliver(stall: StringName) -> void:
 	if stall != cargo_stall():
 		# Sem castigo: a feirante aponta a barraca certa; a carga continua no carrinho.
-		main.say("ep01.market.vendor.wrong_stall")
+		main.say(Ep01V3Dialogue.pick("oops.vendor", "ep01.market.vendor.wrong_stall"))
 		FeedbackFx.ring(world, _mk(cargo_stall()) + Vector3(0, 2.1, 0), STALL_COLORS[cargo_stall()])
 		main.flash_help_target()
 		return

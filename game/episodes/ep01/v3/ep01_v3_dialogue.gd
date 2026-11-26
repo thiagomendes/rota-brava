@@ -59,3 +59,75 @@ static func all_keys() -> Array[String]:
 	for k: Variant in (sheet().get("lines", {}) as Dictionary).keys():
 		out.append(str(k))
 	return out
+
+
+# ---------- F2: falas que apontam (step_start, travel, step_done) e variantes (D19c) ----------
+
+## Sorteio das variantes: semente fixa por padrao (testes reproduziveis); o jogo chama `randomize_picks()`.
+static var _rng := RandomNumberGenerator.new()
+## Ultima variante dita por grupo (nunca se repete em seguida).
+static var _last: Dictionary = {}
+
+
+static func randomize_picks() -> void:
+	_rng.randomize()
+
+
+static func reset_picks(seed_value: int = 7) -> void:
+	_rng.seed = seed_value
+	_last.clear()
+
+
+static func step_start_line(mission: StringName, step: StringName) -> String:
+	return str((sheet().get("step_start", {}) as Dictionary).get("%s.%s" % [mission, step], ""))
+
+
+static func step_done_line(mission: StringName, step: StringName) -> String:
+	return str((sheet().get("step_done", {}) as Dictionary).get("%s.%s" % [mission, step], ""))
+
+
+static func travel_line(from_mission: StringName, to_mission: StringName) -> String:
+	return str((sheet().get("travel", {}) as Dictionary).get("%s>%s" % [from_mission, to_mission], ""))
+
+
+static func speaker(key: String) -> StringName:
+	return StringName(str(line(key).get("speaker", "")))
+
+
+## Gesto da fala: {anim, fallback, target} (vazio se a fala nao aponta).
+static func gesture(key: String) -> Dictionary:
+	var g: Variant = line(key).get("gesture", {})
+	return g if g is Dictionary else {}
+
+
+static func group_keys(group: String) -> Array[String]:
+	var out: Array[String] = []
+	for k: Variant in (sheet().get("groups", {}) as Dictionary).get(group, []):
+		out.append(str(k))
+	return out
+
+
+static func has_group(group: String) -> bool:
+	return not group_keys(group).is_empty()
+
+
+## Uma variante do grupo, nunca igual a ultima dita do mesmo grupo. `prefer`: fala de contexto (ex.: o chamado da
+## missao) usada quando esta no grupo e nao foi a ultima. "" se o grupo nao existe.
+static func pick(group: String, prefer: String = "") -> String:
+	var keys := group_keys(group)
+	if keys.is_empty():
+		return prefer
+	var last := str(_last.get(group, ""))
+	var choice := ""
+	if prefer != "" and prefer in keys and prefer != last:
+		choice = prefer
+	else:
+		var pool: Array[String] = []
+		for k in keys:
+			if k != last:
+				pool.append(k)
+		if pool.is_empty():
+			pool = keys
+		choice = pool[_rng.randi_range(0, pool.size() - 1)]
+	_last[group] = choice
+	return choice

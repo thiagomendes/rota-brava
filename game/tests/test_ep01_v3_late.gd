@@ -363,6 +363,7 @@ func _orbit() -> void:
 	# Movimento relativo a camera: "para cima" anda para onde a camera olha.
 	var t := main.controlled_node as MemberActor
 	await r.frames(2)
+	main.guide.skip_look()   # F2: o olhar dirigido do inicio do passo segura o heroi por 1,5 s
 	var p0 := t.global_position
 	Input.action_press(&"move_up")
 	await r.tree.create_timer(0.5).timeout

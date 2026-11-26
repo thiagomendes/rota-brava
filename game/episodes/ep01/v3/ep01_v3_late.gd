@@ -37,6 +37,8 @@ const BOAT_VIEW := Vector3(0, 3.4, 8.0)
 const BOAT_LOOK_Y := 0.9
 ## Cais: lugar do bote rebocado e onde o trio desembarca (perto do capitao).
 const DINGHY_DOCKED := Vector3(-6.0, -0.38, -4.3)
+## Retomada do M5: na rua de pedra, entre o mercado e a 1a pena (chao conferido por raio).
+const M5_START_OFFSET := Vector3(-0.5, 0.0, 1.4)
 
 var _keep: Node3D
 var _icons: Array[Sprite3D] = []
@@ -137,10 +139,18 @@ func handles(id: StringName) -> bool:
 	return super.handles(id) or id in LATE
 
 
+## F2: a mira da lanterna (passo `aim`, marcador M7_StairStep) e feita na bussola ao lado da escada.
+func clue_point(marker: StringName) -> Vector3:
+	if marker == &"M7_StairStep":
+		return points[&"Compass"]
+	return super.clue_point(marker)
+
+
 func start_position(id: StringName) -> Vector3:
 	match id:
 		&"M5":
-			return _mk(&"M5_FeatherTrail_4") + Vector3(1.5, 0, 1.0)
+			# F2: antes (+1,5; +1,0) caia num vao sem chao (dentro de uma casa) e o trio despencava (tela azul).
+			return _mk(&"M5_FeatherTrail_4") + M5_START_OFFSET
 		&"M6", &"M7":
 			return points[&"DockLanding"]
 		&"M8":
@@ -179,8 +189,17 @@ func clear() -> void:
 
 
 func _build_m5() -> void:
+	# F2: penas de verdade na rua (antes so pontos invisiveis): decalque grande entre as penas e uma pena 3D em cada uma.
+	var path: Array[Vector3] = []
 	for i in FEATHERS.size():
+		path.append(_mk(FEATHERS[i]))
 		_spot(StringName("feather_%d" % (i + 1)), _mk(FEATHERS[i]), &"paw", "", &"tracker", 1.0, true)
+		var f := Ep01V3Pieces.final(_root, "feather", "Feather_%d" % (i + 1))
+		if f != null:
+			f.global_position = _floor_at(_mk(FEATHERS[i]) + Vector3(0.25, 0, 0.2))
+			f.rotation.y = deg_to_rad(70.0 + 40.0 * i)
+			f.add_to_group(&"ep01v3_clue")
+	trail_decals(_root, "decal_feather_big", path, 1.8)
 	_spot(&"vane", _mk(&"M5_Weathervane"), &"star", "ui.action.examine", &"pilot", 1.6)
 	_spot(&"crates_climb", points[&"CratesBase"], &"carabiner", "ui.action.climb", &"climber")
 	_spot(&"fish", _mk(&"M5_ShedRoof"), &"rope", "ui.action.pick", &"climber", 1.3)
