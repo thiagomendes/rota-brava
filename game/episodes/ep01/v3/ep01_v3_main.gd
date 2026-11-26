@@ -895,7 +895,7 @@ func _cutscene_setup() -> void:
 		m.step_done.connect(func(mid: StringName, _n: int, step: StringName) -> void:
 			var sid := Ep01V3Cutscene.scene_for("%s.%s.done" % [mid, step])
 			if sid != &"":
-				play_cutscene(sid))
+				play_cutscene(sid, false))
 
 
 ## true: ha cena(s) antes da missao `index`; `_start_mission(index)` e chamada de novo ao terminar.
@@ -930,9 +930,10 @@ func _cutscene_run(queue: Array[StringName], index: int) -> void:
 
 
 ## Toca uma cena (espera a que estiver tocando) e devolve o jogo apontando para o `exit_look` dela.
-func play_cutscene(sid: StringName) -> void:
+func play_cutscene(sid: StringName, restore_members: bool = true) -> void:
 	while cutscene.playing:
 		await cutscene.finished
+	cutscene.restore_members = restore_members
 	if not is_inside_tree() or not Ep01V3Cutscene.enabled:
 		return
 	var orbit := camera_rig.orbit_enabled

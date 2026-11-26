@@ -61,6 +61,8 @@ var lines_said: Array[String] = []
 var shots_played: int = 0
 ## Chamado a cada quadro da cena (o jogo usa para manter a entrada bloqueada).
 var on_step: Callable = Callable()
+## Herois voltam ao lugar de antes da cena? Cenas no meio de uma missao (fim de passo) deixam onde o jogo os pos.
+var restore_members: bool = true
 var _scene: Dictionary = {}
 var _shots: Array = []
 var _total: float = 0.0
@@ -478,7 +480,8 @@ func _restore_actors() -> void:
 		var saved: Dictionary = _moved[who]
 		var tr: Transform3D = saved["t"]
 		if node is MemberActor:
-			(node as MemberActor).teleport(tr.origin)
+			if restore_members:
+				(node as MemberActor).teleport(tr.origin)
 			(node as MemberActor).set_expression(&"neutra", 1.0)
 		else:
 			node.global_transform = tr
