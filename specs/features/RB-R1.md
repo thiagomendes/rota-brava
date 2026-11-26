@@ -374,3 +374,9 @@ Relato de Thiago jogando `e6b7d01` (prints em conversa). Elenco: Rastro = menina
 | G9 | Missões "do nada"; falta encaixe, narrador e conversa da equipe | Ponte narrativa entre cada missão (narrador + diálogo da equipe), motivo claro para a próxima; roteiro em `docs/proposals/` antes da implementação | `adventure` |
 
 Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/dia já disputada pelas 177 pendentes. Até gerar, tocam só legenda.
+
+### D19e — cota de voz (Thiago, 2026-11-26)
+- Conta Gemini no nível Pago 1 (pré-pago). O nível sobe sozinho com US$ 100 gastos na API e 3 dias desde o primeiro pagamento. Thiago decidiu não gastar para subir.
+- Usar só a cota diária do **Gemini 3.8 Flash TTS** (100 pedidos/dia), sem pressa. Os modelos 2.5 TTS não serão usados.
+- O painel mostrou 14 pedidos/min contra o limite de 10. Por isso o intervalo mínimo entre pedidos em `tools/voice/gemini_tts.py` subiu de 4,0 s para 6,5 s.
+- Fila: 205 falas, cerca de 3 dias de cota.

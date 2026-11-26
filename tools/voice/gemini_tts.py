@@ -36,7 +36,7 @@ from pathlib import Path
 ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 DEFAULT_MODEL = "gemini-3.8-flash-tts"
 CACHE = Path(__file__).resolve().parent / ".cache"
-MIN_INTERVAL_S = float(os.environ.get("RB_TTS_MIN_INTERVAL", "4.0"))  # limite de taxa local
+MIN_INTERVAL_S = float(os.environ.get("RB_TTS_MIN_INTERVAL", "6.5"))  # limite de taxa local: Tier 1 = 10 pedidos/min (D19e)
 _STAMP = CACHE / ".last_call"
 
 
