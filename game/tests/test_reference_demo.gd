@@ -126,6 +126,9 @@ func run(runner) -> void:
 	# Esc volta ao menu.
 	await _press(&"pause")
 	await r.frames(3)
+	# G10: a troca passa pelo SceneLoader (assincrona); espera ele terminar.
+	while SceneLoaderService.instance().is_busy():
+		await r.tree.process_frame
 	var menu := r.tree.current_scene as MainMenu
 	r.check(menu != null, "Esc volta ao menu principal")
 	if menu:

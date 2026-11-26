@@ -129,6 +129,9 @@ func run(runner) -> void:
 
 	await _tap(&"ui_accept")
 	await r.frames(3)
+	# G10: a troca passa pelo SceneLoader (assincrona); espera ele terminar.
+	while SceneLoaderService.instance().is_busy():
+		await r.tree.process_frame
 	var play := r.tree.current_scene as Ep01V3Main
 	r.check(play != null, "ui_accept em Jogar abre o episodio (Ep01 v3 na vila)")
 	if play:
@@ -142,6 +145,8 @@ func run(runner) -> void:
 		await _tap(&"ui_down")   # Menu
 		await _tap(&"ui_accept")
 		await r.frames(3)
+		while SceneLoaderService.instance().is_busy():
+			await r.tree.process_frame
 		var back := r.tree.current_scene as MainMenu
 		r.check(back != null, "Menu na pausa volta ao menu principal")
 		r.check(not r.tree.paused, "o jogo nao fica pausado no menu")

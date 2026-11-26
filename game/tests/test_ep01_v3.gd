@@ -196,6 +196,8 @@ func _resume_from_menu() -> void:
 	await r.frames(3)
 	await _tap(&"ui_accept")
 	await r.frames(4)
+	while SceneLoaderService.instance().is_busy():  # G10: troca assincrona
+		await r.tree.process_frame
 	var play := r.tree.current_scene as Ep01V3Main
 	r.check(play != null and play.current != null and play.current.id == &"M0", "v3 menu: Jogar sem salvo comeca no M0")
 	if play == null:
@@ -209,12 +211,16 @@ func _resume_from_menu() -> void:
 	await _tap(&"ui_down")
 	await _tap(&"ui_accept")
 	await r.frames(4)
+	while SceneLoaderService.instance().is_busy():  # G10: troca assincrona
+		await r.tree.process_frame
 	var menu2 := r.tree.current_scene as MainMenu
 	r.check(menu2 != null, "v3 menu: Menu na pausa volta ao menu")
 	if menu2 == null:
 		return
 	await _tap(&"ui_accept")
 	await r.frames(4)
+	while SceneLoaderService.instance().is_busy():  # G10: troca assincrona
+		await r.tree.process_frame
 	var again := r.tree.current_scene as Ep01V3Main
 	r.check(again != null and again.current != null and again.current.id == &"M2", "v3 menu: Jogar retoma no M2")
 	if again != null:
