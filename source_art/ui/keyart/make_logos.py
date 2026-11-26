@@ -249,7 +249,9 @@ def logo_b() -> str:
 # BRAVA em arco (letras giradas sobre um circulo), pontas quadradas e juncao em quina: ar de placa/insignia.
 # ROTA numa fita coral; estrela-guia de 4 pontas (o brilho do farol) no alto. Branco com sombra azul-ceu.
 
-def logo_c() -> str:
+def logo_c(night: bool = False) -> str:
+    """night=True: versao da escolha de Thiago (cena B + logo C): recheio creme quente, halo ambar, sombra e
+    estrela-guia com brilho de farol, para ler sobre o ceu roxo e as fachadas acesas."""
     S, GAP = 32.0, 7.0
     navy = "#102A43"
     lay_b = _word_layout("BRAVA", S, GAP)
@@ -274,7 +276,8 @@ def logo_c() -> str:
     defs = (
         '<linearGradient id="skyfill" x1="0" y1="-20" x2="0" y2="140" gradientUnits="userSpaceOnUse">'
         '<stop offset="0" stop-color="#FFFFFF"/><stop offset="0.55" stop-color="#FFFFFF"/>'
-        '<stop offset="0.56" stop-color="#DDF1FF"/><stop offset="1" stop-color="#8CCBF5"/></linearGradient>'
+        + ('<stop offset="0.56" stop-color="#FFF0D2"/><stop offset="1" stop-color="#FFC27A"/></linearGradient>' if night else
+           '<stop offset="0.56" stop-color="#DDF1FF"/><stop offset="1" stop-color="#8CCBF5"/></linearGradient>') +
         '<linearGradient id="ribbon" x1="0" y1="0" x2="0" y2="1">'
         '<stop offset="0" stop-color="#FF7A5C"/><stop offset="1" stop-color="#E2453A"/></linearGradient>'
         '<linearGradient id="star" x1="0" y1="0" x2="0" y2="1">'
@@ -332,12 +335,31 @@ def logo_c() -> str:
     )
     body = extr + outline + fill + ribbon + rota_g + sparkle
     vb = (-120, -200, w_b + 240, 420)
+    if night:
+        round_ = 'fill="none" stroke-linejoin="round" stroke-linecap="round"'
+        halo = "".join(
+            arc_word(f'{round_} stroke="#FFB347" stroke-width="{S + wd}" opacity="{op}"', dy=6)
+            + f'<rect x="{rib_x - 30:.1f}" y="{rib_y:.1f}" width="{rib_w + 60:.1f}" height="{rib_h + 14:.1f}" rx="30" '
+            f'fill="none" stroke="#FFB347" stroke-width="{wd}" opacity="{op}"/>'
+            for wd, op in ((84, 0.07), (60, 0.11), (40, 0.16))
+        )
+        shadow = arc_word(f'{common} stroke="#0A0B22" stroke-width="{S + 26}" opacity="0.55"', dy=16)
+        sx, sy = cx, rib_y - 46
+        rays = "".join(
+            f'<polygon points="{sx:.1f},{sy:.1f} {sx + math.cos(a - 0.05) * 150:.1f},{sy + math.sin(a - 0.05) * 150:.1f} '
+            f'{sx + math.cos(a + 0.05) * 150:.1f},{sy + math.sin(a + 0.05) * 150:.1f}" fill="#FFE9A8" opacity="0.30"/>'
+            for a in [math.radians(i * 30 + 15) for i in range(12)]
+        )
+        glow = "".join(f'<circle cx="{sx:.1f}" cy="{sy:.1f}" r="{r}" fill="#FFE39A" opacity="{op}"/>'
+                       for r, op in ((110, 0.10), (80, 0.16), (56, 0.24)))
+        body = halo + shadow + extr + outline + fill + ribbon + rota_g + rays + glow + sparkle
+        vb = (-130, -310, w_b + 260, 540)
     return _svg(vb[2] * 2, vb[3] * 2, vb, body, defs)
 
 
 def main() -> None:
     GAME_DIR.mkdir(parents=True, exist_ok=True)
-    for name, fn in (("logo_a", logo_a), ("logo_b", logo_b), ("logo_c", logo_c)):
+    for name, fn in (("logo_a", logo_a), ("logo_b", logo_b), ("logo_c", logo_c), ("logo_c_noite", lambda: logo_c(True))):
         p = HERE / f"{name}.svg"
         p.write_text(fn(), encoding="utf-8")
         shutil.copyfile(p, GAME_DIR / f"{name}.svg")
