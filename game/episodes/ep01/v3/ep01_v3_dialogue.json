@@ -42,7 +42,8 @@
   ],
   "M4": [
    "ep01.market.vendor.mess",
-   "ep01.market.vendor.pup_crates"
+   "ep01.market.vendor.pup_crates",
+   "ep01.market.pilot.we_help"
   ],
   "M5": [
    "ep01.street.climber.gull_fish"
@@ -54,21 +55,53 @@
    "ep01.lighthouse.pilot.lamp_off"
   ],
   "M8": [
-   "ep01.festival.radio.night"
+   "ep01.festival.radio.night",
+   "ep01.festival.tracker.pup_home",
+   "ep01.festival.captain.wave"
   ]
  },
  "mission_done": {
   "M2": [
-   "ep01.bank.pilot.m2_done"
+   "ep01.bank.pilot.m2_done",
+   "ep01.bank.tracker.sock_fur",
+   "ep01.team.tracker.follow_1"
   ],
   "M3": [
-   "ep01.plaza.climber.m3_done"
+   "ep01.plaza.climber.m3_done",
+   "ep01.plaza.tracker.ball_rolls",
+   "ep01.plaza.vendor.help_call"
   ],
   "M7": [
-   "ep01.lighthouse.radio.lights_on"
+   "ep01.lighthouse.radio.lights_on",
+   "ep01.lighthouse.climber.pup_hug",
+   "ep01.lighthouse.pilot.to_party"
   ],
   "M8": [
    "ep01.festival.tracker.cheer"
+  ],
+  "M0": [
+   "ep01.arrival.pilot.boat_empty",
+   "ep01.arrival.climber.horn_alone",
+   "ep01.arrival.tracker.clue_dock"
+  ],
+  "M1": [
+   "ep01.narrator.bridge.m1_m2",
+   "ep01.dock.pilot.captain_rowed",
+   "ep01.dock.climber.go_line"
+  ],
+  "M4": [
+   "ep01.market.tracker.gull_where",
+   "ep01.market.climber.see_gull"
+  ],
+  "M5": [
+   "ep01.narrator.bridge.m5_m6",
+   "ep01.street.pilot.to_boat",
+   "ep01.street.tracker.captain_knows"
+  ],
+  "M6": [
+   "ep01.bay.climber.lighthouse_high",
+   "ep01.bay.pilot.lamp_dark",
+   "ep01.team.tracker.follow_1"
   ]
  },
  "switch": {
@@ -2124,6 +2157,287 @@
    ],
    "take": null,
    "group": "switch.to_pilot"
+  },
+  "ep01.arrival.pilot.boat_empty": {
+   "speaker": "pilot",
+   "emotes": [
+    "boat",
+    "question"
+   ],
+   "take": null,
+   "mission": "M0",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.arrival.climber.horn_alone": {
+   "speaker": "climber",
+   "emotes": [
+    "horn",
+    "exclamation"
+   ],
+   "take": null,
+   "mission": "M0",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.arrival.tracker.clue_dock": {
+   "speaker": "tracker",
+   "emotes": [
+    "magnifier",
+    "look"
+   ],
+   "take": null,
+   "mission": "M0",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.narrator.bridge.m1_m2": {
+   "speaker": "narrator",
+   "emotes": [
+    "paw",
+    "boot"
+   ],
+   "take": null,
+   "mission": "M1",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.dock.pilot.captain_rowed": {
+   "speaker": "pilot",
+   "emotes": [
+    "boot",
+    "boat"
+   ],
+   "take": null,
+   "mission": "M1",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.dock.climber.go_line": {
+   "speaker": "climber",
+   "emotes": [
+    "paw",
+    "exclamation"
+   ],
+   "take": null,
+   "mission": "M1",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.bank.tracker.sock_fur": {
+   "speaker": "tracker",
+   "emotes": [
+    "magnifier",
+    "paw"
+   ],
+   "take": null,
+   "mission": "M2",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.team.tracker.follow_1": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "look"
+   ],
+   "take": null,
+   "group": "bridge.tracker.follow",
+   "vary": "bridge.tracker.follow"
+  },
+  "ep01.team.tracker.follow_2": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "magnifier"
+   ],
+   "take": null,
+   "group": "bridge.tracker.follow"
+  },
+  "ep01.team.tracker.follow_3": {
+   "speaker": "tracker",
+   "emotes": [
+    "look",
+    "paw"
+   ],
+   "take": null,
+   "group": "bridge.tracker.follow"
+  },
+  "ep01.narrator.bridge.m2_m3": {
+   "speaker": "narrator",
+   "emotes": [
+    "paw",
+    "look"
+   ],
+   "take": null,
+   "mission": "M3",
+   "when": "start",
+   "moment": "bridge_cutscene"
+  },
+  "ep01.plaza.tracker.ball_rolls": {
+   "speaker": "tracker",
+   "emotes": [
+    "look",
+    "exclamation"
+   ],
+   "take": null,
+   "mission": "M3",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.plaza.vendor.help_call": {
+   "speaker": "vendor",
+   "emotes": [
+    "vendor",
+    "help"
+   ],
+   "take": null,
+   "mission": "M3",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.market.pilot.we_help": {
+   "speaker": "pilot",
+   "emotes": [
+    "heart",
+    "vendor"
+   ],
+   "take": null,
+   "mission": "M4",
+   "when": "start",
+   "moment": "bridge"
+  },
+  "ep01.market.tracker.gull_where": {
+   "speaker": "tracker",
+   "emotes": [
+    "question",
+    "paw"
+   ],
+   "take": null,
+   "mission": "M4",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.market.climber.see_gull": {
+   "speaker": "climber",
+   "emotes": [
+    "look",
+    "fish"
+   ],
+   "take": null,
+   "mission": "M4",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.narrator.bridge.m4_m5": {
+   "speaker": "narrator",
+   "emotes": [
+    "fish",
+    "look"
+   ],
+   "take": null,
+   "mission": "M5",
+   "when": "start",
+   "moment": "bridge_cutscene"
+  },
+  "ep01.narrator.bridge.m5_m6": {
+   "speaker": "narrator",
+   "emotes": [
+    "look",
+    "boat"
+   ],
+   "take": null,
+   "mission": "M5",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.street.pilot.to_boat": {
+   "speaker": "pilot",
+   "emotes": [
+    "helm",
+    "boat"
+   ],
+   "take": null,
+   "mission": "M5",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.street.tracker.captain_knows": {
+   "speaker": "tracker",
+   "emotes": [
+    "idea",
+    "paw"
+   ],
+   "take": null,
+   "mission": "M5",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.bay.climber.lighthouse_high": {
+   "speaker": "climber",
+   "emotes": [
+    "look",
+    "exclamation"
+   ],
+   "take": null,
+   "mission": "M6",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.bay.pilot.lamp_dark": {
+   "speaker": "pilot",
+   "emotes": [
+    "star",
+    "question"
+   ],
+   "take": null,
+   "mission": "M6",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.lighthouse.climber.pup_hug": {
+   "speaker": "climber",
+   "emotes": [
+    "paw",
+    "heart"
+   ],
+   "take": null,
+   "mission": "M7",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.lighthouse.pilot.to_party": {
+   "speaker": "pilot",
+   "emotes": [
+    "music",
+    "star"
+   ],
+   "take": null,
+   "mission": "M7",
+   "when": "done",
+   "moment": "bridge"
+  },
+  "ep01.festival.tracker.pup_home": {
+   "speaker": "tracker",
+   "emotes": [
+    "paw",
+    "heart"
+   ],
+   "take": null,
+   "mission": "M8",
+   "when": "start",
+   "moment": "bridge"
+  },
+  "ep01.festival.captain.wave": {
+   "speaker": "captain",
+   "emotes": [
+    "wave",
+    "heart"
+   ],
+   "take": null,
+   "mission": "M8",
+   "when": "start",
+   "moment": "bridge"
   }
  },
  "step_start": {
@@ -2349,8 +2663,14 @@
    "ep01.radio.v3_m8.thanks",
    "ep01.radio.v3_m8.thanks_2",
    "ep01.radio.v3_m8.thanks_3"
+  ],
+  "bridge.tracker.follow": [
+   "ep01.team.tracker.follow_1",
+   "ep01.team.tracker.follow_2",
+   "ep01.team.tracker.follow_3"
   ]
  },
  "_note_f2": "RB-R1 F2/D19c: step_start ('Mx.passo'), travel ('Ma>Mb') e step_done = falas que apontam; gesture.anim = clipe do heroi (Pico nao tem 'point': usa look_up/wave), fallback se faltar, target = marcador de village_world. groups = variantes sorteadas sem repetir a ultima (hint.radio.<passo>: a 1a e a dica atual). take null = sem audio ainda (vozes D19 depois).",
- "_note_switch": "F2/A1: switch.to_* so tem chamados genericos (sem lugar); a fala da missao (switch) sempre vence."
+ "_note_switch": "F2/A1: switch.to_* so tem chamados genericos (sem lugar); a fala da missao (switch) sempre vence.",
+ "_note_g9": "RB-R1 G9: pontes entre missoes (docs/proposals/ep01_v3_pontes.md). mission_done = conversa da equipe com controle (a cena seguinte espera a fala acabar, ate 12 s); mission_start = conversa andando; moment 'bridge'. 'vary' = a fala vira uma variante sorteada do grupo."
 }

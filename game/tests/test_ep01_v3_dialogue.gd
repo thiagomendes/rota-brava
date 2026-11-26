@@ -158,6 +158,21 @@ func _bot_with_lines() -> void:
 		if not shown.has(str(k)) and not NOT_BY_BOT.has(str(k)):
 			not_shown.append(str(k))
 	r.check(not_shown.is_empty(), "v3 E6: o bot ouviu todo o roteiro (%d falas) %s" % [shown.size(), str(not_shown)])
+	# G9: as pontes entre missoes aparecem na legenda (a cena seguinte espera a conversa; `vary` = qualquer variante).
+	var bridge_missing: Array[String] = []
+	var bridges := 0
+	for k: Variant in Ep01V3Dialogue.sheet().get("lines", {}):
+		var ln := Ep01V3Dialogue.line(str(k))
+		if str(ln.get("moment", "")) != "bridge":
+			continue
+		bridges += 1
+		var ok := shown.has(str(k))
+		if ln.has("vary"):
+			for v in Ep01V3Dialogue.group_keys(str(ln["vary"])):
+				ok = ok or shown.has(v)
+		if not ok:
+			bridge_missing.append(str(k))
+	r.check(bridges >= 20 and bridge_missing.is_empty(), "G9: o bot ouviu as %d falas de ponte M0->M8 %s" % [bridges, str(bridge_missing)])
 	var unknown: Array[String] = []
 	for k in shown:
 		if not Loc.has_key(k):

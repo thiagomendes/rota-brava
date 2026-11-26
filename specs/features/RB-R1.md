@@ -374,3 +374,49 @@ Relato de Thiago jogando `e6b7d01` (prints em conversa). Elenco: Rastro = menina
 | G9 | Missões "do nada"; falta encaixe, narrador e conversa da equipe | Ponte narrativa entre cada missão (narrador + diálogo da equipe), motivo claro para a próxima; roteiro em `docs/proposals/` antes da implementação | `adventure` |
 
 Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/dia já disputada pelas 177 pendentes. Até gerar, tocam só legenda.
+
+### D19e — cota de voz (Thiago, 2026-11-26)
+- Conta Gemini no nível Pago 1 (pré-pago). O nível sobe sozinho com US$ 100 gastos na API e 3 dias desde o primeiro pagamento. Thiago decidiu não gastar para subir.
+- Usar só a cota diária do **Gemini 3.8 Flash TTS** (100 pedidos/dia), sem pressa. Os modelos 2.5 TTS não serão usados.
+- O painel mostrou 14 pedidos/min contra o limite de 10. Por isso o intervalo mínimo entre pedidos em `tools/voice/gemini_tts.py` subiu de 4,0 s para 6,5 s.
+- Fila: 205 falas, cerca de 3 dias de cota.
+
+### G2 + G9 integrados (`feature/rb-r1-g-roteiro`, autor `adventure`)
+- G2: nenhum erro de gênero no texto. O narrador lia "Leme" como a peça do barco. Agora as falas trazem artigo: "A Rastro…", "O Pico…", "A Leme…". Essas falas ainda não tinham take gerado.
+- G9: roteiro em `docs/proposals/ep01_v3_pontes.md`, com 26 falas novas de ponte (`pt_BR.ep01v3_g9.json`, `vary()` em grupos). A espera pela conversa é `BRIDGE_WAIT_S` = 12 s. `_regroup_followers()` tira do alto a seguidora que o teleporte deixou num telhado. Teste `test_ep01_v3_bridge_regroup` (falha sem a correção). Removidas 2 chaves órfãs. Fila de voz: 201.
+- Revisão (`reviewer`, 2 rodadas). A 1ª REPROVOU: o bot ficava sem caminho no M6 em 2 de 3 rodadas. A 2ª APROVOU: `cutscene` passou 3 de 3, o teste nega a correção, `ep01_v3` deu `OK (196 PASS)`.
+- Ressalvas abertas, para um ticket de seguidores depois do pacote G:
+  - (1) o plano B do reagrupamento não checa colisão;
+  - (2) um pulo no último quadro da ponte pula o reagrupamento;
+  - (3) sem cutscene não há espera nem reagrupamento;
+  - (4) o teleporte de seguidor e da troca de herói pode deixar alguém num telhado também fora das pontes (só lido no código, não reproduzido).
+### G1 e G3 (art3d, branch `feature/rb-r1-g-olhos-render`, 2026-11-26)
+- **G1, causas:** (1) a tela-título e o player de cutscenes mantinham `set_expression(alegre, 0,6)`; nos heróis v2 `alegre` é o sorriso de **olhos fechados**, e `CharacterVisual` soma a expressão (máximo) ao clipe a todo quadro: olhos fechados o tempo todo. (2) clipes do trio com o sorriso de olhos fechados longo: idle da Leme 39% do ciclo e 1,80 s seguidos; wave/celebrate/team_pose de Rastro e Leme 0,92–1,22 s. (3) `point` (Rastro, Leme) e `pull_rope` (Pico) terminavam com o olho 62% fechado e ficavam assim parados no último quadro (close do `point` na abertura).
+- **G1, correção:** `neutra` em `title_screen.gd` e `ep01_v3_cutscene.gd` (`2c792f9`); `rv2_anim.py`, `lv2_anim.py`, `pv2_anim.py` com aperto curto (≤ 0,5 s) e piscada antes do fim; GLB e .blend dos três reexportados, malha/materiais/medidas iguais (`2584b8e`).
+- **G3, causa:** sombra do sol com `light_angular_distance` 1,2 + `shadow_blur` 1,3 no filtro suave padrão: a amostragem larga cai na própria malha curva dos personagens e vira grade de pontos. Isolado por capturas a 1,3 m com pose congelada: some sem sombra e com blur 0; não muda com bias 0,1/normal bias 2, sem SSAO ou sem SSIL. **Correção** em `village_world.gd`: angular 0,5 + blur 0,5 (`5abfe20`). Mexe na luz do mundo (vila, abertura, cutscenes); o material compartilhado de personagem não mudou.
+- **Testes:** `test_characters` OK (843), `test_ui_brand` OK (73), `test_cutscenes` OK (152), `test_assets` OK (261), `test_village_world` OK (74). Os testes novos de olhos falham no código/GLB anterior (menu 100% fechado; `point`/`pull_rope` 0,62 no fim; plano 3 da abertura 23/40 quadros fechados).
+- **Capturas** (fora do Git, `captures/g13/`): antes/depois do menu, jogo de frente e de costas a 1,5 m, câmera do jogo, vila larga (2 vistas) e abertura; G3 a 1,3 m com zoom (`g3_antes_depois_zoom.png`).
+
+### G1 + G3 integrados (`feature/rb-r1-g-olhos-render`, autor `art3d`)
+- Revisão (`reviewer`): APROVADO com ressalvas. Os testes novos falham no estado anterior: `test_characters` com 11 falhas, `ui_brand` com 6 e `cutscene` com 10. Passam agora: 843, 73 e 152 PASS. Na captura, a grade some e os olhos ficam abertos no menu e na abertura.
+- Correção de texto: a reexportação do Pico reempacotou as UVs e refez as texturas de `Pico_Gear`. O PROVENANCE do Pico foi corrigido. O lead conferiu o close do Pico na abertura (`captures/g13/after/game_intro_3_pico.png`) sem costura visível. A captura foi feita sem GPU real.
+- Ressalvas abertas: o limite dos gestos no teste é 0,65 s, mas a meta é 0,5 s (medido 0,45 s). A sombra à noite e na festa precisa de olho humano. `preview_characters.gd:66` ainda usa `alegre`, mas só na cena de prévia.
+
+### G5 + G7 integrados (`feature/rb-r1-g-entrada`, autor `gameplay`)
+- **G7, apertar E duas vezes.** Duas causas:
+  - o HUD consumia o `interact` durante a fala e por 250 ms;
+  - o `skip_look` do olhar dirigido vinha antes de `try_interact`.
+  Agora, com o botão de ação visível, o primeiro E age. Sem ação no alcance, o E continua fechando a legenda (D19b).
+- **G5, mouse preso.** `MouseLock` (`game/ui/mouse_lock.gd`) passa a ser o único dono de `Input.mouse_mode`. Troca, escolha, pausa, opções, conclusão e cutscene bloqueiam por id. Ao entrar e sair do episódio, o `MouseLock` é zerado. O lookdev também passa por ele.
+- **Trava do M2 em `free_pieces` (defeito do jogo).** Se o salto do Pico abortava no alto, nenhum ponto religava. Agora os pontos religam quando muda o estado "no alto". Teste: `test_ep01_v3_m2_stuck`. Bot: espera de pouso até 4× no ar, desvio de seguidor e limite do teste por relógio.
+- **Revisão** (`reviewer`, 2 rodadas): APROVADO.
+  - `ep01_v3_input`: 32 PASS.
+  - `m2_stuck`: falha sem a correção; com ela, 4 PASS.
+  - `cutscene`: 3 de 3 OK.
+  - `ep01_v3`: 229 PASS.
+  - `movement`: 81. `camera`: 10.
+- **Ressalvas abertas:**
+  - Salto abortado não volta ao último apoio, só fala "oops" (já era assim).
+  - `refresh()` por mudança de altura sem teste em cutscene.
+  - "Examinar" e ajuda não soltam o mouse, por decisão.
+  - Ninguém viu o cursor real.

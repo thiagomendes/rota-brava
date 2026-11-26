@@ -110,3 +110,11 @@ O build completo leva ~8 min na nuvem (4 CPUs; o bake de AO domina).
 Pedido de Thiago ("os pes estao muito acelerados"): `walk` e `run` refeitos por `source_art/scripts/hero_gait_v2.py` (FK/IK em Python, do zero), configurados em `pv2_anim.py` (`WALK`, `RUN`). Passada longa (curso de apoio 0,44 m), quadril calculado quadro a quadro pelo alcance real das pernas, guinada do quadril, pe que rola do calcanhar a ponta e sai/chega rente ao chao. Os demais clipes nao mudaram.
 - ciclo / curso de apoio / avanco por ciclo / escala no jogo / passos por s: andar 1,00 s / 0,44 m / 1,167 m / x1,20 / 2,40; correr 0,567 s / 0,44 m / 1,577 m / x1,15 / 4,06 (escala = 1,4 ou 3,2 m/s dividido pela velocidade nominal do clipe).
 - Folga minima entre as botas: 6,62 cm (walk), 7,34 cm (run) (`pv2_check.py`).
+
+## Fim do pull_rope de olhos abertos (RB-R1 G1, 2026-11-26)
+O `pull_rope` (1,6 s, sem laco) piscava em 1,45 s e terminava com o olho 62% fechado; parado no ultimo quadro, o Pico
+ficava de olho quase fechado. Agora pisca uma vez em 1,20 s (`blink_once` em `pv2_anim.py`) e termina de olho aberto.
+Demais clipes, corpo, materiais e medidas (`pico_v2.info.json` e `pico_v2.check.json` iguais) sem mudanca; GLB e
+.blend reexportados por `build_pico_v2.py` (`--glb` e `--blend`). Correcao da revisao: a reexportacao reempacotou as UVs
+de `Pico_Gear` e refez as texturas `pico_v2_gear_color/_orm/_normal` para elas (mesmo conteudo, reorganizado); as normais
+das shape keys do rosto tambem variaram. Close do Pico na abertura conferido sem costura visivel (captura, sem GPU real).

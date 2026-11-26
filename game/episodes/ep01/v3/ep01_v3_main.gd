@@ -88,6 +88,7 @@ var _clock: float = 0.0
 
 func _ready() -> void:
 	name = "Ep01V3Main"
+	MouseLock.reset()  # G5: nada de bloqueio/captura herdado de outra cena
 	world = (load(WORLD_SCENE) as PackedScene).instantiate() as VillageWorld
 	world.name = "World"
 	add_child(world)
@@ -370,7 +371,7 @@ func _start_mission(index: int) -> void:
 		camera_rig.set_low_view(deg_to_rad(float(data["camera_yaw"])))
 	guide.on_mission_started(current.id)
 	for k in Ep01V3Dialogue.start_lines(current.id):
-		say(k)
+		say(Ep01V3Dialogue.vary(k))
 	print("[RB] v3 mission %s" % current.id)
 	mission_started.emit(current.id)
 
@@ -410,12 +411,17 @@ func _on_mission_completed(id: StringName) -> void:
 	if _save != "":
 		MissionSave.save(_save, EPISODE_ID, missions)
 	# Comemoracao (D19c): a fala da missao entra no sorteio do grupo do falante; sem fala, um viva do heroi em controle.
+	# G9: depois do viva vem a ponte (conversa da equipe que leva a proxima missao), com o controle na mao.
 	var done := Ep01V3Dialogue.done_lines(id)
+	var cheered := false
 	for k in done:
 		var group := "cheer.%s" % Ep01V3Dialogue.speaker(k)
-		say(Ep01V3Dialogue.pick(group, k) if k in Ep01V3Dialogue.group_keys(group) else k)
-	if done.is_empty() and id != &"M0":
+		cheered = cheered or k in Ep01V3Dialogue.group_keys(group)
+	if not cheered and id != &"M0":
 		say(Ep01V3Dialogue.pick("cheer.%s" % active_member))
+	for k in done:
+		var group := "cheer.%s" % Ep01V3Dialogue.speaker(k)
+		say(Ep01V3Dialogue.pick(group, k) if k in Ep01V3Dialogue.group_keys(group) else Ep01V3Dialogue.vary(k))
 	guide.on_mission_completed(id)
 	mission_completed.emit(id)
 	_start_after_hops.call_deferred(_index_of(id) + 1)
@@ -573,6 +579,8 @@ func _on_progressed(_id: StringName) -> void:
 ## achado pelo teste: `success.climber` (sorteio do acerto parcial) inclui "sock_high", que o M2 tambem diz ao soltar a
 ## meia; os dois caiam no mesmo quadro.
 const SAY_REPEAT_S := 5.0
+## G9: teto da espera pela conversa da ponte antes da cena da missao seguinte.
+const BRIDGE_WAIT_S := 12.0
 var _said_at: Dictionary = {}
 
 
@@ -690,6 +698,22 @@ func in_camera_view(feet: Vector3) -> bool:
 			if cam.is_position_in_frustum(feet + off + Vector3(0, h, 0)):
 				return true
 	return false
+
+
+## G9: fim da conversa da ponte (antes da cena seguinte). Durante a conversa o jogador anda livre e o teleporte de
+## seguidor pode deixar alguem num telhado ou no galpao (ex.: a Leme no telhado do M5, que o M6 nao alcanca); quem nao
+## esta no nivel do lider volta para o chao ao lado dele.
+func _regroup_followers() -> void:
+	var lead := controlled_node as MemberActor
+	if lead == null or lead.riding_on != null or not lead.is_on_floor():
+		return
+	for m: StringName in actors:
+		var a := actors[m] as MemberActor
+		if a == lead or a.riding_on != null or absf(a.global_position.y - lead.global_position.y) <= 0.6:
+			continue
+		var to: Variant = follower_teleport_point(lead, a, m)
+		a.teleport(to as Vector3 if to != null else lead.global_position + (TRIO_OFFSETS[m] as Vector3) + Vector3(0, 0.05, 0))
+		print("[RB] v3 ponte: %s volta ao chao junto de %s" % [m, active_member])
 
 
 ## Destino do teleporte de um seguidor (F1): em aneis em volta do lider, so pontos FORA do frustum da camera, com chao
@@ -811,9 +835,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		if not blocked():
 			help_now()
 	elif event.is_action_pressed(&"interact"):
-		if guide.skip_look():
-			get_viewport().set_input_as_handled()
-		elif try_interact():
+		# G7: com acao ao alcance o mesmo E age (try_interact ja encerra o olhar); sem acao, o E so encerra o olhar.
+		if try_interact() or guide.skip_look():
 			get_viewport().set_input_as_handled()
 
 
@@ -852,8 +875,13 @@ func _on_footstep(speed: float, pos: Vector3) -> void:
 		audio.play_footstep(speed, surface_at(pos), pos)
 
 
+## G5: sair da arvore (inclusive no meio de uma cutscene) nao deixa bloqueio nem captura para a cena seguinte.
+func _exit_tree() -> void:
+	MouseLock.unblock(&"cutscene")
+	MouseLock.reset()
+
+
 func _pause() -> void:
-	camera_rig.release_mouse()
 	get_tree().paused = true
 	hud.open_pause()
 
@@ -933,6 +961,13 @@ func _cutscene_gate(index: int) -> bool:
 
 
 func _cutscene_run(queue: Array[StringName], index: int) -> void:
+	# G9: a cena seguinte espera a conversa da ponte acabar (a cena limpa a legenda), com teto de BRIDGE_WAIT_S.
+	var waited := 0.0
+	while index > 0 and hud.is_speaking() and waited < BRIDGE_WAIT_S and is_inside_tree():
+		await get_tree().process_frame
+		waited += get_process_delta_time()
+	if index > 0:
+		_regroup_followers()
 	for sid in queue:
 		await play_cutscene(sid)
 		if not is_inside_tree():
@@ -950,10 +985,11 @@ func play_cutscene(sid: StringName, restore_members: bool = true) -> void:
 	var orbit := camera_rig.orbit_enabled
 	set_followers_enabled(false)
 	camera_rig.orbit_enabled = false
-	camera_rig.release_mouse()
+	MouseLock.block(&"cutscene")
 	if cutscene.play(sid):
 		_cutscene_hold_input()
 		await cutscene.finished
+	MouseLock.unblock(&"cutscene")
 	if not is_inside_tree():
 		return
 	camera_rig.orbit_enabled = orbit

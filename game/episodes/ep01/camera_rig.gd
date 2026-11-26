@@ -261,21 +261,21 @@ func orbit_step(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not orbit_enabled:
 		return
+	# G5: o modo do mouse e do MouseLock; com painel clicavel aberto o pedido de prender fica guardado.
 	if event is InputEventMouseButton and (event as InputEventMouseButton).pressed \
-			and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED and not get_tree().paused:
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			and not MouseLock.captured() and not MouseLock.blocked() and not get_tree().paused:
+		MouseLock.capture()
+	elif event is InputEventMouseMotion and MouseLock.captured():
 		var rel := (event as InputEventMouseMotion).relative
 		yaw = wrapf(yaw - rel.x * MOUSE_SENS, -PI, PI)
 		pitch = clampf(pitch + rel.y * MOUSE_SENS, PITCH_MIN, PITCH_MAX)
-	elif event.is_action_pressed(&"pause") or event.is_action_pressed(&"ui_cancel"):
-		# Esc/pausa soltam o mouse (o evento segue para o HUD abrir a pausa).
+	elif event.is_action_pressed(&"ui_cancel") and not event.is_action_pressed(&"pause"):
+		# Esc fora da pausa solta o mouse de vez; a pausa so bloqueia (ao fechar, volta a prender).
 		release_mouse()
 
 
 func release_mouse() -> void:
-	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	MouseLock.release()
 
 
 func _exit_tree() -> void:

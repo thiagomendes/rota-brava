@@ -43,6 +43,41 @@ func _outside(hud: Hud, bounds: Rect2) -> Array[String]:
 	return bad
 
 
+## Olho fechado agora no rosto do visual: max(alegre, blink) da malha do rosto (G1; `alegre` fecha os olhos nos herois v2).
+static func eyes_closed_now(vis: CharacterVisual) -> float:
+	var face := vis.face_mesh()
+	if face == null:
+		return 0.0
+	var v := 0.0
+	for key in ["alegre", "blink"]:
+		var idx := face.find_blend_shape_by_name(key)
+		if idx >= 0:
+			v = maxf(v, face.get_blend_shape_value(idx))
+	return v
+
+
+## G1 (RB-R1): os herois do palco da tela-titulo no idle, com a expressao que a tela mantem, ficam de olhos abertos quase
+## sempre (<= 25% do tempo e <= 0,6 s seguidos com o olho fechado). Antes a tela mantinha `alegre` 0,6: olhos sempre fechados.
+func _eyes_open_on_stage(scr: TitleScreen, label: String) -> void:
+	r.check(scr.hero_models.size() == 3, "%s: tres herois 3D no palco" % label)
+	for vis in scr.hero_models:
+		vis.play(&"idle", 1.0, 0.0)
+		var closed := 0
+		var run := 0.0
+		var longest := 0.0
+		var steps := 360
+		for i in steps:
+			vis._process(1.0 / 30.0)
+			if eyes_closed_now(vis) >= 0.5:
+				closed += 1
+				run += 1.0 / 30.0
+				longest = maxf(longest, run)
+			else:
+				run = 0.0
+		r.check(float(closed) / steps <= 0.25 and longest <= 0.6, "%s: %s de olhos abertos no idle (fechados %.0f%%, maior trecho %.2f s)"
+			% [label, vis.get_parent().name, 100.0 * closed / steps, longest])
+
+
 func run(runner) -> void:
 	r = runner
 	Options.motion_override = 1
@@ -131,6 +166,7 @@ func run(runner) -> void:
 		var f := scr.get_viewport().gui_get_focus_owner()
 		r.check(f == scr.play_button, "%s: foco inicial em Jogar" % path.get_file())
 		r.check(scr.logo.texture != null and scr.hero_root != null, "%s: logo SVG e palco dos herois presentes" % path.get_file())
+		_eyes_open_on_stage(scr, path.get_file())
 		scr.options_panel.open()
 		await r.frames(2)
 		r.check(scr.get_viewport().gui_get_focus_owner() == scr.options_panel.back_button, "%s: opcoes abrem com foco em Voltar" % path.get_file())

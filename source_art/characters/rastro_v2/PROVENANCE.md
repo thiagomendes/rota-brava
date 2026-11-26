@@ -34,3 +34,13 @@ O GLB não sai byte a byte idêntico entre exportações (JPEG e ordem interna),
 Pedido de Thiago ("os pes estao muito acelerados"): `walk` e `run` refeitos por `source_art/scripts/hero_gait_v2.py` (FK/IK em Python, do zero), configurados em `rv2_anim.py` (`WALK`, `RUN`). Passada longa (curso de apoio 0,46 m), quadril calculado quadro a quadro pelo alcance real das pernas, guinada do quadril, pe que rola do calcanhar a ponta e sai/chega rente ao chao. Os demais clipes nao mudaram.
 - ciclo / curso de apoio / avanco por ciclo / escala no jogo / passos por s: andar 1,00 s / 0,46 m / 1,186 m / x1,18 / 2,36; correr 0,60 s / 0,46 m / 1,714 m / x1,12 / 3,73 (escala = 1,4 ou 3,2 m/s dividido pela velocidade nominal do clipe).
 - Folga minima entre as botas: 4,04 cm (walk), 4,60 cm (run), 0 intersecoes (`measure_feet.py`).
+
+## Olhos abertos nos gestos (RB-R1 G1, 2026-11-26)
+Thiago viu o trio de olhos fechados na abertura e no menu. O "alegre" e o sorriso de OLHOS FECHADOS e, em `wave`,
+`celebrate`, `team_pose` e `look_to_leme`, durava 0,92-1,22 s seguidos. Agora `short_squint` (`rv2_anim.py`) deixa so um
+aperto de ~0,45 s no pico do gesto; fora dele os olhos ficam abertos com a boca neutra (sorriso leve). Medido nas trilhas
+importadas na Godot (olho fechado = max(alegre, blink) >= 0,5): wave 27% / 0,45 s; celebrate 36% / 0,45 s; team_pose
+29% / 0,45 s; look_to_leme 18% / 0,45 s. Corpo, malha, materiais e medidas (`rastro_v2.info.json` igual) iguais; GLB e
+.blend reexportados por `build_rastro_v2.py` (`--glb` e `--blend`).
+O `point` (1,2 s, sem laco) piscava em 1,05 s e terminava com o olho 62% fechado; parado no ultimo quadro (close da
+abertura) a heroina ficava de olho quase fechado. Agora pisca uma vez em 0,80 s (`blink_once`) e termina de olho aberto.

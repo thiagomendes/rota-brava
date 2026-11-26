@@ -182,7 +182,8 @@ func _mount_hero_models() -> bool:
 			get_tree().create_timer(visual.animation_length(first) + 0.2).timeout.connect(func() -> void:
 				if is_instance_valid(visual):
 					visual.play(&"idle"))
-		visual.set_expression(&"alegre", 0.6)
+		# G1: `neutra` (sorriso leve, olhos abertos). `alegre` e o sorriso de olhos fechados e, mantido, fechava os olhos.
+		visual.set_expression(&"neutra")
 	return true
 
 
