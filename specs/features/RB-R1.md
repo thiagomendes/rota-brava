@@ -357,3 +357,20 @@ _(pendente)_
 - **Evidência (headless, não prova imagem):** `test_camera_tremor` (render 144 Hz sobre física 60 Hz, 50 s de corrida): p99 2ª diferença 292 → 66,2 m/s² (lim. 80), braço 57 → 0,40 inversões/s (lim. 2), herói na tela 60,4 → 0,1/s (lim. 3); falha no rig antigo (revisor: 3 falhas). `test_camera_wall` (5 paredes, giro e corrida rente): 141/2500 passos atrás da parede em `0370e05` → 0. `test_ep01_v3_dialogue`: 0 chaves repetidas em < 5 s em M0–M8 (antes falhava em M2).
 - **Revisão** (`reviewer`, 2 rodadas): 1ª APROVADO com ressalvas R1 (mola de 0,25 s deixava câmera dentro da parede) e R4 (comentários); corrigidas em `4390396`; 2ª APROVADO. Ressalvas abertas: piso do braço de 0,9 m deixa a câmera dentro de obstáculo a < 0,9 m da mira (igual ao código antigo); giro do mouse em degraus de 60 Hz em monitor rápido; falas da cutscene e as enfileiradas no `_ready` fora da trava; `success.climber` ainda contém fala de missão (dado do `adventure`). Pendente de Thiago ver na tela.
 - **Suíte após o merge** (`77a5c41`): `OK (3917 PASS, 0 FALHA(S))` em 896 s, a 4 s do limite de 900 s de `tools/test.sh`. Acelerar a suíte (um bot M0–M8 compartilhado) é a primeira tarefa da E7.
+
+## Quarto retorno de Thiago jogando (2026-11-26): pacote G
+Relato de Thiago jogando `e6b7d01` (prints em conversa). Elenco: Rastro = menina, Pico = menino (verde, cabelo laranja), Leme = menina (`tools/voice/cast.json`).
+
+| Id | Relato | Critério de aceite | Dono |
+|---|---|---|---|
+| G1 | Olhos fechados na abertura e na tela inicial (só a sobrancelha) | Olhos abertos em todas as cenas de menu, abertura e cutscenes; captura de cada uma | `art3d` |
+| G2 | Narrador diz "o Leme" | Nenhum texto ou take trata Rastro/Leme no masculino nem Pico no feminino; textos com artigo explícito ("a Leme") onde o nome abre a frase; takes afetados regenerados quando houver cota | `adventure` (texto), lead (takes) |
+| G3 | Manchas quadriculadas nos ombros quando a câmera chega perto (jogo e abertura) | Causa identificada com captura antes/depois a ≤ 1,5 m; sem padrão xadrez | `art3d` |
+| G4 | Filhote, capitão e demais secundários com acabamento muito abaixo do trio | Mesmo padrão de modelo, material e textura do trio; capturas lado a lado com o trio | `art3d` |
+| G5 | Mouse preso na câmera quando aparece botão de confirmar | Mouse solto sempre que há botão/diálogo clicável; volta a prender ao fechar; botão aceita teclado/controle; teste | `gameplay` |
+| G6 | Objetos atravessando outros (caixotes no carrinho do M4) | Script que lista interpenetrações de props na vila; zero acima de tolerância nos pontos visíveis; teste | `art3d` |
+| G7 | Às vezes precisa apertar E duas vezes | Reproduzido em teste; o primeiro E sempre executa a ação quando o botão está visível | `gameplay` |
+| G8 | Capa/tela inicial sem identidade, pouco chamativa | 3 propostas de arte-chave em 3D no motor + logotipo SVG original; Thiago escolhe; aplicar na tela inicial | `ux` + `art3d` |
+| G9 | Missões "do nada"; falta encaixe, narrador e conversa da equipe | Ponte narrativa entre cada missão (narrador + diálogo da equipe), motivo claro para a próxima; roteiro em `docs/proposals/` antes da implementação | `adventure` |
+
+Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/dia já disputada pelas 177 pendentes. Até gerar, tocam só legenda.
