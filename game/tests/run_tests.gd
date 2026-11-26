@@ -7,6 +7,8 @@ extends SceneTree
 ## O runner `r` oferece: r.check(cond: bool, label: String), r.tree (SceneTree),
 ## r.frames(n := 2) para aguardar quadros. Testes nao comprovam render, som, UX nem desempenho.
 
+const SUITE_SLOTS_PREFIX := "user://suite_"
+
 var tree: SceneTree
 var failures: int = 0
 var passes: int = 0
@@ -50,10 +52,11 @@ func _run() -> void:
 		printerr("FAIL  nenhum teste encontrado (filtro '%s')" % only)
 		quit(1)
 		return
-	# Nenhum teste grava no salvo real do jogador (user://missions.save.json): quem quer salvo define o proprio caminho.
+	# Nenhum teste grava no salvo real do jogador (user://slot_<n>.save.json, G13): quem quer salvo define o proprio caminho.
 	Ep01V3Main.save_path = ""
 	Ep01V3Main.start_mission = &""
 	_reset_cutscenes()
+	_reset_slots()
 	for f in files:
 		print("== ", f)
 		var script := load("res://tests/" + f) as GDScript
@@ -76,6 +79,7 @@ func _reset_shared_state() -> void:
 	Ep01V3Main.save_path = ""
 	Ep01V3Main.start_mission = &""
 	_reset_cutscenes()
+	_reset_slots()
 	Ep01V3Dialogue.reset_picks()
 	for action: StringName in InputMap.get_actions():
 		Input.action_release(action)
@@ -89,3 +93,15 @@ func _reset_cutscenes() -> void:
 	Ep01V3Cutscene.seen_path = ""
 	Ep01V3Cutscene.reset_seen()
 	GameIntroScene.next_scene = GameIntroScene.EP01_SCENE
+
+
+## G13: os espacos de jogo da suite sao arquivos proprios (user://suite_slot_<n>...), vazios no inicio de cada arquivo
+## de teste; os espacos reais do jogador (user://slot_<n>...) nunca sao lidos nem gravados.
+func _reset_slots() -> void:
+	SaveSlots.prefix = SUITE_SLOTS_PREFIX
+	SaveSlots.active = 0
+	for i in SaveSlots.COUNT:
+		SaveSlots.erase(i + 1)
+	# select() durante um teste aponta o salvo/vistas para o espaco: volta ao "nao grava" da suite
+	Ep01V3Main.save_path = ""
+	Ep01V3Cutscene.seen_path = ""

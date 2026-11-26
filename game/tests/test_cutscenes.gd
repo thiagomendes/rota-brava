@@ -78,7 +78,7 @@ func _data_checks() -> void:
 				missing.append("%s:%s" % [id, mk])
 	r.check(missing.is_empty(), "cutscene: todos os marcadores existem na vila %s" % str(missing))
 	r.check(keys_missing.is_empty(), "cutscene: todas as falas estao no catalogo %s" % str(keys_missing))
-	r.check(Loc.has_key("ui.menu.watch_intro") and Loc.has_key("ui.cutscene.skip"), "cutscene: textos do menu e do pular no catalogo")
+	r.check(Loc.has_key("ui.options.replay_intro") and Loc.has_key("ui.cutscene.skip"), "cutscene: textos de Rever abertura e do pular no catalogo")
 	r.check(main.cutscene != null and not main.cutscene.playing, "cutscene: desligadas, o episodio comeca sem cena")
 	await _free(main)
 
@@ -397,7 +397,9 @@ func _menu_target() -> void:
 	Ep01V3Cutscene.enabled = false
 	r.check(GameIntroScene.play_target() == GameIntroScene.EP01_SCENE, "menu: cenas desligadas, Jogar vai direto ao Ep01")
 	var src := FileAccess.get_file_as_string("res://ui/main_menu.gd")
-	r.check(src.contains("ui.menu.watch_intro") and src.contains("GameIntroScene.MENU_SCENE"), "menu: botao Ver abertura volta ao menu")
+	var opts := FileAccess.get_file_as_string("res://ui/options/options_panel.gd")
+	r.check(opts.contains("ui.options.replay_intro") and src.contains("GameIntroScene.MENU_SCENE"),
+		"menu: Rever abertura (nas Opcoes, G12) volta ao menu")
 
 
 func _run_bot(main: Ep01V3Main) -> Ep01V3Bot:

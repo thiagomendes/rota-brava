@@ -84,7 +84,7 @@ func _focus(node: Node) -> Control:
 
 func run(runner) -> void:
 	r = runner
-	# Nao le nem grava o salvo real do jogador (user://missions.save.json) durante a suite.
+	# Nao le nem grava o salvo real do jogador (user://slot_<n>.save.json, G13) durante a suite.
 	Ep01V3Main.save_path = ""
 	for action: StringName in KEYS:
 		for key: Key in KEYS[action]:
@@ -101,16 +101,17 @@ func run(runner) -> void:
 	var menu := await _swap_to("res://ui/main_menu.tscn") as MainMenu
 	r.check(_focus(menu) == menu.play_button, "foco inicial em Jogar")
 
+	# G12: o menu principal tem so Jogar, Opcoes e Sair.
+	var visible_buttons: Array[String] = []
+	for b in menu.menu.get_children():
+		if b is Button and (b as Button).visible:
+			visible_buttons.append(String(b.name))
+	r.check(visible_buttons == ["PlayButton", "OptionsButton", "QuitButton"],
+		"G12: menu principal so com Jogar, Opcoes e Sair (%s)" % str(visible_buttons))
 	await _tap(&"ui_down")
 	r.check(_focus(menu) == menu.options_button, "ui_down move o foco de Jogar para Opcoes")
 	await _tap(&"ui_down")
-	r.check(_focus(menu) == menu.intro_button, "ui_down move o foco de Opcoes para Ver abertura (D21)")
-	await _tap(&"ui_down")
-	r.check(_focus(menu) == menu.references_button, "ui_down move o foco de Ver abertura para Referencias")
-	await _tap(&"ui_down")
-	r.check(_focus(menu) == menu.quit_button, "ui_down move o foco de Referencias para Sair")
-	await _tap(&"ui_up")
-	await _tap(&"ui_up")
+	r.check(_focus(menu) == menu.quit_button, "ui_down move o foco de Opcoes para Sair")
 	await _tap(&"ui_up")
 	await _tap(&"ui_up")
 	r.check(_focus(menu) == menu.play_button, "ui_up volta o foco para Jogar")
@@ -129,12 +130,17 @@ func run(runner) -> void:
 	await _tap(&"ui_up")
 	r.check(_focus(menu) == menu.play_button, "foco continua navegavel depois de fechar Opcoes")
 
+	# G13: Jogar abre os espacos de jogo; ui_accept no cartao 1 (vazio, arquivos de teste) comeca o jogo nele.
+	await _tap(&"ui_accept")
+	await r.frames(2)
+	r.check(menu.slot_screen.visible and _focus(menu) == menu.slot_screen.cards[0],
+		"G13: ui_accept em Jogar abre os espacos de jogo com foco no cartao 1")
 	await _tap(&"ui_accept")
 	await r.frames(3)
 	# G10: a troca passa pelo SceneLoader (assincrona); espera ele terminar.
 	await _wait_loader()
 	var play := r.tree.current_scene as Ep01V3Main
-	r.check(play != null, "ui_accept em Jogar abre o episodio (Ep01 v3 na vila)")
+	r.check(play != null, "ui_accept no cartao abre o episodio (Ep01 v3 na vila)")
 	if play:
 		await _tap(&"pause")
 		r.check(play.hud.pause_open and r.tree.paused, "Esc no episodio abre a pausa")

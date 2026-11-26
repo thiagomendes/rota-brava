@@ -75,5 +75,10 @@ func _ready() -> void:
 
 func _on_finished(_id: StringName, skipped: bool) -> void:
 	done.emit(skipped)
+	# G12: a cena pode acabar com a tela de carregamento ainda saindo (cenas desligadas/puladas no primeiro quadro);
+	# o SceneLoader ignora pedidos nessa hora, entao espera ele ficar livre (antes ficava parado na abertura).
+	var loader := SceneLoaderService.instance()
+	while is_inside_tree() and loader.is_busy():
+		await get_tree().process_frame
 	if next_scene != "" and is_inside_tree():
 		SceneLoaderService.go(next_scene)

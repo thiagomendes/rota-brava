@@ -5,7 +5,7 @@ extends Node
 ## modelo (clipe ausente -> `fallback` da ficha ou `idle`, anotado em `fallbacks`), falas por `hud.say(chave)` (voz,
 ## legenda e retrato pelo HUD) e barras de cinema discretas.
 ##
-## Regras para crianca: pulavel com `interact` so depois de ter sido vista uma vez (`user://cutscenes.seen.json`);
+## Regras para crianca: pulavel com `interact` so depois de ter sido vista uma vez (por espaco de jogo, G13: `user://slot_<n>.cutscenes.seen.json`);
 ## movimento reduzido (Options) troca todo movimento por corte no enquadramento final do plano; a entrada fica bloqueada
 ## durante a cena (so `interact` para pular e `pause` passam); ao sair, quem chamou aponta a camera do jogo para
 ## `exit_look` (ver Ep01V3Main). A cena sempre termina (tempo da ficha + no maximo TAIL_MAX esperando a fala acabar),
@@ -18,7 +18,7 @@ extends Node
 signal finished(scene_id: StringName, skipped: bool)
 
 const DATA_PATH := "res://episodes/ep01/v3/ep01_v3_cutscenes.json"
-const DEFAULT_SEEN_PATH := "user://cutscenes.seen.json"
+const DEFAULT_SEEN_PATH := "user://slot_1.cutscenes.seen.json"
 const SEEN_VERSION := 1
 ## Espera maxima depois do ultimo plano para a fala terminar (s).
 const TAIL_MAX := 3.0
@@ -160,6 +160,12 @@ static func mark_seen(id: StringName) -> void:
 	f.store_string(JSON.stringify({"version": SEEN_VERSION, "seen": list}, "\t"))
 	f.close()
 	DirAccess.rename_absolute(ProjectSettings.globalize_path(tmp), ProjectSettings.globalize_path(seen_path))
+
+
+## G13: a proxima consulta rele o arquivo (trocou ou apagou o espaco de jogo).
+static func forget_seen_cache() -> void:
+	_seen_cache = {}
+	_seen_loaded_from = "<nenhum>"
 
 
 ## Esquece as vistas (testes). Apaga o arquivo se houver caminho.

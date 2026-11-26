@@ -532,3 +532,18 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - teto de 60 s é longo para criança;
   - cena original ALWAYS sem teste no `_fail`.
 - **Suíte completa depois do pacote G** (`d540b78`, `RB_TEST_TIMEOUT=2400`): `FALHOU (4150 PASS, 2 FALHA(S))` em 986 s. As duas falhas eram de `test_assets`: a entrada `keyart_b_bg_still` do manifesto estava fora do formato (`agente` gameplay; `arquivo` e `sha256` em vez de `saida` e `arquivos_sha256`). Os revisores do G10 não rodaram `test_assets`. O lead corrigiu só o formato, com o mesmo hash, e depois `test_assets` deu `OK (278 PASS)`. A correção vai para o próximo revisor. A suíte passou do limite padrão de 900 s, então acelerar a suíte é o próximo item da E7.
+
+### G12 + G13 (`feature/rb-r1-g-menu-saves`, autor `ux`, sem merge)
+- **G12, menu:** só Jogar, Opções e Sair (foco inicial em Jogar). "Rever abertura" fica no fim da coluna direita das Opções (só no menu; a pausa do jogo não mostra) e volta ao menu pelo `SceneLoader`. "Referências" saiu da interface; continua por `--ref-demo`. Chaves removidas: `ui.menu.references`, `ui.menu.watch_intro`, `ui.menu.continue` (o botão Continuar oculto também saiu). `ui.menu.replay` e `ui.menu.cancel` já estavam sem uso antes e ficaram.
+- **G13, espaços:** `SaveSlots` (`game/systems/mission/save_slots.gd`) com `user://slot_<n>.save.json` e `user://slot_<n>.cutscenes.seen.json`. O antigo `user://missions.save.json` (e `cutscenes.seen.json`) é movido para o espaço 1 uma vez, ao abrir o menu; se o espaço 1 já existe, o antigo fica onde está. Jogo novo grava o começo (M0) na hora, então o cartão já mostra a missão.
+- **Tela (`game/ui/slots/`):** abre por cima do menu (sem trocar de cena; a arte-chave 3D fica escondida), fundo = `b_bg_16x9.jpg` com véu. Cartão: retrato do HUD do 1º herói da missão atual, ícone e nome da missão, emblemas x/10; vazio = "Novo jogo". Apagar = `HoldButton` (segurar 1,5 s de relógio, anel enchendo; soltar antes mostra "Segure para apagar") e depois confirmação com retrato, foco em "Não".
+- **Correção junto:** `GameIntroScene._on_finished` esperava 0 quadros pelo `SceneLoader`; se a abertura acabava com a tela de carregamento ainda saindo, o pedido de volta era ignorado e a abertura ficava parada. Agora espera o carregador ficar livre.
+- **Provas:** `save_slots` 33 PASS, `ui_` 248 (inclui `test_ui_slots` 72), `foundation` 72, `keyart` 24, `scene_loader` 39, `cutscene` 152, `reference_demo` 27, `ep01_v3` 232, `mission` 58.
+- **Capturas** (`captures/g13/`, fora do Git, `game/tests/capture_g13.tscn`): `menu_menu_16x9.png`, `menu_options_16x9.png`, `slots_empty_16x9.png`, `slots_one_16x9.png`, `slots_hold_16x9.png`, `slots_hold_20x9.png`, `slots_hold_4x3.png`, `slots_confirm_16x9.png`.
+- **Ressalvas:** a Input Map não tem botão de controle em `ui_accept`/`ui_cancel` (Jogar no menu não aperta com o controle, problema anterior); na tela de espaços o controle escolhe com `interact` (X) e volta pelo botão Voltar. Foco no cartão amarelo vazio é só o anel dourado de fora + escala 1,04 (fraco). Ninguém jogou com controle real nem em tela de toque.
+- **G12 + G13 integrados** (`feature/rb-r1-g-menu-saves`, autor `ux`). Revisão (`reviewer`): APROVADO.
+  - Migração: não sobrescreve nada.
+  - Apagar: só o espaço escolhido, sem disparo acidental (clique curto, auto-repetição e perda de foco cancelam).
+  - Gravação atômica.
+  - A suíte não toca no save real.
+  - Ressalvas: o controle não tem `ui_accept`/`ui_cancel` (o A não aperta Jogar no menu, problema que já existia); `ui_` e `keyart` saem com código 134 ao fechar a Godot, mesmo dando OK.

@@ -63,7 +63,7 @@ func _layout_case(ratio: String, size: Vector2i) -> void:
 	var trio_right := kr.position.x + hr.end.x * kr.size.x
 	var trio_left := kr.position.x + hr.position.x * kr.size.x
 	var buttons_left := INF
-	for b: Button in [menu.play_button, menu.options_button, menu.intro_button, menu.references_button, menu.quit_button]:
+	for b: Button in [menu.play_button, menu.options_button, menu.quit_button]:
 		if b.visible:
 			buttons_left = minf(buttons_left, b.get_global_rect().position.x)
 	r.check(trio_right < buttons_left and trio_left >= 0.0,
@@ -89,7 +89,7 @@ func _focus_case() -> void:
 			bad.append(String(c.name))
 	r.check(bad.is_empty(), "fundo 3D sem foco nem mouse em nenhum Control (%s)" % str(bad))
 	r.check(sv.gui_get_focus_owner() == menu.play_button, "foco inicial em Jogar com o fundo 3D")
-	var buttons: Array = [menu.play_button, menu.options_button, menu.intro_button, menu.references_button, menu.quit_button]
+	var buttons: Array = [menu.play_button, menu.options_button, menu.quit_button]
 	var visited := {}
 	# teclado: setas para baixo e para cima; controle: direcional para baixo e para cima
 	var events: Array[InputEvent] = []
@@ -120,7 +120,7 @@ func _focus_case() -> void:
 		else:
 			visited[f.name] = true
 	r.check(not stray, "teclado e controle: o foco anda so pelos botoes do menu, nunca pelo fundo")
-	r.check(visited.size() >= 4, "teclado e controle percorrem a coluna de botoes (%s)" % str(visited.keys()))
+	r.check(visited.size() == 3, "teclado e controle percorrem a coluna de botoes (G12: Jogar, Opcoes, Sair) (%s)" % str(visited.keys()))
 	# clique no fundo (lado esquerdo, sobre o trio) nao tira o foco dos botoes
 	menu.play_button.grab_focus()
 	var click := InputEventMouseButton.new()

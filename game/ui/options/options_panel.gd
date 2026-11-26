@@ -8,6 +8,8 @@ const BUS_KEYS := {"Master": "ui.options.bus.master", "Voz": "ui.options.bus.voz
 const SIZE_KEYS: Array[String] = ["ui.options.size.0", "ui.options.size.1", "ui.options.size.2"]
 
 signal back_requested
+## G12: "Rever abertura" (so no menu principal; a pausa do jogo nao mostra o botao).
+signal intro_requested
 signal ui_sound(name: StringName)
 
 var back_button: Button
@@ -15,6 +17,8 @@ var sliders: Dictionary = {}
 var size_buttons: Array[Button] = []
 var motion_check: CheckButton
 var assist_check: CheckButton
+var intro_button: Button
+var _right: VBoxContainer
 
 
 func _init() -> void:
@@ -78,6 +82,7 @@ func _ready() -> void:
 	var right := VBoxContainer.new()
 	right.add_theme_constant_override("separation", 16)
 	cols.add_child(right)
+	_right = right
 	var sl := Label.new()
 	sl.text = Loc.t("ui.options.subtitle_size")
 	right.add_child(sl)
@@ -118,6 +123,27 @@ func _check(parent: Control, node_name: String, key: String, opt: String) -> Che
 		ui_sound.emit(&"select"))
 	parent.add_child(c)
 	return c
+
+
+## G12: acrescenta "Rever abertura" no fim da coluna da direita (o menu principal chama; a pausa nao).
+func add_intro_button() -> Button:
+	if intro_button != null:
+		return intro_button
+	intro_button = Button.new()
+	intro_button.name = "ReplayIntroButton"
+	intro_button.text = Loc.t("ui.options.replay_intro")
+	intro_button.icon = IconView.texture_for(&"storybook")
+	intro_button.expand_icon = true
+	intro_button.add_theme_constant_override("icon_max_width", 72)
+	intro_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	intro_button.theme_type_variation = &"QuietButton"
+	intro_button.custom_minimum_size = Vector2(500, 128)
+	ThemeV2.springify(intro_button, 0.03)
+	intro_button.pressed.connect(func() -> void:
+		ui_sound.emit(&"confirm")
+		intro_requested.emit())
+	_right.add_child(intro_button)
+	return intro_button
 
 
 func open() -> void:

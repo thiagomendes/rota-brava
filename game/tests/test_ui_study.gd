@@ -208,7 +208,7 @@ func run(runner) -> void:
 	for b in menu.find_children("*", "Button", true, false):
 		if (b as Button).is_visible_in_tree():
 			heights.append(int((b as Button).size.y))
-	r.check(heights.size() >= 4 and heights.min() >= 120,
+	r.check(heights.size() >= 3 and heights.min() >= 120,
 		"menu: todos os botoes tem alvo de toque >= 120 px na referencia de 1080 (%s)" % str(heights))
 	menu.queue_free()
 	await r.frames(2)

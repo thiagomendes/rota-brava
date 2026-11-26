@@ -4,7 +4,9 @@ extends RefCounted
 ## missao atual; ao carregar, a missao atual recomeca do primeiro passo (nunca do meio).
 
 const VERSION := 1
-const DEFAULT_PATH := "user://missions.save.json"
+## G13: o salvo e por espaco de jogo (SaveSlots); o padrao e o espaco 1. O antigo `user://missions.save.json` migra
+## para ele (SaveSlots.migrate).
+const DEFAULT_PATH := "user://slot_1.save.json"
 
 
 ## Missao atual = primeira (na ordem) ainda nao concluida; &"" se todas concluidas.
