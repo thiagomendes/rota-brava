@@ -88,6 +88,7 @@ var _clock: float = 0.0
 
 func _ready() -> void:
 	name = "Ep01V3Main"
+	MouseLock.reset()  # G5: nada de bloqueio/captura herdado de outra cena
 	world = (load(WORLD_SCENE) as PackedScene).instantiate() as VillageWorld
 	world.name = "World"
 	add_child(world)
@@ -834,9 +835,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		if not blocked():
 			help_now()
 	elif event.is_action_pressed(&"interact"):
-		if guide.skip_look():
-			get_viewport().set_input_as_handled()
-		elif try_interact():
+		# G7: com acao ao alcance o mesmo E age (try_interact ja encerra o olhar); sem acao, o E so encerra o olhar.
+		if try_interact() or guide.skip_look():
 			get_viewport().set_input_as_handled()
 
 
@@ -875,8 +875,13 @@ func _on_footstep(speed: float, pos: Vector3) -> void:
 		audio.play_footstep(speed, surface_at(pos), pos)
 
 
+## G5: sair da arvore (inclusive no meio de uma cutscene) nao deixa bloqueio nem captura para a cena seguinte.
+func _exit_tree() -> void:
+	MouseLock.unblock(&"cutscene")
+	MouseLock.reset()
+
+
 func _pause() -> void:
-	camera_rig.release_mouse()
 	get_tree().paused = true
 	hud.open_pause()
 
@@ -980,10 +985,11 @@ func play_cutscene(sid: StringName, restore_members: bool = true) -> void:
 	var orbit := camera_rig.orbit_enabled
 	set_followers_enabled(false)
 	camera_rig.orbit_enabled = false
-	camera_rig.release_mouse()
+	MouseLock.block(&"cutscene")
 	if cutscene.play(sid):
 		_cutscene_hold_input()
 		await cutscene.finished
+	MouseLock.unblock(&"cutscene")
 	if not is_inside_tree():
 		return
 	camera_rig.orbit_enabled = orbit

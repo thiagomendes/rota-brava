@@ -12,6 +12,7 @@ signal finished(success: bool)
 const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down", &"interact", &"help", &"run"]
 const STUCK_SECONDS := 4.0
 const STUCK_MIN_MOVE := 0.4
+const DETOUR_SECONDS := 0.8
 const WAYPOINT_REACH := 0.6
 const PRESS_COOLDOWN := 0.5
 ## Perto e no mesmo nivel: anda reto (o A* nao precisa).
@@ -34,6 +35,9 @@ var _goal: Node3D
 var _route: Array[Vector3] = []
 var _wp: int = 0
 var _stuck_t: float = 0.0
+## Desvio lateral quando um seguidor parado fecha a passagem (o bot empurrava o mesmo seguidor ate desistir).
+var _detour_t: float = 0.0
+var _detour_dir: Vector3 = Vector3.ZERO
 var _stuck_from: Vector3 = Vector3.ZERO
 var _replans: int = 0
 var _press_t: float = 0.0
@@ -64,7 +68,7 @@ func _physics_process(delta: float) -> void:
 	elapsed += delta
 	_press_t -= delta
 	if elapsed > timeout_seconds:
-		_finish(false, "timeout em %s" % (main.current.id if main.current else &"-"))
+		_finish(false, "timeout em %s; %s" % [main.current.id if main.current else &"-", diagnose()])
 		return
 	if main.hud.handoff_open:
 		_walk(Vector3.ZERO)
@@ -93,10 +97,15 @@ func _physics_process(delta: float) -> void:
 		_force_route = false
 		_stuck_t = 0.0
 		_stuck_from = main.controlled_node.global_position
+		_detour_t = 0.0
 	if main.controlled_node is BoatActor:
 		_drive(goal.global_position)
 		return
 	var here := main.controlled_node.global_position
+	if _detour_t > 0.0:
+		_detour_t -= delta
+		_walk(_detour_dir)
+		return
 	var it := goal as Ep01Interactable
 	if it != null and not it.get_meta(&"auto", false) and main.best_interactable() == it:
 		_walk(Vector3.ZERO)
@@ -126,7 +135,9 @@ func _physics_process(delta: float) -> void:
 	if _stuck_t >= STUCK_SECONDS:
 		if here.distance_to(_stuck_from) < STUCK_MIN_MOVE:
 			if _replans >= 4:
-				_finish(false, "preso em %s perto de %s indo a %s" % [main.current.id, here, goal.name])
+				for m: StringName in main.actors:
+					print("[RB] v3 bot ator %s em %s" % [m, (main.actors[m] as Node3D).global_position])
+				_finish(false, "preso em %s perto de %s indo a %s (%s; rota %s wp %d)" % [main.current.id, here, goal.name, diagnose(), _route, _wp])
 				return
 			_replans += 1
 			var ahead := (_route[_wp] if _wp < _route.size() else target) - here
@@ -134,6 +145,11 @@ func _physics_process(delta: float) -> void:
 			# Seguidor no caminho e obstaculo movel: nao vira parede permanente na grade (antes fechava a passagem).
 			if nav != null and not _follower_near(spot, 1.0):
 				nav.block(spot, 0.6)
+			elif ahead.length() > 0.05:
+				# Seguidor no caminho: contorna de lado (um lado por tentativa), como uma crianca faria.
+				var side := Vector3(-ahead.z, 0.0, ahead.x).normalized() * (1.0 if _replans % 2 == 1 else -1.0)
+				_detour_dir = (side + ahead.normalized() * 0.3).normalized()
+				_detour_t = DETOUR_SECONDS
 			_route.clear()
 			_force_route = true
 		_stuck_t = 0.0
@@ -211,6 +227,19 @@ func _tap(action: StringName) -> void:
 		ev.action = action
 		ev.pressed = p
 		Input.parse_input_event(ev)
+
+
+## Estado no estouro (para achar trava): passo, alvo, heroi, bloqueios.
+func diagnose() -> String:
+	var step: Variant = main.current.current_step().get("id", &"") if main.current else &"-"
+	var g := _pick_goal() if main.current else null
+	var hero := main.controlled_node
+	var best := main.best_interactable()
+	return "passo=%s alvo=%s alvo_pos=%s heroi=%s em %s best=%s blocked=%s busy=%s posing=%s looking=%s handoff=%s speaking=%s cutscene=%s pend=%s" % [
+		step, g.name if g else "-", g.global_position if g else Vector3.INF, main.active_member,
+		hero.global_position if hero else Vector3.INF, best.name if best else "-",
+		main.blocked(), main.land.busy, main.posing, main.guide.looking, main.hud.handoff_open, main.hud.is_speaking(),
+		main.cutscene.playing if main.cutscene else false, main._pending_switch]
 
 
 func _finish(ok: bool, reason: String = "") -> void:

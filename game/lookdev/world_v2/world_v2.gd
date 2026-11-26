@@ -482,7 +482,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		var mb := event as InputEventMouseButton
 		if mb.button_index == MOUSE_BUTTON_RIGHT:
 			looking = mb.pressed
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if looking else Input.MOUSE_MODE_VISIBLE
+			if looking:
+				MouseLock.capture()
+			else:
+				MouseLock.release()
 			if looking and mode != "free":
 				_sync_free_angles()
 				mode = "free"
@@ -507,9 +510,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("wv2_help") and help != null:
 		help.visible = not help.visible
 	elif event.is_action_pressed("wv2_escape"):
-		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		if MouseLock.captured():
 			looking = false
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+			MouseLock.release()
 		else:
 			get_tree().quit()
 

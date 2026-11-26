@@ -618,12 +618,14 @@ func open_options() -> void:
 	ui_sound.emit(&"confirm")
 	options_open = true
 	_options_overlay.visible = true
+	MouseLock.block(&"hud_options")
 	options_panel.open()
 
 
 func close_options() -> void:
 	options_open = false
 	_options_overlay.visible = false
+	MouseLock.unblock(&"hud_options")
 	if pause_open:
 		_pause_options.grab_focus()
 
@@ -962,6 +964,7 @@ func open_choice(title: String, options: Array[Dictionary]) -> void:
 	back.pressed.connect(func() -> void: _pick(&""))
 	_choice_panel.visible = true
 	choice_open = true
+	MouseLock.block(&"hud_choice")
 	ThemeV2.pop_in(_choice_panel, 0.8)
 	ui_sound.emit(&"pop")
 	if first:
@@ -971,6 +974,7 @@ func open_choice(title: String, options: Array[Dictionary]) -> void:
 func close_choice() -> void:
 	_choice_panel.visible = false
 	choice_open = false
+	MouseLock.unblock(&"hud_choice")
 
 
 func _pick(id: StringName) -> void:
@@ -991,6 +995,7 @@ func open_handoff(text: String, member: StringName) -> void:
 	_handoff_text.text = text
 	_handoff_panel.visible = true
 	handoff_open = true
+	MouseLock.block(&"hud_handoff")
 	_handoff_since = Time.get_ticks_msec() / 1000.0
 	ThemeV2.pop_in(_handoff_card, 0.6, 0.45)
 	ThemeV2.pop_in(_handoff_icon, 0.3, 0.6, 0.15)
@@ -1001,6 +1006,7 @@ func open_handoff(text: String, member: StringName) -> void:
 func close_handoff() -> void:
 	handoff_open = false
 	_handoff_panel.visible = false
+	MouseLock.unblock(&"hud_handoff")
 
 
 func _confirm_handoff() -> void:
@@ -1008,8 +1014,7 @@ func _confirm_handoff() -> void:
 		return
 	if Time.get_ticks_msec() / 1000.0 - _handoff_since < HANDOFF_MIN_SECONDS:
 		return
-	handoff_open = false
-	_handoff_panel.visible = false
+	close_handoff()
 	handoff_confirmed.emit()
 
 
@@ -1018,6 +1023,7 @@ func _confirm_handoff() -> void:
 func open_pause() -> void:
 	pause_open = true
 	_pause_panel.visible = true
+	MouseLock.block(&"hud_pause")
 	ThemeV2.pop_in(_pause_box, 0.85, 0.25)
 	_pause_resume.grab_focus()
 
@@ -1025,6 +1031,7 @@ func open_pause() -> void:
 func close_pause() -> void:
 	pause_open = false
 	_pause_panel.visible = false
+	MouseLock.unblock(&"hud_pause")
 	if options_open:
 		close_options()
 
@@ -1032,6 +1039,7 @@ func close_pause() -> void:
 func open_complete() -> void:
 	complete_open = true
 	_complete_panel.visible = true
+	MouseLock.block(&"hud_complete")
 	ThemeV2.pop_in(_complete_box, 0.7, 0.4)
 	for i in _complete_stars.size():
 		ThemeV2.pop_in(_complete_stars[i], 0.2, 0.5, 0.35 + i * 0.25)
@@ -1058,9 +1066,15 @@ func complete_emblems_text(member: StringName) -> String:
 func close_complete() -> void:
 	complete_open = false
 	_complete_panel.visible = false
+	MouseLock.unblock(&"hud_complete")
 
 
 # ---------- entrada ----------
+
+func _exit_tree() -> void:
+	for id: StringName in [&"hud_options", &"hud_choice", &"hud_handoff", &"hud_pause", &"hud_complete"]:
+		MouseLock.unblock(id)
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_echo():
@@ -1083,6 +1097,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_confirm_handoff()
 	# C2: a fala avanca por `interact` e consome o aperto (um E so avanca, nao interage). Nunca por `ui_accept`, que
 	# inclui Espaco (o pulo). Logo depois da fala acabar, `interact` fica ignorado por SPEECH_GRACE_MS.
+	# G7: com o botao de acao visivel, o E e da acao (a legenda nao rouba); sem acao no alcance, o E avanca a fala.
+	elif event.is_action_pressed(&"interact") and _prompt_panel.visible:
+		pass
 	elif event.is_action_pressed(&"interact") and not choice_open and not handoff_open \
 			and not pause_open and not complete_open and _speaking:
 		get_viewport().set_input_as_handled()

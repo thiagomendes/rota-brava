@@ -19,6 +19,8 @@ const HOP_TIME := 0.42
 const HOP_HEIGHT := 0.55
 ## Folga alem da duracao do salto antes de considerar o salto interrompido (s).
 const HOP_GRACE := 0.6
+## Teto da espera de um salto ainda no ar, em multiplos de HOP_TIME + HOP_GRACE.
+const HOP_HARD_LIMIT := 4.0
 ## Varal: o marcador e o centro; 3 ganchos a 0,6 m ao longo da corda real do mundo (diagonal a -23 graus em Y, corda a
 ## ~1,75 m; aviso do lead na E5, nao medido aqui); a peca pendura com o centro 0,17 m abaixo da corda; cesto 0,9 m ao norte.
 const LINE_SLOTS: Array[float] = [-0.6, 0.0, 0.6]
@@ -413,7 +415,25 @@ func _release_cart() -> void:
 	cart_holder = null
 
 
+## Estado "no alto" (galpao, arvore, chafariz) da ultima `refresh()`. Os pontos ligados dependem dele; se o heroi
+## sobe ou cai sem uma cadeia de saltos terminar (salto abortado, queda), religa aqui. Sem isto o M2 travava sem ponto.
+var _height_key: int = -1
+
+
+func _height_state() -> int:
+	return int(_on_shed()) | int(_on_tree()) << 1 | int(_on_fountain()) << 2
+
+
+func _watch_height() -> void:
+	if busy or main == null or main.current == null or _root == null:
+		return
+	var k := _height_state()
+	if k != _height_key:
+		refresh()
+
+
 func _physics_process(delta: float) -> void:
+	_watch_height()
 	if cart_holder != null and is_instance_valid(cart) and is_instance_valid(cart_holder):
 		var f := cart_holder.facing()
 		var want := cart_holder.global_position + f * CART_AHEAD
@@ -435,6 +455,7 @@ func refresh() -> void:
 			it.enabled = true
 		else:
 			it.enabled = false
+	_height_key = _height_state()
 	var step: StringName = main.current.current_step().get("id", &"")
 	match mission_id:
 		&"M1":
@@ -665,8 +686,11 @@ func _hop_chain(a: MemberActor, targets: Array) -> void:
 
 ## Espera o pouso do salto atual; false se o salto sumiu (interrompido) ou passou do limite.
 func _await_landing(a: MemberActor, to: Vector3, limit: float) -> bool:
+	# Limite contado no passo de fisica; o salto e um Tween no passo de processo. Num quadro lento (varios passos de
+	# fisica antes do Tween andar, ex.: Engine.time_scale alto no bot) o limite estourava com o salto ainda no ar e bom.
+	# Espera ate HOP_HARD_LIMIT vezes o limite enquanto o ator segue no ar (salto realmente perdido ainda aborta).
 	var t := 0.0
-	while t < limit:
+	while t < limit * HOP_HARD_LIMIT:
 		await get_tree().physics_frame
 		if not is_inside_tree() or not is_instance_valid(a):
 			return false

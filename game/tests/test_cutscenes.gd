@@ -5,7 +5,7 @@ extends RefCounted
 ## Tempo acelerado (deterministico). Nao comprova render, som nem leitura pela crianca.
 
 const TIME_SCALE := 8.0
-const MAX_FRAMES := 40000
+const WALL_LIMIT_MS := 240000
 const SEEN_TEST := "user://test_cutscenes.seen.json"
 
 var r
@@ -405,10 +405,13 @@ func _run_bot(main: Ep01V3Main) -> Ep01V3Bot:
 	bot.main = main
 	main.add_child(bot)
 	Engine.time_scale = TIME_SCALE
-	var frames := 0
-	while not bot.done and frames < MAX_FRAMES:
+	# Limite por relogio, nao por quadros: numa maquina rapida 40000 quadros eram so ~40 s de jogo (falso timeout).
+	# O proprio bot encerra com `timeout_seconds` de jogo.
+	var t0 := Time.get_ticks_msec()
+	while not bot.done and Time.get_ticks_msec() - t0 < WALL_LIMIT_MS:
 		await r.tree.process_frame
-		frames += 1
+	if not bot.done:
+		bot.fail_reason = "limite de %d s de relogio (%.1f s de jogo)" % [WALL_LIMIT_MS / 1000, bot.elapsed]
 	Engine.time_scale = 1.0
 	Ep01V3Bot.release_all()
 	return bot
@@ -431,7 +434,7 @@ func _bot_with_cutscenes() -> void:
 	main = await _new_main(true)
 	bot = await _run_bot(main)
 	var skipped := bot.elapsed
-	r.check(bot.done and bot.fail_reason == "", "cutscene bot: M0->M8 com as cenas puladas (%.1f s de jogo)" % skipped)
+	r.check(bot.done and bot.fail_reason == "", "cutscene bot: M0->M8 com as cenas puladas (%s; %.1f s de jogo)" % [bot.fail_reason, skipped])
 	print("[RB] cutscene episodio: com cenas %.1f s, puladas %.1f s, acrescimo %.1f s" % [full, skipped, full - skipped])
 	Ep01V3Cutscene.auto_skip = false
 	await _free(main)
