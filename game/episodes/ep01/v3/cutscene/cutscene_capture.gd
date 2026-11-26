@@ -9,7 +9,7 @@ const INTRO_SHOTS := [[3.0, "game_intro_1_vila"], [10.0, "game_intro_2_rastro"],
 	[25.0, "game_intro_4_leme"], [32.5, "game_intro_5_equipe"]]
 ## cena, missao de partida, tempo na cena, nome
 const EP_SHOTS := [[&"opening", &"M0", 7.0, "ep01_opening"], [&"m1_intro", &"M1", 1.6, "ep01_m1_intro"],
-	[&"boat_departure", &"M6", 1.5, "ep01_boat_departure"], [&"nightfall", &"M7", 6.0, "ep01_nightfall"],
+	[&"m4_intro", &"M4", 4.5, "ep01_m4_intro_amora"], [&"boat_departure", &"M6", 1.5, "ep01_boat_departure"], [&"nightfall", &"M7", 6.0, "ep01_nightfall"],
 	[&"closing", &"M8", 5.5, "ep01_closing"]]
 
 var out_dir := ""

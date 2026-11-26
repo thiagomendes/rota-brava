@@ -914,7 +914,19 @@
        0
       ]
      },
-     "actors": [],
+     "actors": [
+      {
+       "who": "vendor",
+       "marker": "M4_Vendor",
+       "offset": [
+        0,
+        0,
+        0
+       ],
+       "anim": "talk",
+       "fallback": "wave"
+      }
+     ],
      "line": {
       "key": "ep01.narrator.m4.vendor",
       "speaker": "narrator"

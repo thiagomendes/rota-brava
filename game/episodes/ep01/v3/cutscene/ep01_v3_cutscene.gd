@@ -30,6 +30,8 @@ const BAR_FRACTION := 0.07
 const BAR_IN := 0.35
 const CAMERA_FOV := 50.0
 ## Efeitos de mundo por cena e plano (indice do plano -> efeito).
+## Quem a ficha pede e o jogo nao passou em `actors`: figurante temporario (StoryFigure), removido ao fim da cena.
+const STORY_MODELS := {&"vendor": "amora_model", &"captain": "captain_model", &"pup": "pup_model"}
 const EFFECTS := {&"nightfall": {1: &"night"}, &"closing": {0: &"festival"}}
 
 ## Liga/desliga todas as cenas (a suite desliga por padrao; os testes de cena religam).
@@ -340,6 +342,11 @@ func _enter_shot(i: int) -> void:
 func _place_actor(a: Dictionary, cam_from: Vector3, sh: Dictionary) -> void:
 	var who := StringName(str(a.get("who", "")))
 	var node := actors.get(who) as Node3D
+	if (node == null or not is_instance_valid(node)) and STORY_MODELS.has(who) and world != null \
+			and ResourceLoader.exists(StoryFigure.DIR % STORY_MODELS[who]):
+		node = StoryFigure.spawn(world, STORY_MODELS[who], "Cutscene_" + String(who))
+		node.set_meta(&"cutscene_temp", true)
+		actors[who] = node
 	if node == null or not is_instance_valid(node):
 		fallbacks.append("%s:%s->ausente" % [who, a.get("anim", "")])
 		return
@@ -443,6 +450,12 @@ func _finish(skipped: bool) -> void:
 
 
 func _restore_actors() -> void:
+	for who: StringName in actors.keys():
+		var n := actors[who] as Node3D
+		if n != null and is_instance_valid(n) and n.get_meta(&"cutscene_temp", false):
+			actors.erase(who)
+			_moved.erase(who)
+			n.queue_free()
 	for who: StringName in _moved:
 		var node := actors.get(who) as Node3D
 		if node == null or not is_instance_valid(node):

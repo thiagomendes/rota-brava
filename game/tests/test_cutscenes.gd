@@ -149,6 +149,8 @@ func _each_scene() -> void:
 		if not all_fallbacks.has(f):
 			all_fallbacks.append(f)
 	print("[RB] cutscene fallbacks: ", ", ".join(all_fallbacks))
+	r.check(all_fallbacks.is_empty(), "cutscene: nenhum clipe/ator no fallback no Ep01 (Amora 3D incluida) %s" % str(all_fallbacks))
+	r.check(main.world.get_node_or_null("Cutscene_vendor") == null, "cutscene: figurante temporario (Amora) removido ao fim")
 	r.check(main.world.night or main.world.festival, "cutscene: cair da noite liga a noite na vila")
 	await _free(main)
 
