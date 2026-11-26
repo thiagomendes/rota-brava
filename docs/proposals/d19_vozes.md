@@ -107,3 +107,20 @@ As páginas de termos não abriram pela rede daqui. O que se sabe de memória, a
 - **No jogo:** `Ep01V3Dialogue.take` prefere `v3:<chave>`; sem take, toca o balbucio de reserva.
 - **Cota:** a do `gemini-3.8-flash-tts` é de **100 pedidos por dia** (Tier 1) e se esgotou com 15 falas geradas. As 208 restantes ficam em `pending` no catalogo. Para retomar: `python tools/voice/gen_v3.py`, depois `python tools/voice/register_v3.py`. O cache evita repetir o que já foi feito.
 - **Não troquei de modelo** para contornar a cota: outro modelo mudaria a voz aprovada.
+
+## Vozes 2 (2026-11-26): leitura dupla
+
+- **Sintoma:** Thiago ouviu falas duplicadas. No primeiro lote (modo `notes`), o detector reprovou 4 de 15 takes: `two_trails`, `pup_village`, `pup_clothes` e `call_climber`. O critério de 1,8× tinha deixado esses takes passar.
+- **Detector** (`tools/voice/detect_double.py`): segmenta o take por silêncio (`silencedetect` a −38 dB, ≥ 0,16 s). Reprova quando há uma pausa de pelo menos 0,22 s com dois lados de fala de duração parecida (razão 0,6–1,6), ou quando o take passa de 1,35× a estimativa calibrada (×0,92, mediana dos takes bons). O `gemini_tts.synth` usa o detector na refação automática.
+- **Formatos de prompt** (`prompt_trial.py`, mesmas 10 falas, 1 tentativa por fala):
+
+| Formato | Reprovados | Leitura dupla |
+|---|---|---|
+| `notes` | 4/10 | 4 |
+| `once` (pede "uma única leitura") | 5/10 | 4 |
+| `once_t` (`once` + `temperature` 0,4) | 2/10 | 2 |
+| `paren` (direção curta entre parênteses) | 4/10 | 2 |
+
+  Escolhido: `once_t`, gravado em `cast.json`. A amostra é pequena; a diferença entre os formatos é indicativa, não conclusiva.
+- **Regra do catálogo:** take reprovado depois de 3 tentativas fica fora do catálogo e vai para `pending.suspects`; até lá, toca o balbucio de reserva. O teste `test_voice_v3.gd` exige `double_check` aprovado em todo take, com a lista de exceções `DOUBLE_EXCEPTIONS` vazia.
+- **Resultado:** 50 takes, 146,9 s, todos aprovados pelo detector. Refeitos: abertura do jogo, M0, M1, M2 e parte do M3–M4. 4 falas reprovaram 3 vezes. Faltam 177, por cota diária (Tier 1, 100 pedidos por dia por modelo).

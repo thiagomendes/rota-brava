@@ -68,7 +68,20 @@ def inventory() -> list[dict]:
                 items.setdefault(ln["key"], {"key": ln["key"], "speaker": ln["speaker"], "emotes": [], "source": "cutscene:" + s["id"]})
     for it in items.values():
         it["group"] = group_of.get(it["key"])
+        it["mission"] = d["lines"].get(it["key"], {}).get("mission", "")
     return list(items.values())
+
+
+def priority(it: dict) -> tuple:
+    """Abertura do jogo primeiro, depois M0..M8 (o que Thiago joga), grupos e demais cutscenes no fim."""
+    src, m = it["source"], it.get("mission") or ""
+    if src in ("cutscene:game_intro", "cutscene:opening"):
+        return (0, src)
+    if m:
+        return (1, m)
+    if src.startswith("cutscene:"):
+        return (2, src)
+    return (3, it.get("group") or "")
 
 
 def direction_for(dr: dict, key: str, group: str | None) -> dict | None:
@@ -111,7 +124,7 @@ def main(argv: list[str] | None = None) -> int:
     (WORK / "raw").mkdir(parents=True, exist_ok=True)
     old = json.loads(CATALOG.read_text(encoding="utf-8")) if CATALOG.exists() else {"lines": []}
     done = {e["id"]: e for e in old["lines"]}
-    items = [i for i in inventory() if i["key"].startswith(a.only)]
+    items = sorted([i for i in inventory() if i["key"].startswith(a.only)], key=priority)
     lines, exceptions, calls, suspects, stopped, made = [], [], 0, [], "", 0
     t0 = time.time()
     for it in items:
@@ -152,7 +165,8 @@ def main(argv: list[str] | None = None) -> int:
             loud = {"lufs": done[key]["lufs"], "true_peak_dbtp": done[key]["true_peak_dbtp"]}
             dur = done[key]["duration"]
         if p["suspect_instruction_read"]:
-            suspects.append(key)
+            suspects.append(key)  # reprovado pelo detector depois de 3 tentativas: fica fora do catalogo (pendente)
+            continue
         lines.append({
             "id": key, "character": ch, "speaker": sp, "intent": intent_of(d, sp), "language": "pt_BR", "subtitle": key,
             "type": "gemini_tts", "file": f"res://audio/voice/v3/{stem}.ogg", "duration": dur,
@@ -166,11 +180,22 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[{len(lines):3d}] {key} {dur:.2f} s{' SUSPEITA' if p['suspect_instruction_read'] else ''}", flush=True)
     have = {e["id"] for e in lines}
     pend_keys = [i["key"] for i in items if i["speaker"] not in EXCEPTIONS and i["key"] not in have]
+    # takes antigos que nao foram refeitos nesta execucao ficam so se passam no detector
+    from detect_double import analyze
+    kept = []
+    for e in lines:
+        det = analyze(ROOT / "game" / e["file"].removeprefix("res://"), e["text_at_generation"])
+        e["double_check"] = {k: det[k] for k in ("duracao_s", "esperada_s", "razao", "segmentos", "leitura_dupla", "reprova")}
+        if not det["reprova"]:
+            kept.append(e)
+    lines = kept
+    have = {e["id"] for e in lines}
+    pend_keys = [i["key"] for i in items if i["speaker"] not in EXCEPTIONS and i["key"] not in have]
     pending = len(pend_keys)
     cat = {"version": 1, "_note": "D19/D21: vozes Gemini TTS do Ep01 v3 (elenco cast.json, preset raw). Gerado por "
            "tools/voice/gen_v3.py; formato do voice_catalog.json + procedencia por take. Prompt de estilo inteiro "
            "reconstruivel de cast.json + direction.json (style_sha256).", "exceptions": exceptions,
-           "pending": {"reason": stopped or "", "keys": pend_keys} if pend_keys else {"reason": "", "keys": []},
+           "pending": {"reason": stopped or ("reprovadas pelo detector apos 3 tentativas: " + ", ".join(suspects) if suspects else ""), "suspects": suspects, "keys": pend_keys} if pend_keys else {"reason": "", "keys": []},
            "lines": lines}
     CATALOG.write_text(json.dumps(cat, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     total = sum(e["duration"] for e in lines)

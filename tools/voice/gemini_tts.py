@@ -40,7 +40,7 @@ MIN_INTERVAL_S = float(os.environ.get("RB_TTS_MIN_INTERVAL", "4.0"))  # limite d
 _STAMP = CACHE / ".last_call"
 
 
-MAX_TRIES = 3
+MAX_TRIES = int(os.environ.get("RB_TTS_TRIES", "3"))
 SUSPECT_RATIO = 1.8
 VOWELS = set("aeiouáéíóúâêôãõày")
 
@@ -87,7 +87,8 @@ def build_prompt(text: str, style: str) -> str:
     return f"{style.strip()}: {text.strip()}" if style.strip() else text.strip()
 
 
-STYLE_MODES = ("notes", "system", "prefix")
+STYLE_MODES = ("notes", "once", "once_t", "paren", "system", "prefix")
+TEMP_LOW = 0.4
 
 
 def request_body(text: str, voice: str, style: str, mode: str = "notes") -> dict:
@@ -98,6 +99,13 @@ def request_body(text: str, voice: str, style: str, mode: str = "notes") -> dict
     elif mode == "notes" and style.strip():
         spoken = (f"### NOTAS DE DIRECAO (nao ler em voz alta)\n{style.strip()}\n\n"
                   f"### TRANSCRICAO (ler somente isto, exatamente)\n{text.strip()}")
+    elif mode in ("once", "once_t") and style.strip():
+        spoken = (f"### NOTAS DE DIRECAO (nao ler em voz alta)\n{style.strip()}\n"
+                  "Leia a transcricao UMA unica vez, do inicio ao fim, e pare. Nao repita, nao acrescente palavras.\n\n"
+                  f"### TRANSCRICAO (uma unica leitura)\n{text.strip()}")
+    elif mode == "paren" and style.strip():
+        short = next((ln for ln in style.splitlines() if ln.startswith("Emocao:")), style.splitlines()[0])
+        spoken = f"({short.removeprefix('Emocao: ').rstrip('.')}) {text.strip()}"
     else:
         spoken = text.strip()
     body = {
@@ -107,6 +115,8 @@ def request_body(text: str, voice: str, style: str, mode: str = "notes") -> dict
             "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voice}}},
         },
     }
+    if mode.endswith("_t"):
+        body["generationConfig"]["temperature"] = TEMP_LOW
     if mode == "system" and style.strip():
         body["systemInstruction"] = {"parts": [{"text": style.strip()}]}
     return body
@@ -213,10 +223,12 @@ def synth(text: str, voice: str, style: str, model: str, out: Path, dry_run: boo
         pcm_wav = cached.read_bytes()
         with wave.open(str(cached)) as w:
             dur = w.getnframes() / w.getframerate()
-        suspect = dur > SUSPECT_RATIO * exp
+        from detect_double import analyze  # leitura dupla por silencio + duracao > 1,35x calibrada
+        det = analyze(cached, text)
+        suspect = det["reprova"]
         if not suspect:
             break
-        print(f"[gemini_tts] {dur:.1f} s > {SUSPECT_RATIO}x {exp:.1f} s esperados (instrucao lida?); "
+        print(f"[gemini_tts] reprovado pelo detector ({dur:.1f} s, esperado {exp:.1f} s, dupla={bool(det['leitura_dupla'])}); "
               f"tentativa {tries}/{MAX_TRIES}", file=sys.stderr)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_bytes(pcm_wav)
