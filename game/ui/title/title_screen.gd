@@ -1,18 +1,25 @@
 class_name TitleScreen
 extends Control
-## Tela-titulo v2 (RB-R1): ceu/mar animado, logo SVG com mola, palco 3D para os herois (placeholder; o lead
-## coloca os modelos em `hero_root`), botoes grandes com pictograma e sons via `ui_sound(name)`.
+## Tela-titulo v2 (RB-R1): fundo = arte-chave 3D escolhida por Thiago no G8 (cena B "Noite das lanternas":
+## vila em festa, farol, barco amarelo e o trio, animada de leve) + logo C em versao noite, botoes grandes com
+## pictograma e sons via `ui_sound(name)`. Sem a arte-chave (cena ausente), volta ao ceu/mar + palco antigo.
 ## Nomes e comportamento dos botoes sao os do menu antigo (test_foundation.gd).
 
 ## Sons da UI: &"focus", &"confirm", &"back", &"tick", &"select", &"whoosh". O lead liga ao AudioDirector.
 signal ui_sound(name: StringName)
 
-const LOGO := "res://ui/brand/logo_h.svg"
+const LOGO := "res://ui/title/keyart/logos/logo_c_noite.svg"
+## Arte-chave do fundo (G8): proposta B com o logo C noite (KeyArtPresets.LOGOS[&"b"]).
+const KEY_ART := "res://ui/title/keyart/keyart_b.tscn"
+## Fracao maxima da altura util para o logo (o trio fica embaixo dele no terco esquerdo).
+const LOGO_MAX_H := 0.34
 const SAFE_FRACTION := 0.05
 const SAFE_MIN := 48.0
 const BUTTON_HEIGHT := 128.0
 
 var background: ColorRect
+## Fundo 3D animado (null se a cena da arte-chave nao existir).
+var key_art: KeyArtView
 var logo: TextureRect
 var hero_stage: SubViewportContainer
 ## Onde o lead instancia os 3 herois 3D (os placeholders sao filhos chamados Placeholder*).
@@ -27,6 +34,7 @@ var options_panel: OptionsPanel
 var back_button: Button
 var _safe: Control
 var _t: float = 0.0
+var _logo_px := 0
 
 
 func _ready() -> void:
@@ -49,11 +57,20 @@ func _build() -> void:
 	background.name = "Background"
 	background.set_anchors_preset(Control.PRESET_FULL_RECT)
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var mat := ShaderMaterial.new()
-	mat.shader = load("res://ui/title/sky_sea.gdshader") as Shader
-	mat.set_shader_parameter("motion", 0.0 if Options.reduced_motion() else 1.0)
-	background.material = mat
+	# cor de espera (noite da festa) enquanto a arte-chave carrega; sem ela, o ceu/mar animado antigo
+	background.color = Color("1a1440")
+	if not ResourceLoader.exists(KEY_ART):
+		var mat := ShaderMaterial.new()
+		mat.shader = load("res://ui/title/sky_sea.gdshader") as Shader
+		mat.set_shader_parameter("motion", 0.0 if Options.reduced_motion() else 1.0)
+		background.material = mat
 	add_child(background)
+	if ResourceLoader.exists(KEY_ART):
+		key_art = (load(KEY_ART) as PackedScene).instantiate() as KeyArtView
+		key_art.name = "KeyArt"
+		key_art.framing = &"menu"
+		key_art.show_logo = false   # o logo e o TextureRect `logo` abaixo (com mola e escondido nas opcoes)
+		add_child(key_art)
 	_safe = Control.new()
 	_safe.name = "Safe"
 	_safe.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -88,6 +105,13 @@ func _build() -> void:
 
 
 func _build_heroes() -> void:
+	if key_art != null and key_art.stage != null:
+		# o trio da arte-chave e o palco dos herois (mesma API: hero_stage, hero_root, hero_models)
+		hero_stage = key_art.get_node("Stage") as SubViewportContainer
+		hero_root = key_art.stage
+		for id: StringName in key_art.stage.heroes:
+			hero_models.append(key_art.stage.heroes[id] as CharacterVisual)
+		return
 	hero_stage = SubViewportContainer.new()
 	hero_stage.name = "HeroStage"
 	hero_stage.stretch = true
@@ -212,7 +236,8 @@ func _layout() -> void:
 	_safe.offset_right = -m.x
 	_safe.offset_bottom = -m.y
 	var area := vp - m * 2.0
-	(background.material as ShaderMaterial).set_shader_parameter("aspect", vp.x / maxf(vp.y, 1.0))
+	if background.material is ShaderMaterial:
+		(background.material as ShaderMaterial).set_shader_parameter("aspect", vp.x / maxf(vp.y, 1.0))
 	var menu_w := clampf(area.x * 0.34, 520.0, 640.0)
 	for b: Button in [play_button, continue_button, options_button, references_button, quit_button]:
 		b.custom_minimum_size.x = menu_w
@@ -220,15 +245,32 @@ func _layout() -> void:
 	menu.reset_size()
 	menu.position = Vector2(area.x - menu_w - 12.0, (area.y - menu.get_combined_minimum_size().y) * 0.5 + area.y * 0.06)
 	var left_w := area.x - menu_w - 60.0
-	var logo_w := minf(left_w, 1100.0)
-	logo.size = Vector2(logo_w, logo_w * 340.0 / 1632.0)
+	var tex := logo.texture
+	var ratio := float(tex.get_width()) / float(tex.get_height()) if tex != null else 1632.0 / 340.0
+	# logo no alto do lado esquerdo, sem passar de LOGO_MAX_H da altura (o trio fica abaixo dele)
+	var logo_w := minf(minf(left_w * 0.8, 820.0), area.y * LOGO_MAX_H * ratio)
+	logo.size = Vector2(logo_w, logo_w / ratio)
 	logo.position = Vector2((left_w - logo_w) * 0.5, 0)
 	logo.pivot_offset = logo.size * 0.5
-	var stage_top := logo.size.y + 20.0
-	hero_stage.position = Vector2(0, stage_top)
-	hero_stage.size = Vector2(left_w, area.y - stage_top)
+	_raster_logo(logo_w)
+	if key_art == null:
+		var stage_top := logo.size.y + 20.0
+		hero_stage.position = Vector2(0, stage_top)
+		hero_stage.size = Vector2(left_w, area.y - stage_top)
 	options_panel.reset_size()
 	options_panel.position = (area - options_panel.get_combined_minimum_size()) * 0.5
+
+
+## Logo SVG rasterizado na largura da tela (pixels reais), sem serrilhado; cai na textura importada se nao abrir.
+func _raster_logo(logical_w: float) -> void:
+	# pixels reais da tela (nunca abaixo da largura logica: em janela minima/headless a escala e quase zero)
+	var px := int(logical_w * maxf(get_viewport().get_stretch_transform().get_scale().x, 1.0))
+	if px < 16 or absi(px - _logo_px) < 8 or not LOGO.begins_with("res://ui/title/keyart/"):
+		return
+	_logo_px = px
+	var t := KeyArtView.logo_texture_path(LOGO, px)
+	if t != null:
+		logo.texture = t
 
 
 func _process(delta: float) -> void:
