@@ -1,5 +1,5 @@
 {
-  "tris": 8744,
+  "tris": 8784,
   "materials": [
     "mat_pup_boca",
     "mat_pup_coleira",
@@ -13,8 +13,8 @@
     "mat_pup_ouro",
     "mat_pup_pelo"
   ],
-  "height_m": 0.507,
-  "min_z": -0.002,
+  "height_m": 0.4922,
+  "min_z": -0.0021,
   "objects": [
     "Pup_Body",
     "Pup_Chest",
@@ -68,6 +68,10 @@
       0,
       30
     ],
+    "run": [
+      0,
+      18
+    ],
     "step_on_horn": [
       0,
       42
@@ -75,6 +79,10 @@
     "wag": [
       0,
       36
+    ],
+    "walk": [
+      0,
+      30
     ]
   },
   "shape_keys": [
@@ -95,7 +103,7 @@
     "look_up"
   ],
   "head_ratio": 0.0,
-  "walk_speed_mps": 0.0,
-  "run_speed_mps": 0.0,
+  "walk_speed_mps": 0.569,
+  "run_speed_mps": 1.2745,
   "variant": "pup"
 }

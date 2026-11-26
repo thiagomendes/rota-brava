@@ -96,3 +96,28 @@
 - **Agente:** `art3d`, 2026-11-26. **Status:** `provisorio` no manifesto (entradas `clues_v3_*`); nas cenas `provisional = false`.
 - **Originalidade:** geometria e decalques 100% por script/formula do projeto; nenhum modelo, malha, textura ou imagem de
   terceiros; sem modelo de imagem. Detalhes, arquivos e como reproduzir: `source_art/clues_v3/PROVENANCE.md`.
+
+## RB-R1 arte das cenas (D21) e das falas que apontam (F2) (PROVISORIO, 2026-11-26)
+
+- **Agente:** `art3d`. Geometria e animacao 100% por script, sem nada de terceiros. Imagens em `captures/arte_cenas/` (fora do Git).
+- **Filhote** (`source_art/scripts/pup_build.py`): clipes `walk` (1,0 s = 3 ciclos de passo lateral, 0,569 m/s) e `run` (0,6 s =
+  2 ciclos de meio-galope com fase aerea, 1,2745 m/s), IK de 2 ossos por pata, pata de apoio recua na velocidade nominal
+  (sem deslizar; medido em `test_characters.gd`). Clipes antigos mantidos. Correcao: o rabo nasce dentro da garupa (antes
+  ficava ~7 cm solto do corpo, medido no .blend) e so pesa no quadril e nos ossos do rabo. `pup_model.tscn`: `walk_speed_mps`
+  0,569, `run_speed_mps` 1,2745. GLB `c0c6d75dca934c890a6122cd3ac9f822ab23779006b230b266796c9f9aa37e45`, 8 784 tris.
+- **Pico v2** (`source_art/characters/pico_v2/pv2_anim.py`, `pose_point_pico`): clipe `point` (1,2 s), braco direito
+  quase esticado para a frente-direita na altura do ombro, volta ao neutro. Rebuild completo (~4 min). GLB
+  `285a950a9e307618453296bdf19fc5d6129201e055a8697a040406f60a3cc228`. Rastro v2 e Leme v2 ja tinham `point` (1,2 s): sem mudanca.
+- **Dona Amora** (nova): `source_art/characters/amora/` (ver `PROVENANCE.md` de la), cena `game/actors/characters/amora_model.tscn`,
+  GLB `85f0a93ec3e9ee0a31b3a24a7d1275fe9c0580e632ce7ee2d7fd53178b68b7b1`, 22 574 tris.
+- **Emblema do mosquetao** (`source_art/props_v3/build_props_v3.py`, `_emb_icon`): curvas do `carabiner.svg` (D inclinado aberto,
+  gatilho e trava) no lugar do anel fechado. So `emblem_carabiner.glb` mudou no rebuild (sha256 dos outros 18 GLB iguais):
+  `28ef053da3c730cb4ff068dedf0f50fe125fd860e7540d2fb16462944fc6633d`, 2 984 tris (orcamento 3 000).
+- **Mundo:** nada novo de geometria. Conferido nas capturas (camera baixa do jogo): o poste da amarra vazia (`M1_EmptyMooring`,
+  estaca do cais com corda enrolada caindo na agua, em `wv2_static.glb`/`wv2_dock`), os arbustos ao lado da lente (`kit bush_a`
+  a 0,5 m de `M7_Lens`), as pedras do promontorio do farol atras do bote encalhado (`kit rock_b` a 4,3-5,7 m de `M6_Dinghy` e a
+  margem de pedra) e as lanternas de papel penduradas sobre a praca (`wv3_festa_lanterns`, fio passa a ~0,5 m de `M8_FestaPlaza`)
+  ja existem e aparecem. Marcadores novos em `village_world.tscn` (e em `wv3_collision.py`, `EXTRA_MARKERS`): `M4_Vendor`,
+  `Cut_VillageWide`, `Cut_LighthouseView` (estes dois com `metadata/camera = true` e `look_at`).
+- **Reproducao:** `python3 -I source_art/scripts/manifest_arte_cenas.py` (sha256 e medidas no manifesto); provas no Blender com
+  `source_art/scripts/render_arte_cenas.py`; capturas no jogo com `tools/capture_arte_cenas.gd`.

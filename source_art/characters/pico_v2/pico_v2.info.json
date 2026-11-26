@@ -20,11 +20,11 @@
     "mat_pico_v2_skin",
     "mat_pico_v2_suit"
   ],
-  "height_m": 1.0602,
+  "height_m": 1.0581,
   "min_z": -0.0001,
   "head_h_m": 0.3931,
-  "head_ratio": 0.3708,
-  "head_with_helmet_ratio": 0.3936,
+  "head_ratio": 0.3715,
+  "head_with_helmet_ratio": 0.3924,
   "eye_h_ratio": 0.3102,
   "hip_x_m": 0.088,
   "objects": [
@@ -82,6 +82,10 @@
     "look_up": [
       0,
       60
+    ],
+    "point": [
+      0,
+      36
     ],
     "pull_rope": [
       0,

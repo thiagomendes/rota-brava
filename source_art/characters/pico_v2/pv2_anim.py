@@ -180,11 +180,31 @@ def pose_jump_pico(R, F, t, T):
     return ha.face(atenta=0.6 * pre, surpresa=0.55 * air)
 
 
+def pose_point_pico(R, F, t, T):
+    """RB-R1 arte das cenas (1,2 s): aponta para a frente-direita com o braco direito quase esticado na altura do ombro
+    (alvo pelo alcance real do rig, como o v_target), tronco e cabeca giram para o alvo, mao aberta; volta ao neutro.
+    O jogo vira o ator para o alvo antes de tocar o clipe (o alvo fica a ~25 graus para a direita da frente)."""
+    a = smooth(t, 0.08, 0.36) * (1 - smooth(t, 0.92, 1.18))
+    nod = math.sin(math.pi * min(max((t - 0.40) / 0.22, 0.0), 1.0))       # pequena enfase ao chegar ("ali!")
+    R.hips_off = Vector((0.0, 0.0, -0.010 - 0.006 * nod))
+    torso(R, lean=lerp(2.0, -3.0, a) + 2.0 * nod, yaw=-10.0 * a, roll=2.0 * a, head_pitch=4.0 * a, head_yaw=-12.0 * a)
+    ha.arms_down(R, F, bend=14, out=6)
+    R.evaluate()
+    rest = R.tip("hand.R")
+    L = R.length("upper_arm.R") + R.length("forearm.R") + R.length("hand.R")
+    d = Vector((0.42, 0.90, 0.10)).normalized()
+    tgt = Vector((F.sh.x, 0.02, F.sh.z)) + d * (L * 0.93) + Vector((0.0, 0.0, 0.012 * nod))
+    reach(R, "R", rest.lerp(tgt, a), Vector((0.1, 0.2, -1.0)).lerp(d, a), pole=(1.0, -0.4, -0.8))
+    ha.stand_feet(R)
+    return ha.face(atenta=0.7 * a, alegre=0.25 * nod, blink=blink_curve(t, 0.84))
+
+
 CLIPS = dict(ha.CLIPS)
 CLIPS["team_pose"] = (1.5, False, pose_team_pico)
 CLIPS["celebrate"] = (1.2, False, pose_celebrate_pico)
 CLIPS["wave"] = (CLIPS["wave"][0], CLIPS["wave"][1], pose_wave_pico)
 CLIPS["jump"] = (CLIPS["jump"][0], CLIPS["jump"][1], pose_jump_pico)
+CLIPS["point"] = (1.2, False, pose_point_pico)
 GEAR_KEYS = ("fist_R", "fist_L")
 IDLE = (4.0, pose_idle_pico)
 # ciclos v2 (pedido de Thiago, 2026-11-25: "pes muito acelerados"): passada longa para escala ~1 no jogo (1,4 e 3,2 m/s).
@@ -201,7 +221,7 @@ RUN = hg.gait_cfg(17 / 30, 0.44, 3.2 * (17 / 30) / 1.15, center=-0.025, lift=0.1
                   arm_pump=0.3, blink_at=None, face={"alegre": 0.2, "fist_R": 0.85, "fist_L": 0.85})
 CLIPS["walk"] = hg.clip(WALK)
 CLIPS["run"] = hg.clip(RUN)
-CLIP_SET = list(ha.CLIP_SETS["pico"])     # idle, walk, run, stop, jump, pull_rope, look_up, react_surprise, celebrate, wave, team_pose
+CLIP_SET = list(ha.CLIP_SETS["pico"]) + ["point"]     # idle, walk, run, stop, jump, pull_rope, look_up, react_surprise, celebrate, wave, team_pose, point
 
 
 def author(rig, face_ob, F, names=CLIP_SET, gear_ob=None):
