@@ -1,0 +1,32 @@
+{
+ "_doc": "D20: biblia musical em forma de dados para lyria.py. Texto humano em docs/proposals/d20_trilhas.md. Prompts em ingles (o modelo responde melhor; nao verificado).",
+ "title": "Rota Brava",
+ "palette_prompt": "ukulele, marimba, nylon-string acoustic guitar, upright bass played pizzicato, light accordion, glockenspiel, soft hand percussion (cajon, shaker, tambourine); no electric guitar, no synths, no drum kit, no orchestra hits",
+ "theme_prompt": "a short bright hummable motif in F major: rising leap C-F-A (up a fourth then a third), a step down to G, then a jump up to high C; rhythm two eighth notes, a quarter, an eighth, a dotted quarter; answered by a gentle descending phrase back to F",
+ "global_prompt": "Warm, friendly, playful and safe for small children; never scary, never aggressive. Clean acoustic mix, intimate room, no heavy reverb. Seamless loop: ends ready to restart from the beginning, no fade-out.",
+ "scenes": {
+  "village": {"label": "vila de dia (tema)", "key": "F major", "bpm": 100, "energy": 2,
+   "prompt": "sunny seaside village by day, kids exploring the harbour and the market. Marimba carries the main theme, ukulele strums on the offbeat, pizzicato bass, light shaker and cajon; accordion answers the theme in the second half.",
+   "form": "4/4, two 8-bar phrases, the theme stated clearly twice."},
+  "mystery": {"label": "misterio / pista", "key": "D dorian (relative of F, gentle)", "bpm": 80, "energy": 1,
+   "prompt": "curious detective moment, following little footprints, tiptoe feeling, wonder not fear. Plucked pizzicato bass walking softly, glockenspiel plays the theme slowly in fragments, nylon guitar harmonics, very sparse shaker.",
+   "form": "4/4, light and sparse, lots of space, theme fragments only."},
+  "boat": {"label": "barco", "key": "Bb major (the IV of F)", "bpm": 100, "energy": 2,
+   "prompt": "small boat gliding over calm waves in the bay, rocking motion. Ukulele and nylon guitar in a lilting 6/8 rhythm, accordion holds long notes like a sea breeze, marimba plays the theme in a swaying version.",
+   "form": "6/8 barcarolle feel, gentle rocking, theme in long notes."},
+  "lighthouse": {"label": "farol", "key": "D minor rising to F major", "bpm": 80, "energy": 2,
+   "prompt": "climbing the lighthouse at dusk to switch its lamp back on, gentle anticipation that grows into warm relief. Starts with pizzicato bass and soft marimba in D minor, adds glockenspiel sparkles, and the theme arrives in F major on accordion and marimba at the end.",
+   "form": "4/4, slow build from sparse to full, no drums until the last phrase."},
+  "festival": {"label": "festa a noite", "key": "F major", "bpm": 120, "energy": 3,
+   "prompt": "Lantern Festival at night in the village square, everyone dancing. Full palette: accordion and marimba play the theme together, ukulele strumming, tambourine, cajon and handclaps, bouncy pizzicato bass.",
+   "form": "4/4, festive dance, theme played twice with a happy final cadence leading back to the start."}
+ },
+ "stings": {
+  "mission_win": {"label": "vitoria de missao", "key": "F major", "bpm": 120, "seconds": 4,
+   "prompt": "very short victory fanfare (about 4 seconds): the full theme once on marimba and accordion, ending on a bright F major chord with a glockenspiel sparkle. One-shot, not a loop, with a natural short ending."},
+  "badge": {"label": "emblema", "key": "F major", "bpm": 120, "seconds": 3,
+   "prompt": "tiny reward jingle (about 3 seconds): glockenspiel and marimba play the first rising notes of the theme C-F-A-high C, then a ukulele strum. One-shot, not a loop."},
+  "hero_switch": {"label": "troca de heroi", "key": "F major", "bpm": 120, "seconds": 2,
+   "prompt": "very short handover cue (about 2 seconds): quick marimba pickup of the theme's first three notes C-F-A and a soft tambourine hit. One-shot, not a loop."}
+ }
+}

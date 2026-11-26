@@ -28,8 +28,10 @@ static func emotes(key: String) -> Array[StringName]:
 	return out
 
 
-## Id do take ja gravado para tocar com esta fala, ou "" (so legenda).
+## Id do take para tocar com esta fala: "v3:<chave>" (voz Gemini) se existir, senao o balbucio ja gravado, ou "" (so legenda).
 static func take(key: String) -> String:
+	if VoiceCatalog.has_v3(key):  # D19: voz Gemini do proprio texto; balbucio so como reserva
+		return VoiceCatalog.V3_PREFIX + key
 	var v: Variant = line(key).get("take", null)
 	return "" if v == null else str(v)
 

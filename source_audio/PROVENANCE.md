@@ -202,3 +202,42 @@ Nao usado (licenca diferente de CC0): `picture.jpg` do pacote World Percussion (
 | `res://audio/voice/ep01_river_pilot_start.wav` | original | Balbucio sintetizado (formantes) — nenhuma amostra de terceiros | `source_audio/babble/babble.py (sintese formante original)` |
 
 Total: 145 arquivos de audio. Data de download/geracao: 2026-11-23.
+
+## Musica gerada pelo Lyria (D20a)
+
+Gerada pela Gemini API (Lyria) com prompts da biblia `tools/music/music_bible.json`; escolha de Thiago (D20a: candidata 1 de cada cena + vinhetas).
+Loop, corte e volume por `tools/music/finalize.py`; dados completos (prompt inteiro) em `tools/music/final_tracks.json`.
+Termos de uso do audio gerado: NAO verificados (ver `docs/proposals/d20_trilhas.md`).
+
+| arquivo | licenca | fonte | ferramenta | sha256 (ogg / bruto) |
+|---|---|---|---|---|
+| `res://audio/music/music_v3_village.ogg` | gerado (Lyria) | cena village, lyria-3-pro-preview, 2026-11-25T23:50:26+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `5156a6b77bd9c7a3…` / `bb2187748894935e…` |
+| `res://audio/music/music_v3_mystery.ogg` | gerado (Lyria) | cena mystery, lyria-3-pro-preview, 2026-11-25T23:51:43+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `2f5bb282d79ce925…` / `0f4416255704dd50…` |
+| `res://audio/music/music_v3_boat.ogg` | gerado (Lyria) | cena boat, lyria-3-pro-preview, 2026-11-25T23:53:21+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `98398af1220eb687…` / `8fa965cd1f43d256…` |
+| `res://audio/music/music_v3_lighthouse.ogg` | gerado (Lyria) | cena lighthouse, lyria-3-pro-preview, 2026-11-25T23:54:52+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `651ab1aee4f661fe…` / `d0ca21692af49430…` |
+| `res://audio/music/music_v3_festival.ogg` | gerado (Lyria) | cena festival, lyria-3-pro-preview, 2026-11-25T23:56:14+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `bea8e9b31ee8b5ef…` / `b30722c9c5536148…` |
+| `res://audio/music/sting_v3_mission_win.ogg` | gerado (Lyria) | cena mission_win, lyria-3-clip-preview, 2026-11-25T23:57:21+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `f21ed1581b5497e5…` / `3747d6acf7318dea…` |
+| `res://audio/music/sting_v3_badge.ogg` | gerado (Lyria) | cena badge, lyria-3-clip-preview, 2026-11-25T23:57:39+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `2e8640244469b40a…` / `61ba4db1fc4cdf57…` |
+| `res://audio/music/sting_v3_hero_switch.ogg` | gerado (Lyria) | cena hero_switch, lyria-3-clip-preview, 2026-11-25T23:58:08+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `dab81161eda90c44…` / `8aec96682a658760…` |
+
+## Vozes Gemini TTS do Ep01 v3 (D19/D21)
+
+Gemini API (TTS, vozes pre-prontas) com o elenco aprovado por Thiago (`tools/voice/cast.json`) e direcao por fala (`tools/voice/direction.json`); tratamento `raw` (silencio aparado + loudnorm) em `tools/voice/treat.py`. Procedencia completa por take (modelo, voz, data, sha256 do bruto e do OGG, hash do estilo) no proprio catalogo. Termos de uso: NAO verificados (`docs/proposals/d19_vozes.md`).
+
+| arquivo | licenca | fonte | ferramenta | sha256 |
+|---|---|---|---|---|
+| `res://audio/voice/v3/ep01_arrival_radio_festival.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Schedar, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `c9040790f277dc78…` |
+| `res://audio/voice/v3/ep01_arrival_pilot_no_captain.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Erinome, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `27d1181a59cf989a…` |
+| `res://audio/voice/v3/ep01_arrival_tracker_look_dock.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Leda, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `f74417927284ed55…` |
+| `res://audio/voice/v3/ep01_dock_tracker_small_print.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Leda, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `47e4263ae1291456…` |
+| `res://audio/voice/v3/ep01_dock_tracker_boot_captain.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Leda, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `15927b7b9bc11f08…` |
+| `res://audio/voice/v3/ep01_dock_tracker_two_trails.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Leda, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `64844dd8ef7fe2d4…` |
+| `res://audio/voice/v3/ep01_bank_tracker_pup_village.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Leda, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `8b380c67bfd34a2f…` |
+| `res://audio/voice/v3/ep01_bank_pilot_pup_clothes.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Erinome, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `7d858b8e6a07af3b…` |
+| `res://audio/voice/v3/ep01_bank_tracker_call_climber.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Leda, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `976f68a2e45092ed…` |
+| `res://audio/voice/v3/ep01_bank_climber_sock_high.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Fenrir, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `f9d4406ffb70b2d9…` |
+| `res://audio/voice/v3/ep01_bank_climber_call_tracker.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Fenrir, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `b0598dac03b5cec8…` |
+| `res://audio/voice/v3/ep01_bank_tracker_wet_paw.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Leda, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `6d80ed05a0b19598…` |
+| `res://audio/voice/v3/ep01_bank_tracker_next_clue.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Leda, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `22e03f69279c8701…` |
+| `res://audio/voice/v3/ep01_bank_pilot_m2_done.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Erinome, 2026-11-26T00:40:25+00:00 | `tools/voice/gen_v3.py` | `bf83d47a400c9102…` |
+| `res://audio/voice/v3/ep01_plaza_tracker_no_water.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Leda, 2026-11-26T00:40:28+00:00 | `tools/voice/gen_v3.py` | `eb426c6b8561fd12…` |

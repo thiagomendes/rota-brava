@@ -32,10 +32,11 @@ const SKILL_ICONS := {&"tracker": &"notebook", &"climber": &"rope", &"pilot": &"
 ## Retrato da legenda de quem nao e heroi (RB-R1 E7, PROVISORIO): render do modelo 3D (capitao, filhote; mesmo
 ## enquadramento dos retratos v2) ou retrato-icone da marca (Dona Amora sem modelo; Farol 7 = farol com ondas de radio).
 const SPEAKER_PORTRAITS := {&"captain": "res://ui/portraits/captain_neutra.png", &"pup": "res://ui/portraits/pup_neutra.png"}
-const SPEAKER_ICONS := {&"captain": &"helm", &"pup": &"paw", &"vendor": &"vendor", &"radio": &"radio"}
+const SPEAKER_ICONS := {&"captain": &"helm", &"pup": &"paw", &"vendor": &"vendor", &"radio": &"radio",
+	&"narrator": &"storybook"}
 ## Anel e nome do falante; cores escolhidas para o nome (escurecido 20%) ler sobre o papel do balao.
 const SPEAKER_COLORS := {&"captain": Color("123A5E"), &"pup": Color("2A9D8F"), &"vendor": Color("7A3E9D"),
-	&"radio": Color("FF5A4E")}
+	&"radio": Color("FF5A4E"), &"narrator": Color("2F6BB0")}
 const HANDOFF_MIN_SECONDS := 0.45
 const FONT := 34
 ## Alvo de toque minimo em unidades virtuais (>= 48 dp em aparelho com lado curto >= ~410 dp; ver README).
@@ -803,6 +804,9 @@ func speaker_for(key: String) -> StringName:
 	# Falas de radio de Farol 7 (RB-R1): ep01.radio.<local>.<id>
 	if key.begins_with("ep01.radio."):
 		return &"radio"
+	# D21: narrador das cutscenes: ep01.narrator.<cena>.<id>
+	if key.begins_with("ep01.narrator."):
+		return &"narrator"
 	var parts := key.split(".")
 	if parts.size() >= 3 and Loc.has_key("member.%s.name" % parts[2]):
 		return StringName(parts[2])

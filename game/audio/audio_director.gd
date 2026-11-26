@@ -28,7 +28,16 @@ const AMBIENCE_ZONES: Dictionary = {
 const MUSIC_ALIASES: Dictionary = {
 	&"explore": "theme_explore", &"explore_low": "theme_explore_low", &"crossing": "theme_crossing",
 	&"return": "theme_return", &"discovery": "theme_discovery", &"victory": "theme_victory", &"team_call": "theme_team_call",
+	&"v3_village": "music_v3_village", &"v3_mystery": "music_v3_mystery", &"v3_boat": "music_v3_boat",
+	&"v3_lighthouse": "music_v3_lighthouse", &"v3_festival": "music_v3_festival",
+	&"v3_mission_win": "sting_v3_mission_win", &"v3_badge": "sting_v3_badge", &"v3_hero_switch": "sting_v3_hero_switch",
 }
+## D20a: trilha Lyria do Ep01 v3 por missao (vila como base; misterio nas missoes de pista M1, M2, M3, M5).
+const EP01_V3_MISSION_MUSIC: Dictionary = {
+	&"M0": &"v3_village", &"M1": &"v3_mystery", &"M2": &"v3_mystery", &"M3": &"v3_mystery", &"M4": &"v3_village",
+	&"M5": &"v3_mystery", &"M6": &"v3_boat", &"M7": &"v3_lighthouse", &"M8": &"v3_festival",
+}
+const SCENE_MUSIC_FADE := 2.0
 const UI_SOUNDS: Dictionary = {
 	&"move": "sfx_ui_move", &"confirm": "sfx_ui_confirm", &"back": "sfx_ui_back", &"open": "sfx_ui_open",
 	&"swap": "sfx_ui_swap", &"hero_swap": "sfx_ui_swap", &"clue": "sfx_clue_found", &"clue_found": "sfx_clue_found",
@@ -323,6 +332,40 @@ func is_voice_playing() -> bool:
 ##   id, duration (s; 0.0 se a fala/arquivo nao existe -> o chamador mantem a legenda e libera a sequencia),
 ##   type ("babble" | "radio" | ""), character, intent, emotes (Array), subtitle (chave de Loc),
 ##   frame_s (s por quadro de visema) e visemes (Array[float] 0..1, abertura da boca).
+## D20a: liga a trilha do Ep01 v3 a um no que emita mission_started/mission_completed(mission_id).
+## Ganchos publicos para o gameplay: on_mission_music_started, on_mission_music_completed, play_badge_sting,
+## play_hero_switch_sting, play_scene_music (ex.: voltar a vila quando a pista se resolve).
+func bind_episode_music(episode: Node) -> void:
+	if episode.has_signal(&"mission_started"):
+		episode.connect(&"mission_started", on_mission_music_started)
+	if episode.has_signal(&"mission_completed"):
+		episode.connect(&"mission_completed", on_mission_music_completed)
+
+
+func scene_music_for(mission_id: StringName) -> StringName:
+	return EP01_V3_MISSION_MUSIC.get(mission_id, &"v3_village")
+
+
+func play_scene_music(section: StringName, fade: float = SCENE_MUSIC_FADE) -> void:
+	play_music(String(section), fade)
+
+
+func on_mission_music_started(mission_id: StringName) -> void:
+	play_scene_music(scene_music_for(mission_id))
+
+
+func on_mission_music_completed(_mission_id: StringName) -> void:
+	play_music("v3_mission_win")
+
+
+func play_badge_sting() -> void:
+	play_music("v3_badge")
+
+
+func play_hero_switch_sting() -> void:
+	play_music("v3_hero_switch")
+
+
 ## Abaixa a musica (duck_music) enquanto a fala toca; volta ao terminar ou ser cancelada.
 func play_line(id: String) -> Dictionary:
 	var e := VoiceCatalog.lookup(id, Loc.language)

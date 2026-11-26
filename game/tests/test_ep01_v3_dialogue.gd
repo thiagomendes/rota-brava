@@ -58,14 +58,17 @@ func _catalog_checks() -> void:
 		var tk := Ep01V3Dialogue.take(k)
 		if tk != "":
 			var v := VoiceCatalog.lookup(tk)
-			if v.is_empty() or str(v.get("type", "")) != "babble" or str(v.get("speaker", "")) != str(VOICE_SPEAKER.get(sp, "?")):
+			# D19: take Gemini (v3:<chave>) do mesmo falante da ficha; senao, balbucio de reserva do mesmo personagem.
+			var gem := tk.begins_with(VoiceCatalog.V3_PREFIX)
+			if v.is_empty() or (gem and (str(v.get("type", "")) != "gemini_tts" or str(v.get("speaker", "")) != sp)) \
+					or (not gem and (str(v.get("type", "")) != "babble" or str(v.get("speaker", "")) != str(VOICE_SPEAKER.get(sp, "?")))):
 				bad_take.append("%s -> %s" % [k, tk])
 	hud.free()
 	r.check(missing.is_empty(), "v3 E6: toda fala da ficha existe no catalogo %s" % str(missing))
 	r.check(long.is_empty(), "v3 E6: falas com ate %d caracteres e %d palavras %s" % [MAX_CHARS, MAX_WORDS, str(long)])
 	r.check(bad_icon.is_empty(), "v3 E6: icones da legenda existem %s" % str(bad_icon))
 	r.check(bad_speaker.is_empty(), "v3 E6: falante da legenda bate com a ficha %s" % str(bad_speaker))
-	r.check(bad_take.is_empty(), "v3 E6: takes reaproveitados sao balbucio do mesmo personagem %s" % str(bad_take))
+	r.check(bad_take.is_empty(), "v3 E6: takes sao Gemini do mesmo falante ou balbucio do mesmo personagem %s" % str(bad_take))
 	r.check(Loc.t("member.vendor.name") == "Dona Amora" and Loc.t("member.captain.name") == "Capitão",
 		"v3 E6: nomes da feirante e do capitao na legenda")
 	# Passos das missoes: dica falada (radio) na ficha e curta.
