@@ -198,6 +198,8 @@ Ele relatou: (1) o andar às vezes fica em câmera lenta e às vezes desliza sem
 - **F2 arte (`art3d` `02a89cb`, `reviewer`): APROVADO.** Bota do capitão, pegadas grandes com halo e aro (pata 0,45, molhada 0,56, cais 0,59, pena 0,58, bota 0,54 m), pena 3D, anel alto com pilar de luz; GLB/PNG reproduzíveis; ~0,97 MB. Visto pelo lead: cais com pata de lama, pegadas de bota e a bota. Fraco: grama alta tapa decalques (trilhas em terra/tábua/pedra); bota a 8 m não lê como silhueta.
 - **Integrados F2 arte e F1** (merge do manifesto por id; PROVENANCE com os dois lados); suíte `OK (3578 PASS)`.
 
+- **D19–D21 som (`audio` `c192a8d`, `reviewer` 2026-11-26): APROVADO COM RESSALVAS.** Trilhas Lyria no jogo (5 loops a −18 LUFS com crossfade de 1 batida, salto na emenda ≤ 0,011; 3 vinhetas), troca por missão via `bind_episode_music`; 15 de 223 vozes Gemini geradas (cota de 100/dia do Tier 1; retomar com `tools/voice/gen_v3.py` + `register_v3.py`), balbucio como reserva; narrador no HUD (`storybook.svg`). Nenhuma chave no repositório (`proxy-injected`). Baixas: regra de procedência "gerado (…)" só exige a etiqueta fora dos caminhos v3; ~19 MB de binários (trilhas a ~3,8 MB cada, considerar bitrate menor); vinheta de vitória sem queda do loop novo quando a trilha muda; vinhetas de emblema e vitória no mesmo quadro se cortam. Pendente humano: escuta (loops mistério e farol, equilíbrio). Integrado; suíte `OK (3594 PASS)`.
+
 ## Barra de qualidade (mensurável e perceptual)
 **Personagens (crianças-heróis)**
 - Altura ~1,05 a 1,15 m no mundo; **cabeça 33 a 38% da altura** (~3 cabeças); olhos grandes (altura do olho ≥ 20% da altura da cabeça) com íris, pupila e dois brilhos; mãos de 4 dedos legíveis; pés grandes e arredondados.
