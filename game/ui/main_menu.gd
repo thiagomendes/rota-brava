@@ -43,18 +43,18 @@ func _on_play_pressed() -> void:
 	print("[RB] play")
 	# D21: na primeira vez, a abertura do jogo antes do Ep01 (GameIntroScene segue para PLAY_SCENE).
 	var target := GameIntroScene.play_target()
-	get_tree().change_scene_to_file(target if target != GameIntroScene.EP01_SCENE else PLAY_SCENE)
+	SceneLoaderService.go(target if target != GameIntroScene.EP01_SCENE else PLAY_SCENE)
 
 
 func _on_intro_pressed() -> void:
 	print("[RB] watch_intro")
 	GameIntroScene.next_scene = GameIntroScene.MENU_SCENE
-	get_tree().change_scene_to_file(GameIntroScene.SELF_SCENE)
+	SceneLoaderService.go(GameIntroScene.SELF_SCENE)
 
 
 func _on_references_pressed() -> void:
 	print("[RB] references")
-	get_tree().change_scene_to_file(REFERENCE_SCENE)
+	SceneLoaderService.go(REFERENCE_SCENE)
 
 
 func _layout() -> void:

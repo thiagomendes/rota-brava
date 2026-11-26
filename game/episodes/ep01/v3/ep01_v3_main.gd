@@ -893,12 +893,12 @@ func _resume() -> void:
 
 func _on_replay() -> void:
 	get_tree().paused = false
-	get_tree().reload_current_scene()
+	SceneLoaderService.go(scene_file_path)
 
 
 func _on_menu() -> void:
 	get_tree().paused = false
-	get_tree().change_scene_to_file(MENU_SCENE)
+	SceneLoaderService.go(MENU_SCENE)
 
 
 # ---------- D21: cutscenes (RB-R1; player em episodes/ep01/v3/cutscene/) ----------

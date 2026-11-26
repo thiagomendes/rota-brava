@@ -193,7 +193,7 @@ func _input(event: InputEvent) -> void:
 func leave() -> void:
 	closed.emit()
 	if get_tree().current_scene == self:
-		get_tree().change_scene_to_file("res://ui/main_menu.tscn")
+		SceneLoaderService.go("res://ui/main_menu.tscn")
 
 
 ## Fundo provisorio: ceu, agua, tabuas do cais e tres figuras e o barco amarelo no centro, para ver se a UI cobre a acao.

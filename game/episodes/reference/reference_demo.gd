@@ -147,7 +147,7 @@ func leave() -> void:
 	voice_player.stop()
 	music_player.stop()
 	print("[RB] reference_leave")
-	get_tree().change_scene_to_file(MENU_SCENE)
+	SceneLoaderService.go(MENU_SCENE)
 
 
 # ---------- paginas ----------
@@ -312,7 +312,7 @@ func _page_hud() -> void:
 
 
 func open_study() -> void:
-	get_tree().change_scene_to_file(STUDY_SCENE)
+	SceneLoaderService.go(STUDY_SCENE)
 
 
 func _page_voice() -> void:
