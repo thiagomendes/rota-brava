@@ -444,7 +444,7 @@ func _followers_height_and_teleport() -> void:
 	rel.y = 0.0
 	to_cam.y = 0.0
 	var p := climber.global_position
-	r.check(rel.length() < 7.0, "mov seguidor: preso a 12 m foi teleportado para perto do lider (%.2f m)" % rel.length())
+	r.check(rel.length() <= 6.0 + 0.2, "mov seguidor: preso a 12 m foi teleportado para no maximo 6 m do lider (%.2f m)" % rel.length())
 	r.check(not main.in_camera_view(climber.global_position), "mov seguidor: teleporte cai fora do enquadramento da camera (F1)")
 	r.check(climber.slot_clear(lead.global_position, Vector3(p.x, lead.global_position.y, p.z)), "mov seguidor: destino do teleporte com chao e sem parede")
 	await _physics(5)

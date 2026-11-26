@@ -48,6 +48,9 @@ func run(runner) -> void:
 		await _obstacle_run(label, spots[label] as StringName)
 	await _village_route()
 	await _far_follower_teleport()
+	await _nearest_teleport_ring()
+	await _stuck_follower_returns()
+	await _followers_disabled()
 	_release()
 	r.check(_frames > 3000, "f1: quadros medidos %d" % _frames)
 	r.check(_bad_idle.is_empty(), "f1: nenhum ator a pe com > %.1f m/s fora de walk/run (%d casos %s)" % [MOVE_IDLE_MAX, _bad_idle.size(), _bad_idle.slice(0, 3)])
@@ -281,3 +284,89 @@ func _far_follower_teleport() -> void:
 		await _steps(120)
 		var near := climber.global_position.distance_to(lead.global_position) < 4.0
 		print("  medida f1 teleporte yaw %d: perto=%s teleportes=%d" % [int(yaw_deg), near, _teleports - before])
+
+
+## Havendo lugar livre fora da vista no anel de 1,6 m, o teleporte escolhe esse anel (o mais perto do lider).
+func _nearest_teleport_ring() -> void:
+	var lead := main.actors[&"tracker"] as MemberActor
+	var climber := main.actors[&"climber"] as MemberActor
+	var base := main.world.marker(&"M8_FestaPlaza").global_position
+	await _place(base, base + Vector3(0, 0, -3))
+	var checked := 0
+	for yaw_deg: float in [0.0, 90.0, 180.0, 270.0]:
+		main.camera_rig.set_low_view(deg_to_rad(yaw_deg))
+		main.camera_rig.follow(lead, true)
+		await _steps(2)
+		var free16 := false
+		for k: int in 32:
+			var p := lead.global_position + Vector3(0, 0, 1.6).rotated(Vector3.UP, TAU * k / 32.0)
+			if not main.in_camera_view(p) and climber.slot_clear(lead.global_position, p):
+				free16 = true
+		if not free16:
+			continue
+		checked += 1
+		var to: Variant = main.follower_teleport_point(lead, climber, &"climber")
+		var dist := -1.0 if to == null else Vector2((to as Vector3).x - lead.global_position.x, (to as Vector3).z - lead.global_position.z).length()
+		r.check(to != null and absf(dist - 1.6) < 0.05 and not main.in_camera_view(to as Vector3),
+			"f1 teleporte yaw %d: com lugar livre a 1,6 m fora da vista, escolhe 1,6 m (%.2f m)" % [int(yaw_deg), dist])
+	r.check(checked >= 1, "f1 teleporte: %d vistas com lugar livre a 1,6 m testadas" % checked)
+
+
+## Lider parado a < 9 m, seguidor preso atras dos caixotes do M5 (fora da vista): volta em ate ~3 s, sem aparecer na vista.
+func _stuck_follower_returns() -> void:
+	var lead := main.actors[&"tracker"] as MemberActor
+	var climber := main.actors[&"climber"] as MemberActor
+	var c := main.world.marker(&"M5_Crates").global_position
+	var placed := false
+	for i in 16:
+		var w := Vector3.FORWARD.rotated(Vector3.UP, TAU * i / 16.0)
+		var a: Variant = _floor(c.x - w.x * 2.6, c.z - w.z * 2.6, c.y + 4.0)
+		var b: Variant = _floor(c.x + w.x * 2.6, c.z + w.z * 2.6, c.y + 4.0)
+		if a == null or b == null or (a as Vector3).y > c.y + 0.3 or absf((a as Vector3).y - (b as Vector3).y) > 0.15:
+			continue
+		var space := main.world.get_world_3d().direct_space_state
+		var blocked := not space.intersect_ray(PhysicsRayQueryParameters3D.create((a as Vector3) + Vector3(0, 0.5, 0), (b as Vector3) + Vector3(0, 0.5, 0), 1)).is_empty()
+		if not blocked:
+			continue
+		await _place(a as Vector3, (a as Vector3) - w)
+		# Camera olhando para longe do seguidor (ele fica atras dela).
+		main.camera_rig.set_low_view(atan2(w.x, w.z))
+		main.camera_rig.follow(lead, true)
+		climber.teleport((b as Vector3) + Vector3(0, 0.05, 0))
+		_last[&"climber"] = climber.global_position
+		placed = true
+		break
+	r.check(placed, "f1 preso: seguidor do outro lado dos caixotes, com obstaculo no meio")
+	if not placed:
+		return
+	await _steps(3)
+	r.check(not main.in_camera_view(climber.global_position) and climber.global_position.distance_to(lead.global_position) < 9.0,
+		"f1 preso: comeca fora da vista e a menos de 9 m (%.1f m)" % climber.global_position.distance_to(lead.global_position))
+	var bad0 := _bad_teleports.size()
+	var back_at := -1.0
+	for f in 210:
+		await _step()
+		if climber.global_position.distance_to(lead.global_position) < 2.5:
+			back_at = (f + 1) / 60.0
+			break
+	r.check(back_at > 0.0 and back_at <= 3.5, "f1 preso: seguidor voltou para perto do lider em %.2f s (<= 3,5)" % back_at)
+	r.check(_bad_teleports.size() == bad0, "f1 preso: voltou sem aparecer dentro da vista")
+
+
+## Contrato das cenas: com seguidores desligados nao ha formacao nem teleporte; religados, voltam.
+func _followers_disabled() -> void:
+	var lead := main.actors[&"tracker"] as MemberActor
+	var climber := main.actors[&"climber"] as MemberActor
+	var base := main.world.marker(&"M8_FestaPlaza").global_position
+	await _place(base, base + Vector3(0, 0, -3))
+	main.set_followers_enabled(false)
+	climber.teleport(lead.global_position + Vector3(12, 0, 0))
+	_last[&"climber"] = climber.global_position
+	var p0 := climber.global_position
+	await _steps(90)
+	var moved := Vector2(climber.global_position.x - p0.x, climber.global_position.z - p0.z).length()
+	r.check(not climber.follow_on and moved < 0.05, "f1 cena: seguidores desligados nao andam nem teleportam (%.2f m no plano)" % moved)
+	main.set_followers_enabled(true)
+	await _steps(30)
+	r.check(climber.follow_on and climber.global_position.distance_to(lead.global_position) < 7.0,
+		"f1 cena: religados, o seguidor volta (%.1f m)" % climber.global_position.distance_to(lead.global_position))

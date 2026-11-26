@@ -48,6 +48,8 @@ const STUCK_WINDOW := 0.5
 const STUCK_PROGRESS := 0.12
 ## Abaixo disto o seguidor parado se afasta de quem chegou perto (passo unico, nao empurrao continuo).
 const GAP_RESUME := 0.7
+## Seguidor desistido tenta de novo a cada STUCK_RETRY s (se o episodio nao o teleportar antes, fora da vista).
+const STUCK_RETRY := 1.5
 ## Seguidor longe do lider corre mesmo que o lider ande (para alcancar).
 const CATCHUP_DIST := 4.0
 const CAPSULE_RADIUS := 0.35
@@ -121,6 +123,9 @@ var _level_ok: bool = true
 var _stuck: bool = false
 var _stuck_clock: float = 0.0
 var _stuck_ref: float = INF
+var _stuck_age: float = 0.0
+## Desistiu de chegar ao lugar e ainda nao chegou (o episodio usa para o teleporte fora da vista abaixo de 9 m).
+var gave_up: bool = false
 
 
 func setup(member_id: StringName) -> void:
@@ -475,6 +480,10 @@ func _follow_dir() -> Vector3:
 			_slot = _slot_goal
 		_stuck = false
 		_stuck_ref = INF
+	if _stuck:
+		_stuck_age += delta
+		if _stuck_age >= STUCK_RETRY:
+			_stuck = false
 	_slot = _slot.move_toward(_slot_goal, SLOT_GLIDE * delta)
 	var to_slot := _slot - global_position
 	to_slot.y = 0.0
@@ -487,6 +496,7 @@ func _follow_dir() -> Vector3:
 	if not _settled:
 		if dist <= SLOT_ARRIVE:
 			_settled = true
+			gave_up = false
 		else:
 			# Freia perto do lugar para nao passar do ponto (a velocidade minima de andar ja garante o clipe).
 			out = to_slot / dist * clampf(dist / 0.8, DEADZONE + 0.05, 1.0)
@@ -494,6 +504,8 @@ func _follow_dir() -> Vector3:
 			if _stuck_clock >= STUCK_WINDOW:
 				if _stuck_ref - dist < STUCK_PROGRESS:
 					_stuck = true
+					_stuck_age = 0.0
+					gave_up = true
 					_settled = true
 					out = Vector3.ZERO
 				_stuck_clock = 0.0
@@ -622,6 +634,7 @@ func teleport(pos: Vector3) -> void:
 	_raw_speed = 0.0
 	_anchor = null
 	_stuck = false
+	gave_up = false
 
 
 ## Acompanha um no (ex.: convés do barco) em vez de usar fisica.

@@ -30,11 +30,10 @@ const TEAM_POSE_ANIMS: Array[StringName] = [&"team_pose", &"celebrate", &"wave"]
 const GESTURE_ANIMS: Array[StringName] = [&"point", &"wave"]
 ## Distancia vertical maxima para usar um ponto de acao (o topo do galpao nao serve a quem esta no chao).
 const INTERACT_DY := 1.0
-## Seguidores: andam ate ficar a FOLLOW_NEAR m do heroi; longe demais (preso atras de algo), reaparecem atras dele.
-const FOLLOW_NEAR := 2.0
+## Seguidores (F1): longe demais (preso atras de algo), reaparecem perto do lider fora da vista da camera. Desistido
+## (`gave_up`) e fora da vista ha GAVE_UP_HIDDEN s, reaparece tambem mais perto que FOLLOW_FAR.
 const FOLLOW_FAR := 9.0
-## C2: seguidor nao persegue o lider em outra altura (subiu num degrau/patamar): para e espera o teleporte.
-const FOLLOW_MAX_DY := 0.3
+const GAVE_UP_HIDDEN := 2.0
 ## C2: zonas de subida (pulo livre bloqueado; quem sobe e o Pico pela acao da missao). Marcador -> raio (m) do
 ## cilindro, cobrindo a estrutura e ~1,5 m de corrida antes da borda (pulo correndo avanca ~1,3 m). Tabela de degraus
 ## do ticket RB-R1: chafariz M3 (centro -22,8; 3,6, anel r 2,08), galpao M2, caixotes/toldo/telhado M5, farol M7.
@@ -48,6 +47,9 @@ const CLIMB_ZONES := {
 ## Teste/dev: missao inicial (vazio = M0, ou a do salvo). Salvamento: o jogo real grava e le em user:// (MissionSave);
 ## vazio = nao salva nem le (testes). Os bots de demonstracao (--ep01-demo*) comecam do zero e nao gravam.
 static var start_mission: StringName = &""
+## F1: seguidores ligados (cenas desligam com `set_followers_enabled(false)`); tempo de cada um desistido fora da vista.
+var followers_enabled: bool = true
+var _hidden_stuck: Dictionary = {}
 static var save_path: String = MissionSave.DEFAULT_PATH
 
 var world: VillageWorld
@@ -493,20 +495,38 @@ func _on_handoff_confirmed() -> void:
 
 func _update_followers() -> void:
 	var lead := controlled_node as MemberActor
+	var dt := get_physics_process_delta_time()
 	for m: StringName in actors:
 		var a := actors[m] as MemberActor
-		a.auto_dir = Vector3.ZERO
 		# F1: o ator e o dono unico do proprio movimento de seguidor (formacao, parada, desistencia); aqui so liga o modo
 		# e decide o teleporte. Embarcados (M6) nao seguem nem sao seguidos: o barco leva quem esta nele.
-		a.follow_on = lead != null and a != lead and lead.riding_on == null
+		a.follow_on = followers_enabled and lead != null and a != lead and lead.riding_on == null
 		if not a.follow_on or a.airborne or a.riding_on != null:
+			_hidden_stuck[m] = 0.0
 			continue
 		var d := lead.global_position - a.global_position
 		d.y = 0.0
-		if d.length() > FOLLOW_FAR and lead.is_on_floor() and not lead.airborne:
+		var hidden_for := 0.0
+		if a.gave_up and not in_camera_view(a.global_position):
+			hidden_for = float(_hidden_stuck.get(m, 0.0)) + dt
+		_hidden_stuck[m] = hidden_for
+		var far := d.length() > FOLLOW_FAR
+		if (far or hidden_for >= GAVE_UP_HIDDEN) and lead.is_on_floor() and not lead.airborne:
 			var to: Variant = follower_teleport_point(lead, a, m)
 			if to != null:
 				a.teleport(to as Vector3)
+				_hidden_stuck[m] = 0.0
+
+
+## Contrato para cenas (cutscenes): false desliga o modo seguidor e o teleporte dos seguidores ate voltar a true.
+func set_followers_enabled(on: bool) -> void:
+	followers_enabled = on
+	for m: StringName in actors:
+		var a := actors[m] as MemberActor
+		if not on:
+			a.follow_on = false
+			a.velocity = Vector3.ZERO
+		_hidden_stuck[m] = 0.0
 
 
 ## F1: algum ponto do corpo (pes, peito, cabeca, com a largura da capsula) dentro do enquadramento da camera?
@@ -531,7 +551,7 @@ func follower_teleport_point(lead: MemberActor, a: MemberActor, m: StringName) -
 	var cam_basis := Basis(Vector3.UP, camera_rig.yaw)
 	var side := signf((TRIO_OFFSETS[m] as Vector3).x)
 	for radius: float in [1.6, 2.4, 3.4, 4.6, 6.0]:
-		for k in 16:
+		for k: int in 16:
 			# Comeca atras do lider na vista (-Z da camera) e abre para o lado do seguidor, alternando.
 			var step := (k + 1) / 2
 			var ang := PI + side * (1.0 if k % 2 == 1 else -1.0) * step * TAU / 16.0
