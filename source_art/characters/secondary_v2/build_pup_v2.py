@@ -41,7 +41,7 @@ from rbart import REPO, arg_value, mat, new_object, reset_scene
 TEX_DIR = os.path.join(REPO, "captures", "g4", "build_textures", "pup_v2")
 PREFIX = "pup_v2"
 HC, HR, BZ = PB.HC, PB.HR, PB.BODY_Z
-C = dict(pelo="#E09A52", sela="#C07A3A", creme="#FFF1D6", orelha="#94552B", orelha_dk="#6E3C1E", nariz="#24150F",
+C = dict(pelo="#E09A52", sela="#C07A3A", creme="#F6E4C4", orelha="#94552B", orelha_dk="#6E3C1E", nariz="#24150F",
          coleira="#2FB5A5", coleira_dk="#1E8C80", ouro="#FFC83D", emblema="#123A5E", iris="#6B3F1F", boca="#8E3A44")
 parts = S.Parts()
 
@@ -244,8 +244,10 @@ def paint_fur(kind):
         n = len(P)
         pid = m["part"]
         flow = flow_field(P, N, kind)
-        strands = S.fur_noise(P, flow, N, across=0.0016, along=0.0090)
-        fine = S.fur_noise(P + 0.37, flow, N, across=0.0007, along=0.0035)
+        # G4 r2: pelo curto (tufos + fios + fio fino), no lugar do vinil liso
+        clump = S.fur_noise(P + 1.91, flow, N, across=0.0030, along=0.0100)
+        strands = S.fur_noise(P, flow, N, across=0.0013, along=0.0070)
+        fine = S.fur_noise(P + 0.37, flow, N, across=0.0005, along=0.0025)
         base = np.tile(S.lin(C["pelo"]), (n, 1))
         # sela mais escura no dorso e no alto da cabeca, clareando para a barriga
         up = np.clip(N[:, 2], 0, 1)
@@ -262,10 +264,10 @@ def paint_fur(kind):
         if ear.any():
             tip = S.sstep(-(P[ear, 2] - HC.z), 0.02, 0.07)
             col[ear] = S.lin(C["orelha"]) * (1 - 0.5 * tip[:, None]) + S.lin(C["orelha_dk"]) * 0.5 * tip[:, None]
-        col *= (0.88 + 0.18 * strands + 0.06 * fine)[:, None]
-        col *= (0.80 + 0.20 * m["ao"] ** 0.8)[:, None]
-        h = 0.00022 * strands + 0.00010 * fine
-        rough = 0.62 - 0.10 * strands
+        col *= (0.70 + 0.26 * clump + 0.22 * strands + 0.08 * fine)[:, None]
+        col *= (0.78 + 0.22 * m["ao"] ** 0.8)[:, None]
+        h = 0.00120 * clump + 0.00080 * strands + 0.00030 * fine
+        rough = 0.80 - 0.08 * strands
         return col, h, rough, np.zeros(n)
     return fn
 
@@ -345,9 +347,10 @@ def build(glb=None, blend=None):
     groups = S.join_groups([o for o, _, _ in objs] + [face], "Pup", parts,
                            names={"body": "Pup_Body", "head": "Pup_Head", "gear": "Pup_Gear", "face": "Pup_Face"})
     # texturas (atlas por grupo) e materiais
-    for g, res, coat, cr in (("body", 1024, 0.12, 0.45), ("head", 1024, 0.12, 0.45)):
+    # G4 r2: pelo sem verniz e com normal mais forte (fosco, nao vinil)
+    for g, res, coat, cr in (("body", 1024, 0.0, 0.5), ("head", 1024, 0.0, 0.5)):
         S.apply_material(groups[g], S.texture_group(groups[g], "%s_%s" % (PREFIX, "fur_" + g), res, paint_fur(g), TEX_DIR,
-                                                    coat=coat, coat_rough=cr))
+                                                    coat=coat, coat_rough=cr, normal_strength=1.6))
     S.apply_material(groups["gear"], S.texture_group(groups["gear"], PREFIX + "_gear", 512, paint_gear, TEX_DIR, coat=0.6, coat_rough=0.12))
     S.face_materials(groups["face"], PREFIX, C["iris"], C["pelo"], mouth_hex=C["boca"], dark_hex="#1E120C")
     PB.author(rig, groups["face"])
