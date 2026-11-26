@@ -401,3 +401,22 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 - Revisão (`reviewer`): APROVADO com ressalvas. Os testes novos falham no estado anterior: `test_characters` com 11 falhas, `ui_brand` com 6 e `cutscene` com 10. Passam agora: 843, 73 e 152 PASS. Na captura, a grade some e os olhos ficam abertos no menu e na abertura.
 - Correção de texto: a reexportação do Pico reempacotou as UVs e refez as texturas de `Pico_Gear`. O PROVENANCE do Pico foi corrigido. O lead conferiu o close do Pico na abertura (`captures/g13/after/game_intro_3_pico.png`) sem costura visível. A captura foi feita sem GPU real.
 - Ressalvas abertas: o limite dos gestos no teste é 0,65 s, mas a meta é 0,5 s (medido 0,45 s). A sombra à noite e na festa precisa de olho humano. `preview_characters.gd:66` ainda usa `alegre`, mas só na cena de prévia.
+
+### G5 + G7 integrados (`feature/rb-r1-g-entrada`, autor `gameplay`)
+- **G7, apertar E duas vezes.** Duas causas:
+  - o HUD consumia o `interact` durante a fala e por 250 ms;
+  - o `skip_look` do olhar dirigido vinha antes de `try_interact`.
+  Agora, com o botão de ação visível, o primeiro E age. Sem ação no alcance, o E continua fechando a legenda (D19b).
+- **G5, mouse preso.** `MouseLock` (`game/ui/mouse_lock.gd`) passa a ser o único dono de `Input.mouse_mode`. Troca, escolha, pausa, opções, conclusão e cutscene bloqueiam por id. Ao entrar e sair do episódio, o `MouseLock` é zerado. O lookdev também passa por ele.
+- **Trava do M2 em `free_pieces` (defeito do jogo).** Se o salto do Pico abortava no alto, nenhum ponto religava. Agora os pontos religam quando muda o estado "no alto". Teste: `test_ep01_v3_m2_stuck`. Bot: espera de pouso até 4× no ar, desvio de seguidor e limite do teste por relógio.
+- **Revisão** (`reviewer`, 2 rodadas): APROVADO.
+  - `ep01_v3_input`: 32 PASS.
+  - `m2_stuck`: falha sem a correção; com ela, 4 PASS.
+  - `cutscene`: 3 de 3 OK.
+  - `ep01_v3`: 229 PASS.
+  - `movement`: 81. `camera`: 10.
+- **Ressalvas abertas:**
+  - Salto abortado não volta ao último apoio, só fala "oops" (já era assim).
+  - `refresh()` por mudança de altura sem teste em cutscene.
+  - "Examinar" e ajuda não soltam o mouse, por decisão.
+  - Ninguém viu o cursor real.
