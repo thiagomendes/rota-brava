@@ -2277,11 +2277,11 @@
       },
       "saida": "game/worlds/village_v3",
       "arquivos_sha256": {
-        "village_collision.tscn": "c7163aa1d8bf9a48bc0cb28581152aa7bbd914f820ac9e0d3e08847168d13ae3",
+        "village_collision.tscn": "4c6d20c7d0657592dbc4cc8016651a0188ea5f9d7c9afaaf693e966710cd0336",
         "village_world.tscn": "c86dc7e1a6bf826dd3165f999a9cc8794ba72311142b08c2e3812fabd36967c1"
       },
       "arquivos_bytes": {
-        "village_collision.tscn": 193516,
+        "village_collision.tscn": 193522,
         "village_world.tscn": 9770
       },
       "colisao": {

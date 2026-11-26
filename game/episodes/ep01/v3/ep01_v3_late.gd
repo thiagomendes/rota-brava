@@ -106,7 +106,9 @@ func _derive_late_points() -> void:
 	var out := st - sb
 	out.y = 0.0
 	points[&"StairFoot"] = Vector3(st.x, st.y, st.z) + out.normalized() * 0.85
-	points[&"Compass"] = Vector3(st.x, st.y, st.z) + out.normalized() * 2.2 + Vector3(-1.0, 0, 0)
+	# G6: 0,6 m para -z: a rosa dos ventos (raio 0,45) ficava sob a base da casa do faroleiro (x 27-31, z > -19) e a
+	# agulha entrava 3 cm nela. O ponto de acao `aim` usa o mesmo ponto.
+	points[&"Compass"] = Vector3(st.x, st.y, st.z) + out.normalized() * 2.2 + Vector3(-1.0, 0, -0.6)
 	var berth := _mk(&"M6_BoatStart")
 	points[&"BoardSpot"] = Vector3(berth.x, 0.0, -2.6)
 	points[&"DockLanding"] = _mk(&"M8_CaptainDock") + Vector3(2.0, 0, -1.0)

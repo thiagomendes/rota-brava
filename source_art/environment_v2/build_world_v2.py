@@ -742,16 +742,18 @@ G6_MOVES = {
     ("crate_fish", 6): (-11.7, 0.0, -17.12),
     ("crate_fruit", 1): (1.2, 0.0, -17.1),
     ("crate_fruit", 2): (0.5, 0.0, -17.1),         # (em x 1,85 batia no degrau da porta)
-    ("rock_b", 19): (20.94, "head", -19.69),       # pedra 25 cm dentro do barril
     ("rock_b", 27): (24.76, "head", -15.35),       # pedra 30 cm dentro do poste
+    ("barrel", 6): (22.4, 0.0, -17.2),             # barril 25 cm na pedra e 23 cm na parede da casa: para a rua
     ("tree_b", 102): (25.0, "head_tree", -26.6),   # tronco 46 cm dentro de duas pedras
     ("tree_b", 103): (35.8, "head_tree", -18.6),   # tronco 38 cm dentro da pedra
     ("pot_b", 3): (-27.6, 0.0, -12.6),             # vaso sem chao embaixo (1,5 m no vazio)
-    ("rock_b", 40): (20.0, "head", -25.55),        # pedra 76 cm para fora do barranco: 1 m para dentro
     ("parasol", 1): (19.95, 0.0, -15.5),           # lonas dos dois guarda-sois do cafe 8 cm uma na outra
     ("cafe_set", 1): (19.95, 0.0, -15.5),
     ("crate", 13): (-16.44, 0.0, -8.94),           # 2,7 cm no barril da praca
     ("rope_coil", 1): (1.66, 0.0, 2.34),           # 2,5 cm no monte de rede
+    # revisao G6: caixote e covo da margem 45 e 11 cm dentro da moita; barril 16 cm dentro de outra: as moitas saem
+    ("bush_a", 32): (8.45, "bank", 7.35),
+    ("bush_c", 3): (11.2, "bank", 6.75),
 }
 # Pilha de caixote + caixote de fruta junto ao carrinho do M4: o canto do carrinho (x ~ -18,6) atravessava a pilha; ela
 # sai 25 cm para oeste.
@@ -782,6 +784,68 @@ def g6_fixes():
     for kind in ("bush_a", "bush_b", "bush_c"):
         for row in inst[kind]:
             row[1] = round(row[1] - G6_BUSH_SINK, 3)
+    moved += g6_rocks_out_of_town()
+    return moved
+
+
+# Revisao G6: pedras do promontorio sorteadas no lado da cidade (x < 25) caiam dentro de casas, da escada do farol e da
+# mureta (ate 1,4 m dentro de parede). Retangulos (x0, z0, x1, z1) que pedra nao pode tocar alem das casas: escada e
+# muros da escada, mureta de contencao em z -23 e patamar.
+G6_ROCK_KEEP_OUT = [(22.0, -23.6, 25.9, -16.0), (16.6, -23.4, 23.4, -22.7)]
+
+
+def _rock_rects():
+    rects = list(G6_ROCK_KEEP_OUT)
+    for pos, ry, W, D, H in houses:
+        b = COL.rot_y(ry)
+        xs, zs = [], []
+        for lx, lz in ((0, 0), (W, 0), (0, -D), (W, -D)):
+            v = b @ Vector((lx, 0, lz))
+            xs.append(pos[0] + v.x)
+            zs.append(pos[2] + v.z)
+        rects.append((min(xs), min(zs), max(xs), max(zs)))
+    return rects
+
+
+def _rock_hits(x, z, rad, rects):
+    for x0, z0, x1, z1 in rects:
+        dx = max(x0 - x, 0.0, x - x1)
+        dz = max(z0 - z, 0.0, z - z1)
+        if dx * dx + dz * dz < rad * rad:
+            return True
+    return False
+
+
+def _near_trunk(x, z, rad):
+    for kind in ("tree_a", "tree_b", "tree_c"):
+        for tx, _, tz, _, ts in inst.get(kind, []):
+            if math.hypot(x - tx, z - tz) < rad + 0.35 * ts:
+                return True
+    return False
+
+
+def g6_rocks_out_of_town():
+    """Pedra do promontorio (y = head_h - 0,2) que toca casa, escada ou mureta: espelhada no promontorio (x em torno de
+    31,5; depois z em torno de -23; depois os dois), no mesmo anel do sorteio, fora do corredor do farol e em terra."""
+    rects = _rock_rects()
+    moved = 0
+    for kind in ("rock_a", "rock_b"):
+        for row in inst[kind]:
+            x, y, z, ry, s = row
+            if abs(head_h(x, z) - 0.2 - y) > 0.002:
+                continue
+            rad = (0.62 if kind == "rock_a" else 1.15) * s * 0.9
+            if not _rock_hits(x, z, rad, rects):
+                continue
+            for nx, nz in ((63.0 - x, z), (x, -46.0 - z), (63.0 - x, -46.0 - z)):
+                cx, cz = clear_head_path(nx, nz, (0.62 if kind == "rock_a" else 1.15) * s)
+                if cx is None or head_h(cx, cz) < 0.4 or _rock_hits(cx, cz, rad, rects) or _near_trunk(cx, cz, rad):
+                    continue
+                row[0], row[1], row[2] = round(cx, 3), round(head_h(cx, cz) - 0.2, 3), round(cz, 3)
+                moved += 1
+                break
+            else:
+                print("G6: pedra sem lugar livre", kind, row)
     return moved
 
 

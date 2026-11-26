@@ -18,9 +18,10 @@ extends RefCounted
 ##      faces), confirmada na malha por pontos de uma grade de 1 cm dentro da outra peca (numero de voltas); cesto,
 ##      carrinho e caixote abertos sao ocos (o que esta dentro deles nao toca as paredes). O par conta se passa de TOL_PEN.
 ##   O mesmo contra as pecas pequenas do cenario fixo (`structure_hits`: tabua, degrau, meio-fio, toldo).
-##   Ignorados de proposito: vegetacao rasteira (IGNORE_KINDS: grama, flores, juncos); copas e arbustos entre si e
-##   arbustos contra qualquer coisa (folhagem macia que cobre objetos, ex. lente do M7 meio tapada); rochas entre si;
-##   pares montados de proposito (INTENTIONAL_PAIRS: guarda-sol na mesa, cordao de lanternas no poste, defensa no barco).
+##   Ignorados de proposito: vegetacao rasteira (IGNORE_KINDS: grama, flores, juncos); copas entre si; moita contra o que
+##   nao e duro (copa, pedra, poste); rochas entre si; pares montados de proposito (INTENTIONAL_PAIRS: guarda-sol na
+##   mesa, cordao de lanternas no poste, defensa no barco, lente do M7 no capim). Objeto duro (BUSH_HARD: caixote,
+##   barril, vaso, cesto...) contra moita conta acima de BUSH_TOL (10 cm: folhagem macia encosta e cobre um pouco).
 ##
 ## Flutuando (so props "apoiados"): de cada ponto da faixa de baixo da malha (ate 20% da altura acima do menor y, entre
 ## 2 e 10 cm) um raio vertical desce contra o cenario fixo e os outros props (corpos de malha exata numa camada de fisica
@@ -32,7 +33,8 @@ extends RefCounted
 
 const TOL_PEN := 0.02
 const TOL_FLOAT := 0.03
-## Pecas do cenario fixo maiores que isto (chao, rua, encosta, parede inteira) nao entram em `structure_hits`.
+## Pecas do cenario fixo maiores que isto so entram em `structure_hits` se forem fechadas e altas (casa, parede); chao,
+## encosta (abertos) e lajes baixas (<= 0,5 m: cais, base da rua) sao superficie de apoio.
 const STRUCT_MAX := 4.0
 ## Kits que entram no cenario de proposito: cabeco de amarracao e poste chumbados no chao (o cordao de bandeirolas do
 ## cenario e amarrado no topo do poste); barraca da praca com o mastro da placa redonda encaixado no topo do telhado.
@@ -42,10 +44,16 @@ const PROBE_LAYER := 1 << 31
 const IGNORE_KINDS := ["grass_tuft", "grass_tall", "flowers_a", "flowers_b", "reeds"]
 const FOLIAGE := ["bush_a", "bush_b", "bush_c", "tree_a", "tree_b", "tree_c"]
 const BUSHES := ["bush_a", "bush_b", "bush_c"]
+## Objetos duros que nao podem estar enfiados numa moita: contra moita contam acima de BUSH_TOL (folhagem macia encosta e
+## cobre um pouco; mais que isso e caixote dentro do arbusto). Prefixo do tipo.
+const BUSH_HARD := ["crate", "barrel", "pot_", "planter", "basket", "bucket", "sack", "lobster_trap", "bench", "cart"]
+const BUSH_TOL := 0.10
 const ROCKS := ["rock_a", "rock_b"]
 ## guarda-sol no furo da mesa; cordao das lanternas da festa amarrado no topo do poste; defensa do cais encostada no barco
 ## atracado (e para isso que ela existe).
-const INTENTIONAL_PAIRS := [["cafe_set", "parasol"], ["lamp_post", "wv3_festa_lanterns"], ["fender", "Boat"]]
+## Lente do farol caida no capim, meio tapada pela moita (pista do M7).
+const INTENTIONAL_PAIRS := [["cafe_set", "parasol"], ["lamp_post", "wv3_festa_lanterns"], ["fender", "Boat"],
+	["bush_a", "wv3_lens"], ["bush_b", "wv3_lens"], ["bush_c", "wv3_lens"]]
 ## Kits que nao estao apoiados no chao (agua, pendurados).
 const NOT_RESTING_KINDS := ["rowboat_a", "rowboat_b", "fender", "float_buoy", "life_ring"]
 ## Pecas soltas do mundo/missao que nao estao apoiadas (prefixo do nome).
@@ -139,7 +147,9 @@ func _static_parts(mesh_name: String, faces: PackedVector3Array, xf: Transform3D
 	var boxes: Array[AABB] = cs["boxes"]
 	for k in parts.size():
 		var b: AABB = boxes[k]
-		if maxf(b.size.x, maxf(b.size.y, b.size.z)) > STRUCT_MAX:
+		var big := maxf(b.size.x, b.size.z) > STRUCT_MAX or b.size.y > STRUCT_MAX
+		# grande e aberta (chao, encosta) ou grande e baixa (laje do cais, base da rua: e chao) = superficie de apoio
+		if big and (b.size.y <= 0.5 or not _closed(parts[k])):
 			continue
 		var pk: Array[PackedVector3Array] = [parts[k]]
 		var bk: Array[AABB] = [b]
@@ -147,12 +157,28 @@ func _static_parts(mesh_name: String, faces: PackedVector3Array, xf: Transform3D
 			"inv": Transform3D.IDENTITY, "aabb": b, "geo": {"faces": parts[k], "aabb": b, "comps": {"parts": pk, "boxes": bk}}})
 
 
+## Malha fechada (cada aresta em numero par de triangulos): parede, laje, degrau. Chao e encosta sao chapas abertas.
+static func _closed(f: PackedVector3Array) -> bool:
+	var edges := {}
+	for i in range(0, f.size(), 3):
+		for k in 3:
+			var p := f[i + k].snapped(Vector3.ONE * 0.0001)
+			var q := f[i + (k + 1) % 3].snapped(Vector3.ONE * 0.0001)
+			var key := [p, q] if (p.x < q.x or (p.x == q.x and (p.y < q.y or (p.y == q.y and p.z < q.z)))) else [q, p]
+			edges[key] = int(edges.get(key, 0)) + 1
+	for c: int in edges.values():
+		if c % 2 != 0:
+			return false
+	return true
+
+
 ## Props que atravessam pecas do cenario fixo (tabua, toldo, mureta...) alem de TOL_PEN: [{a, b, depth, points, at}].
-## Fora: folhagem, rochas e o que nao esta apoiado (barco, defensa, boias: encostam no cais de proposito).
+## Pedras entram. Fora: folhagem, kits chumbados (STRUCT_SKIP_KINDS) e o que nao esta apoiado (barco, defensa, boias:
+## encostam no cais de proposito).
 func structure_hits(only_ids: Array = []) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for a in props:
-		if (not only_ids.is_empty() and not a["id"] in only_ids) or not a["rests"] or a["kind"] in FOLIAGE or a["kind"] in ROCKS \
+		if (not only_ids.is_empty() and not a["id"] in only_ids) or not a["rests"] or a["kind"] in FOLIAGE \
 				or a["kind"] in STRUCT_SKIP_KINDS:
 			continue
 		for b in structure:
@@ -272,11 +298,23 @@ func _body(faces: PackedVector3Array, xf: Transform3D) -> RID:
 
 # ---------------------------------------------------------------- interpenetracao
 
+static func _hard(kind: String) -> bool:
+	for pre: String in BUSH_HARD:
+		if kind.begins_with(pre):
+			return true
+	return false
+
+
+## Tolerancia do par: BUSH_TOL para objeto duro x moita; TOL_PEN no resto.
+static func pair_tol(a: Dictionary, b: Dictionary) -> float:
+	return BUSH_TOL if (a["kind"] in BUSHES or b["kind"] in BUSHES) else TOL_PEN
+
+
 func _skip_pair(a: Dictionary, b: Dictionary) -> bool:
 	var ka: String = a["kind"]
 	var kb: String = b["kind"]
 	if ka in BUSHES or kb in BUSHES:
-		return true
+		return not (_hard(ka) or _hard(kb))
 	if ka in FOLIAGE and kb in FOLIAGE:
 		return true
 	if ka in ROCKS and kb in ROCKS:
@@ -303,7 +341,7 @@ func overlaps(only_ids: Array = [], skip_kit_pairs: bool = false) -> Array[Dicti
 			if not _aabb_overlap(a["aabb"], b["aabb"]) or _skip_pair(a, b):
 				continue
 			var pd := _pair_depth(a, b)
-			if pd["depth"] > TOL_PEN:
+			if pd["depth"] > pair_tol(a, b):
 				out.append({"a": a["id"], "b": b["id"], "depth": pd["depth"], "points": pd["count"], "at": pd["at"]})
 	out.sort_custom(func(x: Dictionary, y: Dictionary) -> bool: return x["depth"] > y["depth"])
 	return out
@@ -699,6 +737,16 @@ static func _union(parent: PackedInt32Array, a: int, b: int) -> void:
 	var rb := _find(parent, b)
 	if ra != rb:
 		parent[ra] = rb
+
+
+## Move um prop ja coletado (busca de lugar livre, testes): transformacao, AABB e corpo de sondagem.
+func move_prop(id: String, xf: Transform3D) -> void:
+	for p in props:
+		if p["id"] == id:
+			p["xf"] = xf
+			p["inv"] = xf.affine_inverse()
+			p["aabb"] = xf * (p["geo"]["aabb"] as AABB)
+			PhysicsServer3D.body_set_state(p["body"], PhysicsServer3D.BODY_STATE_TRANSFORM, xf)
 
 
 func ids_with_prefix(prefix: String) -> Array:

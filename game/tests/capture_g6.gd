@@ -2,7 +2,7 @@ extends Node
 ## Captura G6 (RB-R1): um ponto da vila com as pecas da missao montadas, visto de perto por uma camera de captura e
 ## depois pela camera do jogo (heroi ativo parado ao lado, `CameraRig.set_low_view`).
 ## Uso: xvfb-run ... godot.sh --path game res://tests/capture_g6.tscn --write-movie <abs>/f.png --fixed-fps 10 \
-##        --quit-after 40 -- --g6-shot=cart
+##        --quit-after 40 -- --g6-shot=cart   (ou --g6-eye=x,y,z --g6-look=x,y,z [--g6-mission=M1])
 ## Quadro 19 = perto; quadro 39 = camera do jogo.
 
 ## nome -> [missao, olho, alvo, posicao do heroi (perto do alvo), yaw da camera do jogo em graus]
@@ -33,6 +33,13 @@ func _arg(flag: String) -> String:
 
 func _ready() -> void:
 	shot = SHOTS.get(_arg("--g6-shot"), SHOTS["cart"])
+	# Ponto livre: --g6-eye=x,y,z --g6-look=x,y,z [--g6-mission=M1]
+	if _arg("--g6-eye") != "":
+		var e := _arg("--g6-eye").split_floats(",")
+		var l := _arg("--g6-look").split_floats(",")
+		var look := Vector3(l[0], l[1], l[2])
+		shot = [StringName(_arg("--g6-mission")) if _arg("--g6-mission") != "" else &"M1", Vector3(e[0], e[1], e[2]), look,
+			Vector3(e[0], 0.0, e[2]).lerp(Vector3(look.x, 0.0, look.z), 0.3), rad_to_deg(atan2(e[0] - look.x, e[2] - look.z))]
 	Ep01V3Main.start_mission = shot[0]
 	Ep01V3Main.save_path = ""
 	Ep01V3Cutscene.enabled = false

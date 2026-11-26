@@ -385,3 +385,17 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 - **Teste:** `game/tests/test_prop_overlap.gd` (M1–M8: peças da missão + adereços a ≤ 4 m dos marcadores/peças; mais a bola parada nas barracas e um caso de dente: pilha antiga de caixotes é detectada). `bash tools/test.sh prop_overlap`: `OK (34 PASS)` em ~46 s. Afetados: `ep01_v3` `OK (193 PASS)`, `village_world` `OK (74)`, `props_v3` `OK (254)`, `world_v2` `OK (36)`, `test_assets` `OK (261)`, `clues_v3` `OK (96)`, `stage_dock` `OK (75)`. Suíte inteira não rodada (já estava a 4 s do limite de 900 s; este teste soma ~40 s).
 - **Capturas** (fora do Git, `captures/g6/before_<ponto>/` e `after_<ponto>/`; quadro 19 = câmera de perto, 39 = câmera do jogo com o herói ao lado): `cart` (carrinho do M4), `lobster` (covos do cais), `planter_pot` (vaso/canteiro na porta da rua norte), `head_tree` (pedra e árvore no promontório).
 - **Limites:** métrica geométrica, não visual; peças grandes do cenário (chão, paredes inteiras) e a folhagem não são auditadas; contato aresta-com-aresta pode superestimar a profundidade (SAT só nas normais das faces); o estado auditado é o da montagem de cada missão (caixote entregue voando para a barraca e outros estados intermediários não).
+
+#### G6 · revisão 1 (art3d, 2026-11-26): exceções e pedras
+- **Mudou na auditoria:** pedra agora entra contra o cenário fixo; peças grandes fechadas e altas do cenário (casa, parede) também entram (antes só ≤ 4 m); moita contra objeto duro (caixote, barril, vaso, canteiro, cesto, balde, saco, covo, banco, carrinho) conta acima de 10 cm.
+- **Corrigido:** 17 pedras do promontório que o sorteio pôs no lado da cidade (dentro de casas, da escada do farol e da mureta; até 1,4 m, inclusive `rock_b#19` e `#40`) são espelhadas no promontório por `g6_rocks_out_of_town()` (mesmo anel, fora do corredor do farol, longe de tronco); barril `#6` 23 cm na parede da casa vai para a rua; moitas `bush_a#32` e `bush_c#3` saem de cima do caixote `#10`, do covo `#4` e do barril `#4`; rosa dos ventos do M7 0,6 m para fora da base da casa do faroleiro (o ponto `aim` vai junto: `Ep01V3Late`, `points[&"Compass"]`).
+- **Exceções que sobram (uma linha cada):**
+  - grama, flores e juncos: não auditados (vegetação rasteira atravessa tudo de propósito);
+  - copa × copa, pedra × pedra: aglomerados naturais;
+  - moita × o que não é duro (copa, pedra, poste) e objeto duro × moita até 10 cm: folhagem macia encosta e cobre;
+  - `bush_*` × `wv3_lens`: lente caída no capim, meio tapada (pista do M7);
+  - `cafe_set` × `parasol`: mastro no furo da mesa;
+  - `lamp_post` × `wv3_festa_lanterns`: cordão de lanternas amarrado no topo do poste;
+  - `fender` × barco: defensa encosta no barco atracado;
+  - `lamp_post`, `bollard`, `stall_*` × cenário fixo: poste e cabeço chumbados no chão, cordão de bandeirolas no topo do poste, mastro da placa encaixado no telhado da barraca;
+  - chão, encosta (abertos) e lajes baixas grandes (≤ 0,5 m: cais, base da rua): superfície de apoio, objeto assentado nelas não conta.
