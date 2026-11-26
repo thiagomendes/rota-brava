@@ -14,8 +14,8 @@ metadata/provisional = true
 
 [node name="Model" type="Node3D" parent="."]
 script = ExtResource("2_cv")
-walk_speed_mps = 0.586
-run_speed_mps = 0
+walk_speed_mps = 0.569
+run_speed_mps = 1.2745
 
 [node name="Rig" parent="Model" instance=ExtResource("1_glb")]
 

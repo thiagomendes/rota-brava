@@ -282,7 +282,16 @@ def markers(ground, props, bank_info):
     # M8
     add("M8_FestaPlaza", "M8", -19.5, 3.4)
     add("M8_CaptainDock", "M8", -1.5, 0.5)
+    # RB-R1 arte das cenas: Dona Amora atras da barraca azul; marcadores de camera dos planos amplos (sem chao embaixo:
+    # metadata camera = true; look_at = marcador olhado). Escritos a mao tambem no .tscn (ver EXTRA abaixo).
     return out
+
+
+EXTRA_MARKERS = [  # (nome, missao, posicao, girar Y em graus, metadados extras)
+    ("M4_Vendor", "M4", (-18.1, 0.0, -6.4), 90.0, {"note": "Dona Amora atras da barraca azul (uvas), virada para o cliente (-X)"}),
+    ("Cut_VillageWide", "cut", (38.0, 20.0, 8.0), 0.0, {"camera": True, "look_at": "M8_FestaPlaza"}),
+    ("Cut_LighthouseView", "cut", (18.0, 2.5, -2.0), 0.0, {"camera": True, "look_at": "M7_LanternPivot"}),
+]
 
 
 # ------------------------------------------------------------------ montagem
@@ -473,6 +482,13 @@ def write_scenes(repo, inst, houses, lights, props_info, bank_info, terr):
                   "transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, %g, %g, %g)" % p, 'metadata/mission = "%s"' % mis]
         if water:
             lines.append("metadata/water = true")
+        lines.append("")
+    for name, mis, p, ry, meta in EXTRA_MARKERS:
+        c, s_ = math.cos(math.radians(ry)), math.sin(math.radians(ry))
+        lines += ['[node name="%s" type="Marker3D" parent="Markers"]' % name,
+                  "transform = Transform3D(%g, 0, %g, 0, 1, 0, %g, 0, %g, %g, %g, %g)" % ((c, s_, -s_, c) + p), 'metadata/mission = "%s"' % mis]
+        for k, v in meta.items():
+            lines.append("metadata/%s = %s" % (k, "true" if v is True else '"%s"' % v))
         lines.append("")
     with open(os.path.join(out_dir, "village_world.tscn"), "w") as f:
         f.write("\n".join(lines))
