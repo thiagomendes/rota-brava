@@ -370,7 +370,7 @@ func _start_mission(index: int) -> void:
 		camera_rig.set_low_view(deg_to_rad(float(data["camera_yaw"])))
 	guide.on_mission_started(current.id)
 	for k in Ep01V3Dialogue.start_lines(current.id):
-		say(k)
+		say(Ep01V3Dialogue.vary(k))
 	print("[RB] v3 mission %s" % current.id)
 	mission_started.emit(current.id)
 
@@ -410,12 +410,17 @@ func _on_mission_completed(id: StringName) -> void:
 	if _save != "":
 		MissionSave.save(_save, EPISODE_ID, missions)
 	# Comemoracao (D19c): a fala da missao entra no sorteio do grupo do falante; sem fala, um viva do heroi em controle.
+	# G9: depois do viva vem a ponte (conversa da equipe que leva a proxima missao), com o controle na mao.
 	var done := Ep01V3Dialogue.done_lines(id)
+	var cheered := false
 	for k in done:
 		var group := "cheer.%s" % Ep01V3Dialogue.speaker(k)
-		say(Ep01V3Dialogue.pick(group, k) if k in Ep01V3Dialogue.group_keys(group) else k)
-	if done.is_empty() and id != &"M0":
+		cheered = cheered or k in Ep01V3Dialogue.group_keys(group)
+	if not cheered and id != &"M0":
 		say(Ep01V3Dialogue.pick("cheer.%s" % active_member))
+	for k in done:
+		var group := "cheer.%s" % Ep01V3Dialogue.speaker(k)
+		say(Ep01V3Dialogue.pick(group, k) if k in Ep01V3Dialogue.group_keys(group) else Ep01V3Dialogue.vary(k))
 	guide.on_mission_completed(id)
 	mission_completed.emit(id)
 	_start_after_hops.call_deferred(_index_of(id) + 1)
@@ -573,6 +578,8 @@ func _on_progressed(_id: StringName) -> void:
 ## achado pelo teste: `success.climber` (sorteio do acerto parcial) inclui "sock_high", que o M2 tambem diz ao soltar a
 ## meia; os dois caiam no mesmo quadro.
 const SAY_REPEAT_S := 5.0
+## G9: teto da espera pela conversa da ponte antes da cena da missao seguinte.
+const BRIDGE_WAIT_S := 12.0
 var _said_at: Dictionary = {}
 
 
@@ -933,6 +940,11 @@ func _cutscene_gate(index: int) -> bool:
 
 
 func _cutscene_run(queue: Array[StringName], index: int) -> void:
+	# G9: a cena seguinte espera a conversa da ponte acabar (a cena limpa a legenda), com teto de BRIDGE_WAIT_S.
+	var waited := 0.0
+	while index > 0 and hud.is_speaking() and waited < BRIDGE_WAIT_S and is_inside_tree():
+		await get_tree().process_frame
+		waited += get_process_delta_time()
 	for sid in queue:
 		await play_cutscene(sid)
 		if not is_inside_tree():
