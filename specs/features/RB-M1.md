@@ -87,3 +87,8 @@ O GitHub só mostra o "Run workflow" quando o arquivo do workflow existe na bran
   - o SHA-256 das platform-tools do Windows segue PENDENTE (`dl.google.com` bloqueado aqui);
   - tamanho e SHA-256 do APK só existem depois da 1ª execução;
   - o toque básico está em andamento.
+- **1ª execução do `android.yml`** (Thiago, run 45921259074, `e917b2a`): verde em 1 min 57 s.
+  - APK exportado e assinado com a keystore temporária (CN=Rota Brava teste), porque não há segredo de keystore. Cada build sai com assinatura diferente, então reinstalar apaga o save do aparelho.
+  - Artefato `rota-brava-android-apk`: 323.341.262 bytes compactados. Digest do zip: `sha256:d0ef6878…04a8`.
+  - Tamanho e SHA-256 do APK e das platform-tools do Windows ficam no resumo do job; não aparecem no log.
+  - Aviso do GitHub: as actions fixadas rodam em Node 20, que está obsoleto e é forçado para Node 24. Não é erro.
