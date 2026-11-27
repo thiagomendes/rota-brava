@@ -146,6 +146,8 @@ var _grips: Dictionary = {}
 ## Objeto na mao agora (G19) e quem segura.
 var carried: Node3D = null
 var carrier: MemberActor = null
+## G19b (C): peca pousada no chao pelo heroi antigo na troca de heroi (M2/M4); qualquer heroi a pega de novo.
+var ground_piece: Node3D = null
 ## Registros para os testes: cada passagem pela mao, cada clipe tocado e cada apoio da escalada.
 var hand_log: Array[Dictionary] = []
 var clip_log: Array[Dictionary] = []
@@ -339,6 +341,7 @@ func clear() -> void:
 	_basket = null
 	_bench = null
 	_drop_carried()
+	ground_piece = null
 	for a in _act_actors:
 		if is_instance_valid(a):
 			a.scripted = false
@@ -933,6 +936,7 @@ func refresh() -> void:
 					_enable(&"take_cart", cart_holder == null and carried == null and _cargo < CARGO_ORDER.size())
 					for st: StringName in CARGO_ORDER:
 						_enable(StringName("deliver_" + String(st)), cart_holder != null or carried != null)
+	_enable(&"pick_ground", ground_piece != null and is_instance_valid(ground_piece) and carried == null)
 	# Emblema de outro heroi continua visivel, mas so o heroi certo pega (Ep01Interactable.member).
 
 
@@ -964,7 +968,14 @@ func _on_spot(id: StringName, actor: Node3D) -> void:
 			it.queue_free()
 			spots.erase(id)
 		return
+	# G19b (C): so quem carrega poe no cesto, pendura ou entrega (nada sai da mao de outro heroi "por magica")
+	if carried != null and carrier != null and actor != carrier \
+			and (id == &"basket" or id == &"hang" or String(id).begins_with("deliver_")):
+		main.flash_help_target()
+		return
 	match id:
+		&"pick_ground":
+			await _act_pick_ground(actor as MemberActor)
 		&"bench":
 			_examine(actor, it)
 			if main.notify_mission(&"paw_examined"):
@@ -1074,14 +1085,17 @@ func _act_lift_box(a: MemberActor, stall: StringName) -> void:
 	var stand := box.global_position + side * BOX_REACH
 	stand.y = a.global_position.y
 	if not await _step_walk(a, _floor_at(stand), s):
+		_act_end(a, s)
 		return
 	a.face_now(box.global_position)
 	var L := _clip(a, &"place_low", 1.3, true)
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	_take(a, box, true, _box_local(box))
 	FeedbackFx.sparkle(world, box.global_position)
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	_rest(a)
 	_act_end(a, s)
@@ -1097,12 +1111,15 @@ func _act_drop_box(a: MemberActor, stall: StringName) -> void:
 	away.y = 0.0
 	var stand := to.origin + (away.normalized() if away.length() > 0.01 else -a.facing()) * BOX_DROP_REACH
 	if not await _step_walk(a, _floor_at(stand), s):
+		_act_end(a, s)
 		return
 	a.face_now(to.origin)
 	var L := _clip(a, &"pick_up", 1.2, true)
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	if not await _put(box, _root, to, 0.08, s):
+		_act_end(a, s)
 		return
 	box.set_meta(&"delivered", true)
 	FeedbackFx.sparkle(world, _mk(stall) + Vector3(0, 1.0, 0))
@@ -1111,6 +1128,7 @@ func _act_drop_box(a: MemberActor, stall: StringName) -> void:
 		main.say("ep01.market.vendor.gull_hint")
 	main.notify_mission(&"cargo_delivered")
 	if not await _wait(L * 0.4, s):
+		_act_end(a, s)
 		return
 	_act_end(a, s)
 
@@ -1133,16 +1151,21 @@ func _act_boot(a: MemberActor) -> void:
 	a.face_now(boot.global_position)
 	var L := _clip(a, &"pick_up", 1.0)
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	_take(a, boot, true, _box_local(boot))
 	if not await _wait(L * 0.5 + 0.35, s):
+		_act_end(a, s)
 		return
 	var L2 := _clip(a, &"pick_up", 1.2, true)
 	if not await _wait(L2 * 0.5, s):
+		_act_end(a, s)
 		return
 	if not await _put(boot, _root, home, 0.1, s):
+		_act_end(a, s)
 		return
 	if not await _wait(L2 * 0.4, s):
+		_act_end(a, s)
 		return
 	_act_end(a, s)
 
@@ -1159,12 +1182,15 @@ func _act_pull_leaves(a: MemberActor) -> void:
 	a.face_now(leaves.global_position)
 	var L := _clip(a, &"pick_up", 1.0)
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	_take(a, leaves, false, Transform3D(Basis(), Vector3(0, -0.04, 0)))
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	FeedbackFx.splash(world, _mk(&"M3_UpperBasin") + Vector3(0, 0.3, 0))
 	if not await _wait(_clip(a, &"pull_rope", 2.0), s):
+		_act_end(a, s)
 		return
 	# arremesso: sai da mao em arco ate o chao ao pe do chafariz
 	var from := leaves.global_position
@@ -1181,12 +1207,14 @@ func _act_pull_leaves(a: MemberActor) -> void:
 			var p := from.lerp(to.origin, k)
 			p.y += 0.6 * 4.0 * k * (1.0 - k)
 			leaves.global_transform = Transform3D(Basis(q0.slerp(to.basis.get_rotation_quaternion(), k)), p)):
+		_act_end(a, s)
 		return
 	main.say("ep01.plaza.climber.top_basin")
 	main.notify_mission(&"leaves_pulled")
 	main.say("ep01.plaza.radio.water_back")
 	_roll_ball()
 	if not await _climb_chain(a, [_mk(&"M3_FountainStep_2"), _mk(&"M3_FountainStep_1"), points[&"FountainBase"]], s):
+		_act_end(a, s)
 		return
 	_act_end(a, s)
 
@@ -1205,17 +1233,21 @@ func _act_free_piece(a: MemberActor, piece: Node3D, down: Array) -> void:
 	away.y = 0.0
 	if away.length() > 0.3:
 		if not await _step_walk(a, near + away.normalized() * 0.3, s):
+			_act_end(a, s)
 			return
 	a.face_now(at)
 	var L := _clip(a, &"pick_up", 1.0)
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	piece.set_meta(&"freed", true)
 	_take(a, piece, true, _flat_local(piece, BASKET_FOLD[maxi(0, _pieces.find(piece))]))
 	FeedbackFx.sparkle(world, piece.global_position)
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	if not await _climb_chain(a, down, s):
+		_act_end(a, s)
 		return
 	_rest(a)
 	_act_end(a, s)
@@ -1228,14 +1260,17 @@ func _act_find_reeds(a: MemberActor, it: Ep01Interactable, piece: Node3D) -> voi
 	var s := _act_begin(a)
 	a.face_now(piece.global_position)
 	if not await _wait(_clip(a, &"inspect", 1.8), s):
+		_act_end(a, s)
 		return
 	var L := _clip(a, &"pick_up", 1.0)
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	piece.set_meta(&"freed", true)
 	_take(a, piece, true, _flat_local(piece, BASKET_FOLD[2]))
 	main.say("ep01.bank.tracker.wet_paw")
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	_rest(a)
 	_act_end(a, s)
@@ -1253,12 +1288,15 @@ func _act_to_basket(a: MemberActor) -> void:
 	a.face_now(target.origin)
 	var L := _clip(a, &"pick_up", 1.2, true)
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	if not await _put(piece, _root, target, 0.1, s):
+		_act_end(a, s)
 		return
 	var ev: StringName = piece.get_meta(&"event", &"piece_freed")
 	main.notify_mission(ev)
 	if not await _wait(L * 0.4, s):
+		_act_end(a, s)
 		return
 	_act_end(a, s)
 
@@ -1279,10 +1317,12 @@ func _act_from_basket(a: MemberActor) -> void:
 	a.face_now(piece.global_position)
 	var L := _clip(a, &"pick_up", 1.0)
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	piece.set_meta(&"in_basket", false)
 	_take(a, piece, true, _flat_local(piece, BASKET_FOLD[maxi(0, _pieces.find(piece))]))
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	_rest(a)
 	_act_end(a, s)
@@ -1299,30 +1339,156 @@ func _act_hang(a: MemberActor) -> void:
 	var s := _act_begin(a)
 	var back := -bench_xf().basis.z
 	if not await _step_walk(a, bench_point(k, BENCH_GROUND), s):
+		_act_end(a, s)
 		return
 	if not await _hop_to(a, bench_point(k, BENCH_STEP_STAND), 0.24, 0.3, s):
+		_act_end(a, s)
 		return
 	if not await _hop_to(a, bench_point(k, BENCH_STAND), 0.24, 0.3, s):
+		_act_end(a, s)
 		return
 	a.face_now(a.global_position + back)
 	var L := _clip(a, &"place_high", 1.3)
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	if not await _put(piece, _root, line_slot(k), 0.08, s):
+		_act_end(a, s)
 		return
 	piece.set_meta(&"hung", true)
 	Ep01V3Pieces.play(piece, &"sway")
 	_hung += 1
 	FeedbackFx.sparkle(world, line_slot(k).origin)
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	if not await _hop_to(a, bench_point(k, BENCH_STEP_STAND), 0.2, 0.12, s):
+		_act_end(a, s)
 		return
 	if not await _hop_to(a, bench_point(k, BENCH_GROUND), 0.22, 0.12, s):
+		_act_end(a, s)
 		return
 	main.notify_mission(&"piece_hung")
 	if _hung == 3:
 		main.say("ep01.bank.tracker.next_clue")
+	_act_end(a, s)
+
+
+# ---------------------------------------------------------------- G19b (C): troca de heroi com peca na mao
+
+## Distancia (m) a frente do heroi onde ele pousa a peca no chao, e as direcoes tentadas (frente, lados, tras).
+const SET_DOWN_REACH := 0.42
+const SET_DOWN_DIRS: Array[float] = [0.0, 50.0, -50.0, 100.0, -100.0, 180.0]
+
+
+## O jogo trocou o heroi em controle para `a`. No M2 e no M4, se outro heroi esta com a peca na mao, ele a pousa no chao
+## a frente dele (place_low), apoiada e sem atravessar nada; quem vier depois pega de novo (ponto `pick_ground`). O M7
+## continua com a entrega de mao em mao (`_give`).
+func hero_changed(a: Node3D) -> void:
+	if carried == null or carrier == null or not is_instance_valid(carrier) or carrier == a:
+		return
+	if mission_id != &"M2" and mission_id != &"M4":
+		return
+	_act_set_down(carrier)
+
+
+## Onde a peca fica deitada/apoiada no chao junto de `a`: a primeira direcao em que ela nao encosta em nada alem do chao.
+func ground_xf(piece: Node3D, a: MemberActor) -> Transform3D:
+	var yaw := rad_to_deg(a.visual().global_rotation.y)
+	var first := Transform3D()
+	for i in SET_DOWN_DIRS.size():
+		var dir := a.facing().rotated(Vector3.UP, deg_to_rad(SET_DOWN_DIRS[i]))
+		dir.y = 0.0
+		var at := _floor_at(a.global_position + dir.normalized() * SET_DOWN_REACH + Vector3(0, 0.2, 0))
+		var xf := _ground_pose(piece, at, yaw)
+		if i == 0:
+			first = xf
+		if _clear_at(piece, xf):
+			return xf
+	return first
+
+
+func _ground_pose(piece: Node3D, at: Vector3, yaw: float) -> Transform3D:
+	if piece.has_meta(&"stall"):
+		return rest_xf(piece, at, yaw)
+	return lay_flat_xf(piece, at, yaw, BASKET_FOLD[clampi(_pieces.find(piece), 0, 2)])
+
+
+## A caixa da peca em `xf`, erguida 2 cm do apoio, nao toca nada da camada 1 (mundo, banco, cesto, barracas).
+func _clear_at(piece: Node3D, xf: Transform3D) -> bool:
+	var bx := piece_local_aabb(piece)
+	var sh := BoxShape3D.new()
+	sh.size = (bx.size * xf.basis.get_scale()).max(Vector3.ONE * 0.01)
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = sh
+	var b := xf.basis.orthonormalized()
+	q.transform = Transform3D(b, xf * bx.get_center() + Vector3(0, 0.02, 0))
+	q.collision_mask = 1
+	return get_world_3d().direct_space_state.intersect_shape(q, 1).is_empty()
+
+
+## O heroi antigo abaixa (place_low) e deixa a peca no chao a frente dele; ela sai da mao no meio do gesto.
+func _act_set_down(a: MemberActor) -> void:
+	var piece := carried
+	if a == null or piece == null:
+		return
+	var s := _act_begin(a)
+	var to := ground_xf(piece, a)
+	a.face_now(to.origin)
+	var L := _clip(a, &"place_low", 1.3)
+	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
+		return
+	if not await _put(piece, _root, to, 0.1, s):
+		_act_end(a, s)
+		return
+	ground_piece = piece
+	piece.set_meta(&"on_ground", true)
+	_ground_spot(piece)
+	if not await _wait(L * 0.4, s):
+		_act_end(a, s)
+		return
+	_rest(a)
+	_act_end(a, s)
+
+
+func _ground_spot(piece: Node3D) -> void:
+	var it := spots.get(&"pick_ground") as Ep01Interactable
+	if it == null:
+		it = _spot(&"pick_ground", piece.global_position, &"rope", "ui.action.pick", &"", 1.3)
+	it.global_position = piece.global_position
+
+
+## Pegar do chao: chega perto, abaixa (place_low de tras para frente) e a peca volta para as maos.
+func _act_pick_ground(a: MemberActor) -> void:
+	var piece := ground_piece
+	if a == null or piece == null or not is_instance_valid(piece) or carried != null:
+		return
+	var s := _act_begin(a)
+	var at := piece.global_position
+	var away := a.global_position - at
+	away.y = 0.0
+	if away.length() > SET_DOWN_REACH + 0.05:
+		if not await _step_walk(a, _floor_at(at + away.normalized() * SET_DOWN_REACH + Vector3(0, 0.2, 0)), s):
+			_act_end(a, s)
+			return
+	a.face_now(at)
+	var L := _clip(a, &"place_low", 1.3, true)
+	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
+		return
+	if not is_instance_valid(piece) or ground_piece != piece:
+		_act_end(a, s)
+		return
+	ground_piece = null
+	piece.remove_meta(&"on_ground")
+	var local := _box_local(piece) if piece.has_meta(&"stall") \
+		else _flat_local(piece, BASKET_FOLD[clampi(_pieces.find(piece), 0, 2)])
+	_take(a, piece, true, local)
+	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
+		return
+	_rest(a)
 	_act_end(a, s)
 
 
@@ -1472,6 +1638,8 @@ func _wait(t: float, serial: int) -> bool:
 		await get_tree().physics_frame
 		if not is_inside_tree() or serial != _hop_serial:
 			return false
+		if get_tree().paused:
+			continue   # G19b (A): na pausa a acao congela (corpo e peca parados)
 		e += get_physics_process_delta_time() * _rate
 	return true
 
@@ -1484,6 +1652,8 @@ func _over(t: float, serial: int, f: Callable) -> bool:
 		await get_tree().physics_frame
 		if not is_inside_tree() or serial != _hop_serial:
 			return false
+		if get_tree().paused:
+			continue   # G19b (A): na pausa a acao congela (corpo e peca parados)
 		e += get_physics_process_delta_time() * _rate
 		f.call(clampf(e / maxf(t, 0.001), 0.0, 1.0))
 	return true
@@ -1571,9 +1741,16 @@ func _take(a: MemberActor, piece: Node3D, two: bool, local: Transform3D) -> void
 
 
 ## Solta o que esta na mao em `parent`, assentando em `to` (mundo) em `t` s; a peca deixa de ser carregada.
-func _put(piece: Node3D, parent: Node, to: Transform3D, t: float, serial: int) -> bool:
-	if piece == null or not is_instance_valid(piece):
+func _put(what: Variant, parent: Node, to: Transform3D, t: float, serial: int) -> bool:
+	if not is_instance_valid(what) or not what is Node3D:
+		# G19b (B): a peca sumiu no meio; a mao fica livre (quem chama encerra a acao)
+		if not is_instance_valid(carried):
+			if carrier != null and is_instance_valid(carrier):
+				carrier.hands = &""
+			carried = null
+			carrier = null
 		return false
+	var piece := what as Node3D
 	piece.reparent(parent, true)
 	piece.remove_meta(&"in_hand")
 	if carried == piece:

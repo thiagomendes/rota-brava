@@ -880,6 +880,8 @@ func set_controlled(node: Node3D) -> void:
 	hud.set_member(active_member if node != null else &"")
 	if node != null:
 		camera_rig.follow(node)
+	if land != null and node is MemberActor:
+		land.hero_changed(node)   # G19b (C): o heroi antigo pousa no chao o que tinha na mao (M2/M4)
 
 
 ## Piso sob o heroi para o som do passo (PROVISORIO): madeira no cais, pedra no resto da vila.

@@ -442,9 +442,11 @@ func _on_spot(id: StringName, actor: Node3D) -> void:
 			var s := _act_begin(pico)
 			if carried != null and carried.get_meta(&"lens", false) and carrier != pico:
 				if not await _give(carrier, pico, s):
+					_act_end(pico, s)
 					return
 			if not await _climb_chain(pico, [_mk(&"M7_StairStep"), _mk(&"M7_StairBase"), _mk(&"M7_Landing_1"),
 					_mk(&"M7_Landing_2"), _mk(&"M7_Landing_3"), _mk(&"M7_Gallery")], s):
+				_act_end(pico, s)
 				return
 			_act_end(pico, s)
 		&"pup":
@@ -493,23 +495,28 @@ func _recover_fish(a: MemberActor) -> void:
 			if is_instance_valid(_fish):
 				_fish.global_transform = Transform3D(Basis(q0.slerp(land_xf.basis.get_rotation_quaternion(), k)),
 					f0.lerp(land_xf.origin, k * k))):
+			_act_end(a, s)
 			return
 		a.face_now(_fish.global_position)
 		var L := _clip(a, &"pick_up", 1.0)
 		if not await _wait(L * 0.5, s):
+			_act_end(a, s)
 			return
 		_take(a, _fish, true, Transform3D(Basis(Vector3.UP, PI / 2.0), Vector3.ZERO))
 		if not await _wait(L * 0.5, s):
+			_act_end(a, s)
 			return
 	main.say("ep01.street.climber.fish_got")
 	# Baixa o peixe na corda ate a rua (lower_rope): a corda sai da mao e o peixe desce na ponta dela.
 	var down := _floor_at((points[&"CratesBase"] as Vector3) + Vector3(0.6, 0.1, 0.4))
 	if not await _lower_on_rope(a, _fish, down, s):
+		_act_end(a, s)
 		return
 	FeedbackFx.sparkle(world, down)
 	main.say("ep01.street.climber.sees_boat")
 	# Desce escalando antes de concluir (a missao seguinte desmonta esta).
 	if not await _climb_chain(a, [_mk(&"M5_Awning"), _mk(&"M5_Crates"), points[&"CratesBase"]], s):
+		_act_end(a, s)
 		return
 	_act_end(a, s)
 	main.notify_mission(&"fish_recovered")
@@ -578,6 +585,7 @@ func _board() -> void:
 		if a.global_position.distance_to(boat.to_global(BoatActor.CREW[m])) < 4.0:
 			var s := _act_begin(a)
 			if not await _hop_to(a, boat.to_global(BoatActor.CREW[m]), 0.45, 0.3, s):
+				_act_end(a, s)
 				return
 			_act_end(a, s)
 		a.ride(boat, BoatActor.CREW[m])
@@ -654,6 +662,7 @@ func _throw_rope_and_tow(a: MemberActor) -> void:
 			_take(a, _rope, false, Transform3D(Basis(), Vector3(0, -0.08, 0)))
 		var L := _clip(a, &"throw_rope", 1.0)
 		if not await _wait(L * (0.74 / 1.2), s):
+			_act_end(a, s)
 			return
 		var hand := _rope.global_position
 		_rope.reparent(_root, true)
@@ -668,6 +677,7 @@ func _throw_rope_and_tow(a: MemberActor) -> void:
 				var e := hand.lerp(tie, k)
 				e.y += 1.2 * 4.0 * k * (1.0 - k)
 				Ep01V3Pieces.aim_rope(_rope, bow, e)):
+			_act_end(a, s)
 			return
 	Ep01V3Pieces.aim_rope(_rope, bow, tie)
 	FeedbackFx.sparkle(world, tie)
@@ -696,9 +706,11 @@ func _throw_rope_and_tow(a: MemberActor) -> void:
 	tw.tween_method(follow, 0.0, 1.0, TOW_TIME)
 	await tw.finished
 	if not is_inside_tree():
+		_act_end(a, s)
 		return
 	await _cut(_land_on_dock)
 	if not is_inside_tree() or s != _hop_serial:
+		_act_end(a, s)
 		return
 	main.say("ep01.bay.captain.pup_lighthouse")
 	_act_end(a, s)
@@ -761,16 +773,20 @@ func _rescue_pup(a: MemberActor) -> void:
 		var stand := mxf.origin + mxf.basis.z * (0.12 + LENS_REACH)
 		stand.y = a.global_position.y
 		if not await _step_walk(a, stand, s):
+			_act_end(a, s)
 			return
 		a.face_now(mxf.origin)
 		var L := _clip(a, &"place_high", 1.3)
 		if not await _wait(L * 0.5, s):
+			_act_end(a, s)
 			return
 		var lens := carried
 		if not await _put(lens, _root, mxf * Transform3D(LENS_UPRIGHT, Vector3(0, 0, 0.12)) * Transform3D(Basis(), -LENS_CENTER), 0.1, s):
+			_act_end(a, s)
 			return
 		lens.set_meta(&"mounted", true)
 		if not await _wait(L * 0.5, s):
+			_act_end(a, s)
 			return
 	world.set_beam(true)
 	if world.lantern != null:
@@ -780,10 +796,12 @@ func _rescue_pup(a: MemberActor) -> void:
 	a.face_now(pup.global_position)
 	var foot := points[&"StairFoot"] as Vector3
 	if not await _lower_on_rope(a, pup, _floor_at(foot + Vector3(0.8, 0.3, 0.4)), s):
+		_act_end(a, s)
 		return
 	main.notify_mission(&"pup_rescued")
 	if not await _climb_chain(a, [_mk(&"M7_Landing_3"), _mk(&"M7_Landing_2"), _mk(&"M7_Landing_1"), _mk(&"M7_StairBase"),
 			_mk(&"M7_StairStep"), points[&"StairFoot"]], s):
+		_act_end(a, s)
 		return
 	_act_end(a, s)
 
@@ -809,9 +827,11 @@ func _act_find_lens(a: MemberActor) -> void:
 	var s := _act_begin(a)
 	a.face_now(src.global_position)
 	if not await _wait(_clip(a, &"inspect", 1.8), s):
+		_act_end(a, s)
 		return
 	var L := _clip(a, &"pick_up", 1.0)
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	# a lente do mundo vira peca da missao no mesmo lugar (o mundo do art3d nao e alterado; so a visibilidade)
 	var lens := src.duplicate() as Node3D
@@ -822,6 +842,7 @@ func _act_find_lens(a: MemberActor) -> void:
 	lens.set_meta(&"lens", true)
 	_take(a, lens, true, Transform3D(LENS_UPRIGHT, -(LENS_UPRIGHT * LENS_CENTER)))
 	if not await _wait(L * 0.5, s):
+		_act_end(a, s)
 		return
 	_rest(a)
 	_act_end(a, s)
@@ -838,16 +859,19 @@ func _give(from: MemberActor, to: MemberActor, serial: int) -> bool:
 	if from.global_position.distance_to(meet) > 4.0:
 		from.teleport(to.global_position - to.facing() * 1.2)   # longe (fora do quadro): chega perto antes
 	if not await _step_walk(from, meet, serial):
+		_act_end(from, s2)
 		return false
 	from.face_now(to.global_position)
 	to.face_now(from.global_position)
 	var L := _clip(from, &"place_low", 1.3)
 	if not await _wait(L * 0.45, serial):
+		_act_end(from, s2)
 		return false
 	var piece := carried
 	from.hands = &""
 	_take(to, piece, true, piece.transform)
 	if not await _wait(L * 0.55, serial):
+		_act_end(from, s2)
 		return false
 	_rest(to)
 	_act_end(from, s2)
@@ -865,9 +889,11 @@ func _aim_next(a: MemberActor) -> void:
 		a.face_now(_hand_compass.global_position)
 		var L := _clip(a, &"pick_up", 1.0)
 		if not await _wait(L * 0.5, s):
+			_act_end(a, s)
 			return
 		_take(a, _hand_compass, true, _box_local(_hand_compass))
 		if not await _wait(L * 0.5, s):
+			_act_end(a, s)
 			return
 	if a != null:
 		var want := _mk(FESTA_BOATS[_lit]) - a.global_position
@@ -877,6 +903,7 @@ func _aim_next(a: MemberActor) -> void:
 		if not await _over(0.3, s, func(k: float) -> void:
 			if is_instance_valid(a):
 				a.visual().rotation.y = lerp_angle(y0, y1, k)):
+			_act_end(a, s)
 			return
 	if _lit == 0:
 		main.say("ep01.lighthouse.pilot.aim")
@@ -895,12 +922,16 @@ func _aim_next(a: MemberActor) -> void:
 		if a != null and carried == _hand_compass and _hand_compass != null:
 			var L2 := _clip(a, &"pick_up", 1.2, true)
 			if not await _wait(L2 * 0.5, s):
+				_act_end(a, s)
 				return
 			if not await _put(_hand_compass, _root, rest_xf(_hand_compass, _compass_spot(), 0.0), 0.1, s):
+				_act_end(a, s)
 				return
 			if not await _wait(L2 * 0.4, s):
+				_act_end(a, s)
 				return
 	if not await _wait(0.6, s):   # a lanterna termina de girar (0,6 s)
+		_act_end(a, s)
 		return
 	_act_end(a, s)
 
