@@ -4051,16 +4051,16 @@
         "source_art/characters/secondary_v2/captain_v2.blend"
       ],
       "saida_glb": "game/assets/models/characters/captain_v2.glb",
-      "glb_sha256": "2c956bac94e0fadb9e1c8f81f429e091719417d441774476f5916fae378805d8",
-      "glb_bytes": 4233760,
+      "glb_sha256": "81b3d26d2385e5d56a44cc4fa233a2a6a21267095832202c1b4c2d02d52c22d3",
+      "glb_bytes": 4260308,
       "cena": "game/actors/characters/captain_model.tscn",
       "importacao": "game/lookdev/gltf_pbr_import.gd (mipmaps e verniz, como no trio v2)",
-      "triangulos": 24038,
+      "triangulos": 24242,
       "triangulos_por_objeto": {
         "Captain_Skin": 5620,
         "Captain_Hair": 4728,
         "Captain_Cloth": 8054,
-        "Captain_Gear": 3268,
+        "Captain_Gear": 3472,
         "Captain_Face": 2368
       },
       "materiais": [
@@ -4191,7 +4191,7 @@
       "aprovacao": "pendente (Thiago)",
       "originalidade": "geometria procedural propria (SKIN + SUBSURF, metaballs, torno, bmesh, deslocamento em numpy); texturas pintadas por formula; rig e animacoes autorais por script; nenhum modelo, malha, rig, mocap, textura, HDRI ou personagem-base de terceiros",
       "data": "2026-11-26",
-      "nota": "RB-R1 G4: capitao refeito no padrao do trio v2 e com proporcao adulta (cabeca ~21% da altura). Mesmo esqueleto de 28 ossos e mesmos clipes (idle, walk, wave, thanks) do captain.glb; velocidades recalculadas pela proporcao nova. G4 r2: pulso continua para dentro da manga (sem vao), idle relaxado (bracos soltos, respiracao).",
+      "nota": "RB-R1 G4: capitao refeito no padrao do trio v2 e com proporcao adulta (cabeca ~21% da altura). Mesmo esqueleto de 28 ossos e mesmos clipes (idle, walk, wave, thanks) do captain.glb; velocidades recalculadas pela proporcao nova. G4 r2: pulso continua para dentro da manga (sem vao), idle relaxado (bracos soltos, respiracao). G23: bota de cano por dentro da barra da calca (sem vao perna-sapato; medido em game/tests/test_feet_gap.gd).",
       "razao_cabeca_altura": 0.2095
     },
     {
@@ -4370,15 +4370,15 @@
         "source_art/characters/secondary_v2/amora_v2.blend"
       ],
       "saida_glb": "game/assets/models/characters/amora_v2.glb",
-      "glb_sha256": "084dfbb49a8f48f76b0f7101cf9b62b3909a15d7167b3522f4e54421541fdd4c",
-      "glb_bytes": 4033280,
+      "glb_sha256": "2952973579600daa77a11513d88007b99baba3a75f6bc03cf27d50a8e4a31de8",
+      "glb_bytes": 4035796,
       "cena": "game/actors/characters/amora_model.tscn",
       "importacao": "game/lookdev/gltf_pbr_import.gd (mipmaps e verniz, como no trio v2)",
-      "triangulos": 22630,
+      "triangulos": 22876,
       "triangulos_por_objeto": {
         "Amora_Skin": 5116,
         "Amora_Hair": 3044,
-        "Amora_Cloth": 9090,
+        "Amora_Cloth": 9336,
         "Amora_Gear": 3012,
         "Amora_Face": 2368
       },
@@ -4511,7 +4511,7 @@
       "aprovacao": "pendente (Thiago)",
       "originalidade": "geometria procedural propria (SKIN + SUBSURF, metaballs, torno, bmesh, deslocamento em numpy); texturas pintadas por formula; rig e animacoes autorais por script; nenhum modelo, malha, rig, mocap, textura, HDRI ou personagem-base de terceiros",
       "data": "2026-11-26",
-      "nota": "RB-R1 G4: Dona Amora refeita com proporcao de senhora (cabeca ~21% da altura; antes 27%, lia como crianca), olhos menores, linhas de sorriso e fios grisalhos pintados. Mesmos clipes (idle, wave, thanks, point, talk). G4 r2: rosto de senhora (mandibula mais longa, sem bochecha de bebe, olhos menores e caidos, sobrancelha fina, pes de galinha), pulso dentro da manga, idle relaxado.",
+      "nota": "RB-R1 G4: Dona Amora refeita com proporcao de senhora (cabeca ~21% da altura; antes 27%, lia como crianca), olhos menores, linhas de sorriso e fios grisalhos pintados. Mesmos clipes (idle, wave, thanks, point, talk). G4 r2: rosto de senhora (mandibula mais longa, sem bochecha de bebe, olhos menores e caidos, sobrancelha fina, pes de galinha), pulso dentro da manga, idle relaxado. G23: meia continua por um tornozelo que entra no sapato (sem vao perna-sapato; medido em game/tests/test_feet_gap.gd).",
       "razao_cabeca_altura": 0.2109
     },
     {
@@ -4622,15 +4622,15 @@
         "source_art/characters/secondary_v2/render_lineup_g21.py"
       ],
       "saida_glb": "game/assets/models/characters/lumi_v2.glb",
-      "glb_sha256": "1bd3af3b3ce3a2309a74696aa03045ab04f5b91484bf407b408caf7d64cb7f64",
-      "glb_bytes": 4443772,
+      "glb_sha256": "f6af8508e3751522477b8b7e0976a50e9c36454b79269a61f1d0de81d9cb3756",
+      "glb_bytes": 4446004,
       "cena": "game/actors/characters/lumi_model.tscn",
       "importacao": "game/lookdev/gltf_pbr_import.gd (mipmaps e verniz, como no trio v2)",
-      "triangulos": 22823,
+      "triangulos": 23027,
       "triangulos_por_objeto": {
         "Lumi_Skin": 5116,
         "Lumi_Hair": 4073,
-        "Lumi_Gear": 5976,
+        "Lumi_Gear": 6180,
         "Lumi_Cloth": 5290,
         "Lumi_Face": 2368
       },
@@ -4765,7 +4765,7 @@
       "aprovacao": "pendente (reviewer, depois Thiago)",
       "originalidade": "geometria procedural propria (SKIN + SUBSURF, metaballs, torno, bmesh, deslocamento em numpy); texturas pintadas por formula; rig e animacoes autorais por script; nenhum modelo, malha, rig, mocap, textura, HDRI ou personagem-base de terceiros",
       "data": "2026-11-27",
-      "nota": "RB-R1 G21: operador do Farol 7 (decisao de Thiago: homem, ~30 anos, nome Lumi). Clipes idle (loop, braços relaxados), talk (3,0 s, visemas), wave (1,6 s), point (1,2 s) e, sentado na cadeira da base (plano 9a, filho de Chair/Seat), idle_seated (3,6 s, loop) e turn_chair (1,0 s)."
+      "nota": "RB-R1 G21: operador do Farol 7 (decisao de Thiago: homem, ~30 anos, nome Lumi). Clipes idle (loop, braços relaxados), talk (3,0 s, visemas), wave (1,6 s), point (1,2 s) e, sentado na cadeira da base (plano 9a, filho de Chair/Seat), idle_seated (3,6 s, loop) e turn_chair (1,0 s). G23: tenis de cano por dentro da barra da calca (sem vao perna-sapato; medido em game/tests/test_feet_gap.gd)."
     },
     {
       "id": "portraits_v2_lumi",

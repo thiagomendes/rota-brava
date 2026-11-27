@@ -1,10 +1,10 @@
 {
-  "tris": 24038,
+  "tris": 24242,
   "tris_por_objeto": {
     "Captain_Skin": 5620,
     "Captain_Hair": 4728,
     "Captain_Cloth": 8054,
-    "Captain_Gear": 3268,
+    "Captain_Gear": 3472,
     "Captain_Face": 2368
   },
   "materials": [

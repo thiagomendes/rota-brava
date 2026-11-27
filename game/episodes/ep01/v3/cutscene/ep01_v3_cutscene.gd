@@ -16,6 +16,8 @@ extends Node
 ## cima. Entram em 0,35 s (instantaneo com movimento reduzido).
 
 signal finished(scene_id: StringName, skipped: bool)
+## G21i: entrou no plano `index` (quem montou a cena reage a `stage`, `stage_event` e `hud` da ficha).
+signal shot_entered(index: int, shot: Dictionary)
 
 const DATA_PATH := "res://episodes/ep01/v3/ep01_v3_cutscenes.json"
 const DEFAULT_SEEN_PATH := "user://slot_1.cutscenes.seen.json"
@@ -31,7 +33,7 @@ const BAR_IN := 0.35
 const CAMERA_FOV := 50.0
 ## Efeitos de mundo por cena e plano (indice do plano -> efeito).
 ## Quem a ficha pede e o jogo nao passou em `actors`: figurante temporario (StoryFigure), removido ao fim da cena.
-const STORY_MODELS := {&"vendor": "amora_model", &"captain": "captain_model", &"pup": "pup_model"}
+const STORY_MODELS := {&"vendor": "amora_model", &"captain": "captain_model", &"pup": "pup_model", &"radio": "lumi_model"}
 const EFFECTS := {&"nightfall": {1: &"night"}, &"closing": {0: &"festival"}}
 
 ## Liga/desliga todas as cenas (a suite desliga por padrao; os testes de cena religam).
@@ -46,6 +48,8 @@ static var _data: Dictionary = {}
 
 var world: VillageWorld
 var hud: Hud
+## G21i: palco extra (Farol7Base) com marcadores proprios (`Base_*`), consultado antes do mundo; null = so o mundo.
+var stage: Node3D
 ## who (tracker, climber, pilot, captain, pup) -> Node3D (MemberActor ou raiz de StoryFigure).
 var actors: Dictionary = {}
 var reduced_motion: bool = false
@@ -74,6 +78,8 @@ var _starts: Array[float] = []
 ## G17: duracao efetiva de cada plano (shot_length), calculada no play.
 var _durs: Array[float] = []
 var _held: Dictionary = {}
+## G21i: figurante segurando o trecho que importa do clipe (`hold` da ficha): who -> {node, anim, a, b, until, then}.
+var _holds: Dictionary = {}
 var _moved: Dictionary = {}
 var _bars: CanvasLayer
 var _bar_top: ColorRect
@@ -364,6 +370,7 @@ func _step(delta: float) -> void:
 		if (pose[0] as Vector3).distance_to(pose[1]) > 0.01:
 			camera.look_at(pose[1], Vector3.UP)
 	_hold_clips()
+	_hold_ranges()
 	if _shots.is_empty() or (shot_index == _shots.size() - 1 and shot_time >= _durs[shot_index]):
 		var speaking := hud != null and hud.is_speaking()
 		if not speaking or shot_time >= (_durs[shot_index] if shot_index >= 0 else 0.0) + TAIL_MAX:
@@ -403,7 +410,12 @@ func point_of(ref: Variant) -> Vector3:
 	var o: Array = d.get("offset", [0, 0, 0])
 	if o.size() >= 3:
 		off = Vector3(float(o[0]), float(o[1]), float(o[2]))
-	var m := world.marker(StringName(str(d.get("marker", "")))) if world != null else null
+	var id := StringName(str(d.get("marker", "")))
+	var m: Node3D = null
+	if stage != null and stage.has_method(&"marker"):
+		m = stage.call(&"marker", id) as Node3D
+	if m == null and world != null:
+		m = world.marker(id)
 	return (m.global_position if m != null else Vector3.ZERO) + off
 
 
@@ -417,8 +429,13 @@ func _enter_shot(i: int) -> void:
 				world.set_night(true)
 			&"festival":
 				world.set_festival(true)
+	# G21i: antes da pose e dos atores (quem montou a cena pode trazer o palco do plano)
+	shot_entered.emit(i, sh)
+	if hud != null:
+		hud.spotlight_help(str(sh.get("hud", "")) == "help_pulse")
 	var cam_from := shot_pose(sh, 0.0)[0]
 	_held.clear()
+	_holds.clear()
 	for a: Variant in sh.get("actors", []):
 		_place_actor(a as Dictionary, cam_from, sh)
 	var key := line_key(sh)
@@ -435,13 +452,30 @@ func _place_actor(a: Dictionary, cam_from: Vector3, sh: Dictionary) -> void:
 	var node := actors.get(who) as Node3D
 	if (node == null or not is_instance_valid(node)) and STORY_MODELS.has(who) and world != null \
 			and ResourceLoader.exists(StoryFigure.DIR % STORY_MODELS[who]):
-		node = StoryFigure.spawn(world, STORY_MODELS[who], "Cutscene_" + String(who))
+		var parent: Node = world
+		if stage != null and stage.get_node_or_null(^"Actors") != null:
+			parent = stage.get_node(^"Actors")
+		node = StoryFigure.spawn(parent, STORY_MODELS[who], "Cutscene_" + String(who))
 		node.set_meta(&"cutscene_temp", true)
 		actors[who] = node
 	if node == null or not is_instance_valid(node):
 		fallbacks.append("%s:%s->ausente" % [who, a.get("anim", "")])
 		return
 	var member := node as MemberActor
+	# G21i: `seat` = caminho de um no do palco (ex.: Chair/Seat); o figurante vira filho dele e gira junto.
+	var seat := str(a.get("seat", ""))
+	if member == null and stage != null and seat != "" and stage.get_node_or_null(seat) != null:
+		var to := stage.get_node(seat)
+		if node.get_parent() != to:
+			node.reparent(to, false)
+		node.transform = Transform3D.IDENTITY
+		node.visible = true
+		var seated := resolve_anim(node, StringName(str(a.get("anim", "idle"))), StringName(str(a.get("fallback", "idle"))), who)
+		_play_clip(node, seated, StringName(str(a.get("then", "idle"))))
+		return
+	var stage_actors := stage.get_node_or_null(^"Actors") if stage != null else null
+	if member == null and stage_actors != null and stage.is_ancestor_of(node) and node.get_parent() != stage_actors:
+		node.reparent(stage_actors, false)  # levantou da cadeira
 	# Quem esta embarcado (M6) fica no barco: so troca o clipe.
 	if member == null or member.riding_on == null:
 		if not _moved.has(who):
@@ -462,7 +496,18 @@ func _place_actor(a: Dictionary, cam_from: Vector3, sh: Dictionary) -> void:
 	else:
 		StoryFigure.face(node, face_to)
 	var anim := resolve_anim(node, StringName(str(a.get("anim", "idle"))), StringName(str(a.get("fallback", "idle"))), who)
-	_play_clip(node, anim)
+	var hold: Array = a.get("hold", [])
+	var cv := _visual(node)
+	if member == null and hold.size() == 2 and cv != null and cv.has_animation(anim) and cv.animation_player() != null:
+		# G21i: toca o clipe e segura o trecho [a, b] (a == b: congela a pose) ate `hold_until` do plano; depois
+		# passa para `then` com blend (ex.: o point fica estendido durante a fala inteira).
+		node.set_meta(StoryFigure.LOOP_META, &"")
+		cv.play(anim, 1.0, 0.2)
+		var then := StringName(str(a.get("then", "idle")))
+		_holds[who] = {"node": node, "anim": anim, "a": float(hold[0]), "b": float(hold[1]),
+			"until": float(a.get("hold_until", 0.85)), "then": then if cv.has_animation(then) else &"idle"}
+		return
+	_play_clip(node, anim, StringName(str(a.get("then", "idle"))))
 	if CharacterVisual.LOOPING.has(anim) and anim != &"idle":
 		_held[who] = anim
 
@@ -483,7 +528,8 @@ static func _visual(node: Node3D) -> CharacterVisual:
 	return StoryFigure.visual(node)
 
 
-func _play_clip(node: Node3D, anim: StringName) -> void:
+## `then` (G21i): clipe de laco depois de um clipe unico no figurante (ex.: wave -> talk).
+func _play_clip(node: Node3D, anim: StringName, then: StringName = &"idle") -> void:
 	if node is MemberActor:
 		var m := node as MemberActor
 		if anim == &"idle":
@@ -494,7 +540,8 @@ func _play_clip(node: Node3D, anim: StringName) -> void:
 	elif anim == &"idle" or CharacterVisual.LOOPING.has(anim):
 		StoryFigure.loop(node, anim)
 	else:
-		StoryFigure.once(node, anim)
+		var cv := _visual(node)
+		StoryFigure.once(node, anim, then if cv != null and cv.has_animation(then) else &"idle")
 
 
 ## Clipes de laco (idle_wheel, wag) seguem tocando no MemberActor, que voltaria ao idle no fim da acao.
@@ -503,6 +550,39 @@ func _hold_clips() -> void:
 		var m := actors.get(who) as MemberActor
 		if m != null and m.model != null and m.model.current_animation() != _held[who]:
 			m.play_action(_held[who])
+
+
+## G21i: mantem os figurantes no trecho `hold` do clipe e solta para `then` (blend 0,35 s) no fim do trecho.
+func _hold_ranges() -> void:
+	if shot_index < 0:
+		return
+	var dur := maxf(_durs[shot_index], 0.001)
+	for who: StringName in _holds.keys():
+		var h: Dictionary = _holds[who]
+		var node := h["node"] as Node3D
+		var cv := _visual(node) if node != null and is_instance_valid(node) else null
+		var ap := cv.animation_player() if cv != null else null
+		if ap == null:
+			_holds.erase(who)
+			continue
+		if shot_time >= float(h["until"]) * dur:
+			ap.play(String(h["then"]), 0.35)
+			node.set_meta(StoryFigure.LOOP_META, h["then"])
+			_holds.erase(who)
+			continue
+		var a := float(h["a"])
+		var b := float(h["b"])
+		if ap.current_animation == String(h["anim"]) and ap.current_animation_position >= b:
+			if b - a < 0.01:
+				# congela a pose sem pausar o player (pausado, o visual volta ao idle): volta ao instante a cada quadro
+				ap.seek(a, true)
+			else:
+				ap.seek(a + fmod(ap.current_animation_position - b, b - a), true)
+
+
+## Trecho segurado agora (testes): who -> clipe, ou vazio.
+func holding(who: StringName) -> StringName:
+	return StringName((_holds[who] as Dictionary)["anim"]) if _holds.has(who) else &""
 
 
 ## Pula a cena (so se pulavel). true se pulou.
@@ -534,6 +614,8 @@ func _finish(skipped: bool) -> void:
 	var id := scene_id
 	mark_seen(id)
 	_restore_actors()
+	if hud != null:
+		hud.spotlight_help(false)
 	_restore_game_hud()
 	if hud != null:
 		hud.clear_speech()
@@ -566,6 +648,7 @@ func _restore_actors() -> void:
 		node.visible = bool(saved["v"])
 	_moved.clear()
 	_held.clear()
+	_holds.clear()
 
 
 ## Ponto para onde a camera do jogo deve olhar ao sair da cena atual/ultima.
@@ -582,6 +665,9 @@ func _hide_game_hud() -> void:
 	for n: String in HUD_GAME_NODES:
 		var c := hud.find_child(n, true, false) as CanvasItem
 		if c == null:
+			continue
+		# G21i: no plano com o disco da ajuda em destaque o canto de cima fica (o Hud mostra so o disco nele).
+		if n == "TopLeft" and hud.help_spotlit():
 			continue
 		if not _hud_hidden.has(n):
 			_hud_hidden[n] = c.visible

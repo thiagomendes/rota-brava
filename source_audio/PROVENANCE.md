@@ -241,7 +241,6 @@ Gemini API (TTS, vozes pre-prontas) com o elenco aprovado por Thiago (`tools/voi
 | `res://audio/voice/v3/ep01_intro_climber_hello.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Fenrir, 2026-11-26T13:32:56+00:00 | `tools/voice/gen_v3.py` | `78ec56d32db378f9…` |
 | `res://audio/voice/v3/ep01_narrator_intro_pilot.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Sadaltager, 2026-11-27T08:25:04+00:00 | `tools/voice/gen_v3.py` | `9dae6e7518d385a0…` |
 | `res://audio/voice/v3/ep01_intro_pilot_hello.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Erinome, 2026-11-26T13:32:57+00:00 | `tools/voice/gen_v3.py` | `93db6b7ed6ab4558…` |
-| `res://audio/voice/v3/ep01_radio_intro_hello.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Schedar, 2026-11-27T08:25:20+00:00 | `tools/voice/gen_v3.py` | `8d1cf5cc25660b1d…` |
 | `res://audio/voice/v3/ep01_narrator_intro_call.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Sadaltager, 2026-11-26T13:32:59+00:00 | `tools/voice/gen_v3.py` | `72ed5ca1e64973b8…` |
 | `res://audio/voice/v3/ep01_narrator_opening_team.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Sadaltager, 2026-11-26T13:33:00+00:00 | `tools/voice/gen_v3.py` | `e30a4b266a2676a5…` |
 | `res://audio/voice/v3/ep01_narrator_opening_empty_boat.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Sadaltager, 2026-11-26T13:33:00+00:00 | `tools/voice/gen_v3.py` | `040f42b1def5de81…` |
