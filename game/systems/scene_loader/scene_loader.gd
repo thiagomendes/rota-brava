@@ -194,6 +194,18 @@ func is_busy() -> bool:
 	return phase != Phase.IDLE
 
 
+## G17: a tela ja foi liberada para a cena (ocioso ou no fade de saida). Relogio, falas e musica de cena esperam isto.
+func screen_released() -> bool:
+	return phase == Phase.IDLE or phase == Phase.FADING_OUT
+
+
+## G17: retorna quando a tela de carregamento libera a cena (na hora, se ja liberou).
+static func wait_released(node: Node) -> void:
+	var loader := instance()
+	while node.is_inside_tree() and not loader.screen_released():
+		await node.get_tree().process_frame
+
+
 ## A tela de carregamento esta na frente (visivel e bloqueando entrada).
 func is_showing() -> bool:
 	return _root.visible

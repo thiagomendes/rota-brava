@@ -51,8 +51,9 @@ func _ready() -> void:
 	audio = AudioDirector.new()
 	audio.name = "AudioDirector"
 	add_child(audio)
-	audio.start_ambience()
+	audio.ambience_hold = true
 	audio.set_ambience_zone(&"dock")
+	_start_ambience_when_released()
 	hud.emotes_hook = func(key: String) -> Array[StringName]: return Ep01V3Dialogue.emotes(key)
 	hud.voice_hook = func(key: String) -> float:
 		var id := Ep01V3Dialogue.take(key)
@@ -71,6 +72,14 @@ func _ready() -> void:
 	cutscene.finished.connect(_on_finished)
 	if not cutscene.play(SCENE_ID):
 		_on_finished.call_deferred(SCENE_ID, true)
+
+
+## G17: o som da vila so entra quando a tela de carregamento sai (no celular ela fica muito tempo na frente).
+func _start_ambience_when_released() -> void:
+	await SceneLoaderService.wait_released(self)
+	if is_inside_tree():
+		audio.ambience_hold = false
+		audio.start_ambience()
 
 
 func _on_finished(_id: StringName, skipped: bool) -> void:

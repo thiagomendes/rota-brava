@@ -91,6 +91,10 @@ var _line_started_ms: int = 0
 var _line_duck: bool = false
 
 
+## G17: true segura o ambiente (a cena ainda esta sob a tela de carregamento); a zona muda, mas nada toca.
+var ambience_hold: bool = false
+
+
 func _ready() -> void:
 	Options.music_duck_db = func() -> float: return DUCK_DB if ducked else 0.0
 	_ensure_catalog()
@@ -489,6 +493,8 @@ func ambience_layers_playing() -> Array[String]:
 ## Ambiente: camadas em loop da zona atual (padrao dock: agua, vento, rangidos, gaivotas), cada uma com nivel proprio
 ## (gain_db do catalogo); entram com fade a partir de pontos aleatorios para nao alinhar as emendas.
 func start_ambience(fade: float = 2.0) -> void:
+	if ambience_hold:
+		return
 	for n in AMBIENCE_ZONES[ambience_zone]:
 		var s := _stream(n)
 		if s == null:

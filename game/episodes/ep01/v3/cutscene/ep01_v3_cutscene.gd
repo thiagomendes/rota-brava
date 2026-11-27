@@ -57,6 +57,8 @@ var shot_index: int = -1
 var time: float = 0.0
 ## G17: tempo dentro do plano atual (s).
 var shot_time: float = 0.0
+## G17: a cena foi pedida com a tela de carregamento na frente; o relogio e as falas so comecam quando ela libera.
+var waiting_screen: bool = false
 ## Clipes que caíram no fallback nesta instancia: "who:anim->usado".
 var fallbacks: Array[String] = []
 var lines_said: Array[String] = []
@@ -309,7 +311,9 @@ func play(id: StringName) -> bool:
 	_skip_label.visible = skippable
 	_layout_bars(1.0 if reduced_motion else 0.0)
 	print("[RB] cutscene start %s skippable=%s" % [id, skippable])
-	_step(0.0)
+	waiting_screen = not SceneLoaderService.instance().screen_released()
+	if not waiting_screen:
+		_step(0.0)
 	if auto_skip:
 		_finish.call_deferred(true)
 	return true
@@ -317,6 +321,17 @@ func play(id: StringName) -> bool:
 
 func _process(delta: float) -> void:
 	if not playing:
+		return
+	if waiting_screen:
+		# G17: o celular segura a tela de carregamento por muito tempo; a cena nao conta tempo nem fala por baixo dela.
+		if on_step.is_valid():
+			on_step.call()
+		_hide_game_hud()
+		if not SceneLoaderService.instance().screen_released():
+			return
+		waiting_screen = false
+		print("[RB] cutscene tela liberada %s" % scene_id)
+		_step(0.0)
 		return
 	_step(delta)
 
@@ -514,6 +529,7 @@ func _finish(skipped: bool) -> void:
 	if not playing:
 		return
 	playing = false
+	waiting_screen = false
 	var id := scene_id
 	mark_seen(id)
 	_restore_actors()
