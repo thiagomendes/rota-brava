@@ -6,7 +6,7 @@
   "ui.slots.emblems": "{found}/{total}",
   "ui.slots.complete": "Festa completa!",
   "ui.slots.erase": "Apagar",
-  "ui.slots.erase_hold": "Segure para apagar",
+  "ui.slots.erase_hold": "Segure {ui_accept} para apagar",
   "ui.slots.erase_confirm": "Apagar o Jogo {n}?",
   "ui.slots.erase_yes": "Sim, apagar",
   "ui.slots.erase_no": "Não"

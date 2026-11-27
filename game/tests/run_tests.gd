@@ -89,6 +89,7 @@ func _reset_shared_state() -> void:
 	_reset_cutscenes()
 	_reset_slots()
 	Ep01V3Dialogue.reset_picks()
+	InputDevice.reset()
 	for action: StringName in InputMap.get_actions():
 		Input.action_release(action)
 	paused = false
