@@ -10,7 +10,8 @@ Thiago instala e joga o Ep01 v3 nos próprios aparelhos:
 Por enquanto o objetivo é só validação. Não há publicação em loja.
 
 ## Decisões de Thiago (2026-11-27)
-- **Android:** o GitHub Actions gera o APK a cada push. Um script PowerShell no PC baixa o último APK e instala pelo `adb`. Thiago não instala o Android SDK.
+- **Android e iOS só sob demanda** (Thiago, 2026-11-27): os dois workflows rodam só por disparo manual (`workflow_dispatch`), nunca a cada push.
+- **Android:** o GitHub Actions gera o APK quando disparado. Um script PowerShell no PC baixa o último APK e instala pelo `adb`. Thiago não instala o Android SDK.
 - **Toque:** entra um **controle por toque básico** já neste ticket. Ele é provisório e tem UX infantil.
 - **Assinatura iOS automática** com chave da App Store Connect API, papel Admin. Thiago cadastra os segredos no GitHub. O Xcode no Actions cria o certificado e o perfil com `-allowProvisioningUpdates` e envia ao TestFlight.
 - **Bundle ID:** `com.thiagomendes.rotabrava`, igual no Android e no iOS.
@@ -22,13 +23,13 @@ Por enquanto o objetivo é só validação. Não há publicação em loja.
 2. **Workflows do GitHub Actions** em `.github/workflows/`.
    - **`android.yml`:**
      - Linux, Godot 4.7.2 e templates fixados com SHA-256, como em `tools/toolchain.json`; JDK e Android SDK.
-     - Exporta o APK e publica como artefato.
+     - Disparo manual (`workflow_dispatch`). Exporta o APK e publica como artefato.
      - Keystore: usa o segredo `ANDROID_KEYSTORE_B64`/`ANDROID_KEYSTORE_PASS` se ele existir. Senão, usa uma keystore temporária da execução; nesse caso o script de instalação trata a troca de assinatura.
    - **`ios.yml`:**
      - macOS com Xcode; exporta o projeto Xcode pela Godot.
      - `xcodebuild archive` + `-exportArchive` com destino de envio ao App Store Connect, usando a chave da API.
      - Segredos: `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8_B64` e `APPLE_TEAM_ID`.
-     - Disparo manual (`workflow_dispatch`), porque minuto de macOS custa caro.
+     - Disparo manual (`workflow_dispatch`).
 3. **Script `tools/android-install.ps1`** (Windows):
    - Baixa e instala por conta própria as platform-tools, com hash fixado, em `.tools/`.
    - Baixa o último APK do Actions. Usa o `gh` se o Thiago tiver; senão, aceita o caminho de um APK já baixado.
@@ -53,7 +54,7 @@ Publicação em loja; ajuste fino de desempenho; UX de toque definitiva; ícones
 
 ## Riscos
 - O renderizador móvel pode mudar luz, sombra e pós-processamento. A vila tem custo alto, e o celular pode ficar lento.
-- O GitHub cobra minutos de macOS em repositório privado com multiplicador alto. Por isso o iOS roda só por disparo manual.
+- O GitHub cobra minutos de macOS em repositório privado com multiplicador alto; os dois workflows rodam só por disparo manual.
 - A Apple exige que o registro do app já exista no App Store Connect antes do primeiro envio. Thiago cria esse registro manualmente uma vez.
 - Uma keystore temporária no Android troca a assinatura a cada build. Reinstalar apaga o save do aparelho até existir uma keystore fixa.
 
