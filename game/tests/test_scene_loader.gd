@@ -214,3 +214,13 @@ func _corrupt_scene() -> void:
 	r.check(loader.last_timings.has("failed"), "corrompida: caminho de erro registrado (%s)" % loader.last_timings)
 	r.check(before != null and before.can_process() and not MouseLock.blocked(), "corrompida: cena anterior volta a processar e mouse solto")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(bad))
+	# G16b: a falha nao deixa pedido orfao preso (target_path limpo): a fila esvazia em poucos quadros
+	var k := 0
+	while not loader.bg_idle() and k < 60:
+		await r.tree.process_frame
+		k += 1
+	r.check(loader.bg_idle() and loader.target_path == "", "corrompida: fila livre em poucos quadros depois da falha (%d)" % k)
+	var ok2 := loader.change_scene(MENU)
+	await _wait_idle()
+	r.check(ok2 and r.tree.current_scene != null and r.tree.current_scene.scene_file_path == MENU,
+		"corrompida: a troca seguinte funciona")
