@@ -37,7 +37,7 @@ jobs:
           fi
           echo "Segredos presentes."
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Godot 4.7.2 (macOS) e templates, com SHA-256
         run: |
@@ -60,11 +60,12 @@ jobs:
       - name: Exportar o projeto Xcode pela Godot
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          RUN_NUMBER: ${{ github.run_number }}
         run: |
           set -euo pipefail
           P=game/export_presets.cfg
           sed -i '' "s/^application\/app_store_team_id=.*/application\/app_store_team_id=\"$APPLE_TEAM_ID\"/" $P
-          sed -i '' "s/^application\/version=.*/application\/version=\"${{ github.run_number }}\"/" $P
+          sed -i '' "s/^application\/version=.*/application\/version=\"$RUN_NUMBER\"/" $P
           mkdir -p build/ios
           "$GODOT" --headless --path game --import
           "$GODOT" --headless --path game --export-release "iOS" "$PWD/build/ios/RotaBrava.ipa" 2>&1 | tee build/ios/godot-export.log
@@ -91,6 +92,7 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          RUN_NUMBER: ${{ github.run_number }}
         run: |
           set -euo pipefail
           xcodebuild archive \
@@ -104,7 +106,7 @@ jobs:
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CODE_SIGN_STYLE=Automatic \
             CODE_SIGN_IDENTITY="Apple Development" PROVISIONING_PROFILE_SPECIFIER="" \
             PRODUCT_BUNDLE_IDENTIFIER=com.thiagomendes.rotabrava \
-            CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            CURRENT_PROJECT_VERSION="$RUN_NUMBER" \
             2>&1 | tee build/ios/xcodebuild-archive.log
 
       - name: Exportar e enviar ao App Store Connect (TestFlight)
@@ -112,6 +114,7 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          RUN_NUMBER: ${{ github.run_number }}
         run: |
           set -euo pipefail
           cat > build/ios/ExportOptions.plist <<EOF
@@ -138,21 +141,30 @@ jobs:
             2>&1 | tee build/ios/xcodebuild-export.log
           {
             echo "### Enviado ao App Store Connect"
-            echo "- Commit: \`${GITHUB_SHA}\`, build ${{ github.run_number }}"
+            echo "- Commit: \`${GITHUB_SHA}\`, build ${RUN_NUMBER}"
             echo "- A build aparece no TestFlight depois do processamento da Apple (costuma levar de 5 a 30 min)."
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Apagar a chave
+      - name: Apagar a chave e o ExportOptions.plist
         if: always()
-        run: rm -f "$RUNNER_TEMP"/AuthKey_*.p8
+        run: rm -f "$RUNNER_TEMP"/AuthKey_*.p8 build/ios/ExportOptions.plist
 
-      - uses: actions/upload-artifact@v4
+      - name: Mascarar o Team ID nos logs
+        id: mask
         if: failure()
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for f in build/ios/*.log; do
+            if [ -n "$APPLE_TEAM_ID" ]; then sed -i '' "s/$APPLE_TEAM_ID/***/g" "$f"; fi
+          done
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: failure() && steps.mask.outcome == 'success'
         with:
-          name: ios-logs-e-xcarchive
-          path: |
-            build/ios/*.log
-            build/ios/ExportOptions.plist
-            build/ios/RotaBrava.xcarchive
+          name: ios-logs
+          path: build/ios/*.log
           if-no-files-found: ignore
           retention-days: 14

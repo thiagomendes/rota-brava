@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+#Requires -Version 7.2
 <#
 .SYNOPSIS
   RB-M1: instala o APK do Rota Brava num celular Android ligado por cabo ao PC Windows.
@@ -52,7 +52,7 @@ if (-not (Test-Path $adb)) {
             Write-Host "SHA-256 do arquivo baixado: $got"
             Write-Host "Compare com o valor do resumo do ultimo job 'Android APK' no GitHub Actions (secao 'platform-tools Windows')."
             $ok = Read-Host 'Os dois sao iguais? Digite SIM para continuar'
-            if ($ok -ne 'SIM') { Remove-Item $zip -Force; throw 'Instalacao cancelada: hash nao confirmado.' }
+            if ($ok -cne 'SIM') { Remove-Item $zip -Force; throw 'Instalacao cancelada: hash nao confirmado.' }
         } elseif ($got -ne $pt.sha256.ToLowerInvariant()) {
             Remove-Item $zip -Force
             throw "SHA-256 divergente nas platform-tools (esperado $($pt.sha256), obtido $got). Arquivo apagado."
@@ -62,10 +62,13 @@ if (-not (Test-Path $adb)) {
     }
 }
 
+$script:AdbExit = 0
 function Adb {
     # sem param(): assim "-s <serial>" passa direto ao adb em $args
-    if ($DryRun -and -not (Test-Path $adb)) { Write-Host "[dry-run] adb $($args -join ' ')"; return '' }
-    return (& $adb @args 2>&1 | Out-String)
+    if ($DryRun -and -not (Test-Path $adb)) { Write-Host "[dry-run] adb $($args -join ' ')"; $script:AdbExit = 0; return '' }
+    $out = & $adb @args 2>&1 | Out-String
+    $script:AdbExit = $LASTEXITCODE
+    return $out
 }
 
 # ---------- 2. APK ----------
@@ -85,8 +88,9 @@ O GitHub CLI (gh) nao esta instalado. Duas saidas:
     }
     & gh auth status *> $null
     if ($LASTEXITCODE -ne 0) { throw 'O gh nao esta autenticado. Rode: gh auth login (ou use -Apk <caminho>).' }
-    $runId = (& gh run list --repo $Repo --workflow android.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId').Trim()
-    if (-not $runId) { throw 'Nenhuma execucao verde do workflow android.yml. Dispare em Actions > Android APK > Run workflow.' }
+    $runRaw = & gh run list --repo $Repo --workflow android.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId'
+    $runId = if ($LASTEXITCODE -eq 0 -and $runRaw) { "$runRaw".Trim() } else { '' }
+    if (-not $runId -or $runId -eq 'null') { throw 'Nenhuma execucao verde do workflow android.yml. Dispare em Actions > Android APK > Run workflow.' }
     $dest = Join-Path $Root "build/android/run-$runId"
     if ($DryRun) {
         Write-Host "[dry-run] gh run download $runId --repo $Repo --name $Artifact --dir $dest"
@@ -142,7 +146,7 @@ if ($DryRun) {
 }
 $res = Adb -s $serial install -r $Apk
 Write-Host $res
-if ($res -match 'Success') {
+if ($script:AdbExit -eq 0 -and $res -match 'Success') {
     Write-Host "`nPronto: Rota Brava instalado. Abra pelo icone no celular." -ForegroundColor Green
     exit 0
 }
@@ -153,10 +157,10 @@ Para instalar esta, e preciso DESINSTALAR a anterior. Isso APAGA O SAVE do jogo 
 (missoes, emblemas e opcoes). Nao ha como recuperar.
 "@
     $ok = Read-Host 'Digite APAGAR para desinstalar e reinstalar, ou Enter para cancelar'
-    if ($ok -ne 'APAGAR') { Write-Host 'Cancelado. Nada mudou no aparelho.'; exit 3 }
+    if ($ok -cne 'APAGAR') { Write-Host 'Cancelado. Nada mudou no aparelho.'; exit 3 }
     Write-Host (Adb -s $serial uninstall $Package)
     $res = Adb -s $serial install $Apk
     Write-Host $res
-    if ($res -match 'Success') { Write-Host "`nPronto: reinstalado (save anterior apagado)." -ForegroundColor Green; exit 0 }
+    if ($script:AdbExit -eq 0 -and $res -match 'Success') { Write-Host "`nPronto: reinstalado (save anterior apagado)." -ForegroundColor Green; exit 0 }
 }
-throw "Falha na instalacao. Saida do adb acima."
+throw "Falha na instalacao (adb saiu com codigo $script:AdbExit). Saida do adb acima."

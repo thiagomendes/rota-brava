@@ -6,20 +6,22 @@ Builds de **validação** (sem publicação em loja). Android: APK pelo cabo. iO
 
 ## 1. Custo antes de tudo
 - Os dois workflows só rodam quando você clica em **Run workflow**. Nada roda a cada push.
-- Em repositório **privado**, minutos de **macOS** contam com multiplicador alto (10x os de Linux no plano atual do GitHub; confira em Settings > Billing). Uma build iOS leva em torno de 20 a 40 min de runner, ou seja, centenas de minutos da cota. Dispare o iOS só quando houver algo novo para testar.
-- O Android roda em Linux (multiplicador 1x).
+- Em repositório **privado**, minutos de **macOS** custam mais que os de Linux (o GitHub aplica um multiplicador; confira o valor atual na documentação de cobrança do GitHub Actions e em Settings > Billing). Dispare o iOS só quando houver algo novo para testar.
+- O Android roda em Linux, que custa menos.
 
 ## 2. Apple (uma vez só)
 Você precisa da conta do Apple Developer Program ativa.
 
 1. **Bundle ID** `com.thiagomendes.rotabrava`
    - O workflow usa assinatura automática: o Xcode no Actions registra o bundle ID, cria o certificado e o perfil sozinho (`-allowProvisioningUpdates`).
-   - Se preferir registrar à mão: developer.apple.com > Certificates, Identifiers & Profiles > Identifiers > **+** > App IDs > App. Descrição "Rota Brava", Bundle ID **Explicit** `com.thiagomendes.rotabrava`. Nenhuma capability extra.
+   - Se preferir registrar à mão: https://developer.apple.com/account/resources (Certificates, Identifiers & Profiles) > Identifiers > **+** > App IDs > App. Descrição "Rota Brava", Bundle ID **Explicit** `com.thiagomendes.rotabrava`. Nenhuma capability extra.
 2. **Criar o app no App Store Connect** (obrigatório antes do primeiro envio)
    - appstoreconnect.apple.com > Apps > **+** > New App.
    - Plataforma iOS, nome "Rota Brava" (se o nome estiver em uso, use outro só no App Store Connect, como "Rota Brava Jogo"), idioma Português (Brasil), Bundle ID `com.thiagomendes.rotabrava` (se ele não aparecer na lista, faça o item 1 à mão), SKU `rotabrava`, acesso total.
 3. **Chave da App Store Connect API**
-   - App Store Connect > **Users and Access > Integrations > App Store Connect API** > Team Keys > **+**.
+   - App Store Connect > **Users and Access > Integrations > App Store Connect API**.
+   - Na primeira vez, o **Account Holder** (o dono da conta, você) precisa clicar em **Request Access** e aceitar os termos; só depois aparece a opção de gerar chaves.
+   - Team Keys > **+**.
    - Nome "GitHub Actions", papel (Access) **Admin**. O papel Admin é o que deixa o Xcode criar certificado e perfil.
    - Clique em **Download API Key**: baixa `AuthKey_XXXXXXXXXX.p8`. **Só dá para baixar uma vez**; guarde num lugar seguro.
    - Anote o **Key ID** (coluna da chave) e o **Issuer ID** (no topo da página).
@@ -55,7 +57,8 @@ Cadastre `ANDROID_KEYSTORE_B64` (área de transferência), `ANDROID_KEYSTORE_PAS
 1. No GitHub, aba **Actions**.
 2. À esquerda, escolha **Android APK** ou **iOS TestFlight**.
 3. Botão **Run workflow** > escolha a branch > **Run workflow**.
-4. Ao terminar, abra a execução: o **resumo** mostra tamanho e SHA-256 do APK, ou o envio ao TestFlight. Se faltar segredo do iOS, o primeiro passo falha com a lista do que falta.
+4. Não use **Re-run** numa execução do iOS: ele reaproveita o mesmo número de build (`run_number`) e a Apple recusa número repetido. Dispare sempre um novo **Run workflow**.
+5. Ao terminar, abra a execução: o **resumo** mostra tamanho e SHA-256 do APK, ou o envio ao TestFlight. Se faltar segredo do iOS, o primeiro passo falha com a lista do que falta.
 
 Os workflows só existem no GitHub depois que a branch com `.github/workflows/` for enviada (push). O GitHub só oferece **Run workflow** para workflows que já estão na branch padrão (`main`). Depois disso, dá para rodar sobre outra branch escolhendo-a no botão, ou pela linha de comando: `gh workflow run android.yml --ref <branch>`.
 
