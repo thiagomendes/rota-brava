@@ -11,6 +11,7 @@ Linux/nuvem (bash, a partir da raiz):
 ```bash
 bash tools/setup-linux.sh      # Godot 4.7.2 + templates e Blender 4.5.16 em .tools/ (SHA-256)
 bash tools/test.sh             # import + suite com timeout; filtro: bash tools/test.sh dialogue
+bash tools/test.sh             # paralelo: RB_TEST_JOBS processos (padrao 3) + camera_tremor com --fixed-fps 60; RB_TEST_JOBS=1 = serial; logs em logs/test-*.log
 bash tools/build-windows.sh    # build/windows/RotaBrava.exe
 ```
 O smoke test do exe so roda no Windows (`tools/smoke-test.ps1`); no Linux registre-o como pendente.
