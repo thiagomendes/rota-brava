@@ -71,7 +71,7 @@ func run(runner) -> void:
 			await _tick()
 			top = maxf(top, lead.real_speed)
 			low_y = minf(low_y, lead.global_position.y)
-			if rig.last_pull > 0.05:
+			if rig.last_pull > 0.05 or rig.occluded:  # G24a2 v2: estrutura encurta o braco; peca no meio fica pontilhada
 				pulls += 1
 			t += 1
 	_release()
@@ -86,7 +86,7 @@ func run(runner) -> void:
 	r.check(saw < SAW_MAX, "tremor: heroi nao vai e volta na tela (%.1f < %.0f inversoes/s)" % [saw, SAW_MAX])
 	r.check(low_y > -3.0, "tremor: heroi ficou no mapa (y min %.1f)" % low_y)
 	r.check(_seconds > 20.0 and top > 3.0, "tremor: correu %.1f s a ate %.2f m/s" % [_seconds, top])
-	r.check(pulls > 30, "tremor: percurso passou por obstaculos que encurtam o braco (%d passos)" % pulls)
+	r.check(pulls > 30, "tremor: percurso passou por obstaculos que encurtam o braco ou ficam pontilhados (%d passos)" % pulls)
 	r.check(cam_p99 < CAM_ACC_P99_MAX, "tremor: camera sem saltos (p99 %.2f < %.0f m/s2)" % [cam_p99, CAM_ACC_P99_MAX])
 	r.check(flips < ARM_FLIPS_MAX, "tremor: braco sem vai-e-vem (%.2f < %.1f inversoes/s)" % [flips, ARM_FLIPS_MAX])
 	main.queue_free()
