@@ -11,7 +11,7 @@ da Leme so aparece quando a missao pede).
 Uso (um heroi por chamada, abrindo o .blend dele):
   bash tools/blender.sh --background source_art/characters/pico_v2/pico_v2.blend \
        --python source_art/scripts/hero_portraits_v2.py -- pico [--out game/ui/portraits] [--samples 96]
-  capitao/filhote: source_art/characters/secondary_v2/{captain,pup}_v2.blend -- captain | pup
+  capitao/filhote/Lumi: source_art/characters/secondary_v2/{captain,pup,lumi}_v2.blend -- captain | pup | lumi
 """
 import json
 import os
@@ -33,14 +33,15 @@ for p in (HERE, os.path.join(REPO, "source_art", "scripts"), os.path.join(REPO, 
 # RB-R1 E7 (ux): capitao e filhote usam a mesma luz e render do Rastro v2 (rv2_render), para a legenda nao misturar estilos
 # com os herois v2. RB-R1 G4 r2 (art3d): fontes passam a ser os v2 (source_art/characters/secondary_v2/<id>_v2.blend).
 RR = __import__({"rastro": "rv2_render", "pico": "pv2_render", "leme": "lv2_render",
-                 "captain": "rv2_render", "pup": "rv2_render"}[HID])
+                 "captain": "rv2_render", "pup": "rv2_render", "lumi": "rv2_render"}[HID])
 EXPRS = ("neutra", "alegre", "surpresa")
 # 1,60 m e 7 cm abaixo do meio do osso: calibrado para a cabeca v2 ocupar a mesma area do quadro que a dos antigos
 DIST, ELEV, AZIM, LENS, DROP = 1.60, 6.0, -20.0, 85.0, 0.07
 # Capitao (adulto) e filhote: calibrados lado a lado com os retratos v2 dos herois (cabeca na mesma area do quadro).
 # Capitao: mais longe e alvo 2 cm acima para caber o quepe; filhote: perto (cabeca pequena), alvo 2 cm abaixo.
 # G4 r2: capitao v2 tem cabeca adulta menor (0,37 m) que a da primeira geracao (0,46 m): camera mais perto.
-DIST, AZIM, DROP = {"captain": (1.62, AZIM, -0.03), "pup": (0.95, AZIM, 0.02)}.get(HID, (DIST, AZIM, DROP))
+# RB-R1 G21: Lumi (adulto, cabeca 0,36 m, sem chapeu; o arco do fone e a antena precisam caber): perto do capitao.
+DIST, AZIM, DROP = {"captain": (1.62, AZIM, -0.03), "pup": (0.95, AZIM, 0.02), "lumi": (1.58, AZIM, -0.01)}.get(HID, (DIST, AZIM, DROP))
 
 
 def _opt(flag, default):

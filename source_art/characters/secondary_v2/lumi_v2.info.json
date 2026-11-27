@@ -1,0 +1,175 @@
+{
+  "tris": 24037,
+  "tris_por_objeto": {
+    "Lumi_Skin": 5092,
+    "Lumi_Hair": 4195,
+    "Lumi_Gear": 5976,
+    "Lumi_Cloth": 6406,
+    "Lumi_Face": 2368
+  },
+  "materials": [
+    "mat_lumi_v2_cloth",
+    "mat_lumi_v2_face_dark",
+    "mat_lumi_v2_face_eye",
+    "mat_lumi_v2_face_iris",
+    "mat_lumi_v2_face_mouth",
+    "mat_lumi_v2_face_skin",
+    "mat_lumi_v2_gear",
+    "mat_lumi_v2_hair",
+    "mat_lumi_v2_skin"
+  ],
+  "height_m": 1.7347,
+  "min_z": -0.0001,
+  "objects": [
+    "Lumi_Cloth",
+    "Lumi_Face",
+    "Lumi_Gear",
+    "Lumi_Hair",
+    "Lumi_Skin"
+  ],
+  "bones": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "shoulder.R",
+    "upper_arm.R",
+    "forearm.R",
+    "hand.R",
+    "hand_tip.R",
+    "shoulder.L",
+    "upper_arm.L",
+    "forearm.L",
+    "hand.L",
+    "hand_tip.L",
+    "thigh.R",
+    "shin.R",
+    "foot.R",
+    "toe.R",
+    "toe_tip.R",
+    "heel.R",
+    "thigh.L",
+    "shin.L",
+    "foot.L",
+    "toe.L",
+    "toe_tip.L",
+    "heel.L"
+  ],
+  "bone_count": 28,
+  "animations": {
+    "idle": [
+      0,
+      108
+    ],
+    "point": [
+      0,
+      36
+    ],
+    "talk": [
+      0,
+      90
+    ],
+    "wave": [
+      0,
+      48
+    ]
+  },
+  "shape_keys": [
+    "Basis",
+    "neutra",
+    "atenta",
+    "surpresa",
+    "alegre",
+    "triste",
+    "brava_leve",
+    "blink",
+    "mouth_A",
+    "mouth_E",
+    "mouth_O",
+    "mouth_M",
+    "look_left",
+    "look_right",
+    "look_up"
+  ],
+  "texturas": {
+    "lumi_v2_cloth_color": [
+      2048,
+      2048
+    ],
+    "lumi_v2_cloth_normal": [
+      2048,
+      2048
+    ],
+    "lumi_v2_cloth_orm": [
+      2048,
+      2048
+    ],
+    "lumi_v2_gear_color": [
+      1024,
+      1024
+    ],
+    "lumi_v2_gear_normal": [
+      1024,
+      1024
+    ],
+    "lumi_v2_gear_orm": [
+      1024,
+      1024
+    ],
+    "lumi_v2_hair_color": [
+      1024,
+      1024
+    ],
+    "lumi_v2_hair_normal": [
+      1024,
+      1024
+    ],
+    "lumi_v2_hair_orm": [
+      1024,
+      1024
+    ],
+    "lumi_v2_skin_color": [
+      1024,
+      1024
+    ],
+    "lumi_v2_skin_normal": [
+      1024,
+      1024
+    ],
+    "lumi_v2_skin_orm": [
+      1024,
+      1024
+    ]
+  },
+  "head_h_m": 0.36,
+  "head_ratio": 0.2075,
+  "loops": {
+    "idle": true,
+    "talk": true,
+    "wave": false,
+    "point": false
+  },
+  "walk_speed_mps": 0.0,
+  "run_speed_mps": 0.0,
+  "variant": "lumi_v2",
+  "headset": {
+    "cup": [
+      0.1983,
+      -0.004,
+      1.462,
+      0.044
+    ],
+    "antenna": [
+      0.2423,
+      -0.02,
+      1.5712
+    ],
+    "mic": [
+      -0.086,
+      0.1479,
+      1.376
+    ]
+  }
+}
