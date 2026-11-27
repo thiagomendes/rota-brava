@@ -39,11 +39,23 @@
   - O build iOS 1 travou na estrela (impasse); o G16 é a correção.
   - O build 2, com toque básico, está esperando Thiago disparar.
 - **Vozes:** 101 de 251 com voz. Lote diário agendado.
+- **Integrado em 2026-11-27, à tarde:**
+  - G15: dicas pelo aparelho em uso.
+  - G17: vozes no plano certo, com a cena esperando a tela de carregamento.
+  - G20: rádio do Farol 7, aprovado por Thiago.
+  - E7: suíte em paralelo, cerca de 7 min.
+  - G16b.
+  - Vozes 3 (101 com voz).
+  - Suíte: `OK (4542 PASS)` em 455 s.
+  - O build 2 do iPhone rodou sem o travamento.
+- **Em andamento:**
+  - G18: varal do M2.
+  - G19: clipes de carregar e escalar, e depois a integração das 31 ações da auditoria, todas na ordem, por decisão de Thiago.
+  - G21: Lumi, operador do Farol 7 (homem), a base e a Vila Maré.
 - **Próximo:**
-  - Thiago dispara iOS/Android build 2 e confirma o iPhone.
-  - G15.
-  - Lote de vozes de 2026-11-28.
-  - E7: acelerar a suíte (cerca de 17 min, roda com `RB_TEST_TIMEOUT=2400`), bot humano, capturas, vídeo, build Windows, Portão 2. Depois, PARAR.
+  - Thiago dispara os builds iOS/Android e confere a abertura no iPhone.
+  - Lote de vozes de 2026-11-28 08:20 UTC.
+  - E7 restante: bot humano, capturas, vídeo, build Windows e Portão 2. Depois, PARAR.
 - **Páginas para Thiago:** trio 3D https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (Leme antiga), mundo v2 https://claude.ai/artifact/6WpRQzYXY2hW74LxMiPVww, novidades https://claude.ai/artifact/2WyeZqg8DNSLWegCPcCXAt.
 - **Dívidas:** `wv2_static.glb` ainda 10,6 MB e `world_v2.blend` 5,2 MB; materiais do mundo em `game/lookdev/world_v2/`; tris dos heróis no teto; cabelos de trás facetados; luz de parede estoura à noite; GPU real não medida; retratos do HUD antigos; branches `wip/*` a apagar pelo GitHub.
 

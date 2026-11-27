@@ -667,3 +667,4 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - **G16b:** `_fail` limpa o `target_path`. O teste nega isso no código antigo. O contorno do `a7e19c5` saiu na integração.
   - **Ajuste do lead:** o modo serial passa a ter limite padrão de 2700 s.
   - **Correção da meta:** o autor disse "~350 s", mas a revisão mediu de 420 s a 450 s nesta máquina. Fica abaixo de 600 s.
+- **Suíte completa na integração** (`d27aa75`): pacote G, G14 a G17, G20, toque, G16, G16b e E7 juntos. `bash tools/test.sh`: `OK (4542 PASS, 0 FALHA(S))`, código 0, em 455 s.
