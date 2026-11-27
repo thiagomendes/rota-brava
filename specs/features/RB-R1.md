@@ -830,3 +830,4 @@ Fonte: `docs/proposals/g21_farol7.md` §3 e §4, **trocando a personagem por um 
   - teste de catálogo;
   - capturas dos 3 planos (headless; o render final fica com Thiago no iPhone);
   - suíte completa.
+- **Decisão de Thiago (2026-11-27, revoga o "build único"):** integrar hoje o que ficar pronto e revisado (G23 e G21i) e buildar hoje. As vozes novas vêm no lote de 28/11 e entram num build seguinte.
