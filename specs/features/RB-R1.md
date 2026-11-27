@@ -641,3 +641,8 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - Ressalvas:
     - Takes legados do catálogo v1 com `type: radio` passam pelo filtro duas vezes; isso afeta só o fluxo antigo.
     - Ao juntar com o G17, `hud.gd` entra em conflito: as duas branches mudam `Hud.line_seconds`. O G17 tem de usar a chave da fala, ou somar `radio_extra_seconds`, para o plano de rádio contar os cliques.
+- **Decisões de Thiago sobre o G21** (2026-11-27):
+  - O operador do Farol 7 é **homem**, porque a voz Schedar já gravada é masculina e assim nada precisa ser regravado.
+  - O nome dele é **Lumi** ("Na escuta! Sou o Lumi, do rádio.").
+  - A vila passa a se chamar **Vila Maré**: saem as 2 falas do narrador que diziam "Vila Farol 7".
+  - O documento `docs/proposals/g21_farol7.md` descreve a personagem como mulher. Na implementação vale a decisão acima. O restante do visual se mantém: fone de arco com microfone, antena coral, cores da equipe e o mesmo padrão de qualidade do trio. Coque e outros traços femininos são revistos pela arte.
