@@ -561,3 +561,7 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - Revisão (`reviewer`): APROVADO. `test_keyart` dá 30 PASS e falha no código antigo (6 heróis).
   - Ressalva menor: arte-chave carregada com `stage` nulo deixaria o palco antigo sem tamanho.
   - O revisor do G13 contou "4 heróis" na captura do menu. Nem o autor nem o lead investigaram, e o defeito só voltou pelo Thiago.
+- **G14 integrado** (`feature/rb-r1-g14-controle`, autor `gameplay`): botão A em `ui_accept` e B em `ui_cancel`. Com painel aberto, `MouseLock.jump_suppressed()` impede o pulo, inclusive no quadro em que o painel fecha. Teto da tela de carregamento: 20 s. Carregamento em segundo plano com `use_sub_threads=false`; isso corrige o abort 134 ao fechar a Godot. Pedidos de arte-chave abandonados são recolhidos.
+  - Revisão (`reviewer`): APROVADO. `ui_joypad` 13, `scene_loader` 39, `keyart` 30, `ui_` 261, `cutscene` 152; o par `keyart,scene_loader` passa.
+  - Ressalva do revisor: isto **não prova** a correção do travamento no iOS (RB-M1). Ainda existem pedidos em segundo plano simultâneos com dependências em comum (`title_screen.gd:96-101`, `scene_loader.gd:173-178`) ao mesmo tempo que `load()` síncrono na thread principal. Vira o ticket G16.
+  - Tremor (`camera_tremor`): o p99 varia na base de 60 a 84 por tempo de máquina. É dívida; a proposta é rodar com `--fixed-fps 60`.
