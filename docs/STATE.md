@@ -33,6 +33,7 @@
   - Tela de carregamento com teto de 20 s.
   - Fila única de carregamento, e no celular o menu é a imagem parada (G16).
   - G15 (dicas pelo aparelho em uso) foi decidido e não começou.
+  - G18 (art3d, branch `feature/rb-r1-g18-varal`, sem merge): roupas do M2 penduradas na corda real (vagas no marcador `M2_Clothesline`), cesto no M2, roupas e caixotes do M4 ficam depois da missão, caixote do M4 no chão (antes 95 cm no ar). Guarda em `test_prop_overlap`; detalhes no ticket.
 - **Mobile (RB-M1):**
   - Workflows Android/iOS sob demanda, na `main` só os dois arquivos.
   - O APK foi instalado no Galaxy Tab FE.
