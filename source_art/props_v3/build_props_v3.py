@@ -252,6 +252,42 @@ def sock():
     return m
 
 
+def pup_scarf():
+    """G25: lenco vermelho do filhote (bandana em triangulo, pata creme e tufos de pelo castanho), a pista do M2 nos
+    juncos no lugar da meia. Menor que o lenco do varal e de outra cor. Pivo: meio da dobra, na linha do varal."""
+    m = MB("pv3_cloth_pup_scarf")
+    poly = [(-0.15, 0.0), (0.15, 0.0), (0.02, -0.205), (0.0, -0.215), (-0.02, -0.205)]
+
+    def disp(x, y):
+        return 0.009 * math.sin(x * 24.0 + 0.4) * min(1.0, -y * 6.0) + 0.006 * math.sin(y * 34.0 + x * 6.0)
+    red = hexc("#E0412B")
+    m.add_bm(sheet_bm(poly, 2, 0.01, disp), T(0, 0, 0), "pv3_cloth", red, uv="box")
+    # dobra (rolinho) com as duas pontas de amarrar soltas
+    m.tube([(-0.15, 0.004, 0.0), (0.0, 0.006, 0.0), (0.15, 0.004, 0.0)], 0.01, "pv3_cloth", hexc("#C9362A"), seg=8)
+    for s_ in (-1, 1):
+        m.tube([(s_ * 0.15, 0.004, 0.0), (s_ * 0.185, -0.03, 0.004), (s_ * 0.2, -0.07, 0.0)], 0.008, "pv3_cloth",
+               hexc("#C9362A"), seg=6)
+    # pata creme na frente e atras: almofada + 4 dedos
+    pad = [(math.cos(a_) * 0.032, -0.105 + math.sin(a_) * 0.024) for a_ in [k * math.pi / 8 for k in range(16)]]
+    for sd in (1, -1):
+        z = disp(0.0, -0.105) + sd * 0.011
+        m.prism((0, 0, z), pad, 0.004, "pv3_vinyl", hexc(CREAM), rot=R(ry=0 if sd > 0 else 180))
+        for dx, dy in ((-0.036, -0.066), (-0.013, -0.054), (0.013, -0.054), (0.036, -0.066)):
+            m.cyl((0, 0, 0), 0.011, 0.004, "pv3_vinyl", hexc(CREAM), seg=10,
+                  rot=T(dx, dy, disp(dx, dy) + sd * 0.011) @ R(rx=90 * sd))
+    # tufos de pelo do filhote presos no tecido (a pista)
+    rng = random.Random(25)
+    for k in range(7):
+        x, y = rng.uniform(-0.1, 0.1), rng.uniform(-0.17, -0.02)
+        if abs(x) > 0.15 + y * 0.7:   # fica dentro do triangulo
+            x *= 0.4
+        sd = 1 if k % 2 else -1
+        for j in range(3):
+            m.cyl((0, 0, 0), 0.006, 0.025 + rng.uniform(0, 0.012), "pv3_vinyl", hexc(PUP_FUR, rng.uniform(0.85, 1.1)), r1=0.0,
+                  seg=5, rot=T(x + j * 0.005, y, sd * 0.015) @ R(rx=sd * rng.uniform(45, 80), rz=rng.uniform(-60, 60)))
+    clothespin(m, 0.0)
+    return m
+
 def basket():
     """Cesto de vime oval com alcas. Pivo: centro do fundo, no chao."""
     m = MB("pv3_basket")
@@ -1048,6 +1084,10 @@ PIECES += [
     ("fruit_box_grapes", lambda: fruit_box("grapes"), "centro do fundo", 2500),
     ("lens_mount", lens_mount, "meio da placa na parede; lente em (0, 0, 0,12)", 1000),
     ("hand_compass", hand_compass, "centro do fundo", 800),
+]
+# G25 (2026-11-27): lenco do filhote (pista do M2), no fim da lista pelo mesmo motivo.
+PIECES += [
+    ("cloth_pup_scarf", pup_scarf, "meio da dobra, na linha do varal", 2500),
 ]
 
 

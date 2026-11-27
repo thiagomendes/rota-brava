@@ -48,6 +48,7 @@ Metros, +Y para cima. Raiz de cada cena na origem com escala 1. Tris = LOD 0 (a 
 | `cloth_tshirt.tscn` camiseta rosa com estrela | M2 | meio da gola, na linha do varal | `sway` (loop), `shake` | 1840 / 2500 |
 | `cloth_scarf.tscn` lenço azul de bolinhas | M2 | meio da dobra, na linha | `sway` (loop), `shake` | 1956 / 2500 |
 | `cloth_sock.tscn` meia amarela com pelo do filhote | M2 | meio do punho, na linha | `sway` (loop), `shake` | 1300 / 2500 |
+| `cloth_pup_scarf.tscn` lenço vermelho do filhote com pata creme e pelo (G25: a pista do M2 nos juncos, no lugar da meia) | M2 | meio da dobra, na linha | `sway` (loop), `shake` | 1436 / 2500 |
 | `basket.tscn` cesto de vime | M2 | centro do fundo | — | 3476 / 4000 |
 | `fountain_leaves.tscn` tufo que entope a bacia | M3 | centro da base | `rustle` (loop), `pull_out`, `reset` | 1172 / 3000 |
 | `ball.tscn` bola do filhote (raio 0,16) | M3 | contato no chão; malha no filho `Spin` | `roll` (loop, rola para +Z), `bounce` | 920 / 1500 |
@@ -96,3 +97,6 @@ nada de terceiros). Exportadas com `-- --only=<ids>` (as outras GLB não foram r
 | `fruit_box_apple/lemon/grapes` | M4: caixinha de cada barraca, pega com as duas mãos (a caixa grande fica no carrinho) | 0,16 x 0,13 x 0,09 m |
 | `lens_mount` | M7: encaixe da lente na parede do farol, junto à galeria | berço para o aro de raio 0,2 m |
 | `hand_compass` | M7: bússola de mão da Leme | raio 0,07 m |
+
+## G25 (RB-R1, 2026-11-27)
+`cloth_pup_scarf` (`pup_scarf()` em `build_props_v3.py`, no fim de `PIECES` para não mudar as sementes das outras peças): bandana em triângulo 0,30 × 0,22 m, vermelha, pata creme dos dois lados e 7 tufos de pelo castanho; geometria 100% por script. Gerada com `bash tools/blender.sh --background --factory-startup --python source_art/props_v3/build_props_v3.py -- --only=cloth_pup_scarf` e `python3 source_art/props_v3/gen_scenes.py`; só o GLB novo foi exportado (os outros 25 não mudaram; o manifesto só ganhou a entrada nova). A meia (`cloth_sock`) continua na base, sem uso no Ep01 v3.
