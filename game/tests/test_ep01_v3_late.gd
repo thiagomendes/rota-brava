@@ -288,7 +288,9 @@ func _camera_shed_top() -> void:
 	main.camera_rig.follow(t, true)
 	await r.frames(3)
 	var h := main.camera_rig.camera.global_position.y - t.global_position.y
-	r.check(main.camera_rig.last_pull < 0.01 and absf(h - CameraRig.LOW_OFFSET.y) < 0.1, "v3 camera: no cais fica a camera baixa (%.2f m, sem encurtar)" % h)
+	# G24a: com o braco inteiro (4,2 m; antes o lead o deixava em 3,5 m) a esfera macia de 0,9 m roca o cais a ~4,11 m
+	# sem nada na esfera dura; a mola anda ~1 cm nos 3 quadros. Tolerancia 0,05 m: so encosto real reprova.
+	r.check(main.camera_rig.last_pull < 0.05 and absf(h - CameraRig.LOW_OFFSET.y) < 0.1, "v3 camera: no cais fica a camera baixa (%.2f m, encurtou %.3f m)" % [h, main.camera_rig.last_pull])
 	r.check(main.camera_rig.occluders.size() > 100, "v3 camera: %d copas de arvore como obstaculo" % main.camera_rig.occluders.size())
 	await _free(main)
 
