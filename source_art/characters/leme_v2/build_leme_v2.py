@@ -144,5 +144,31 @@ def build(glb=None, blend=None, textures=True, feet=True):
     return b, groups, info
 
 
+def anim_only(glb, blend, feet=True):
+    """RB-R1 G19: regrava so os clipes (e os ossos HoldPoint) sobre o .blend versionado; malha e texturas intactas."""
+    import g19_rebuild
+    t0 = time.time()
+    b, rig, groups = g19_rebuild.reopen(blend, lv2_body.build)
+    bpy.context.scene.render.fps = lv2_anim.FPS
+    rep = lv2_anim.author(rig, groups["face"], b.F, hand_ob=groups["gear"], sole=sole_points(groups["gear"]))
+    bpy.context.view_layer.update()
+    info = measure(b, groups, rig)
+    info.update(rep)
+    if feet:
+        info["botas"] = lv2_anim.measure_feet(rig, groups["gear"], groups["face"], b.F, lv2_tex.PID)
+        print("BOTAS", json.dumps({k: info["botas"][k] for k in ("min_m", "min_clip", "min_frame", "deslize")}))
+    print("CHAR_INFO", json.dumps({k: v for k, v in info.items() if k not in ("tris_por_objeto", "botas")}))
+    bpy.ops.wm.save_as_mainfile(filepath=blend, compress=True)
+    with open(os.path.splitext(blend)[0] + ".info.json", "w", encoding="utf-8") as f:
+        json.dump(info, f, indent=2, ensure_ascii=False)
+    if glb:
+        export_glb(glb)
+        print("GLB", glb, os.path.getsize(glb))
+    print("TOTAL s", round(time.time() - t0, 1))
+
+
 if __name__ == "__main__":
-    build(arg_value("--glb"), arg_value("--blend"), "--no-tex" not in sys.argv, "--no-feet" not in sys.argv)
+    if "--anim-only" in sys.argv:
+        anim_only(arg_value("--glb"), arg_value("--blend"), "--no-feet" not in sys.argv)
+    else:
+        build(arg_value("--glb"), arg_value("--blend"), "--no-tex" not in sys.argv, "--no-feet" not in sys.argv)

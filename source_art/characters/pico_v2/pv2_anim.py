@@ -235,10 +235,17 @@ def blink_once(fn, at):
 
 CLIPS["pull_rope"] = (CLIPS["pull_rope"][0], CLIPS["pull_rope"][1], blink_once(CLIPS["pull_rope"][2], 1.20))
 CLIP_SET = list(ha.CLIP_SETS["pico"]) + ["point"]     # idle, walk, run, stop, jump, pull_rope, look_up, react_surprise, celebrate, wave, team_pose, point
+# RB-R1 G19: pegar, levar, pousar, examinar, escalar (climb_up/_low/_high, climb_wall, climb_top, climb_down) e corda
+# (throw_rope, lower_rope); hero_anim.g19_clips, carry_walk com o mesmo passo do WALK acima.
+G19 = ha.g19_clips(WALK, climber=True)
+CLIPS.update(G19)
+CLIP_SET = ha.g19_names(climber=True) + CLIP_SET   # G19 antes: o ultimo clipe gravado (pose em que o info.json mede a altura) segue o de antes
 
 
 def author(rig, face_ob, F, names=CLIP_SET, gear_ob=None):
-    """Grava cada clipe como Action + faixa NLA (corpo), Action de shape keys do rosto e, se houver, das luvas (punho)."""
+    """Grava cada clipe como Action + faixa NLA (corpo), Action de shape keys do rosto e, se houver, das luvas (punho).
+    G19: cria antes os ossos HoldPoint/HoldPoint_L (sem deformacao) e devolve as medidas dos clipes novos em "g19"."""
+    ha.add_hold_points(rig)
     R = cl.Rigger(rig)
     sk = face_ob.data.shape_keys
     sk.animation_data_create()
@@ -270,7 +277,7 @@ def author(rig, face_ob, F, names=CLIP_SET, gear_ob=None):
             fc = fn(R, F, t, dur)
             R.evaluate()
             R.apply(i, prev)
-            for kn in ha.FACE_KEYS:
+            for kn in ha.FACE_KEYS + ha.G19_FACE_EXTRA:
                 kb = sk.key_blocks[kn]
                 kb.value = max(0.0, min(1.0, fc.get(kn, 0.0)))
                 kb.keyframe_insert("value", frame=i)
@@ -279,7 +286,7 @@ def author(rig, face_ob, F, names=CLIP_SET, gear_ob=None):
                     kb = gk.key_blocks[kn]
                     kb.value = max(0.0, min(1.0, fc.get(kn, 0.0)))
                     kb.keyframe_insert("value", frame=i)
-        act["loop"] = name in ha.LOOPING
+        act["loop"] = name in ha.LOOPING or name in ha.G19_LOOPS
         pairs = [(rig.animation_data, act), (sk.animation_data, keyact)]
         if gk is not None:
             pairs.append((gk.animation_data, gearact))
@@ -289,4 +296,4 @@ def author(rig, face_ob, F, names=CLIP_SET, gear_ob=None):
             tr.name = name
             st = tr.strips.new(name, 0, a_)
             st.name = name
-    return {}
+    return {"g19": {n: ha.g19_measure(R, F, n, CLIPS[n][2], CLIPS[n][0]) for n in names if n in G19}}

@@ -106,9 +106,10 @@ def build(glb=None, blend=None, textures=True):
         finish_materials(groups, b)
     print("MATERIAIS ok", round(time.time() - t0, 1))
     pv2_body.add_fist_keys(groups["gear"], b.F, b.v["hand"], pv2_tex.PID["glove"])
-    pv2_anim.author(rig, groups["face"], b.F, gear_ob=groups["gear"])
+    rep = pv2_anim.author(rig, groups["face"], b.F, gear_ob=groups["gear"])
     bpy.context.view_layer.update()
     info = measure(b, groups, rig)
+    info.update(rep)
     print("CHAR_INFO", json.dumps(info))
     if blend:
         os.makedirs(os.path.dirname(blend), exist_ok=True)
@@ -122,5 +123,28 @@ def build(glb=None, blend=None, textures=True):
     return b, groups, info
 
 
+def anim_only(glb, blend):
+    """RB-R1 G19: regrava so os clipes (e os ossos HoldPoint) sobre o .blend versionado; malha e texturas intactas."""
+    import g19_rebuild
+    t0 = time.time()
+    b, rig, groups = g19_rebuild.reopen(blend, pv2_body.build)
+    bpy.context.scene.render.fps = pv2_anim.FPS
+    rep = pv2_anim.author(rig, groups["face"], b.F, gear_ob=groups["gear"])
+    bpy.context.view_layer.update()
+    info = measure(b, groups, rig)
+    info.update(rep)
+    print("CHAR_INFO", json.dumps(info))
+    bpy.ops.wm.save_as_mainfile(filepath=blend, compress=True)
+    with open(os.path.splitext(blend)[0] + ".info.json", "w", encoding="utf-8") as f:
+        json.dump(info, f, indent=2)
+    if glb:
+        export_glb(glb)
+        print("GLB", glb, os.path.getsize(glb))
+    print("TOTAL s", round(time.time() - t0, 1))
+
+
 if __name__ == "__main__":
-    build(arg_value("--glb"), arg_value("--blend"), "--no-tex" not in sys.argv)
+    if "--anim-only" in sys.argv:
+        anim_only(arg_value("--glb"), arg_value("--blend"))
+    else:
+        build(arg_value("--glb"), arg_value("--blend"), "--no-tex" not in sys.argv)
