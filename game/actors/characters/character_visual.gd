@@ -7,7 +7,7 @@ extends Node3D
 ## Uso pelo integrador: `visual.play(&"walk", visual.walk_speed_scale(velocity.length()))` quando velocity > 0.1,
 ## `visual.play(&"idle")` parado, `visual.set_expression(&"atenta")`.
 
-const LOOPING: Array[StringName] = [&"idle", &"walk", &"run", &"idle_wheel", &"chat", &"wag"]
+const LOOPING: Array[StringName] = [&"idle", &"walk", &"run", &"idle_wheel", &"chat", &"wag", &"idle_seated"]
 const EXPRESSIONS: Array[StringName] = [&"atenta", &"surpresa", &"alegre", &"triste", &"brava_leve", &"blink"]
 ## Visemas de boca (RB-R1): somados por cima da expressao para a boca acompanhar o balbucio.
 const VISEMES: Array[StringName] = [&"mouth_A", &"mouth_E", &"mouth_O", &"mouth_M"]

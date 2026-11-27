@@ -1,10 +1,10 @@
 {
-  "tris": 24037,
+  "tris": 22823,
   "tris_por_objeto": {
-    "Lumi_Skin": 5092,
-    "Lumi_Hair": 4195,
+    "Lumi_Skin": 5116,
+    "Lumi_Hair": 4073,
     "Lumi_Gear": 5976,
-    "Lumi_Cloth": 6406,
+    "Lumi_Cloth": 5290,
     "Lumi_Face": 2368
   },
   "materials": [
@@ -18,8 +18,8 @@
     "mat_lumi_v2_hair",
     "mat_lumi_v2_skin"
   ],
-  "height_m": 1.7347,
-  "min_z": -0.0001,
+  "height_m": 1.7151,
+  "min_z": -0.0,
   "objects": [
     "Lumi_Cloth",
     "Lumi_Face",
@@ -63,6 +63,10 @@
       0,
       108
     ],
+    "idle_seated": [
+      0,
+      108
+    ],
     "point": [
       0,
       36
@@ -70,6 +74,10 @@
     "talk": [
       0,
       90
+    ],
+    "turn_chair": [
+      0,
+      30
     ],
     "wave": [
       0,
@@ -144,12 +152,14 @@
     ]
   },
   "head_h_m": 0.36,
-  "head_ratio": 0.2075,
+  "head_ratio": 0.2099,
   "loops": {
     "idle": true,
     "talk": true,
     "wave": false,
-    "point": false
+    "point": false,
+    "idle_seated": true,
+    "turn_chair": false
   },
   "walk_speed_mps": 0.0,
   "run_speed_mps": 0.0,
@@ -158,18 +168,18 @@
     "cup": [
       0.1983,
       -0.004,
-      1.462,
+      1.432,
       0.044
     ],
     "antenna": [
       0.2423,
       -0.02,
-      1.5712
+      1.5412
     ],
     "mic": [
       -0.086,
       0.1479,
-      1.376
+      1.346
     ]
   }
 }

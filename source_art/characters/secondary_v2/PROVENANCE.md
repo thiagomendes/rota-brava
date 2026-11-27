@@ -82,3 +82,14 @@ bash tools/blender.sh --background --factory-startup --python source_art/charact
 bash tools/blender.sh --background --factory-startup --python source_art/characters/secondary_v2/render_lineup_g21.py -- $PWD/captures/g21
 python3 -I source_art/farol7_base/manifest_g21.py
 ```
+
+### G21 rodada 2 (retorno do coordenador)
+- Proporção da família do capitão e da Dona Amora: pernas mais curtas e grossas (perna 0,75 m, membro 0,062), tronco e
+  ombros com mais volume (tronco 0,52, barriga 0,168, ombro 0,208). Altura 1,715 m, 22 823 tris.
+- Calça caqui `#A9844E`; gola em pé trocada por gola baixa canelada pintada com filete amarelo; cavanhaque pequeno e
+  arredondado na cor do cabelo (castanho bem escuro `#2A1E18`/`#4E3829`); cabelo fosco (rugosidade ~0,85, verniz 0,02).
+- `talk` refeito: braços junto ao corpo, mão direita aberta na altura do peito gesticulando, esquerda solta.
+- `wave`/`turn_chair` sorriem pela boca (o `alegre` acima de ~0,3 fecha o olho em arco na Godot: regra G1).
+- Clipes sentados para o plano 9a: `idle_seated` (3,6 s, laço) e `turn_chair` (1,0 s), assento a 0,40 m; o Lumi sentado é
+  filho de `Chair/Seat` em `farol7_base.tscn` e gira com a cadeira (`Farol7Base.set_chair_yaw`). `idle_seated` entrou em
+  `CharacterVisual.LOOPING`.

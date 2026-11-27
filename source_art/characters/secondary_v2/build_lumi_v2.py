@@ -39,7 +39,7 @@ import char_lib as cl
 import hero_anim as ha
 import hero_lib
 import sv2_lib as S
-from char_anim import blink_curve, smooth
+from char_anim import blink_curve, lerp, smooth
 from hero_lib import join_bm
 from rbart import REPO, arg_value, new_object, reset_scene
 from sv2_human import Adult, V, pose_idle_adult
@@ -47,13 +47,14 @@ from sv2_human import Adult, V, pose_idle_adult
 CID = "lumi_v2"
 PREFIX = "lumi_v2"
 TEX_DIR = os.path.join(REPO, "captures", "g21", "build_textures", CID)
-C = dict(pele="#9C6240", rubor="#B9604A", barba="#3A2418", cabelo="#1B1411", cabelo_lt="#3A2A22",
-         navy="#0B2440", navy_lt="#16345A", amarelo="#FFD23A", coral="#E2453A", calca="#D3C7AE", calca_dk="#B8AA8E",
+C = dict(pele="#9C6240", rubor="#B9604A", barba="#4E3829", cabelo="#2A1E18", cabelo_lt="#4A3428",
+         navy="#0B2440", navy_lt="#16345A", amarelo="#FFD23A", coral="#E2453A", calca="#A9844E", calca_dk="#86663A",
          tenis="#F3F5F8", tenis_dk="#C9D2DE", concha="#2A5DA8", almofada="#22262E", emblema="#123A5E", ouro="#FFC83D",
          iris="#5A3820", boca="#7E3A36")
 # proporcao adulta (metros): cabeca 0,36 m em ~1,73 m (21%), entre a Dona Amora (1,68) e o capitao (1,77); mais magro
 # que o capitao, ombros um pouco mais largos que os da Dona Amora
-hero_lib.VARIANTS["LU2"] = dict(head=0.360, leg=0.800, torso=0.500, belly=0.150, sh_x=0.198, limb=0.056, hand=1.42, boot=1.16,
+# G21 r2 (coordenador): pernas mais curtas e grossas, tronco e ombros com mais volume (familia do capitao e da Dona Amora)
+hero_lib.VARIANTS["LU2"] = dict(head=0.360, leg=0.750, torso=0.520, belly=0.168, sh_x=0.208, limb=0.062, hand=1.46, boot=1.18,
                                 eye=0.84, layers=False, label="adulto v2 (Lumi)")
 hero_lib.CAST[CID] = dict(display="Lumi", K=1.0, variant="LU2", hat="none", hair="short", team=True, gear=(), gloves=False,
                           pal=dict(pele=C["pele"], cabelo=C["cabelo"], iris=C["iris"], uniforme=C["navy"], creme=C["amarelo"],
@@ -95,7 +96,7 @@ class Lumi(Adult):
         self.reg(self.t(ob, "hair", "hair"), "single", "head")
         # cavanhaque curto: casca de fora do queixo (o que fica dentro do rosto sai), boca livre
         zc = hc.z - hr[2] * (1.0 + self.CHIN) + 0.030 * k
-        E = [("ELLIPSOID", (0, hc.y + hr[1] * 0.62, zc), 1.0, (0.034 * k, 0.060 * k, 0.030 * k), False),
+        E = [("ELLIPSOID", (0, hc.y + hr[1] * 0.66, zc - 0.002 * k), 1.0, (0.034 * k, 0.050 * k, 0.020 * k), False),
              ("ELLIPSOID", (0, hc.y + hr[1] * 0.98, hc.z - 0.112 * k), 1.0, (0.060 * k, 0.060 * k, 0.030 * k), True)]
         ob = hero_lib.metaball_obj(self.name("Beard"), E, M["cabelo"], res=0.006 * k, thresh=0.6)
         bm = bmesh.new()
@@ -111,8 +112,8 @@ class Lumi(Adult):
             loc, nrm, _, dist = bvh.find_nearest(vv.co)
             if loc is not None:
                 off = (vv.co - loc).dot(nrm)
-                if off > 0.006 * k:
-                    vv.co = loc + nrm * 0.006 * k
+                if off > 0.0075 * k:
+                    vv.co = loc + nrm * 0.0075 * k
         for _ in range(2):
             bmesh.ops.smooth_vert(bm, verts=bm.verts[:], factor=0.5, use_axis_x=True, use_axis_y=True, use_axis_z=True)
         bm.to_mesh(ob.data)
@@ -241,35 +242,9 @@ class Lumi(Adult):
         F, k = self.F, self.F.k
         nz = F.nz
         jk = self.jacket
-        # gola amarela em pe (aberta so no ziper), mais alta atras: a base segue a superficie da jaqueta (raycast) e a borda de
-        # cima fecha um pouco em volta do pescoco
+        # G21 r2: sem gola em pe (o anel abria e se via por dentro); a gola e baixa, canelada e pintada no topo da jaqueta,
+        # com um filete amarelo (paint_cloth)
         bvh = BVHTree.FromObject(jk, bpy.context.evaluated_depsgraph_get())
-        z0 = nz - 0.030
-        bm = bmesh.new()
-        rows = []
-        nu, nv = 44, 3
-        for i in range(nu + 1):
-            a = math.radians(12 + 336 * i / nu)
-            back = 0.5 - 0.5 * math.cos(a)
-            d = Vector((math.sin(a), math.cos(a), 0.0))
-            hit = bvh.ray_cast(Vector((0, 0.004, z0)) + d * 0.6, -d)
-            base = (hit[0] if hit[0] is not None else Vector((0, 0.004, z0)) + d * 0.08) + d * 0.0015
-            ring = []
-            for j in range(nv + 1):
-                t = j / nv
-                h = (0.034 + 0.012 * back) * t
-                ring.append(bm.verts.new(base + Vector((0, 0, h)) - d * (0.012 * t ** 1.3)))
-            rows.append(ring)
-        for i in range(nu):
-            for j in range(nv):
-                bm.faces.new((rows[i][j], rows[i + 1][j], rows[i + 1][j + 1], rows[i][j + 1]))
-        ob = new_object(self.name("Collar"), bm, self.M["creme"], recalc=False)
-        sol = ob.modifiers.new("sol", "SOLIDIFY")
-        sol.thickness = 0.007
-        sol.offset = 1.0
-        sol.use_rim = True
-        hero_lib.bake(ob)
-        self.reg(self.t(ob, "collar", "cloth"), "torso")
         # emblema da Rota Brava no peito esquerdo (escudo azul, borda e estrela amarelas), colado na jaqueta
         ex, ez = -0.080, nz - 0.115
         hit = bvh.ray_cast(Vector((ex, 0.6, ez)), Vector((0, -1, 0)))
@@ -435,11 +410,18 @@ def paint_cloth(b):
             leg = tr & (sx * x > 0.0)
             S.add_line_detail(col, h, rough, leg & (z < F.hz - 0.08), x - sx * F.hip_x * 1.02, 0.0014, depth=0.0004, color=C["calca_dk"], mix=0.35)
         S.add_line_detail(col, h, rough, tr, z - (F.ankle_z + 0.090), 0.0018, depth=-0.0006, color=C["calca_dk"], mix=0.5)
-        # gola: canelado fino horizontal
-        co = pid == parts.pid("collar")
-        cr = 0.5 + 0.5 * np.sin(2 * np.pi * z / 0.0045)
-        h += 0.0002 * cr * co
-        col *= (1 - 0.06 * cr * co)[:, None]
+        # gola baixa canelada (azul) no topo da jaqueta com filete amarelo na borda de cima e um filete fino embaixo
+        neck = jk & (z > F.nz - 0.034)
+        ang2 = np.arctan2(x, y + 0.0001)
+        rb = 0.5 + 0.5 * np.sin(ang2 * 120.0)
+        col[neck] = S.lin(C["navy_lt"]) * (0.82 + 0.22 * rb[neck])[:, None]
+        h += 0.0003 * rb * neck
+        rough[neck] = 0.72
+        top = jk * S.sstep(z, F.nz + 0.004, F.nz + 0.008)
+        fil = jk * S.line(z - (F.nz - 0.034), 0.0022)
+        yl = np.clip(top + fil, 0, 1)
+        col[:] = col * (1 - yl[:, None]) + S.lin(C["amarelo"]) * yl[:, None]
+        h += 0.0002 * fil
         return col, h, rough, metal
     return fn
 
@@ -500,7 +482,7 @@ def paint_skin(b):
         mouth_free = 1 - np.exp(-((rel[:, 2] + 0.62) / 0.06) ** 2) * np.exp(-(rel[:, 0] / 0.22) ** 2)
         beard = np.clip(np.maximum(jaw, 0.7 * lip) * mouth_free, 0, 1) * head
         speck = S.sstep(S.fbm(P, 0.0011, 2), 0.45, 0.70)
-        bw = beard * (0.30 + 0.30 * speck)
+        bw = beard * (0.12 + 0.16 * speck)
         col = col * (1 - bw[:, None]) + S.lin(C["barba"]) * bw[:, None]
         hand = m["part"] == parts.pid("skin_hand")
         col[hand] = col[hand] * 0.95 + S.lin(C["rubor"]) * 0.05
@@ -530,13 +512,13 @@ def paint_hair(b):
         col *= (0.72 + 0.28 * m["ao"] ** 0.8)[:, None]
         # laterais baixas: mais claras (pele aparece no degrade) perto da costeleta e da nuca
         beard = m["part"] == parts.pid("beard")
-        col[beard] = col[beard] * 0.55 + S.lin(C["barba"]) * 0.45 * (0.8 + 0.4 * coil[beard])[:, None]
+        col[beard] = S.lin(C["barba"]) * (0.85 + 0.35 * coil[beard])[:, None] * (0.80 + 0.20 * m["ao"][beard] ** 0.8)[:, None]
         rel = (P - hc) / np.array(F.hr)
         fade = S.sstep(-rel[:, 2], -0.10, 0.25) * (~beard)
         col = col * (1 - 0.22 * fade[:, None]) + S.lin(C["pele"]) * 0.22 * fade[:, None] * S.fbm(P, 0.0012, 1)[:, None]
         h = 0.0016 * coil + 0.0003 * coil2
         h *= (1 - 0.6 * fade)
-        rough = 0.62 - 0.10 * coil
+        rough = 0.86 - 0.06 * coil          # G21 r2: fosco (na Godot o cabelo brilhava)
         return col, h, rough, np.zeros(n)
     return fn
 
@@ -549,11 +531,28 @@ def pose_idle_lumi(R, F, t, T):
 
 
 def pose_talk_lumi(R, F, t, T):
-    """Fala no radio (3,0 s): gesticula com a mao direita, acena com a cabeca; a boca abre em silabas (visemas A/O/E)."""
-    f = ha.pose_chat(R, F, t, T)
-    f["alegre"] = 0.15       # sorriso leve com os olhos abertos (o alegre cheio fecha o olho)
-    f["atenta"] = 0.15
-    g = smooth(t, 0.15, 0.40) * (1 - smooth(t, T - 0.40, T - 0.12))
+    """Fala no radio (3,0 s): bracos soltos junto ao corpo (sem o A do repouso), mao direita gesticula na frente do peito
+    com a palma aberta, a esquerda descansa na lateral da coxa; acena com a cabeca; boca em silabas (visemas A/O/E)."""
+    from char_anim import reach, stand_feet, torso
+    ph = 2 * math.pi * t / T
+    g = smooth(t, 0.15, 0.55) * (1 - smooth(t, T - 0.55, T - 0.10))
+    R.hips_off = Vector((0.004 * math.sin(ph), 0.0, -0.008))
+    torso(R, lean=2.0 + 1.0 * math.sin(2 * ph), yaw=5.0 * math.sin(ph) * g, roll=1.5 * math.sin(ph),
+          head_pitch=4.0 * math.sin(3 * ph) * g, head_yaw=-7.0 * math.sin(ph) * g, head_roll=3.0 * math.sin(2 * ph + 0.5) * g)
+    ha.arms_down(R, F, bend=20, out=-9)
+    R.evaluate()
+    rr, rl = R.tip("hand.R"), R.tip("hand.L")
+    b = F.v["belly"]
+    # mao direita aberta, palma para cima, ao lado do peito (gesto de "olha so"), indo e voltando em silabas
+    # (na rodada 2a o alvo a 13 cm abaixo do ombro deixava a mao na altura da barriga: lia como braco caido)
+    tgt_r = Vector((F.sh.x + 0.05 + 0.04 * math.sin(2 * ph), b + 0.20 + 0.03 * math.sin(3 * ph), F.sh.z - 0.02 + 0.05 * math.sin(2 * ph + 0.8)))
+    reach(R, "R", rr.lerp(tgt_r, g), Vector((0.1, 0.2, -1.0)).lerp(Vector((0.55, 0.75, 0.35)), g), pole=(1.0, -0.5, -0.6),
+          roll=-60.0 * g)
+    # mao esquerda solta junto a coxa, com um balanco pequeno (sem a mao na cintura)
+    tgt_l = rl + Vector((0.025, 0.03 + 0.015 * math.sin(2 * ph + 1.0), 0.02))
+    reach(R, "L", rl.lerp(tgt_l, g), Vector((-0.1, 0.2, -1.0)), pole=(-1.0, -0.6, -0.2))
+    stand_feet(R)
+    f = ha.face(alegre=0.15, atenta=0.15, blink=blink_curve(t, 0.9) + blink_curve(t, 2.3))
     syl = abs(math.sin(2 * math.pi * 2.6 * t))
     pick = int(t * 5.2) % 3
     f["mouth_A"] = g * syl * (0.75 if pick == 0 else 0.25)
@@ -562,12 +561,76 @@ def pose_talk_lumi(R, F, t, T):
     return f
 
 
+# ---- sentado na cadeira giratoria da base (G21 r2). O Lumi fica filho da cadeira (Farol7Base: Chair/Seat), que gira;
+# o clipe nao gira o corpo inteiro: so a postura sentada e o gesto. Assento a 0,40 m do chao (com a canela de 0,29 m do
+# Lumi, a 0,45 m a coxa descia ~20 graus e ele parecia escorregando da cadeira).
+SEAT_TOP = 0.40
+
+
+def seated_base(R, F, breath=0.0, lean=-4.0):
+    from char_anim import put_foot, torso
+    hip_z = SEAT_TOP + 0.075
+    R.hips_off = Vector((0.0, -0.04, hip_z - F.hz + 0.003 * breath))
+    torso(R, lean=lean + 1.0 * breath)
+    for s, sx in (("R", 1), ("L", -1)):
+        ankle = Vector((sx * (F.hip_x + 0.03), 0.30, F.ankle_z))
+        put_foot(R, s, 0.0, 0.0, "heel", ankle=ankle, pole=(sx * 0.15, 1.0, 0.2))
+    return hip_z
+
+
+def lap_hands(R, F, u=1.0, hip_z=None):
+    """Maos descansando sobre as coxas (u = 0: bracos soltos; 1: no colo)."""
+    from char_anim import reach
+    hz = hip_z if hip_z is not None else F.hz
+    ha.arms_down(R, F, bend=30, out=-8)
+    R.evaluate()
+    for s, sx in (("R", 1), ("L", -1)):
+        rest = R.tip("hand." + s)
+        tgt = Vector((sx * (F.hip_x + 0.035), 0.20, hz + 0.075))
+        reach(R, s, rest.lerp(tgt, u), Vector((0.1 * sx, 0.2, -1.0)).lerp(Vector((0.0, 1.0, -0.35)), u), pole=(sx * 1.0, -0.4, -0.2))
+
+
+def pose_idle_seated(R, F, t, T):
+    """Sentado na cadeira, de frente: respira, olha em volta, maos no colo (laco)."""
+    ph = 2 * math.pi * t / T
+    breath = math.sin(ph)
+    hip_z = seated_base(R, F, breath)
+    from char_anim import torso
+    torso(R, lean=-4.0 + 1.0 * breath, roll=1.0 * math.sin(ph * 0.5), head_yaw=8.0 * math.sin(ph * 0.5 + 0.6),
+          head_pitch=2.0 * math.sin(ph + 1.0), head_roll=1.5 * math.sin(ph + 2.0))
+    lap_hands(R, F, 1.0, hip_z)
+    return ha.face(atenta=0.15, alegre=0.12, blink=blink_curve(t, 1.0) + blink_curve(t, T - 0.7))
+
+
+def pose_turn_chair(R, F, t, T):
+    """Plano 9a (1,0 s): a cadeira gira de costas para a frente (quem gira e o no da cadeira). O corpo acompanha: comeca
+    debrucado para a mesa com a mao direita no microfone, endireita, levanta a cabeca e chega na pose do idle_seated com
+    um sorriso, de olhos abertos."""
+    u = smooth(t, 0.05, 0.85)
+    hip_z = seated_base(R, F, 0.0, lean=lerp(14.0, -4.0, u))
+    from char_anim import reach, torso
+    torso(R, lean=lerp(14.0, -4.0, u), yaw=lerp(-10.0, 0.0, u), head_pitch=lerp(-12.0, 0.0, u) + 6.0 * math.sin(math.pi * u),
+          head_yaw=lerp(-8.0, 8.0 * math.sin(0.6), u))
+    lap_hands(R, F, 1.0, hip_z)
+    R.evaluate()
+    a = 1.0 - smooth(t, 0.0, 0.55)
+    if a > 0.0:
+        rr = R.tip("hand.R")
+        reach(R, "R", rr.lerp(Vector((0.10, 0.42, hip_z + 0.32)), a), Vector((0.0, 1.0, -0.35)).lerp(Vector((0.0, 0.8, 0.2)), a),
+              pole=(1.0, -0.4, -0.2))
+    # sorriso so pela boca: o "alegre" acima de ~0,3 ja fecha o olho em arco na Godot (G1)
+    f = ha.face(atenta=0.15 * u, alegre=0.12)
+    f["mouth_A"] = 0.30 * math.sin(math.pi * smooth(t, 0.4, 1.0))
+    return f
+
+
 def pose_wave_lumi(R, F, t, T):
     """Aceno de oi (1,6 s), sorriso aberto com os olhos abertos (regra G1)."""
     f = ha.pose_wave(R, F, t, T)
     a = f.get("alegre", 0.0)
-    f["alegre"] = 0.38 * a
-    f["mouth_A"] = 0.35 * a
+    f["alegre"] = 0.15 * a                  # G21 r2: com 0,38 o olho ja virava arco fechado na Godot (regra G1)
+    f["atenta"] = 0.20 * a
+    f["mouth_A"] = 0.45 * a
     f["blink"] = blink_curve(t, 1.15)       # piscada longe do fim: o clipe sem laco para no ultimo quadro de olho aberto
     return f
 
@@ -581,7 +644,7 @@ def pose_point_lumi(R, F, t, T):
 
 
 CLIPS = {"idle": (3.6, True, pose_idle_lumi), "talk": (3.0, True, pose_talk_lumi), "wave": (1.6, False, pose_wave_lumi),
-         "point": (1.2, False, pose_point_lumi)}
+         "point": (1.2, False, pose_point_lumi), "idle_seated": (3.6, True, pose_idle_seated), "turn_chair": (1.0, False, pose_turn_chair)}
 KEYS = tuple(ha.FACE_KEYS) + ("mouth_A", "mouth_O", "mouth_E")
 
 
@@ -636,12 +699,16 @@ def build(glb=None, blend=None):
     groups = S.join_groups(objs, "Lumi", parts, names={"cloth": "Lumi_Cloth", "skin": "Lumi_Skin", "hair": "Lumi_Hair",
                                                        "gear": "Lumi_Gear", "face": "Lumi_Face"})
     for g, res, paint, coat, cr in (("cloth", 2048, paint_cloth(b), 0.05, 0.5), ("skin", 1024, paint_skin(b), 0.30, 0.35),
-                                    ("hair", 1024, paint_hair(b), 0.10, 0.45), ("gear", 1024, paint_gear(b), 0.55, 0.15)):
+                                    ("hair", 1024, paint_hair(b), 0.02, 0.9), ("gear", 1024, paint_gear(b), 0.55, 0.15)):
         S.apply_material(groups[g], S.texture_group(groups[g], "%s_%s" % (PREFIX, g), res, paint, TEX_DIR, coat=coat, coat_rough=cr))
     S.face_materials(groups["face"], PREFIX, C["iris"], C["pele"], mouth_hex=C["boca"], dark_hex="#1E1512")
     author(rig, groups["face"], b.F)
+    # medidas na pose de repouso (a ultima trilha NLA e um clipe sentado e baixaria a altura medida)
+    rig.data.pose_position = "REST"
     bpy.context.view_layer.update()
     info = S.base_info(list(groups.values()), rig, groups["face"], PREFIX)
+    rig.data.pose_position = "POSE"
+    bpy.context.view_layer.update()
     info.update({"head_h_m": round(b.F.head_h, 4), "head_ratio": round(b.F.head_h / info["height_m"], 4),
                  "loops": {k_: v[1] for k_, v in CLIPS.items()}, "walk_speed_mps": 0.0, "run_speed_mps": 0.0, "variant": CID,
                  "headset": {k_: [round(x, 4) for x in v] for k_, v in GEO.items()}})
