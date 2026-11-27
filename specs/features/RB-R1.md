@@ -646,3 +646,15 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - O nome dele é **Lumi** ("Na escuta! Sou o Lumi, do rádio.").
   - A vila passa a se chamar **Vila Maré**: saem as 2 falas do narrador que diziam "Vila Farol 7".
   - O documento `docs/proposals/g21_farol7.md` descreve a personagem como mulher. Na implementação vale a decisão acima. O restante do visual se mantém: fone de arco com microfone, antena coral, cores da equipe e o mesmo padrão de qualidade do trio. Coque e outros traços femininos são revistos pela arte.
+- **G17 integrado** (`feature/rb-r1-g17-sincronia`, autor `gameplay`), em três partes:
+  1. Cada plano dura no mínimo o tempo da voz real mais uma folga. A fala do plano começa no corte de câmera.
+  2. A cutscene e o som ambiente esperam a tela de carregamento liberar (`SceneLoader.screen_released`/`wait_released`, `ambience_hold`). Thiago viu no iPhone o áudio tocando com a estrela ainda na tela.
+  3. Os planos de rádio somam os cliques do G20.
+  - Testes: `test_cutscene_sync` (93) e `test_cutscene_cover` (22).
+  - Revisão (`reviewer`, 3 rodadas): APROVADO. Mutações conferidas:
+    - sem os cliques: 1 falha;
+    - `_finish` sem zerar a espera: 1 falha;
+    - liberar só em IDLE: 4 falhas.
+  - Abertura: de 34,5 s para 38,7 s.
+  - Ressalva: os casos de teto e de falha de carga do `cutscene_cover` são frouxos. Eles provam que a cena não trava, mas não que ela começa já no fade.
+  - Pendente: Thiago ouvir no iPhone.
