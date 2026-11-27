@@ -7,17 +7,26 @@ const DIR := "res://actors/characters/"
 const BONES := ["root", "hips", "spine", "chest", "neck", "head", "shoulder.L", "shoulder.R", "upper_arm.L", "upper_arm.R",
 	"forearm.L", "forearm.R", "hand.L", "hand.R", "thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R", "toe.L", "toe.R"]
 const SHAPES := ["neutra", "atenta", "surpresa", "alegre", "blink"]
-const LOOPS := ["idle", "walk", "run", "idle_wheel", "chat", "wag"]
+const LOOPS := ["idle", "walk", "run", "idle_wheel", "chat", "wag", "carry_idle", "carry_walk", "climb_wall", "lower_rope", "push_cart"]
+## RB-R1 G19: clipes de pegar, levar, pousar e examinar (os tres herois); escalar e corda (Pico); carrinho (Leme).
+## Duracao esperada (s); laco conforme LOOPS. carry_walk tem o ciclo do walk.
+const G19_COMMON := {"pick_up": 0.6, "carry_idle": 2.4, "carry_walk": 1.0, "place_high": 0.9, "place_low": 0.8, "inspect": 1.4}
+const G19_PICO := {"climb_up_low": 1.0, "climb_up": 1.2, "climb_up_high": 1.333, "climb_wall": 1.2, "climb_top": 0.8,
+	"climb_down": 1.0, "throw_rope": 1.2, "lower_rope": 1.0}
+const G19_LEME := {"push_cart": 1.0}
+## Degraus do climb_up* (altura em m); o climb_down desce 0,9 m.
+const CLIMB_H := {"climb_up_low": 0.6, "climb_up": 0.9, "climb_up_high": 1.2}
 ## RB-R1: rosto completo (expressoes + visemas da fala + olhar) em todo o elenco novo.
 const FULL_SHAPES := ["neutra", "atenta", "surpresa", "alegre", "triste", "brava_leve", "blink", "mouth_A", "mouth_E", "mouth_O",
 	"mouth_M", "look_left", "look_right", "look_up"]
 const RASTRO_SHAPES := FULL_SHAPES
 const RASTRO_ANIMS := ["idle", "walk", "run", "stop", "crouch", "inspect_touch", "look_to_leme", "react_surprise", "point", "wave",
-	"celebrate", "team_pose"]
+	"celebrate", "team_pose", "pick_up", "carry_idle", "carry_walk", "place_high", "place_low", "inspect"]
 const PICO_ANIMS := ["idle", "walk", "run", "stop", "jump", "pull_rope", "look_up", "react_surprise", "celebrate", "wave", "team_pose",
-	"point"]
+	"point", "pick_up", "carry_idle", "carry_walk", "place_high", "place_low", "inspect", "climb_up_low", "climb_up", "climb_up_high",
+	"climb_wall", "climb_top", "climb_down", "throw_rope", "lower_rope"]
 const LEME_ANIMS := ["idle", "walk", "run", "stop", "idle_wheel", "steer_left", "steer_right", "react_horn", "celebrate", "wave", "point",
-	"team_pose"]
+	"team_pose", "pick_up", "carry_idle", "carry_walk", "place_high", "place_low", "inspect", "push_cart"]
 const PUP_BONES := ["root", "hips", "spine", "chest", "neck", "head", "tail1", "fl_paw.L", "fl_paw.R", "bl_paw.L", "bl_paw.R"]
 const HEROES := ["rastro", "pico", "leme"]
 
@@ -71,12 +80,15 @@ func run(runner) -> void:
 		await _test_walk_contact(id)
 	for id in HEROES:
 		await _test_gait_contact(id, &"run")
+		await _test_gait_contact(id, &"carry_walk")
+		await _test_g19(id)
 		await _test_hero_child(id)
 		await _test_loops_close(id)
 		await _test_eyes_open_loops(id)
 	for id in ["rastro", "pico", "leme", "captain", "villager_a", "villager_b", "villager_c"]:
 		await _test_idle_upright(id)
 	await _test_pico()
+	await _test_pico_climb()
 	await _test_pup()
 	await _test_pup_gaits()
 	await _test_point_gestures()
@@ -271,7 +283,8 @@ func _test_walk_contact(id: String) -> void:
 func _test_gait_contact(id: String, clip: StringName) -> void:
 	var root := await _spawn(id)
 	var vis := root.find_child("Model", false, false) as CharacterVisual
-	var nominal := vis.walk_speed_mps if clip == &"walk" else vis.run_speed_mps
+	# carry_walk (G19) tem o mesmo passo do walk: mesma velocidade nominal
+	var nominal := vis.run_speed_mps if clip == &"run" else vis.walk_speed_mps
 	r.check(vis.has_animation(clip) and nominal > 0.0, "chars: %s tem %s com velocidade nominal (%.3f m/s)" % [id, clip, nominal])
 	var len := vis.animation_length(clip)
 	var n := 30
@@ -931,4 +944,170 @@ func _test_pbr_and_accessories() -> void:
 	r.check(lv.set_accessory(&"Acc_LifeVest", false) and not lv.accessory_visible(&"Acc_LifeVest"), "chars: set_accessory desliga o colete")
 	r.check(not lv.set_accessory(&"Acc_Nada", true), "chars: set_accessory de acessorio inexistente retorna false")
 	leme.queue_free()
+	await r.frames(1)
+
+
+# ------------------------------------------------------------------ RB-R1 G19
+## Clipes G19: existem, duracao e laco esperados, carry_walk com o ciclo do walk, olho fechado em ate 0,5 s seguidos,
+## HoldPoint/HoldPoint_L filhos das maos, palmas juntas a frente do peito no carregar, pick_up termina no carry_idle,
+## pes plantados nos clipes parados (ponta do pe nao sai do lugar), place_* e inspect voltam ao repouso de maos vazias.
+func _test_g19(id: String) -> void:
+	var root := await _spawn(id)
+	var vis := root.find_child("Model", false, false) as CharacterVisual
+	var sk := vis.skeleton()
+	var o := root.global_position
+	var want: Dictionary = G19_COMMON.duplicate()
+	if id == "pico":
+		want.merge(G19_PICO)
+	if id == "leme":
+		want.merge(G19_LEME)
+	for c: String in want:
+		var n := StringName(c)
+		r.check(vis.has_animation(n), "chars: G19 %s tem %s" % [id, c])
+		if not vis.has_animation(n):
+			continue
+		r.check(absf(vis.animation_length(n) - float(want[c])) < 0.02, "chars: G19 %s/%s dura %.2f s (%.3f)" % [id, c, want[c], vis.animation_length(n)])
+		r.check(vis.is_looping(n) == (c in LOOPS), "chars: G19 %s/%s laco %s" % [id, c, c in LOOPS])
+		var st := eyes_closed_stats(vis.animation_player().get_animation(n))
+		r.check(st.y <= 0.5, "chars: G19 %s/%s olho fechado no maximo 0,5 s seguidos (%.2f s)" % [id, c, st.y])
+	r.check(absf(vis.animation_length(&"carry_walk") - vis.animation_length(&"walk")) < 0.001, "chars: G19 carry_walk de %s com o ciclo do walk" % id)
+	for pair in [["HoldPoint", "hand.R"], ["HoldPoint_L", "hand.L"]]:
+		var bi := sk.find_bone(pair[0])
+		r.check(bi >= 0 and sk.get_bone_parent(bi) == sk.find_bone(pair[1]), "chars: G19 %s tem o osso %s filho de %s" % [id, pair[0], pair[1]])
+	# carregar: palmas a ~0,2 m, ponto medio a frente do corpo e na altura do peito
+	for c: StringName in [&"carry_idle", &"carry_walk"]:
+		var len := vis.animation_length(c)
+		var worst_gap := 0.0
+		var lo := INF
+		var hi := -INF
+		var front := INF
+		for i in 12:
+			vis.seek_clip(c, len * i / 12.0)
+			var a := vis.bone_position(&"HoldPoint")
+			var b := vis.bone_position(&"HoldPoint_L")
+			worst_gap = maxf(worst_gap, absf(a.distance_to(b) - 0.20))
+			var m := (a + b) * 0.5 - o
+			lo = minf(lo, m.y)
+			hi = maxf(hi, m.y)
+			front = minf(front, -m.z)
+		r.check(worst_gap < 0.02, "chars: G19 %s/%s palmas a 0,20 m (desvio max %.1f mm)" % [id, c, worst_gap * 1000])
+		r.check(lo > 0.40 and hi < 0.62 and front > 0.18, "chars: G19 %s/%s objeto a frente do peito (altura %.2f-%.2f m, %.2f m a frente)" % [id, c, lo, hi, front])
+	# pick_up termina na pose do carry_idle (troca sem salto)
+	vis.seek_clip(&"pick_up", vis.animation_length(&"pick_up"))
+	var p_end := [vis.bone_position(&"HoldPoint"), vis.bone_position(&"HoldPoint_L"), vis.bone_position(&"head")]
+	vis.seek_clip(&"carry_idle", 0.0)
+	var p_ci := [vis.bone_position(&"HoldPoint"), vis.bone_position(&"HoldPoint_L"), vis.bone_position(&"head")]
+	var dj := 0.0
+	for i in 3:
+		dj = maxf(dj, (p_end[i] as Vector3).distance_to(p_ci[i]))
+	r.check(dj < 0.015, "chars: G19 %s pick_up termina na pose do carry_idle (desvio %.1f mm)" % [id, dj * 1000])
+	vis.seek_clip(&"pick_up", 0.27)
+	var grab := (vis.bone_position(&"HoldPoint") + vis.bone_position(&"HoldPoint_L")) * 0.5 - o
+	r.check(grab.y < 0.13 and -grab.z > 0.15, "chars: G19 %s pick_up pega no chao a frente dos pes (meio das palmas a %.3f m de altura, %.3f m a frente)" % [id, grab.y, -grab.z])
+	# place_* e inspect: terminam de maos vazias na pose de repouso (mao a menos de 4 cm do idle)
+	vis.seek_clip(&"idle", 0.0)
+	var rest_r := vis.bone_position(&"hand.R")
+	for c: StringName in [&"place_high", &"place_low", &"inspect"]:
+		vis.seek_clip(c, vis.animation_length(c))
+		var dr := vis.bone_position(&"hand.R").distance_to(rest_r)
+		r.check(dr < 0.04, "chars: G19 %s/%s volta ao repouso (mao a %.1f cm do idle)" % [id, c, dr * 100])
+	# pes plantados nos clipes parados: a bola de cada pe nao anda mais de 1,5 cm e fica no chao (+-2 cm)
+	for c: StringName in [&"pick_up", &"carry_idle", &"place_high", &"place_low", &"inspect"]:
+		var len := vis.animation_length(c)
+		vis.seek_clip(c, 0.0)
+		var t0 := [vis.bone_position(&"toe.R"), vis.bone_position(&"toe.L")]
+		var drift := 0.0
+		var high := 0.0
+		for i in 13:
+			vis.seek_clip(c, len * i / 12.0)
+			for k in 2:
+				var p := vis.bone_position(&"toe.R" if k == 0 else &"toe.L")
+				var q: Vector3 = t0[k]
+				drift = maxf(drift, Vector2(p.x, p.z).distance_to(Vector2(q.x, q.z)))
+				high = maxf(high, absf(p.y - o.y))
+		r.check(drift < 0.015 and high < 0.02, "chars: G19 %s/%s pes plantados (bola do pe anda %.1f mm, altura ate %.1f mm)" % [id, c, drift * 1000, high * 1000])
+	print("  medida G19 %s: pega no chao a %.3f m de altura e %.3f m a frente; fim do pick_up a %.1f mm do carry_idle" % [id, grab.y, -grab.z, dj * 1000])
+	root.queue_free()
+	await r.frames(1)
+
+
+## Pico (G19): escalada. climb_up*: nenhum osso do corpo entra no degrau mais de 1 cm, a palma apoia no topo (<= 4 cm), o
+## clipe termina de pe EM CIMA, deslocado (0, H, -0,3028), com o calcanhar no topo. climb_down e o inverso (0,9 m, de
+## costas). climb_wall: maos e pes do lado de fora da parede e o membro de apoio desce a 0,25 m/s (o ator sobe nessa
+## velocidade). climb_top termina de pe em cima da borda.
+func _test_pico_climb() -> void:
+	var root := await _spawn("pico")
+	var vis := root.find_child("Model", false, false) as CharacterVisual
+	var o := root.global_position
+	vis.seek_clip(&"idle", 0.0)
+	var face_d := -(vis.bone_position(&"toe_tip.R") - o).z + 0.03       # face do degrau, a frente do ator (m)
+	var heel0 := vis.bone_position(&"heel.R").y - o.y
+	var body := [&"hand.R", &"hand.L", &"HoldPoint", &"HoldPoint_L", &"forearm.R", &"forearm.L", &"toe_tip.R", &"toe_tip.L",
+		&"toe.R", &"toe.L", &"heel.R", &"heel.L", &"foot.R", &"foot.L", &"shin.R", &"shin.L", &"hips", &"chest", &"neck"]
+	for c: String in ["climb_up_low", "climb_up", "climb_up_high", "climb_down"]:
+		var n := StringName(c)
+		var len := vis.animation_length(n)
+		var down := c == "climb_down"
+		var h := 0.9 if down else float(CLIMB_H[c])
+		var d0 := face_d - (0.3028 if down else 0.0)      # volume do degrau: a frente de d0 e abaixo de `top`
+		var top := 0.0 if down else h
+		var worst := INF
+		var worst_b := &""
+		var best_palm := INF
+		for i in 61:
+			vis.seek_clip(n, len * i / 60.0)
+			for b: StringName in body:
+				var p := vis.bone_position(b) - o
+				var clear := maxf(d0 - (-p.z), p.y - top)
+				if clear < worst:
+					worst = clear
+					worst_b = b
+			var pr := vis.bone_position(&"HoldPoint") - o
+			if -pr.z > d0:
+				best_palm = minf(best_palm, absf(pr.y - top))
+		r.check(worst > -0.01, "chars: G19 pico/%s nada entra no degrau (pior %s a %.1f mm)" % [c, worst_b, worst * 1000])
+		r.check(best_palm < 0.04, "chars: G19 pico/%s palma apoiada no topo do degrau (%.1f mm)" % [c, best_palm * 1000])
+		vis.seek_clip(n, 0.0)
+		var a := vis.bone_position(&"hips") - o
+		vis.seek_clip(n, len)
+		var e := vis.bone_position(&"hips") - o
+		var want := Vector3(0, -h if down else h, 0.3028 if down else -0.3028)
+		r.check((e - a).distance_to(want) < 0.01, "chars: G19 pico/%s desloca o corpo %s (medido %s)" % [c, want, e - a])
+		var heel_err := (vis.bone_position(&"heel.R").y - o.y) - (heel0 + (0.0 if down else h) - (h if down else 0.0))
+		r.check(absf(heel_err) < 0.02, "chars: G19 pico/%s termina com o pe no apoio (calcanhar a %.1f mm)" % [c, heel_err * 1000])
+		print("  medida G19 pico %s: pior folga %.1f mm (%s), palma no topo %.1f mm, deslocamento %s" % [c, worst * 1000, worst_b, best_palm * 1000, e - a])
+	# climb_wall: parede a 0,203 m a frente (barriga + 7,5 cm; info.json "g19/climb_wall")
+	var wall := 0.203
+	var len_w := vis.animation_length(&"climb_wall")
+	var worst_w := INF
+	var vs: Array = []
+	var prev := {}
+	for i in 49:
+		vis.seek_clip(&"climb_wall", minf(len_w * i / 48.0, len_w - 0.0005))
+		var cur := {}
+		for b: StringName in body:
+			var p := vis.bone_position(b) - o
+			worst_w = minf(worst_w, wall - (-p.z))
+			cur[b] = p
+		for b: StringName in [&"toe.R", &"toe.L", &"HoldPoint", &"HoldPoint_L"]:
+			if not prev.is_empty():
+				var pa: Vector3 = prev[b]
+				var pb: Vector3 = cur[b]
+				var v := (pa.y - pb.y) / (len_w / 48.0)
+				if absf(pb.z - pa.z) < 0.0005 and v > 0.05:
+					vs.append(v)
+		prev = cur
+	var mean := 0.0
+	for v in vs:
+		mean += v
+	mean /= maxf(vs.size(), 1.0)
+	r.check(worst_w > -0.01, "chars: G19 pico/climb_wall maos e pes do lado de fora da parede (pior %.1f mm)" % (worst_w * 1000))
+	r.check(vs.size() >= 20 and absf(mean - 0.25) < 0.03, "chars: G19 pico/climb_wall membro de apoio desce a 0,25 m/s (%.3f m/s, %d amostras)" % [mean, vs.size()])
+	vis.seek_clip(&"idle", 0.0)
+	var hips0 := vis.bone_position(&"hips") - o
+	vis.seek_clip(&"climb_top", vis.animation_length(&"climb_top"))
+	var ct1 := vis.bone_position(&"hips") - o
+	r.check((ct1 - hips0).distance_to(Vector3(0, 0.7887, -0.303)) < 0.015, "chars: G19 pico/climb_top termina de pe em cima da borda (quadril %s do idle)" % [ct1 - hips0])
+	print("  medida G19 pico climb_wall: pior folga %.1f mm, apoio desce %.3f m/s; climb_top quadril %s do idle" % [worst_w * 1000, mean, ct1 - hips0])
+	root.queue_free()
 	await r.frames(1)
