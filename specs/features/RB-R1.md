@@ -1033,3 +1033,14 @@ Critérios de aceite:
     - `2496 PASS`: o mesmo crash, agora em `test_ep01_v3_late`, e uma falha de `radio nivel` (-1,54 LU).
   - Esses três arquivos sozinhos (`ep01_v3_late,movement_f1,audio_radio_level`) dão OK (97 PASS). A terceira rodada da suíte completa deu OK (5388 PASS, 0 falhas) em 590 s.
   - Captura aberta: `captures/g24/after/unstick_09.png` (barco solto da boia A, girando).
+
+### G24c · terceira correção (preso entre a boia e a margem), `gameplay`, 2026-11-27
+- **Recuo automático:** com acelerador ou leme acionados e 1,2 s sem andar 15 cm nem girar 0,15 rad, o barco recua sozinho a 1 m/s por 1,2 s, dentro do teto de 5 cm por quadro. Se a ré estiver bloqueada, ele desliza na diagonal ou de lado, sem entrar na margem nem piorar a folga. Não há dica na tela. Código em `_guard_boat_turn`.
+- **Efeito colateral:** quem segura o acelerador contra uma boia também recua depois de 1,2 s, ou seja, o barco "quica" devagar para trás.
+- **Teste:** `test_boat_unstick` não tem mais a exceção `_squeezed`; os dois lados do leme precisam soltar em todos os casos, em até 3,5 s.
+  - O caso boia A, quina, leme esquerdo agora solta, mas o teste mostra "solto em 0,2 s". O recuo começa ainda na fase de 3 s com o acelerador contra a boia, então, quando o leme entra, o barco já se afastou.
+  - Ou seja, o teste não mede quanto tempo o leme sozinho leva para soltar nesse caso.
+- **Provas:**
+  - `bash tools/test.sh ep01_v3,prop_overlap,motion_audit,boat_unstick`: OK (420 PASS).
+  - Suíte completa `bash tools/test.sh`: OK (5388 PASS, 0 falhas) em 592 s.
+  - A sonda v2 do revisor rodou como teste temporário, que já foi removido: o maior salto num quadro foi de 5,0 cm. A rodada terminou com `FALHOU (0 PASS, 1 FALHA)`, e não investiguei qual checagem da sonda falhou.

@@ -1218,6 +1218,34 @@ func _guard_boat_turn() -> void:
 		budget -= step
 		if boat.forward().dot(n) < 0.0:
 			boat.speed = minf(boat.speed, 0.5)   # bateu de frente: perde o embalo
+	# preso (acelerador ou leme acionados e ~1,5 s sem andar nem girar, ex.: espremido entre a boia e a margem): o barco
+	# recua devagar (ou desliza de lado) para fora da quina, sem passar do teto do quadro. Qualquer leme solta.
+	var dt := get_physics_process_delta_time()
+	var trying := absf(boat.throttle) > 0.05 or absf(boat.steer) > 0.05
+	if trying and _stuck_from != Vector3.INF and boat.global_position.distance_to(_stuck_from) < STUCK_MOVE \
+			and absf(wrapf(boat.heading - _stuck_h, -PI, PI)) < STUCK_TURN:
+		_stuck_t += dt
+	else:
+		_stuck_t = 0.0
+		_stuck_from = boat.global_position
+		_stuck_h = boat.heading
+	if _stuck_t > STUCK_S:
+		_backing = BACK_S
+		_stuck_t = 0.0
+	if _backing > 0.0:
+		_backing -= dt
+		var step := minf(budget, BACK_SPEED * dt)
+		var back := -boat.forward()
+		var side := Vector3(-back.z, 0, back.x)
+		for d: Vector3 in [back, (back + side).normalized(), (back - side).normalized(), side, -side]:
+			var p := boat.global_position + d * step
+			if _hull_free(p, boat.heading) and boat_gap(p, boat.heading) >= minf(boat_gap(boat.global_position, boat.heading), TOUCH_GAP):
+				boat.global_position = p
+				budget -= step
+				break
+		boat.speed = 0.0
+		_stuck_from = boat.global_position
+		_stuck_h = boat.heading
 	# giro que enfia a quina na margem alem do que a correcao do quadro tira: o giro deste quadro nao vale (o outro
 	# lado e o motor continuam livres)
 	if not is_nan(_prev_heading) and not _hull_free(boat.global_position, boat.heading) \
@@ -1230,6 +1258,17 @@ func _guard_boat_turn() -> void:
 
 var _prev_heading := NAN
 var _prev_pos := Vector3.ZERO
+var _stuck_t := 0.0
+var _stuck_from := Vector3.INF
+var _stuck_h := 0.0
+var _backing := 0.0
+## Preso: STUCK_S s andando menos que STUCK_MOVE m e girando menos que STUCK_TURN rad, com comando: recua BACK_S s a
+## BACK_SPEED m/s (dentro do teto do quadro).
+const STUCK_S := 1.2
+const STUCK_MOVE := 0.15
+const STUCK_TURN := 0.15
+const BACK_S := 1.2
+const BACK_SPEED := 1.0
 
 
 ## Direcao (plano) que afasta o casco do que boia mais perto: do ponto mais perto do obstaculo ao eixo do casco.

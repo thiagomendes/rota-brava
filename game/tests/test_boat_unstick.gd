@@ -43,22 +43,17 @@ func run(runner) -> void:
 			for s: float in [1.0, -1.0]:
 				if _case(land, boat, cs[0], cs[1], kind, s):
 					sides.append("esq" if s > 0 else "dir")
-			# entre a boia e a margem um dos lados fica bloqueado de verdade (a margem); o outro sempre solta
-			r.check(sides.size() == 2 or (sides.size() == 1 and _squeezed),
+			# qualquer lado do leme solta (preso, o barco recua sozinho para fora da quina)
+			r.check(sides.size() == 2,
 				"G24c: barco encostado (%s %s) se solta so com o leme: lados que soltam %s%s" % [cs[0], kind, sides,
-				" (espremido contra a margem)" if _squeezed else ""])
+				""])
 	Ep01V3Main.start_mission = &""
 	main.queue_free()
 	await r.frames(2)
 	r.tree.current_scene = null
 
 
-var _squeezed := false
-
-
 func _case(land: Ep01V3Late, boat: BoatActor, id: String, at: Vector3, kind: String, s: float) -> bool:
-	if s > 0.0:
-		_squeezed = false
 	# boia e barco parado: vem do oeste (agua livre), a 5 m; cais: vem da baia para o norte do cais. Quina: proa
 	# desviada 0,5 rad e 0,9 m de lado.
 	# direcao de chegada: a primeira (de 16, comecando do oeste) com o casco livre no ponto de partida (a 5-6 m)
@@ -100,8 +95,6 @@ func _case(land: Ep01V3Late, boat: BoatActor, id: String, at: Vector3, kind: Str
 		worst = minf(worst, land.boat_gap(boat.global_position, boat.heading))
 		if not land._hull_free(boat.global_position, boat.heading):
 			wall_hit += 1
-		if land.boat_clearance(boat.global_position) < 0.8 and land.boat_gap(boat.global_position, boat.heading) < 0.2:
-			_squeezed = true
 		# solto: ja nao encosta (folga do que boia > 0,4 m e longe do cais) ou a proa ja virou para longe (> 1 rad)
 		var gap := land.boat_gap(boat.global_position, boat.heading)
 		if absf(wrapf(boat.heading - h0, -PI, PI)) > FREE_TURN or (id != "cais" and gap > 0.4):
