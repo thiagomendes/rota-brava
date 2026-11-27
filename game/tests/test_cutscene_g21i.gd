@@ -263,7 +263,13 @@ func _arm_samples(cs: Ep01V3Cutscene, lumi: Node3D, i: int, id: String) -> void:
 			var saying := cs.hud.is_speaking()
 			# estendido: mao na altura do ombro (> 1,2 m; em repouso fica a ~0,79 m) e a frente do corpo (> 0,15 m; em
 			# repouso ~0,08 m), com a fala no ar
-			if not saying or cs.holding(&"radio") != &"point" or hand.y < 1.2 or -hand.z < 0.15:
+			# e de olhos abertos (a pose segurada nao pode cair na piscada do clipe)
+			var blink := 0.0
+			var face := cv.face_mesh()
+			if face != null and face.find_blend_shape_by_name("blink") >= 0:
+				blink = face.get_blend_shape_value(face.find_blend_shape_by_name("blink"))
+			log[-1] += " blink=%.2f" % blink
+			if not saying or cs.holding(&"radio") != &"point" or hand.y < 1.2 or -hand.z < 0.15 or blink >= 0.3:
 				bad.append(log[-1])
 		elif cs.holding(&"radio") != &"wave" or hand.y < 1.2:
 			bad.append(log[-1])

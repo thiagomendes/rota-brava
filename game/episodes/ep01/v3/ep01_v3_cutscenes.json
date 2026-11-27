@@ -628,10 +628,10 @@
        "marker": "Base_LumiStand",
        "anim": "point",
        "then": "idle",
-       "_note": "G21i: thumbs_up nao existe no lumi_v2; o point congela estendido (0,7 s) ate 90% do plano e passa para idle com blend",
+       "_note": "G21i: thumbs_up nao existe no lumi_v2; o point congela estendido em 0,55 s (antes da piscada do clipe, 0,70-0,88 s) ate 90% do plano e passa para idle com blend",
        "hold": [
-        0.7,
-        0.7
+        0.55,
+        0.55
        ],
        "hold_until": 0.9
       }
