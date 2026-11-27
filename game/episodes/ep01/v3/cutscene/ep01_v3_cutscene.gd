@@ -160,7 +160,8 @@ static func shot_length(sh: Dictionary) -> float:
 	var key := line_key(sh)
 	if key == "":
 		return base
-	return maxf(base, Hud.line_seconds(Loc.t(key), voice_seconds(key)))
+	# Por chave (G20): numa fala de radio soma os cliques de abrir e fechar.
+	return maxf(base, Hud.line_seconds(key, voice_seconds(key)))
 
 
 ## G17: quem esta em foco no plano (`focus` da ficha ou o primeiro ator); &"" se o plano nao tem ator.

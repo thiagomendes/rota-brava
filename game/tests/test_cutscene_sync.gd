@@ -25,7 +25,8 @@ func run(runner) -> void:
 	root.add_child(world)
 	var hud := Hud.new()
 	root.add_child(hud)
-	hud.voice_hook = func(key: String) -> float: return _voice(key)
+	# Como o AudioDirector.play_line: numa fala de radio com voz a duracao inclui os cliques (G20).
+	hud.voice_hook = func(key: String) -> float: return _voice(key) + Hud.radio_extra_seconds(key) if _voice(key) > 0.0 else 0.0
 	_cs = Ep01V3Cutscene.new()
 	root.add_child(_cs)
 	_cs.setup(world, hud, {})
@@ -116,6 +117,21 @@ func _scene(id: StringName, hud: Hud, line_frames: Array) -> int:
 			late.append("%s comecou %.2f, plano %d em %.2f" % [k, float(row[1]), i, st])
 	r.check(late.is_empty(), "cutscene sync: %s cada fala comeca no corte do plano dela %s" % [id, str(late)])
 	r.check(line_frames.size() == expected.size(), "cutscene sync: %s todas as falas tocam (%d/%d)" % [id, line_frames.size(), expected.size()])
+	# G20: plano de radio com voz dura >= voz + cliques (0,35) + folga (0,35); o clique de fechar acaba antes do corte.
+	var radio_bad: Array[String] = []
+	for e: Variant in line_frames:
+		var row: Array = e
+		var k := str(row[0])
+		var i := int(row[2])
+		var v := _voice(k)
+		if v <= 0.0 or not AudioDirector.is_radio_line(k):
+			continue
+		var st := float(shot_t.get(i, 0.0))
+		var cut_t := float(shot_t.get(i + 1, _cs.time))
+		var close_end := float(row[1]) + AudioDirector.RADIO_OPEN_S + v + AudioDirector.RADIO_CLOSE_S
+		if cut_t - st + FRAME_TOL < v + AudioDirector.RADIO_EXTRA_S + Hud.VOICE_TAIL or close_end > cut_t:
+			radio_bad.append("%s plano %.2f s (voz %.2f), fecha %.2f, corte %.2f" % [k, cut_t - st, v, close_end, cut_t])
+	r.check(radio_bad.is_empty(), "cutscene sync: %s planos de radio cabem voz + cliques + folga %s" % [id, str(radio_bad)])
 	if id == &"game_intro":
 		for i in shots.size():
 			var line2: Variant = (shots[i] as Dictionary).get("line")
