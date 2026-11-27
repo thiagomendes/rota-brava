@@ -107,7 +107,7 @@ def main():
     if WIRE:
         wm = RR.wire_material()
         for cid in ADULTS:
-            for o in figs[cid][4]:
+            for o in figs[cid][3]:
                 if o.type == "MESH":
                     o.data.materials.clear()
                     o.data.materials.append(wm)

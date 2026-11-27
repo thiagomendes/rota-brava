@@ -8,7 +8,7 @@ extends RefCounted
 ## arestas, centro). Em 24 setores em volta do eixo, so pontos a 30 mm ou mais do eixo (a borda da silhueta):
 ## vao = ponto mais baixo da perna - ponto mais alto do sapato. O pior setor, perna e quadro tem de dar <= 0 mm.
 ## Mutacao embutida: o mesmo modelo com o sapato baixado 60 mm ao longo da canela TEM de dar vao > 0 (a medida enxerga um
-## vao); o modelo antigo (antes do G23) dava +35,5 a +39,0 mm (ver o ticket).
+## vao); o modelo antigo (antes do G23) dava +37,4 a +41,5 mm (ver o ticket).
 
 const ADULTS := {"captain": "res://actors/characters/captain_model.tscn", "amora": "res://actors/characters/amora_model.tscn",
 	"lumi": "res://actors/characters/lumi_model.tscn"}

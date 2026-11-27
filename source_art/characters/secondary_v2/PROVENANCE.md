@@ -103,8 +103,8 @@ sapato. Só geometria por script; rig, pesos por distância e clipes iguais.
 - Capitão: bota de cano (`shaft=(0.125, 0.045)`); Lumi: tênis de cano (`shaft=(0.125, 0.047)`); Dona Amora: meia com
   tornozelo dentro do sapato (`ankle_r=0.040`). Brilho e pintura do sapato iguais (mesma parte `shoe`).
 - Medida: `measure_feet_g23.py` (no .blend) e `game/tests/test_feet_gap.gd` (no GLB), mesma conta, todos os quadros de
-  todos os clipes: vão perna-sapato antes +35,5 a +39,0 mm no .blend (+37,4 a +41,5 mm no GLB), depois −15,7 a −26,3 mm
-  (sobreposição; os dois dão o mesmo número).
+  todos os clipes: vão perna-sapato antes +37,4 a +41,5 mm, depois −15,7 a −26,3 mm (sobreposição; .blend e
+  GLB dão o mesmo número).
 - Provas: `render_feet_g23.py` (fila de frente, de lado e de 3/4 e close dos pés) em `captures/g23/` (fora do Git).
 - GLB: `captain_v2.glb` `81b3d26d2385e5d56a44cc4fa233a2a6a21267095832202c1b4c2d02d52c22d3` (24 242 tris),
   `amora_v2.glb` `2952973579600daa77a11513d88007b99baba3a75f6bc03cf27d50a8e4a31de8` (22 876 tris),

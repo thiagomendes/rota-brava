@@ -806,6 +806,39 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 |---|---|---|---|
 | G23 | No capitão, na Dona Amora e no Lumi o sapato fica separado da perna: aparece um vão com o fundo passando entre a barra da calça e o sapato (conferido pelo lead em `captures/g21/g21_fila_frente.png`). Nos três heróis o sapato está encaixado. É a mesma família do G4, das mãos soltas | Perna e sapato contínuos em idle, walk e nos clipes próprios: a barra da calça ou da saia entra no cano do sapato, ou um tornozelo ou meia fecha o vão, sem vão visível de frente, de lado e de 3/4. Medição por script do vão perna-sapato em todos os quadros dos clipes (máximo ≤ 0 mm, isto é, sobreposição), com mutação que falha no modelo atual. O brilho de plástico do sapato fica igual ao dos heróis. Os mesmos 3 adultos e também os outros NPCs que tiverem o mesmo esquema de perna. Geometria por script, sem mexer no rig nem nos clipes. Capturas antes e depois: fila de frente, de lado e close dos pés | `art3d` |
 - **Decisão de Thiago (2026-11-27):** o Lumi da rodada 2 está aprovado ("ficou legal"). O único ajuste é o pé solto, sem tornozelo, que vira o G23. A integração do plano do Lumi na abertura (G21) pode seguir em paralelo com o G23.
+- **G23 feito (`art3d`, branch `feature/rb-r1-g23-pes`, 2026-11-27, sem merge):**
+  - Causa: em `sv2_human.py` a calça (ou meia) terminava numa calota redonda 5,5 cm acima do tornozelo e o sapato numa
+    calota redonda 5 cm acima dele; as duas pontas arredondadas deixavam uma faixa sem nada em volta da perna.
+  - Correção só de geometria (rig, pesos por distância e clipes iguais): `shoes(shaft=...)` sobe um cano por dentro da
+    barra (o cano é a ponta da corrente SKIN, sem ramificação, para não dobrar em quina) e `trousers(ankle_r=...)` continua
+    a meia por um tornozelo que entra no sapato. Capitão: bota de cano; Lumi: tênis de cano; Dona Amora: meia dentro do
+    sapato. Pintura e verniz do sapato iguais (mesma parte `shoe`). Tris: capitão 24 038 → 24 242, Dona Amora
+    22 630 → 22 876, Lumi 22 823 → 23 027; o resto da malha saiu igual (tris por objeto).
+  - Medida (vão perna-sapato no pior setor de 24 em volta da canela, só a borda a ≥ 30 mm do eixo, todos os quadros de
+    todos os clipes; `source_art/characters/secondary_v2/measure_feet_g23.py` no .blend e `game/tests/test_feet_gap.gd` no
+    GLB, mesma conta e os mesmos números nos dois):
+
+    | Personagem | Clipes | Antes | Depois |
+    |---|---|---|---|
+    | Capitão | idle, walk, wave, thanks | +39,5 a +41,5 mm | −20,5 mm |
+    | Dona Amora | idle, wave, thanks, point, talk | +37,4 a +38,6 mm | −15,7 a −15,8 mm |
+    | Lumi | idle, talk, wave, point, idle_seated, turn_chair | +37,8 a +39,7 mm | −23,0 a −26,3 mm |
+
+    Dona Amora e Lumi não têm `walk`. Mutação: `test_feet_gap` roda nos GLB antigos e falha (15 FAIL, os números acima); a
+    mutação embutida (sapato baixado 60 mm) acusa vão de +37,0 a +43,2 mm nos modelos novos.
+  - Outros NPCs: só capitão, Dona Amora e Lumi usam `sv2_human`. Os moradores `villager_a/b/c` são do `hero_lib` antigo, com
+    a calça terminando dentro de uma bota mais larga (esquema diferente) e fora do v3; o filhote não tem sapato.
+  - Provas (fora do Git, `captures/g23/`, todas abertas): `g23_{antes,depois}_idle_fila_{frente,perfil,tres_quartos}.png`;
+    close dos pés de frente, de lado, de 3/4 e de baixo `g23_{antes,depois}_idle_pes.png`, nos clipes
+    `g23_{antes,depois}_clipes_pes.png` (capitão `walk` q9, Amora `thanks` q28, Lumi `turn_chair` q15) e
+    `g23_{antes,depois}_sentado_pes.png` (capitão `walk` q21, Amora `wave` q24, Lumi `idle_seated` q40); malha
+    `g23_depois_idle_pes_malha.png`; câmera do jogo no cais `g23_jogo_pes_{captain,amora,lumi}.png` (`capture_g4.gd`
+    ganhou a tomada `feet:<id>`).
+  - Testes: `bash tools/test.sh characters,assets,feet_gap` → `RESULTADO: OK (1662 PASS, 0 FALHA(S))`; nos GLB antigos,
+    `RB_TEST_JOBS=1 bash tools/test.sh feet_gap` → `FALHOU (12 PASS, 15 FALHA(S))`. Cenas não mudaram (sem `cutscene`).
+  - Fraco: o cano aparece como bota/tênis de cano (2–4 cm entre o sapato e a barra), não como tornozelo de pele; no Lumi
+    sentado a vista de perfil do close não enquadrou os pés (sem cadeira no render do Blender); retratos não mudam (só
+    rosto).
 
 ### G21i · plano do Lumi na abertura (dono `gameplay`; texto e voz seguem o padrão do G22c)
 Fonte: `docs/proposals/g21_farol7.md` §3 e §4, **trocando a personagem por um homem, o Lumi**.
