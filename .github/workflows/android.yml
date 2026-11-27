@@ -1,0 +1,186 @@
+# RB-M1: APK Android de validacao. So sob demanda (decisao de Thiago, 2026-11-27): aba Actions > Android APK > Run workflow.
+name: Android APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GODOT_HOME: ${{ github.workspace }}/.tools/godot-linux
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Versoes fixadas (tools/toolchain.json)
+        id: tc
+        run: |
+          set -euo pipefail
+          T=tools/toolchain.json
+          {
+            echo "editor_url=$(jq -r .godot.editorLinux.url $T)"
+            echo "editor_sha=$(jq -r .godot.editorLinux.sha256 $T)"
+            echo "editor_exe=$(jq -r .godot.editorLinux.exe $T)"
+            echo "tpl_url=$(jq -r .godot.templates.url $T)"
+            echo "tpl_sha=$(jq -r .godot.templates.sha256 $T)"
+            echo "tpl_dir=$(jq -r .godot.templatesDir $T)"
+            echo "jdk=$(jq -r .android.jdk $T)"
+            echo "build_tools=$(jq -r .android.buildTools $T)"
+            echo "platform=$(jq -r .android.platform $T)"
+            echo "pt_url=$(jq -r .android.platformToolsWindows.url $T)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Godot 4.7.2 (Linux) e templates, com SHA-256
+        env:
+          EDITOR_URL: ${{ steps.tc.outputs.editor_url }}
+          EDITOR_SHA: ${{ steps.tc.outputs.editor_sha }}
+          EDITOR_EXE: ${{ steps.tc.outputs.editor_exe }}
+          TPL_URL: ${{ steps.tc.outputs.tpl_url }}
+          TPL_SHA: ${{ steps.tc.outputs.tpl_sha }}
+          TPL_DIR: ${{ steps.tc.outputs.tpl_dir }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$GODOT_HOME" /tmp/dl
+          curl -fL --retry 3 -o /tmp/dl/godot.zip "$EDITOR_URL"
+          echo "$EDITOR_SHA  /tmp/dl/godot.zip" | sha256sum -c -
+          curl -fL --retry 3 -o /tmp/dl/tpl.tpz "$TPL_URL"
+          echo "$TPL_SHA  /tmp/dl/tpl.tpz" | sha256sum -c -
+          unzip -oq /tmp/dl/godot.zip -d "$GODOT_HOME"
+          chmod +x "$GODOT_HOME/$EDITOR_EXE"
+          touch "$GODOT_HOME/._sc_"
+          TPL="$GODOT_HOME/editor_data/export_templates/$TPL_DIR"
+          mkdir -p "$TPL" /tmp/tpl
+          unzip -oq /tmp/dl/tpl.tpz -d /tmp/tpl
+          cp /tmp/tpl/templates/android_release.apk /tmp/tpl/templates/android_debug.apk /tmp/tpl/templates/version.txt "$TPL/"
+          "$GODOT_HOME/$EDITOR_EXE" --headless --version
+
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
+        with:
+          distribution: temurin
+          java-version: ${{ steps.tc.outputs.jdk }}
+
+      - name: Android SDK (build-tools e platform pedidos pela Godot 4.7)
+        env:
+          BUILD_TOOLS: ${{ steps.tc.outputs.build_tools }}
+          PLATFORM: ${{ steps.tc.outputs.platform }}
+        run: |
+          set -euo pipefail
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          SDKM="$(ls "$SDK"/cmdline-tools/*/bin/sdkmanager | sort -V | tail -1)"
+          yes | "$SDKM" --licenses > /dev/null || true
+          "$SDKM" --install "platform-tools" "build-tools;$BUILD_TOOLS" "platforms;$PLATFORM"
+          echo "SDK_DIR=$SDK" >> "$GITHUB_ENV"
+          mkdir -p "$GODOT_HOME/editor_data"
+          cat > "$GODOT_HOME/editor_data/editor_settings-4.7.tres" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "$SDK"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          EOF
+
+      - name: Keystore de assinatura
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          KS_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          KS="$RUNNER_TEMP/release.keystore"
+          if [ -n "$KS_B64" ]; then
+            if [ -z "$KS_PASS" ] || [ -z "$KS_ALIAS" ]; then
+              echo "::error::ANDROID_KEYSTORE_B64 existe, mas falta ANDROID_KEYSTORE_PASS ou ANDROID_KEY_ALIAS."
+              exit 1
+            fi
+            echo "$KS_B64" | base64 -d > "$KS"
+            ALIAS="$KS_ALIAS"; PASS="$KS_PASS"
+            echo "Assinatura: keystore fixa do segredo ANDROID_KEYSTORE_B64." >> "$GITHUB_STEP_SUMMARY"
+          else
+            ALIAS="rotabrava"; PASS="$(openssl rand -hex 16)"
+            echo "::add-mask::$PASS"
+            keytool -genkeypair -v -keystore "$KS" -alias "$ALIAS" -keyalg RSA -keysize 2048 -validity 3650 \
+              -storepass "$PASS" -keypass "$PASS" -dname "CN=Rota Brava teste, O=Rota Brava, C=BR" > /dev/null 2>&1
+            echo "::warning::Sem ANDROID_KEYSTORE_B64: APK assinado com keystore TEMPORARIA. Ao instalar por cima de outra build, o aparelho recusa e reinstalar apaga o save."
+            {
+              echo "### Aviso: keystore temporaria"
+              echo "Este APK foi assinado com uma chave criada so para esta execucao."
+              echo "Instalar por cima de uma build anterior vai falhar por assinatura diferente; o script \`tools/android-install.ps1\` pede confirmacao antes de desinstalar (isso apaga o save do aparelho)."
+              echo "Para assinatura fixa, cadastre ANDROID_KEYSTORE_B64, ANDROID_KEYSTORE_PASS e ANDROID_KEY_ALIAS (veja docs/mobile.md)."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          {
+            echo "GODOT_ANDROID_KEYSTORE_RELEASE_PATH=$KS"
+            echo "GODOT_ANDROID_KEYSTORE_RELEASE_USER=$ALIAS"
+            echo "GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=$PASS"
+          } >> "$GITHUB_ENV"
+
+      - name: Importar e exportar o APK
+        env:
+          EDITOR_EXE: ${{ steps.tc.outputs.editor_exe }}
+          BUILD_TOOLS: ${{ steps.tc.outputs.build_tools }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          G="$GODOT_HOME/$EDITOR_EXE"
+          mkdir -p build/android
+          sed -i "s/^version\/code=.*/version\/code=$RUN_NUMBER/" game/export_presets.cfg
+          "$G" --headless --path game --import
+          "$G" --headless --path game --export-release "Android" "$PWD/build/android/RotaBrava.apk" 2>&1 | tee build/android/export.log
+          test -s build/android/RotaBrava.apk
+          "$SDK_DIR/build-tools/$BUILD_TOOLS/apksigner" verify --print-certs build/android/RotaBrava.apk | head -5
+
+      - name: SHA-256 e resumo
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          cd build/android
+          sha256sum RotaBrava.apk > RotaBrava.apk.sha256
+          SIZE=$(stat -c %s RotaBrava.apk)
+          {
+            echo "### APK Rota Brava"
+            echo "- Commit: \`${GITHUB_SHA}\` (build ${RUN_NUMBER})"
+            echo "- Tamanho: ${SIZE} bytes"
+            echo "- SHA-256: \`$(cut -d' ' -f1 RotaBrava.apk.sha256)\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Medir platform-tools do Windows (para fixar o hash do script)
+        continue-on-error: true
+        env:
+          PT_URL: ${{ steps.tc.outputs.pt_url }}
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 -o /tmp/dl/pt-win.zip "$PT_URL"
+          {
+            echo "### platform-tools Windows"
+            echo "- URL: $PT_URL"
+            echo "- SHA-256: \`$(sha256sum /tmp/dl/pt-win.zip | cut -d' ' -f1)\` (copie para tools/toolchain.json > android.platformToolsWindows.sha256)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rota-brava-android-apk
+          path: |
+            build/android/RotaBrava.apk
+            build/android/RotaBrava.apk.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: failure()
+        with:
+          name: android-export-log
+          path: build/android/export.log
+          if-no-files-found: ignore
+
+      - name: Apagar a keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.keystore"

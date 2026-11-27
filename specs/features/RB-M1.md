@@ -67,3 +67,23 @@ Publicação em loja; ajuste fino de desempenho; UX de toque definitiva; ícones
 
 ## Decisão de Thiago (2026-11-27): workflows na main
 O GitHub só mostra o "Run workflow" quando o arquivo do workflow existe na branch padrão. Thiago autorizou mandar para a `main` **só** `.github/workflows/android.yml` e `ios.yml`, depois da revisão, sem o resto do RB-R1 e do RB-M1. Para rodar, ele escolhe a branch de integração em "Use workflow from".
+### build-qa (2026-11-27, nuvem Linux, Godot 4.7.2.stable.official.ed1daf0bf, OpenJDK 21 do sistema)
+- **Medido:** `tools/mobile_icons.gd` gerou 4 PNGs em `game/ui/brand/app_icon/` (manifesto `app_icon_m1`). Export iOS (projeto Xcode, `export_project_only`) **concluiu no Linux** com Team ID fictício: esquema `RotaBrava`, assinatura `Automatic`, bundle `com.thiagomendes.rotabrava`, `RotaBrava.pck` de 307 MB. Export Android parou só por falta de SDK (sem erro de preset, ícone ou ETC2/ASTC).
+- **Bloqueado:** `dl.google.com` recusado pelo proxy da nuvem (403): sem Android SDK local, sem APK local e sem o SHA-256 das platform-tools Windows (`toolchain.json` marca `PENDENTE`; o `android.yml` mede e mostra no resumo do job).
+- **Sintaxe:** `actionlint 1.7` + `shellcheck`: só 2 avisos informativos (SC2012, `ls` em vez de `find`).
+- **Testes:** `bash tools/test.sh foundation` OK (72 PASS); `bash tools/test.sh test_assets` OK (280 PASS).
+- **Pendente:** `android.yml` e `ios.yml` verdes no GitHub (depois do push e merge em `main`); APK: tamanho e SHA-256; `android-install.ps1` não foi executado (sem `pwsh` aqui); instalação, visual e desempenho no aparelho (Thiago).
+
+## Revisão e integração
+- **Revisão** (`reviewer`, 3 rodadas):
+  - 1ª, REPROVADA: o artefato de falha do iOS levava o teamID, as actions não estavam fixadas por SHA e a keystore não era apagada.
+  - 2ª, REPROVADA: os logs ainda continham Key ID e Issuer ID.
+  - 3ª, APROVADA: a máscara dos três valores foi testada com log falso, e o caso forçado de falha sai com 1 e não faz upload.
+- `foundation` 72 PASS, `test_assets` 280 PASS, `ui_` 248 PASS.
+- **Na `main`:** entraram só os dois workflows (`32969cb`), por decisão de Thiago. O resto do RB-M1 está integrado na `feature/rb-r1-reorientacao`.
+- **Ainda não validado:**
+  - nenhum dos dois workflows rodou no GitHub;
+  - o `android-install.ps1` nunca foi executado (não há pwsh na nuvem);
+  - o SHA-256 das platform-tools do Windows segue PENDENTE (`dl.google.com` bloqueado aqui);
+  - tamanho e SHA-256 do APK só existem depois da 1ª execução;
+  - o toque básico está em andamento.
