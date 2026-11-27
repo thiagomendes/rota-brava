@@ -595,3 +595,14 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 - **Capturas** (fora do Git, `captures/g15/`, `game/tests/capture_g15.tscn` e `capture_g15_panels.tscn`): `g15_{keyboard,xbox,playstation,touch}_16x9.png` (+ `_crop`), `g15_xbox_20x9.png`, `g15_touch_4x3.png`, `painel_xbox_*`, `painel_playstation_*` (pausa, fim, cartão).
 - **Suíte pedida:** `ui_,touch_controls,ep01_v3_input,cutscene,foundation,assets` = `OK (910 PASS, 0 FALHA(S))`; a Godot imprime no fim `Parse Error ... rastro_model.tscn:16` (ou `village_world.tscn:7`), sem falha de teste; não investigado.
 - **Ressalvas:** ninguém usou controle real; a família vem do nome que o sistema dá ao joypad (adaptadores podem cair no genérico). O selo do Rever episódio fica encostado no texto. A dica "pular a cena" e o "Segure para apagar" com glifo não foram capturados (só testados). Ferramentas de desenvolvimento seguem com tecla escrita.
+- **G15 integrado** (`feature/rb-r1-g15-dicas`, autor `ux`).
+  - **Detecção do aparelho:** a família vem de `get_joy_name` e do fabricante no guid SDL.
+  - **Glifos:** 45 SVG originais, gerados por `tools/glyphs/make_glyphs.py`.
+  - **Mapeamento:** `InputGlyphs` lê a Input Map pela posição do botão.
+  - **Textos:** todos os que citavam uma tecla passaram a usar glifo ou marcador `{acao}`. Saíram do i18n as chaves com tecla fixa.
+  - **Revisão** (`reviewer`): APROVADO.
+    - Os SVG não trazem marca nem logo.
+    - O mapeamento por posição confere com a Input Map: `interact` = X no Xbox e □ no PlayStation.
+    - Mutação: `glyph_id` devolvendo sempre teclado → 15 falhas.
+    - Testes: `ui_` 307, `ui_glyphs` 46, `touch_controls` 65, `cutscene` 152.
+  - **Pendente:** controle físico real e legibilidade na tela; o glifo genérico é abstrato; teclado AZERTY não testado.
