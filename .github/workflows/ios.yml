@@ -149,17 +149,34 @@ jobs:
         if: always()
         run: rm -f "$RUNNER_TEMP"/AuthKey_*.p8 build/ios/ExportOptions.plist
 
-      - name: Mascarar o Team ID nos logs
+      - name: Mascarar segredos nos logs
         id: mask
         if: failure()
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
+          # MASK-BEGIN (testado localmente; sem sed -i para valer em macOS e Linux)
           set -euo pipefail
           shopt -s nullglob
-          for f in build/ios/*.log; do
-            if [ -n "$APPLE_TEAM_ID" ]; then sed -i '' "s/$APPLE_TEAM_ID/***/g" "$f"; fi
+          vals=()
+          for v in "${APPLE_TEAM_ID:-}" "${ASC_KEY_ID:-}" "${ASC_ISSUER_ID:-}"; do
+            if [ -n "$v" ]; then vals+=("$v"); fi
           done
+          for f in build/ios/*.log; do
+            # defesa extra: some a linha de invocacao com a chave da API
+            grep -v -e '-authenticationKey' "$f" > "$f.tmp" || true
+            mv "$f.tmp" "$f"
+            for v in "${vals[@]+"${vals[@]}"}"; do
+              esc=$(printf '%s' "$v" | sed 's/[]\/.*^$[]/\\&/g')
+              sed "s/$esc/***/g" "$f" > "$f.tmp"
+              mv "$f.tmp" "$f"
+              n=$(grep -cF -- "$v" "$f" || true)
+              if [ "$n" != "0" ]; then echo "::error::segredo ainda presente em $f; nada sera enviado"; exit 1; fi
+            done
+          done
+          # MASK-END
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure() && steps.mask.outcome == 'success'
