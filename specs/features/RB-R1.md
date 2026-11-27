@@ -707,3 +707,10 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
     - grama atravessando o cesto;
     - a captura `basket_perto` saiu mal enquadrada.
 - **Clipes do G19 integrados.** Revisão (`reviewer`): APROVADO. Malha, materiais e clipes antigos estão idênticos, conferido canal a canal. Os ossos foram de 28 para 30, sem índice fixo no jogo. Duas mutações (`HoldPoint` em outro osso, `carry_walk` com passo de corrida) produzem 8 e 2 falhas. `characters` 1189, `ep01_v3` 232, `cutscene` 152, `keyart` 30.
+
+### Retorno de Thiago no iPhone, build 3 (TestFlight, `68a015e`), 2026-11-27: pacote G22
+| Id | Relato | Critério de aceite | Dono |
+|---|---|---|---|
+| G22a | O botão de ajuda mostra um "H" mesmo no celular. Ele fica pequeno e desproporcional | O ícone de ajuda não usa letra de tecla: vira um símbolo de ajuda original (boia ou "?" desenhado), legível em qualquer aparelho. O selo do teclado e do controle continua só como selo (G15). No toque, o botão de ajuda fica no tamanho e no estilo dos botões da camada de toque, com alvo de pelo menos 110 px e desenho proporcional. Captura em 16:9, 20:9 e 4:3 | `ux` |
+| G22b | A voz do rádio (Farol 7) está muito baixa no jogo, desproporcional às outras vozes | Loudness percebida da fala de rádio, já depois do bus Radio, igual à das outras vozes (±1 LU), medida offline com a mesma cadeia e conferida pelo nível do bus na Godot. Cliques e chiado continuam abaixo da voz. Teste com os níveis | `audio` |
+| G22c | Na abertura, o narrador diz "Esta é a Vila Farol 7, à beira-mar!", que confunde com a base | Aplicar a decisão do G21: a vila se chama Vila Maré. Trocar `ep01.narrator.intro.village` e `ep01.narrator.opening.village` e gerar a voz de novo no próximo lote | `audio` (texto e voz) |
