@@ -86,7 +86,7 @@ func run(runner) -> void:
 	r.check(missing.is_empty(), "os 20 emotes existem e importam como textura >= 48 px (faltam: %s)" % str(missing))
 	for p: String in BRAND:
 		r.check(load(p) is Texture2D, "marca importa: %s" % p.get_file())
-	for k: StringName in [&"line", &"bank", &"harbor", &"magnifier", &"help", &"pause", &"gear", &"home"]:
+	for k: StringName in [&"line", &"bank", &"harbor", &"magnifier", &"help_balloon", &"pause", &"gear", &"home"]:
 		r.check(IconView.texture_for(k) != null, "pictograma '%s' resolve para um SVG" % k)
 
 	# --- mutacao: tirar um SVG reprova e e restaurado ---

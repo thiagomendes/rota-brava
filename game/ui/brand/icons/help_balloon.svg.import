@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://blrdrxubqfa0a"
-path="res://.godot/imported/help.svg-d72f40e911ce90dac95a65cb675276ff.ctex"
+uid="uid://b378b1a14cq2p"
+path="res://.godot/imported/help_balloon.svg-26d3b7beeb7b1d2a6dcb7f706e0567de.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/brand/icons/help.svg"
-dest_files=["res://.godot/imported/help.svg-d72f40e911ce90dac95a65cb675276ff.ctex"]
+source_file="res://ui/brand/icons/help_balloon.svg"
+dest_files=["res://.godot/imported/help_balloon.svg-26d3b7beeb7b1d2a6dcb7f706e0567de.ctex"]
 
 [params]
 

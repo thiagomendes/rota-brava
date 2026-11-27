@@ -26,6 +26,7 @@ func run(runner) -> void:
 	_input_map_case()
 	_catalog_case()
 	_contrast_case()
+	_help_icon_case()
 	await _live_case()
 	InputDevice.reset()
 
@@ -157,6 +158,51 @@ func _contrast_case() -> void:
 			bad.append("%s: simbolo x corpo = %.2f" % [f, cs])
 	r.check(n >= 40 and bad.is_empty(), "G15 contraste >= 4,5:1 em %d glifos (contorno x fundo da dica e simbolo x botao) %s" % [n, str(bad)])
 	r.check(ThemeV2.contrast_ratio(Color("1D5FC4"), ThemeV2.NAVY) < 4.5, "G15 mutacao: um contorno azul sobre o selo seria reprovado")
+
+
+# ---------- G22a: pictograma da ajuda sem letra de tecla ----------
+
+## Antigos desenhos da ajuda: a letra H em traco (glifo de toque/tecla H e o pictograma help.svg da marca, relativo).
+const OLD_H_PATHS := ["M36 28V72M64 28V72M36 50H64", "M36 28v44M64 28v44M36 50h28"]
+const OLD_BRAND_HELP := "<svg viewBox=\"0 0 100 100\"><path d=\"M36 28v44M64 28v44M36 50h28\"/></svg>"
+
+
+## Problemas de um SVG de ajuda: texto/fonte ou a letra H desenhada.
+static func help_svg_problems(svg: String) -> Array[String]:
+	var bad: Array[String] = []
+	if "<text" in svg or "font-" in svg:
+		bad.append("usa texto/fonte")
+	for h: String in OLD_H_PATHS:
+		if h in svg:
+			bad.append("desenha a letra H")
+	return bad
+
+
+func _help_icon_case() -> void:
+	var id := Hud.HELP_ICON
+	var glyph_ids: Array[String] = []
+	for f in DirAccess.get_files_at(InputGlyphs.DIR):
+		if f.ends_with(".svg"):
+			glyph_ids.append(f.get_basename())
+	r.check(not (String(id) in glyph_ids) and not String(id).begins_with("key_") and String(id).length() > 1
+		and IconView.has_icon(id), "G22a ajuda: pictograma '%s' existe e nao e id de tecla nem de glifo" % id)
+	var svg := FileAccess.get_file_as_string(IconView.icon_path(id))
+	var tsvg := FileAccess.get_file_as_string(InputGlyphs.DIR + "touch_help.svg")
+	r.check(help_svg_problems(svg).is_empty() and help_svg_problems(tsvg).is_empty(),
+		"G22a ajuda: sem letra nem texto no pictograma %s e no glifo de toque %s" % [str(help_svg_problems(svg)), str(help_svg_problems(tsvg))])
+	r.check(not help_svg_problems(FileAccess.get_file_as_string(InputGlyphs.DIR + "key_h.svg")).is_empty()
+		and not help_svg_problems(OLD_BRAND_HELP).is_empty(), "G22a mutacao: a tecla H e o help.svg antigo seriam reprovados")
+	# Contraste: "?" x balao, contorno do balao x disco claro (HUD e camada de toque desenham o disco em papel).
+	var body := _attr(svg, "data-body")
+	var sym := _attr(svg, "data-sym")
+	var out := _attr(svg, "data-out")
+	var c_sym := ThemeV2.contrast_ratio(sym, body)
+	var c_out := ThemeV2.contrast_ratio(out, Color(TouchControls.PAPER))
+	var c_hud := ThemeV2.contrast_ratio(out, Color.WHITE)
+	r.check(body.a > 0.0 and c_sym >= 4.5 and c_out >= 4.5 and c_hud >= 4.5,
+		"G22a ajuda: contraste '?' x balao %.1f, contorno x disco %.1f / %.1f (>= 4,5:1)" % [c_sym, c_out, c_hud])
+	for c: Color in [body, sym, out]:
+		r.check(("\"#" + c.to_html(false)).to_lower() in svg.to_lower(), "G22a ajuda: cor %s declarada e desenhada" % c.to_html(false))
 
 
 # ---------- ao vivo: eventos de verdade, troca no mesmo quadro ----------

@@ -92,6 +92,16 @@
 - **Nao mexido:** o emblema 3D do mosquetao (`props_v3`, `_emb_icon` em `source_art/props_v3/build_props_v3.py`) e geometria
   propria do `art3d` (oval com barra dourada); o achado "le como 0" continua la.
 
+## RB-R1 G22a: pictograma da ajuda sem letra de tecla (PROVISORIO)
+- **Agente:** `ux`, 2026-11-27. **Status:** `provisorio`; aprovacao de Thiago pendente (no iPhone). Manifesto: `brand_icon_help_g22a`.
+- **O que:** `game/ui/brand/icons/help_balloon.svg`, um ponto de interrogacao desenhado em traco (path, sem fonte nem
+  `<text>`) dentro de um balao de fala amarelo com rabicho. Substitui `help.svg`, que era a letra H num disco (a tecla da
+  ajuda virava o desenho do botao, ate no toque). O mesmo desenho entra no glifo de toque `touch_help.svg`.
+- **Como:** gerado por `python3 tools/glyphs/help_symbol.py` (pictograma) e `python3 tools/glyphs/make_glyphs.py` (glifos,
+  importa `BALLOON`). Paleta da style-bible (`#FFD23F`, `#123A5E`, `#0B2440`). Nenhuma fonte, imagem ou icone de
+  terceiros; sem modelo de imagem.
+- **Por que balao e nao boia:** a boia ja e objeto de missao (M6, boias no rio); no botao de ajuda leria como "missao da boia".
+
 ## RB-R1 F2: pistas do roteiro intuitivo (bota do capitao, pegadas grandes, pena, anel alto)
 - **Agente:** `art3d`, 2026-11-26. **Status:** `provisorio` no manifesto (entradas `clues_v3_*`); nas cenas `provisional = false`.
 - **Originalidade:** geometria e decalques 100% por script/formula do projeto; nenhum modelo, malha, textura ou imagem de

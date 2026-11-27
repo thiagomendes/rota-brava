@@ -44,6 +44,8 @@ const HANDOFF_MIN_SECONDS := 0.45
 const FONT := 34
 ## Alvo de toque minimo em unidades virtuais (>= 48 dp em aparelho com lado curto >= ~410 dp; ver README).
 const MIN_TOUCH := 128.0
+## G22a: pictograma da ajuda (res://ui/brand/icons/help_balloon.svg, gerado por tools/glyphs/help_symbol.py).
+const HELP_ICON := &"help_balloon"
 const ACTION_SIZE := 236.0
 ## G15: largura extra (e margem do texto) dos botoes de painel que levam selo de glifo.
 const GLYPH_BUTTON_PAD := 76.0
@@ -79,6 +81,7 @@ var _action_button: Button
 var _glyph_badge: PanelContainer
 var _glyph: GlyphView
 var _help_glyph: GlyphView
+var _help_icon: IconView
 var _skip_text: GlyphText
 ## G15: selos de glifo em botoes de painel (pausa, fim, cartao de equipe): intencao -> GlyphView.
 var _button_glyphs: Array[GlyphView] = []
@@ -300,26 +303,25 @@ func _build_top_left(safe: Control) -> void:
 	row.add_theme_constant_override("separation", 12)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(row)
-	# Ajuda: disco pequeno (72) dentro de um alvo de toque de 128 transparente.
+	# Ajuda: disco (72) dentro de um alvo de toque de 128 transparente (teclado, mouse e controle).
+	# G22a: o pictograma e um "?" num balao (HELP_ICON), nao a letra H; a tecla aparece so no selo do G15. No toque, a
+	# camada de toque desenha o proprio disco da ajuda neste mesmo lugar (`help_slot_rect`) e este botao fica vazio.
 	_help_button = Button.new()
 	_help_button.name = "HelpButton"
 	_help_button.theme_type_variation = &"GhostButton"
 	_help_button.custom_minimum_size = Vector2(MIN_TOUCH, MIN_TOUCH)
 	_help_button.focus_mode = Control.FOCUS_NONE
 	_help_button.tooltip_text = Loc.t("ui.help.repeat")
-	_help_button.pressed.connect(func() -> void:
-		ui_sound.emit(&"confirm")
-		help_requested.emit()
-		# RB-M1: o botao (mouse/toque) vira a mesma intencao `help` da tecla H (antes so emitia o sinal, sem ouvinte).
-		_send_action(&"help"))
+	_help_button.pressed.connect(trigger_help)
 	row.add_child(_help_button)
-	var hi := _icon(_help_button, &"help", 72, ThemeV2.NAVY, false)
-	hi.set_anchors_preset(Control.PRESET_CENTER)
-	hi.offset_left = -36
-	hi.offset_top = -36
-	hi.offset_right = 36
-	hi.offset_bottom = 36
-	hi.ring = 0.05
+	_help_icon = _icon(_help_button, HELP_ICON, 72, ThemeV2.NAVY, false)
+	_help_icon.name = "HelpIcon"
+	_help_icon.set_anchors_preset(Control.PRESET_CENTER)
+	_help_icon.offset_left = -36
+	_help_icon.offset_top = -36
+	_help_icon.offset_right = 36
+	_help_icon.offset_bottom = 36
+	_help_icon.ring = 0.05
 	# G15: a tecla/botao da ajuda no canto do disco (some no toque: o proprio disco e o botao).
 	var help_badge := _glyph_badge_for(_help_button, &"help", 44)
 	help_badge.position = Vector2(MIN_TOUCH - 60, MIN_TOUCH - 58)
@@ -787,17 +789,38 @@ func prompt_icon() -> StringName:
 	return _prompt_icon.kind
 
 
-## RB-M1: liga/desliga o modo toque (a camada de toque chama). So esconde/mostra o botao de acao do HUD.
+## RB-M1: liga/desliga o modo toque (a camada de toque chama). Esconde/mostra o botao de acao do HUD e, desde o G22a,
+## esvazia o botao de ajuda: a camada de toque desenha a ajuda no mesmo lugar, no estilo e na escala dos seus botoes.
+## O lugar continua ocupado (o contador de emblemas e a dica de pular nao andam ao trocar de aparelho).
 func set_touch_mode(on: bool) -> void:
 	if on == touch_mode:
 		return
 	touch_mode = on
 	_prompt_panel.visible = _prompt_on and not touch_mode
+	_help_icon.visible = not touch_mode
+	_help_button.self_modulate.a = 0.0 if touch_mode else 1.0
+	_help_button.mouse_filter = Control.MOUSE_FILTER_IGNORE if touch_mode else Control.MOUSE_FILTER_STOP
 
 
 ## Controles do HUD que continuam sendo da GUI quando o toque esta ativo (a camada de toque nao os cobre).
+## G22a: a ajuda saiu daqui (no toque ela e um botao da camada, que aceita o segundo dedo).
 func touch_passthrough() -> Array[Control]:
-	return [_help_button]
+	return []
+
+
+## G22a: lugar do botao de ajuda (coordenadas da tela, px logicos); vazio se o HUD nao o mostra agora.
+func help_slot_rect() -> Rect2:
+	if _help_button == null or not _help_button.is_visible_in_tree():
+		return Rect2()
+	return _help_button.get_global_rect()
+
+
+## Pedir ajuda, de onde vier (clique, toque no HUD ou na camada de toque): som, sinal e a intencao `help` da Input Map.
+func trigger_help() -> void:
+	ui_sound.emit(&"confirm")
+	help_requested.emit()
+	# RB-M1: o botao (mouse/toque) vira a mesma intencao `help` da tecla H (antes so emitia o sinal, sem ouvinte).
+	_send_action(&"help")
 
 
 ## Mesmo efeito de tocar/clicar no botao de acao (a camada de toque usa).
