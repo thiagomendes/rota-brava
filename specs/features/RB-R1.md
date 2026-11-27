@@ -987,3 +987,24 @@ Critérios de aceite:
   - **Peças** (caixotes, carrinho, toldos, barracas, barris, árvores pequenas): a câmera não desvia delas. Quando uma peça fica entre a câmera e o herói, ou contém a câmera, ela fica pontilhada; o código das variantes por malha do WIP é reaproveitado.
 
   O critério de Thiago não muda: a câmera não pula, o herói fica visível e nada tapa o herói sem ficar transparente.
+
+#### Evidência G24a2 v2 (`gameplay`, branch `feature/rb-r1-g24a2-v2`): NÃO FECHA
+- **Separação (data-driven, sem .blend nem GLB):** peça é cada instância do `kit` do layout (fora `grass_*`/`flowers_*`), mais `NetShedAwning`, `NetShedFishTable`, `TreeBench` e `FlowerBedN/S` (`CameraOcclusion.PIECE_SHAPES`), que são movidas na carga para `Collision/CameraPieces`, na mesma camada. A câmera exclui `Collision/Props` e `CameraPieces` e não desvia mais das copas (`avoid_canopies = false`). As cenas continuam desviando de tudo (`_solid_exclude`). A mola G6 da estrutura não mudou.
+- **Pontilhado:** por instância. A instância do MultiMesh some e entra um `MeshInstance3D` com a malha pontilhada; o toldo do galpão troca os materiais da malha estática. Os parâmetros são `instance uniform`: fade por peça de 0,15 s, e no modo reduzido só liga e desliga. A sombra não pontilha. O aquecimento é feito na frente da câmera (`warm_mode`).
+- **`test_camera_occlusion`, 880 passos por modo (depois / rig da integração `5cef201`):**
+  - vista tapada sem pontilhado: normal **0** / 68; reduzido **1** (estrutura) / 94;
+  - câmera dentro da estrutura: 117 / 149;
+  - salto máximo: normal 0,76 / 3,32 m; reduzido 3,32 / 3,73 m;
+  - herói no quadro, mínimo: 8% / 8% no normal; 31% / 30% no reduzido;
+  - altura máxima: 2,08 m (limite 2,70).
+
+  Todas as falhas restantes são de **estrutura**: o galpão `Structures/23` no M5, com o braço no mínimo, e `Structures/31-32` no M4/M3. Nenhuma é de peça.
+- **Conflito:** com a mola G6 sem mudança, o cenário do teste (câmera girada 0,6 rad contra a parede) leva o braço ao mínimo de 0,9 m. A câmera entra no galpão e o herói fica com 8–34% no quadro.
+  - Tentei fazer a câmera escorregar na parede (esfera no pivô, projeção no plano, limite de taxa). Não fechou: saltos de até 3 m nas quinas do M4/M3. Revertido.
+  - Medido, mas não aplicado (muda a mola): com a mola suave também no modo reduzido, o salto reduzido cai de p99 1,48 m / máx 3,32 m para p99 0,195 m / máx 1,47 m.
+- **CPU da troca (headless):** média 56–67 µs/quadro, p99 145–188 µs, máximo 6,6 ms num quadro. No percurso foram 11–12 trocas, no máximo 1 por quadro e 5 peças pontilhadas ao mesmo tempo; 602 peças em grade de 4 m. GPU no celular: **pendente**.
+- **Pipeline (xvfb + llvmpipe):** `draw=0` em todos os quadros. Com o aquecimento na vista, `surface`/`specialization` vão de 91/85 para 96/89 entre a carga e o primeiro pontilhado no M5. Não comparei com `--g24-warm=out|none`: segue aberta a pergunta se a 4.7 compila o pipeline fora da vista.
+- **Capturas:** `captures/g24a2v2/{m5_crates,m5_awning,m4_cart}-{antes,depois}/f00000039.png`. Abri `m4_cart-depois` (herói atrás dos caixotes, inteiro, sem pontilhado visível) e `m5_crates-depois` (câmera a 1,54 m, encurtada pelo galpão). O enquadramento não mostra bem o pontilhado; as capturas precisam ser refeitas.
+- **Testes:**
+  - `bash tools/test.sh camera,movement,touch_controls,ep01_v3_late`: `FALHOU (261 PASS, 7 FALHA(S))`, todas em `test_camera_occlusion`. Passam o G3 (p99 41,14 m/s²), o G6 (0 de 2500) e o `test_camera_run`. O `test_movement_f1:312` passou sem o ajuste do WIP.
+  - Suíte completa: `FALHOU (5412 PASS, 7 FALHA(S))` em 531 s, com as mesmas 7 falhas.
