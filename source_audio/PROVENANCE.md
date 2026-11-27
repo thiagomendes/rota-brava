@@ -223,13 +223,17 @@ Termos de uso do audio gerado: NAO verificados (ver `docs/proposals/d20_trilhas.
 | `res://audio/music/sting_v3_badge.ogg` | gerado (Lyria) | cena badge, lyria-3-clip-preview, 2026-11-25T23:57:39+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `2e8640244469b40a…` / `61ba4db1fc4cdf57…` |
 | `res://audio/music/sting_v3_hero_switch.ogg` | gerado (Lyria) | cena hero_switch, lyria-3-clip-preview, 2026-11-25T23:58:08+00:00, prompt em final_tracks.json | Gemini API + `tools/music/finalize.py` | `dab81161eda90c44…` / `8aec96682a658760…` |
 
+## Sons de radio do Farol 7 (G20)
+Gerados pelo projeto, sem amostras de terceiros: `tools/audio/radio_fx.py` (numpy/scipy/soundfile em `.tools/audio-venv`),
+semente fixa 7007, OGG Vorbis 44,1 kHz mono. Parametros, medidas e sha256 por arquivo em `source_audio/radio/g20_generated.json`.
+Data de geracao: 2026-11-27. Nada foi ouvido por agentes; aceite perceptual com Thiago.
+
 ## Vozes Gemini TTS do Ep01 v3 (D19/D21)
 
 Gemini API (TTS, vozes pre-prontas) com o elenco aprovado por Thiago (`tools/voice/cast.json`) e direcao por fala (`tools/voice/direction.json`); tratamento `raw` (silencio aparado + loudnorm) em `tools/voice/treat.py`. Procedencia completa por take (modelo, voz, data, sha256 do bruto e do OGG, hash do estilo) no proprio catalogo. Termos de uso: NAO verificados (`docs/proposals/d19_vozes.md`).
 
 | arquivo | licenca | fonte | ferramenta | sha256 |
 |---|---|---|---|---|
-| `res://audio/voice/v3/ep01_narrator_intro_village.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Sadaltager, 2026-11-27T08:24:45+00:00 | `tools/voice/gen_v3.py` | `69ca7e5060169106…` |
 | `res://audio/voice/v3/ep01_narrator_intro_team.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Sadaltager, 2026-11-26T13:32:56+00:00 | `tools/voice/gen_v3.py` | `a14d5c111002c992…` |
 | `res://audio/voice/v3/ep01_narrator_intro_tracker.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Sadaltager, 2026-11-27T08:24:51+00:00 | `tools/voice/gen_v3.py` | `829b2866b7bbd088…` |
 | `res://audio/voice/v3/ep01_intro_tracker_hello.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Leda, 2026-11-26T13:32:56+00:00 | `tools/voice/gen_v3.py` | `36bddfd58fb48ee4…` |
@@ -239,7 +243,6 @@ Gemini API (TTS, vozes pre-prontas) com o elenco aprovado por Thiago (`tools/voi
 | `res://audio/voice/v3/ep01_intro_pilot_hello.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Erinome, 2026-11-26T13:32:57+00:00 | `tools/voice/gen_v3.py` | `93db6b7ed6ab4558…` |
 | `res://audio/voice/v3/ep01_radio_intro_hello.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Schedar, 2026-11-27T08:25:20+00:00 | `tools/voice/gen_v3.py` | `8d1cf5cc25660b1d…` |
 | `res://audio/voice/v3/ep01_narrator_intro_call.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Sadaltager, 2026-11-26T13:32:59+00:00 | `tools/voice/gen_v3.py` | `72ed5ca1e64973b8…` |
-| `res://audio/voice/v3/ep01_narrator_opening_village.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Sadaltager, 2026-11-26T13:32:59+00:00 | `tools/voice/gen_v3.py` | `31d782d0a6e172ad…` |
 | `res://audio/voice/v3/ep01_narrator_opening_team.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Sadaltager, 2026-11-26T13:33:00+00:00 | `tools/voice/gen_v3.py` | `e30a4b266a2676a5…` |
 | `res://audio/voice/v3/ep01_narrator_opening_empty_boat.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Sadaltager, 2026-11-26T13:33:00+00:00 | `tools/voice/gen_v3.py` | `040f42b1def5de81…` |
 | `res://audio/voice/v3/ep01_arrival_radio_festival.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Schedar, 2026-11-26T13:33:00+00:00 | `tools/voice/gen_v3.py` | `c2cb099d91a68145…` |
@@ -330,8 +333,3 @@ Gemini API (TTS, vozes pre-prontas) com o elenco aprovado por Thiago (`tools/voi
 | `res://audio/voice/v3/ep01_radio_v3_m6_buoys.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Schedar, 2026-11-27T08:33:24+00:00 | `tools/voice/gen_v3.py` | `ff8510721c1c7521…` |
 | `res://audio/voice/v3/ep01_radio_v3_m6_approach.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Schedar, 2026-11-27T08:33:30+00:00 | `tools/voice/gen_v3.py` | `41bda94c2d0f9183…` |
 | `res://audio/voice/v3/ep01_radio_v3_m6_rope.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Schedar, 2026-11-27T08:33:37+00:00 | `tools/voice/gen_v3.py` | `2166c1b57e3ab4c6…` |
-
-## Sons de radio do Farol 7 (G20)
-Gerados pelo projeto, sem amostras de terceiros: `tools/audio/radio_fx.py` (numpy/scipy/soundfile em `.tools/audio-venv`),
-semente fixa 7007, OGG Vorbis 44,1 kHz mono. Parametros, medidas e sha256 por arquivo em `source_audio/radio/g20_generated.json`.
-Data de geracao: 2026-11-27. Nada foi ouvido por agentes; aceite perceptual com Thiago.

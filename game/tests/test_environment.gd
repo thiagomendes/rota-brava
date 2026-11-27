@@ -234,7 +234,7 @@ func _test_world() -> void:
 	await r.frames(1)
 
 
-# ------------------------------------------------------------------ RB-R1: trecho do porto/vila Farol 7
+# ------------------------------------------------------------------ RB-R1: trecho do porto/Vila Maré
 const HARBOR := "res://episodes/ep01/world/harbor_slice.tscn"
 const HARBOR_CAM_OFFSET := Vector3(0, 4.6, 6.2)   # camera do cais pedida no RB-R1 (fov 55, olhar +1 m)
 ## Densidade minima na camera do cais (16:9, ate 60 m): 40 pecas. Justificativa: o quadro cobre ~40 m de fachada

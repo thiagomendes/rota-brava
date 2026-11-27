@@ -38,6 +38,15 @@ func run(r) -> void:
 		"voz v3: %d chaves faladas, todas com take, excecao ou pendencia explicita (faltam %d: %s)" % [keys.size(), missing.size(), ", ".join(missing.slice(0, 6))])
 	if not pending.is_empty():
 		print("[RB] voz v3: %d falas PENDENTES (cota da API), tocam balbucio de reserva" % pending.size())
+	# G22c: take gravado com outro texto (ex.: "Vila Farol 7" -> "Vila Mare") nao fica no catalogo; sai e vira pendente
+	var stale: Array[String] = []
+	for k: String in v3:
+		if str(v3[k].get("text_at_generation", "")) != Loc.t(k):
+			stale.append(k)
+	r.check(stale.is_empty(), "voz v3: todo take foi gravado com o texto atual da legenda (desatualizados: %s)" % ", ".join(stale))
+	r.check(pending.has("ep01.narrator.intro.village") and pending.has("ep01.narrator.opening.village") and not v3.has("ep01.narrator.intro.village") and not v3.has("ep01.narrator.opening.village"),
+		"voz v3: falas da Vila Mare sem take antigo, pendentes para o proximo lote (G22c)")
+	r.check(Loc.t("ep01.narrator.intro.village").contains("Vila Maré") and not Loc.t("ep01.narrator.opening.village").contains("Farol 7"), "voz v3: a vila se chama Vila Mare no texto do narrador (G22c)")
 	var bad_exc: Array[String] = []
 	for k: String in exc:
 		if keys.get(k, "") != "pup":

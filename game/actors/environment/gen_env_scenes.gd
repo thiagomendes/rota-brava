@@ -47,7 +47,7 @@ const SPEC := {
 	"rock_b": ["Rock_B", AABB_BOX],
 	"rock_c": ["Rock_C", AABB_BOX],
 	"boat_v2": ["BoatV2", {"box": [Vector3(2.2, 0.8, 5.0), Vector3(0, 0.1, -0.5)]}],
-	# RB-R1 kit da vila Farol 7 (style-bible)
+	# RB-R1 kit da Vila Maré (style-bible)
 	"house_a": ["House_A", {"box": [Vector3(4.4, 6.0, 5.2), Vector3(0, 3.0, 0)]}],
 	"house_b": ["House_B", {"box": [Vector3(5.2, 6.0, 5.2), Vector3(0, 3.0, 0)]}],
 	"house_c": ["House_C", {"box": [Vector3(5.4, 8.7, 5.8), Vector3(0, 4.35, 0)]}],

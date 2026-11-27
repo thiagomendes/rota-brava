@@ -122,7 +122,7 @@ Marcadores usados: `M0_BoatArrival`, `M0_BoatDocked`, `M0_RastroStart`, `M1_Benc
 
 | # | s | Câmera (de → para · olha) | Movimento | Quem e clipe | Fala (chave · texto) |
 |---|---|---|---|---|---|
-| 1 | 5.0 | `M7_LanternPivot` [-30, -6, 30] → `M0_BoatDocked` [6, 8, 14] · olha `M8_FestaPlaza` [0, 2, 0] | dolly | — | `ep01.narrator.intro.village` (narrator) · Esta é a Vila Farol 7, à beira-mar! |
+| 1 | 5.0 | `M7_LanternPivot` [-30, -6, 30] → `M0_BoatDocked` [6, 8, 14] · olha `M8_FestaPlaza` [0, 2, 0] | dolly | — | `ep01.narrator.intro.village` (narrator) · Esta é a Vila Maré, à beira-mar! |
 | 2 | 3.5 | `M0_RastroStart` [0, 2.5, 6] → `M0_RastroStart` [0, 1.8, 4] · olha `M0_RastroStart` [0, 1, 0.9] | dolly | tracker `idle` em `M0_RastroStart`, climber `idle` em `M0_RastroStart`, pilot `idle` em `M0_RastroStart` | `ep01.narrator.intro.team` (narrator) · E esta é a equipe Rota Brava! |
 | 3 | 3.5 | `M0_RastroStart` [-0.8, 1.3, 2.2] · olha `M0_RastroStart` [-0.8, 1.2, 0.6] | dolly | tracker `inspect_touch` em `M0_RastroStart` | `ep01.narrator.intro.tracker` (narrator) · Rastro segue pistas, de lupa e óculos. |
 | 4 | 2.5 | `M0_RastroStart` [-0.8, 1.3, 2.0] · olha `M0_RastroStart` [-0.8, 1.3, 0.6] | cut | tracker `point` em `M0_RastroStart` | `ep01.intro.tracker.hello` (tracker) · Sou a Rastro! Nenhuma pista me escapa! |
@@ -137,7 +137,7 @@ Marcadores usados: `M0_BoatArrival`, `M0_BoatDocked`, `M0_RastroStart`, `M1_Benc
 
 | # | s | Câmera (de → para · olha) | Movimento | Quem e clipe | Fala (chave · texto) |
 |---|---|---|---|---|---|
-| 1 | 5.0 | `M0_BoatArrival` [0, 6, 8] → `M0_BoatDocked` [8, 4, 8] · olha `M0_BoatDocked` [0, 1.0, 0] | dolly | — | `ep01.narrator.opening.village` (narrator) · Na vila Farol 7, hoje tem festa! |
+| 1 | 5.0 | `M0_BoatArrival` [0, 6, 8] → `M0_BoatDocked` [8, 4, 8] · olha `M0_BoatDocked` [0, 1.0, 0] | dolly | — | `ep01.narrator.opening.village` (narrator) · Na Vila Maré, hoje tem festa! |
 | 2 | 4.0 | `M0_RastroStart` [2, 1.6, 3] · olha `M0_RastroStart` [0, 1.2, 0] | dolly | tracker `wave` em `M0_RastroStart`, climber `celebrate` em `M0_RastroStart`, pilot `wave` em `M0_RastroStart` | `ep01.narrator.opening.team` (narrator) · Rastro, Pico e Leme chegam ao cais. |
 | 3 | 4.0 | `M0_BoatDocked` [3, 2, 4] · olha `M0_BoatDocked` [0, 1.0, 0] → `M1_BenchClue` [0, 0.2, 0] | pan | pilot `point` em `M0_RastroStart` | `ep01.narrator.opening.empty_boat` (narrator) · Mas o barco do capitão está vazio! |
 

@@ -15,7 +15,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from gemini_tts import directed_style, load_json, synth  # noqa: E402
 
-LINES = ["Hoje é dia de Festa das Lanternas na Vila Farol 7!", "Mas o barco do capitão chegou... sem o capitão!"]
+LINES = ["Hoje é dia de Festa das Lanternas na Vila Maré!", "Mas o barco do capitão chegou... sem o capitão!"]
 DIRECTION = {"emotion": "encanto de quem conta uma história", "energy": 2, "pace": "normal",
              "note": "abre a história com sorriso na voz; na segunda frase, pausa de suspense leve e divertido antes de 'sem o capitão'"}
 

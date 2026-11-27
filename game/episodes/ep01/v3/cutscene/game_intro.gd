@@ -1,6 +1,6 @@
 class_name GameIntroScene
 extends Node3D
-## Abertura do jogo (RB-R1 D21, cena `game_intro`): a Vila Farol 7, os tres herois, o Farol 7 no radio e a pose de
+## Abertura do jogo (RB-R1 D21, cena `game_intro`): a Vila Maré, os tres herois, o Farol 7 no radio e a pose de
 ## equipe, antes do Ep01 na primeira vez que se aperta Jogar e pelo menu ("Ver abertura"). Na primeira vez nao pula;
 ## depois, `interact` pula. Ao terminar vai para `next_scene` (o Ep01 ou o menu).
 
