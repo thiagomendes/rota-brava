@@ -800,3 +800,8 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - O gesto não foi visto em imagem e fica com Thiago.
 
   Merge em `feature/rb-r1-reorientacao`.
+
+### G23 · pés soltos nos adultos (retorno de Thiago, 2026-11-27, print da fila do G21)
+| Id | Relato | Critério de aceite | Dono |
+|---|---|---|---|
+| G23 | No capitão, na Dona Amora e no Lumi o sapato fica separado da perna: aparece um vão com o fundo passando entre a barra da calça e o sapato (conferido pelo lead em `captures/g21/g21_fila_frente.png`). Nos três heróis o sapato está encaixado. É a mesma família do G4, das mãos soltas | Perna e sapato contínuos em idle, walk e nos clipes próprios: a barra da calça ou da saia entra no cano do sapato, ou um tornozelo ou meia fecha o vão, sem vão visível de frente, de lado e de 3/4. Medição por script do vão perna-sapato em todos os quadros dos clipes (máximo ≤ 0 mm, isto é, sobreposição), com mutação que falha no modelo atual. O brilho de plástico do sapato fica igual ao dos heróis. Os mesmos 3 adultos e também os outros NPCs que tiverem o mesmo esquema de perna. Geometria por script, sem mexer no rig nem nos clipes. Capturas antes e depois: fila de frente, de lado e close dos pés | `art3d` |
