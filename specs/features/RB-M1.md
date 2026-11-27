@@ -93,3 +93,8 @@ O GitHub só mostra o "Run workflow" quando o arquivo do workflow existe na bran
   - Tamanho e SHA-256 do APK e das platform-tools do Windows ficam no resumo do job; não aparecem no log.
   - Aviso do GitHub: as actions fixadas rodam em Node 20, que está obsoleto e é forçado para Node 24. Não é erro.
 - **Instalação real** (Thiago, 2026-11-27): o APK da execução nº 1 foi instalado num tablet Samsung Galaxy Tab FE pelo cabo. Foi preciso desligar o "Bloqueador automático" da Samsung (Segurança e privacidade) para ligar a depuração USB. Thiago não relatou erro no `android-install.ps1`. Ainda faltam desempenho e visual no aparelho.
+- **1ª execução do `ios.yml`** (Thiago, run 45921274599, `e917b2a`): verde em cerca de 6 min 45 s.
+  - Export da Godot, `xcodebuild archive` com assinatura automática e envio ao App Store Connect concluídos ("Upload succeeded", "EXPORT SUCCEEDED").
+  - O passo de máscara foi pulado porque não houve falha. Nenhum artefato.
+  - **Avisos da Apple, válidos a partir de abril de 2027:** o build usou o SDK do iOS 26.5, e passará a ser exigido o SDK 27 (Xcode 27). O alvo é iOS 14.0, e o mínimo passará a ser 15.0. Subir o alvo para 15.0 numa próxima rodada.
+  - Pendente de Thiago: processamento no TestFlight, conformidade de exportação, instalar no iPhone e jogar.
