@@ -969,3 +969,16 @@ Critérios de aceite:
   - **Revisão da corrida.** O código é o `633a08a`, já coberto pela revisão do G24a. Ela aprovou a causa, `_keep_arm`, +10% de braço e +4° de FOV, FOV fixo com movimento reduzido, testes não vácuos e nenhuma regressão em cutscene ou cais. O bloqueio daquela revisão era só o `_crane`, que ficou de fora.
   - **Ajuste do lead.** O único código novo é a tolerância de `test_ep01_v3_late.gd:291`, de 0,01 para 0,05 m. A esfera macia roça o cais e o braço encurta 0,011 m. Conferi o diff: a altura continua exigida e não houve outro afrouxamento.
   - **Suíte do autor:** 5363 PASS.
+- **Revisão G25** (`reviewer`):
+  - **Rodada 1 (`c165356`):** REPROVADO. Quatro falas prometiam lanternas que a criança não vê.
+  - **Rodada 2 (`2b74d4b`):** **APROVADO**.
+    - Os greps não acharam mais lanternas, bandeirinhas nem varal de lanternas prometidos nas falas.
+    - A renomeação está completa. O lote de 28/11 tem 32 chaves (5 G21i + 2 G22c + 25 G25).
+    - Peixe: `pick_up`, depois `place_low`, depois `hand.R`.
+    - O lenço é gerado com `--only`, o sha e o tamanho conferem com o manifesto, e as outras GLB estão intactas.
+    - `LONG_OK` tem texto fixado e teto.
+    - Suítes: `ep01_v3,voice_v3,cutscene,ui,props_v3` com 1352 PASS; a completa do autor com 5380 PASS.
+  - **Não bloqueantes:**
+    - "perto das lanternas" (`see_captain`, `v3_m8.thanks_2`, `captain.wave`) precisa ser conferido na tela da praça.
+    - A nota `_note_g25` em `ep01_v3_dialogue.json:2736` está desatualizada.
+  - Merge em `feature/rb-r1-reorientacao`.
