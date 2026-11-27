@@ -31,6 +31,22 @@
    "pivo": "centro do fundo, no chao",
    "triangulos": 3476
   },
+  "cloth_pup_scarf": {
+   "glb": "game/assets/models/props_v3/cloth_pup_scarf.glb",
+   "glb_bytes": 76236,
+   "materiais": [
+    "pv3_cloth",
+    "pv3_vinyl",
+    "wv2_metal",
+    "wv2_wood"
+   ],
+   "objetos": {
+    "pv3_cloth_pup_scarf": 1316
+   },
+   "orcamento_tris": 2500,
+   "pivo": "meio da dobra, na linha do varal",
+   "triangulos": 1316
+  },
   "cloth_scarf": {
    "glb": "game/assets/models/props_v3/cloth_scarf.glb",
    "glb_bytes": 94644,

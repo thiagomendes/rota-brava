@@ -8,7 +8,8 @@ extends RefCounted
 const PROVISIONAL := &"provisional"
 ## Modelos finais do art3d (feature/rb-r1-props-v3): se a cena existe, ela entra; senao, o bloco provisorio.
 const PROPS_DIR := "res://assets/models/props_v3/%s.tscn"
-const CLOTHS: Array[String] = ["cloth_tshirt", "cloth_scarf", "cloth_sock"]
+## G25: a terceira peca (nos juncos, a pista) e o lenco do filhote, no lugar da meia.
+const CLOTHS: Array[String] = ["cloth_tshirt", "cloth_scarf", "cloth_pup_scarf"]
 const CRATES := {&"M4_Stall_Apple": "crate_apple", &"M4_Stall_Lemon": "crate_lemon", &"M4_Stall_Grapes": "crate_grapes"}
 const EMBLEMS := {&"tracker": "emblem_paw", &"climber": "emblem_carabiner", &"pilot": "emblem_helm"}
 

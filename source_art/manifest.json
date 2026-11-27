@@ -2516,6 +2516,48 @@
       ]
     },
     {
+      "id": "props_v3_cloth_pup_scarf",
+      "nome": "Ep01 v3 · G25: lenco vermelho do filhote com pelo (nos juncos; a pista, no lugar da meia)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M2",
+      "saida_glb": "game/assets/models/props_v3/cloth_pup_scarf.glb",
+      "glb_sha256": "51808ee05b780189274e6bb4635f3348f8c234a487525629ddd7a81cd00771b9",
+      "glb_bytes": 76236,
+      "cena": "game/assets/models/props_v3/cloth_pup_scarf.tscn",
+      "cena_sha256": "dcaaccb4fe88c653a5920fc7eba9ade94273701a4f8da962fc6d4167df037d78",
+      "cena_bytes": 2669,
+      "triangulos": 1316,
+      "orcamento_tris": 2500,
+      "materiais": [
+        "pv3_cloth",
+        "pv3_vinyl",
+        "wv2_metal",
+        "wv2_wood"
+      ],
+      "pivo": "meio da dobra, na linha do varal",
+      "animacoes": [
+        "sway",
+        "shake"
+      ]
+    },
+    {
       "id": "props_v3_cloth_tshirt",
       "nome": "Ep01 v3 · camiseta rosa (presa no telhado do galpao)",
       "agente": "art3d",

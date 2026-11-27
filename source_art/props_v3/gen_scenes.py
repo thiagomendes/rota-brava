@@ -21,6 +21,7 @@ META = {
     "cloth_tshirt": ("M2", True, "free_then_hang", "climber", "camiseta rosa (presa no telhado do galpao)"),
     "cloth_scarf": ("M2", True, "free_then_hang", "climber", "lenco azul de bolinhas (preso no galho)"),
     "cloth_sock": ("M2", True, "find_then_hang", "tracker", "meia amarela com pelo do filhote (nos juncos; a pista)"),
+    "cloth_pup_scarf": ("M2", True, "find_then_hang", "tracker", "G25: lenco vermelho do filhote com pelo (nos juncos; a pista, no lugar da meia)"),
     "basket": ("M2", False, "", "", "cesto de vime ao pe do varal (cenario)"),
     "fountain_leaves": ("M3", True, "pull", "climber", "tufo removivel na bacia de cima do chafariz"),
     "ball": ("M3", True, "examine", "tracker", "bola do filhote presa na grade; rola ate as barracas"),
@@ -108,7 +109,7 @@ def wave(n, length, fn):
 def anims_for(pid):
     """Devolve (no_animado, posicao_do_no, lista de (nome, duracao, loop, trilhos)), autoplay."""
     if pid.startswith("cloth_"):
-        ph = {"cloth_tshirt": 0.0, "cloth_scarf": 0.7, "cloth_sock": 1.4}[pid]
+        ph = {"cloth_tshirt": 0.0, "cloth_scarf": 0.7, "cloth_sock": 1.4, "cloth_pup_scarf": 1.4}[pid]
         sway = [("Cloth:rotation", wave(12, 2.4, lambda t: (0.09 * math.sin(TAU * t / 2.4 + ph) + 0.03,
                                                             0.0, 0.035 * math.sin(TAU * t / 1.2 + ph))), 0)]
         shake = [("Cloth:rotation", [(0.0, (0.0, 0.0, 0.0)), (0.1, (0.35, 0.0, 0.12)), (0.2, (-0.25, 0.0, -0.1)),

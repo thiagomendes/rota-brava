@@ -20,6 +20,7 @@ Fala com "{" sem texto falado e recusada (a voz leria o marcador).
 
 Uso: gen_v3.py [--limit N] [--max-calls N] [--only prefixo] [--force chave,chave] [--dry-run]
 --dry-run: lista o que seria gerado (chave, falante, texto falado) sem chamar a API e sem gravar nada.
+G25: priority.json (ao lado) lista as chaves que saem primeiro, por lote; o --dry-run mostra o lote de cada fala.
 """
 from __future__ import annotations
 
@@ -93,8 +94,26 @@ def spoken_of(key: str, tx: dict, sp: dict) -> str:
     return tx[key]
 
 
+def first_order() -> dict:
+    """G25: chave -> (posicao, lote) da lista de prioridade em priority.json (lotes na ordem, chaves na ordem do lote)."""
+    f = HERE / "priority.json"
+    if not f.exists():
+        return {}
+    out: dict = {}
+    for lote in json.loads(f.read_text(encoding="utf-8")).get("first", []):
+        for k in lote["keys"]:
+            out.setdefault(k, (len(out), lote["lote"]))
+    return out
+
+
+FIRST = first_order()
+
+
 def priority(it: dict) -> tuple:
-    """Abertura do jogo primeiro, depois M0..M8 (o que Thiago joga), grupos e demais cutscenes no fim."""
+    """G25: as chaves de priority.json primeiro (lote de 2026-11-28: Lumi, Vila Mare, G25); depois a abertura do jogo,
+    M0..M8 (o que Thiago joga), grupos e demais cutscenes no fim."""
+    if it["key"] in FIRST:
+        return (-1, FIRST[it["key"]][0])
     src, m = it["source"], it.get("mission") or ""
     if src in ("cutscene:game_intro", "cutscene:opening"):
         return (0, src)
@@ -267,7 +286,8 @@ def dry_run(a, tx: dict, sp_tx: dict) -> int:
         todo = todo[:a.limit]
     for i, t in enumerate(todo, 1):
         extra = "" if t["spoken"] == t["subtitle"] else f"  (legenda: {t['subtitle']})"
-        print(f"[{i:3d}] {t['key']} [{t['speaker']}/{t['voice']}] fala: {t['spoken']}{extra}")
+        lote = FIRST[t["key"]][1] if t["key"] in FIRST else "ordem de jogo"
+        print(f"[{i:3d}] <{lote}> {t['key']} [{t['speaker']}/{t['voice']}] fala: {t['spoken']}{extra}")
     print(json.dumps({"seriam_geradas": len(todo), "api": "nao chamada (--dry-run)"}, ensure_ascii=False))
     return 0
 

@@ -558,11 +558,9 @@ func _m5_fish() -> void:
 	var ids := []
 	if fish != null and is_instance_valid(fish):
 		ids.append("mission:" + String((land.get("_root") as Node).get_path_to(fish)))
-	# o PropOverlap nao mede o peixe (prefixo "Fish" = pendurado): mede aqui o ponto mais baixo contra o chao
-	var gap := INF
-	if fish != null and is_instance_valid(fish):
-		var f := fish as Node3D
-		gap = f.global_position.y + Ep01V3Land.piece_low(f, f.global_basis) - float(land.call("_floor_y", f.global_position))
+	# o PropOverlap nao mede o peixe (prefixo "Fish" = pendurado): mede o ponto mais baixo contra o chao quando a corda o
+	# pousa na rua (G25: depois o Pico o entrega a Dona Amora, entao a folga e gravada naquele instante)
+	var gap := float(land.get("fish_street_gap"))
 	r.check(ids.size() == 1 and absf(gap) < 0.03, "G19 M5: o peixe baixado na corda termina apoiado na rua (folga %.1f cm)" % (gap * 100.0))
 	po.free_probes()
 	land.call("_set_busy", false)

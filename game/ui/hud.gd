@@ -988,7 +988,15 @@ func speaker_for(key: String) -> StringName:
 	# D21: narrador das cutscenes: ep01.narrator.<cena>.<id>
 	if key.begins_with("ep01.narrator."):
 		return &"narrator"
+	# G25: lanternas do Lumi (ep01.lumi.<id>), chamados ep01.call.cN.<quem>_<id> (lumi = radio) e o bordao da equipe
+	if key.begins_with("ep01.lumi."):
+		return &"radio"
+	if key == "ep01.call.team_go":
+		return &"tracker"
 	var parts := key.split(".")
+	if key.begins_with("ep01.call.") and parts.size() >= 4:
+		var who := parts[3].get_slice("_", 0)
+		return &"radio" if who == "lumi" else (StringName(who) if Loc.has_key("member.%s.name" % who) else &"")
 	if parts.size() >= 3 and Loc.has_key("member.%s.name" % parts[2]):
 		return StringName(parts[2])
 	return &""

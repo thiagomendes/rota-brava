@@ -94,7 +94,7 @@ func _run() -> void:
 func _lines() -> void:
 	await _size(Vector2i(1280, 720))
 	await _open(&"M0")
-	await _say("ep01.arrival.radio.festival")
+	await _say("ep01.call.c1.lumi_alert")
 	await _shot("legenda_farol7_m0")
 	await _open(&"M4")
 	await _say("ep01.market.vendor.mess")
@@ -105,7 +105,7 @@ func _lines() -> void:
 	await _open(&"M8")
 	await _wait(1.0)
 	_yaw_to(main.controlled_node.global_position, main.land.captain.global_position)
-	await _say("ep01.festival.captain.thanks")
+	await _say("ep01.festival.captain.thanks_m8")
 	await _shot("legenda_capitao_m8")
 
 
