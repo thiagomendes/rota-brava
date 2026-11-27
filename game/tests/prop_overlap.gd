@@ -110,7 +110,7 @@ func collect(main: Node) -> void:
 		_add_node("boat", "Boat", main.get("boat") as Node3D)
 	# Pecas das missoes.
 	if land != null:
-		for holder: Node in [land.get("_root"), land.get("_keep")]:
+		for holder: Node in [land.get("_root"), land.get("_keep"), land.get("_after")]:
 			if holder == null or not is_instance_valid(holder):
 				continue
 			# Cada malha vai para UM objeto (o caixote dentro do carrinho e outro objeto, nao parte do carrinho).
@@ -749,6 +749,121 @@ func move_prop(id: String, xf: Transform3D) -> void:
 			p["inv"] = xf.affine_inverse()
 			p["aabb"] = xf * (p["geo"]["aabb"] as AABB)
 			PhysicsServer3D.body_set_state(p["body"], PhysicsServer3D.BODY_STATE_TRANSFORM, xf)
+
+
+# ---------------------------------------------------------------- varal do M2 (G18)
+
+## Folga maxima entre a corda e cada metade (ao longo da corda) da faixa de cima de uma roupa pendurada.
+const TOL_LINE := 0.01
+## Faixa de cima da roupa (prendedores e barra), em y local abaixo do pivo das pecas props_v3 (pivo = boca do prendedor).
+const LINE_BAND := -0.06
+## Pecas do cenario fixo mais compridas que isto (a propria corda, paredes) nao entram no teste roupa x cenario: a corda
+## atravessa a boca do prendedor e a barra do pano de proposito (o pano dobra sobre ela).
+const LINE_STRUCT_SKIP := 1.5
+
+
+## Triangulos (mundo) da corda do varal: superficie `wv2_rope` do cenario fixo perto do marcador M2_Clothesline.
+static func rope_faces(world: Node) -> PackedVector3Array:
+	var out := PackedVector3Array()
+	var mk := world.call("marker", &"M2_Clothesline") as Node3D
+	var st := world.get_node_or_null("Static")
+	if mk == null or st == null:
+		return out
+	var c := mk.global_position
+	for node: Node in st.find_children("*", "MeshInstance3D", true, false):
+		var mi := node as MeshInstance3D
+		if mi.mesh == null:
+			continue
+		for s in mi.mesh.get_surface_count():
+			var mat := mi.mesh.surface_get_material(s)
+			if mat == null or mat.resource_name != "wv2_rope":
+				continue
+			var arr := mi.mesh.surface_get_arrays(s)
+			var v: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+			var idx: PackedInt32Array = arr[Mesh.ARRAY_INDEX]
+			var n := idx.size() if not idx.is_empty() else v.size()
+			for i in range(0, n, 3):
+				var tri: Array[Vector3] = []
+				for k in 3:
+					tri.append(mi.global_transform * v[idx[i + k] if not idx.is_empty() else i + k])
+				var m := (tri[0] + tri[1] + tri[2]) / 3.0
+				if Vector2(m.x - c.x, m.z - c.z).length() < 4.5 and m.y > c.y + 1.0:
+					out.append_array(PackedVector3Array(tri))
+	return out
+
+
+## G18: roupas penduradas no varal. Para cada peca: a faixa de cima (y local > LINE_BAND) e partida em metade esquerda e
+## direita (x local); a folga de cada metade e a menor distancia de um ponto dela a superficie da corda real
+## (`rope_faces`). Flutua se alguma metade passa de TOL_LINE (peca no ar, ou reta numa corda curva com uma ponta solta).
+## Interpenetracao: pares de roupas penduradas, roupa x pecas pequenas do cenario fixo (panos e prendedores do varal,
+## menos a corda) e roupa x outros props, acima de TOL_PEN.
+## Devolve {gaps: [{id, side, gap}], floating: [{id, side, gap}], overlaps: [{a, b, depth}], rope_tris: n}.
+func clothesline(world: Node, hung: Array) -> Dictionary:
+	var rope := rope_faces(world)
+	var gaps: Array[Dictionary] = []
+	var fl: Array[Dictionary] = []
+	var items: Array[Dictionary] = []
+	for node: Node3D in hung:
+		var faces := PackedVector3Array()
+		var inv := node.global_transform.affine_inverse()
+		for mi: Node in node.find_children("*", "MeshInstance3D", true, false):
+			var m := mi as MeshInstance3D
+			if m.mesh == null or not m.is_visible_in_tree():
+				continue
+			var xf := inv * m.global_transform
+			for v in m.mesh.get_faces():
+				faces.append(xf * v)
+		if faces.is_empty():
+			continue
+		var geo := _geo_from_faces(faces)
+		var xfn := node.global_transform
+		items.append({"id": "hung:" + String(node.name), "kind": String(node.name), "xf": xfn, "inv": inv, "geo": geo,
+			"aabb": xfn * (geo["aabb"] as AABB), "rests": false})
+		var band := PackedVector3Array()
+		var x0 := INF
+		var x1 := -INF
+		for p: Vector3 in geo["points"]:
+			if p.y > LINE_BAND:
+				band.append(p)
+				x0 = minf(x0, p.x)
+				x1 = maxf(x1, p.x)
+		var mid := (x0 + x1) * 0.5
+		for side in ["esq", "dir"]:
+			var best := INF
+			for p in band:
+				if (side == "esq") != (p.x < mid):
+					continue
+				var wp := xfn * p
+				for i in range(0, rope.size(), 3):
+					var lo := rope[i].min(rope[i + 1]).min(rope[i + 2]) - Vector3.ONE * 0.3
+					var hi := rope[i].max(rope[i + 1]).max(rope[i + 2]) + Vector3.ONE * 0.3
+					if wp.x < lo.x or wp.y < lo.y or wp.z < lo.z or wp.x > hi.x or wp.y > hi.y or wp.z > hi.z:
+						continue
+					best = minf(best, wp.distance_to(_closest_on_tri(wp, rope[i], rope[i + 1], rope[i + 2])))
+			var row := {"id": String(node.name), "side": side, "gap": best}
+			gaps.append(row)
+			if best > TOL_LINE:
+				fl.append(row)
+	var ov: Array[Dictionary] = []
+	for i in items.size():
+		var a := items[i]
+		var others: Array[Dictionary] = []
+		for j in range(i + 1, items.size()):
+			others.append(items[j])
+		for b in structure:
+			if maxf((b["aabb"] as AABB).size.x, (b["aabb"] as AABB).size.z) <= LINE_STRUCT_SKIP:
+				others.append(b)
+		for b in props:
+			if not hung.any(func(h: Node3D) -> bool: return (b["id"] as String).ends_with(":" + String(h.name)) \
+					or (b["id"] as String).ends_with("/" + String(h.name))):
+				others.append(b)
+		for b in others:
+			if not _aabb_overlap(a["aabb"], b["aabb"]):
+				continue
+			var pd := _pair_depth(a, b)
+			if pd["depth"] > TOL_PEN:
+				ov.append({"a": a["kind"], "b": b["id"], "depth": pd["depth"]})
+	return {"gaps": gaps, "floating": fl, "overlaps": ov, "rope_tris": rope.size() / 3}
 
 
 func ids_with_prefix(prefix: String) -> Array:
