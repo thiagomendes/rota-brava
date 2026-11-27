@@ -56,7 +56,7 @@
   - G24 (iPhone, jogado até o resgate do capitão):
     - G24a, câmera ao correr: com `gameplay`.
     - G24b/c/d, corda que atravessa, barco de ré no meio dos outros e auditoria dinâmica de interpenetração: com `gameplay`.
-    - G24e: proposta pronta (`docs/proposals/g24_roteiro.md`). Thiago escolheu pacote mínimo hoje (G25, depois do G21i), fio do filhote fujão, varal de bandeirinhas (no médio) e vozes novas primeiro.
+    - G24e: proposta pronta (`docs/proposals/g24_roteiro.md`). Thiago escolheu pacote mínimo hoje (G25, depois do G21i), fio do filhote fujão, varal de bandeirinhas (no médio) e vozes novas primeiro. G25 feito na `feature/rb-r1-g25-roteiro-min` (sem merge; aguarda revisão).
   - G22 (iPhone, build 3):
     - G22b (rádio no nível das vozes, −0,26 LU) e G22c (Vila Maré) estão revisados e integrados; falta Thiago ouvir.
     - G22a ("?" no lugar do "H" e disco de 128 px no toque) revisado e integrado; falta Thiago ver no iPhone.

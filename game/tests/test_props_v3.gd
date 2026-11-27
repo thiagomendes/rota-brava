@@ -10,6 +10,7 @@ const PIECES := {
 	"cloth_tshirt": [["sway", "shake"], 0.45, 0.7],
 	"cloth_scarf": [["sway", "shake"], 0.35, 0.6],
 	"cloth_sock": [["sway", "shake"], 0.2, 0.45],
+	"cloth_pup_scarf": [["sway", "shake"], 0.15, 0.45],  # G25: lenco do filhote (pista do M2)
 	"basket": [[], 0.55, 0.9],
 	"fountain_leaves": [["rustle", "pull_out", "reset"], 0.4, 0.75],
 	"ball": [["roll", "bounce"], 0.3, 0.36],
