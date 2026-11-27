@@ -132,3 +132,4 @@ O GitHub só mostra o "Run workflow" quando o arquivo do workflow existe na bran
     - "Parse Error" no fechamento: um pedido ainda vivo ao sair, que já existia antes do G16;
     - cancelamento e falha de carga não são exercitados pelo teste.
   - **Confirmar no iPhone que o travamento sumiu** é o próximo passo, com o build 2.
+- **Build 2 no iPhone** (Thiago, 2026-11-27): "rodou bem aparentemente". Passou da estrela e o jogo abriu. O travamento do build 1 não se repetiu, o que confirma o efeito do G16 + G14 no aparelho. Defeito novo: na abertura, as vozes saem um pouco adiantadas, e um personagem fala enquanto outro aparece na tela (G17 do RB-R1).

@@ -606,3 +606,7 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
     - Mutação: `glyph_id` devolvendo sempre teclado → 15 falhas.
     - Testes: `ui_` 307, `ui_glyphs` 46, `touch_controls` 65, `cutscene` 152.
   - **Pendente:** controle físico real e legibilidade na tela; o glifo genérico é abstrato; teclado AZERTY não testado.
+
+| Id | Relato | Critério de aceite | Dono |
+|---|---|---|---|
+| G17 | Thiago, no iPhone: na abertura do jogo as vozes saem um pouco adiantadas; um personagem fala enquanto outro aparece | Cada fala começa junto com o plano do personagem que fala e o plano não corta antes de a voz acabar, mais uma pequena folga. Vale para a abertura e para as cutscenes do Ep01. Teste: em todas as cenas, a fala ativa é sempre do personagem do plano atual (ou do narrador) | `gameplay` |
