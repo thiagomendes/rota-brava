@@ -741,3 +741,7 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - `touch_passthrough()` agora devolve `[]`, e o único chamador, `touch_controls.gd:202`, só itera.
 
   Falta Thiago julgar o visual no iPhone. Merge em `feature/rb-r1-reorientacao`.
+
+### Decisões de Thiago, 2026-11-27 (G19 e build)
+- A lente do M7 fica no encaixe da parede da galeria, como foi entregue. Não sobe até a lanterna.
+- O próximo build do iPhone fica para depois. Ele sai de uma vez, quando houver o G19 aprovado e integrado e o lote de vozes de 2026-11-28 (com Vila Maré) registrado. Ainda não é para buildar.

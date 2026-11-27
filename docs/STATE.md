@@ -57,7 +57,7 @@
     - G22b (rádio no nível das vozes, −0,26 LU) e G22c (Vila Maré) estão revisados e integrados; falta Thiago ouvir.
     - G22a ("?" no lugar do "H" e disco de 128 px no toque) revisado e integrado; falta Thiago ver no iPhone.
 - **Próximo:**
-  - Thiago dispara os builds iOS/Android e confere a abertura no iPhone.
+  - Build único do iPhone (decisão de Thiago) depois do G19 integrado e do lote de vozes de 28/11. Avisar Thiago com a branch e o que conferir.
   - Lote de vozes de 2026-11-28 08:20 UTC.
   - E7 restante: bot humano, capturas, vídeo, build Windows e Portão 2. Depois, PARAR.
 - **Páginas para Thiago:** trio 3D https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (Leme antiga), mundo v2 https://claude.ai/artifact/6WpRQzYXY2hW74LxMiPVww, novidades https://claude.ai/artifact/2WyeZqg8DNSLWegCPcCXAt.
