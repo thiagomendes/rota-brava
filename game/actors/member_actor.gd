@@ -126,6 +126,13 @@ var _stuck_ref: float = INF
 var _stuck_age: float = 0.0
 ## Desistiu de chegar ao lugar e ainda nao chegou (o episodio usa para o teleporte fora da vista abaixo de 9 m).
 var gave_up: bool = false
+## RB-R1 G19: acao no jogo (pegar, pendurar, escalar). Enquanto `scripted`, a missao move o corpo e escolhe o clipe (como
+## `airborne`, mas sem salto): sem fisica, sem selecao automatica de clipe e sem entrada. Ninguem fica preso: quem liga
+## desliga (Ep01V3Land._act_end e clear()).
+var scripted: bool = false
+## G19: o que as maos fazem ao andar e parar: &"" (nada), &"carry" (objeto nas duas maos: carry_walk/carry_idle) ou
+## &"push" (alca do carrinho: push_cart ao andar).
+var hands: StringName = &""
 
 
 func setup(member_id: StringName) -> void:
@@ -219,6 +226,10 @@ func _update_animation() -> void:
 		var g := gait(planar, loco)
 		var anim: StringName = g["anim"]
 		var anim_scale: float = g["scale"]
+		var held := _hands_anim(true)
+		if held != &"":
+			anim = held
+			anim_scale = clampf(planar / maxf(model.walk_speed_mps, 0.01), WALK_SCALE_MIN, ANIM_SCALE_MAX)
 		model.play(anim, anim_scale)
 		_was_moving = true
 		# Um passo a cada meio ciclo do clipe, no ritmo real da animacao.
@@ -229,12 +240,13 @@ func _update_animation() -> void:
 	else:
 		loco = &"idle"
 		_step_clock = 0.0
-		if _was_moving and model.has_animation(&"stop"):
+		if _was_moving and hands == &"" and model.has_animation(&"stop"):
 			_was_moving = false
 			play_action(&"stop")
 			return
 		_was_moving = false
-		model.play(&"idle")
+		var rest := _hands_anim(false)
+		model.play(rest if rest != &"" else &"idle")
 
 
 ## Proximo estado de locomocao para a velocidade real `planar` (histerese em idle<->walk e walk<->run).
@@ -268,6 +280,23 @@ func gait(planar: float, state: StringName = &"") -> Dictionary:
 	return {"anim": anim, "scale": clampf(planar / maxf(nominal, 0.01), lo, ANIM_SCALE_MAX)}
 
 
+## G19: clipe das maos ocupadas (andando ou parado); vazio se as maos estao livres ou o modelo nao tem o clipe.
+func _hands_anim(moving: bool) -> StringName:
+	if model == null or hands == &"":
+		return &""
+	var want: StringName = &""
+	if hands == &"push":
+		want = &"push_cart" if moving else &"carry_idle"
+	elif hands == &"carry":
+		want = &"carry_walk" if moving else &"carry_idle"
+	return want if model.has_animation(want) else &""
+
+
+## G19: pivo visual (gira com o rumo do heroi); a missao usa a base dele para orientar o que vai na mao.
+func visual() -> Node3D:
+	return _visual
+
+
 func face_point(point: Vector3) -> void:
 	_face_target = point
 
@@ -292,7 +321,7 @@ func _physics_process(delta: float) -> void:
 			if f.length() > 0.01:
 				_visual.rotation.y = lerp_angle(_visual.rotation.y, atan2(-f.x, -f.z), clampf(TURN_SPEED * delta, 0.0, 1.0))
 		return
-	if airborne:
+	if airborne or scripted:
 		_mark_position(delta)
 		return
 	var dir := Vector2.ZERO

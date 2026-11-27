@@ -75,6 +75,23 @@ static func crate(parent: Node, n: String, color: Color, stall: StringName = &""
 	return _done(root)
 
 
+## G19 (M4): caixinha de feira da barraca (pega com as duas maos; origem no fundo). As caixas grandes ficam no carrinho.
+const FRUIT_BOXES := {&"M4_Stall_Apple": "fruit_box_apple", &"M4_Stall_Lemon": "fruit_box_lemon",
+	&"M4_Stall_Grapes": "fruit_box_grapes"}
+
+
+static func fruit_box(parent: Node, n: String, color: Color, stall: StringName = &"") -> Node3D:
+	if FRUIT_BOXES.has(stall):
+		var f := final(parent, FRUIT_BOXES[stall], n)
+		if f != null:
+			return f
+	var root := Node3D.new()
+	root.name = n
+	parent.add_child(root)
+	Blocks.box(root, "Mesh", Vector3(0.16, 0.09, 0.13), Vector3(0, 0.045, 0), color, 0.1)
+	return _done(root)
+
+
 ## M4: placa de cor da barraca.
 static func stall_sign(parent: Node, n: String, color: Color) -> Node3D:
 	var s := Blocks.cylinder(parent, n, 0.22, 0.04, Vector3.ZERO, color, 0.6)

@@ -178,6 +178,13 @@ func _plan(target: Vector3, reach: float) -> bool:
 	if nav == null:
 		nav = Ep01V3Nav.new()
 		nav.build(main.world.get_world_3d().direct_space_state)
+	# G19: o banco do varal (M2) entra depois da grade: bloqueia as celulas dele uma vez
+	for b in get_tree().get_nodes_in_group(&"g19_bench"):
+		if not b.get_meta(&"nav_blocked", false) and b is Node3D:
+			b.set_meta(&"nav_blocked", true)
+			var bx := (b as Node3D).global_transform
+			for i in 9:
+				nav.block(bx * Vector3(-1.0 + i * 0.25, 0, 0.1), 0.6)
 	var from := main.controlled_node.global_position
 	_route = nav.route(from, target, maxf(reach, 0.5))
 	_wp = 0

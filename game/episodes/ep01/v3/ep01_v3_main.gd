@@ -663,7 +663,8 @@ func _update_followers() -> void:
 		# F1: o ator e o dono unico do proprio movimento de seguidor (formacao, parada, desistencia); aqui so liga o modo
 		# e decide o teleporte. Embarcados (M6) nao seguem nem sao seguidos: o barco leva quem esta nele.
 		a.follow_on = followers_enabled and lead != null and a != lead and lead.riding_on == null
-		if not a.follow_on or a.airborne or a.riding_on != null:
+		# G19: quem esta numa acao (escalada, gesto) nao segue nem e seguido por teleporte ate ela acabar
+		if not a.follow_on or a.airborne or a.scripted or a.riding_on != null:
 			_hidden_stuck[m] = 0.0
 			continue
 		var d := lead.global_position - a.global_position
@@ -673,7 +674,7 @@ func _update_followers() -> void:
 			hidden_for = float(_hidden_stuck.get(m, 0.0)) + dt
 		_hidden_stuck[m] = hidden_for
 		var far := d.length() > FOLLOW_FAR
-		if (far or hidden_for >= GAVE_UP_HIDDEN) and lead.is_on_floor() and not lead.airborne:
+		if (far or hidden_for >= GAVE_UP_HIDDEN) and lead.is_on_floor() and not lead.airborne and not lead.scripted:
 			var to: Variant = follower_teleport_point(lead, a, m)
 			if to != null:
 				a.teleport(to as Vector3)
@@ -841,6 +842,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		if not blocked():
 			help_now()
 	elif event.is_action_pressed(&"interact"):
+		# G19: durante uma acao (pegar, pendurar, escalar) o mesmo "agir" acelera o resto dela.
+		if land.busy and land.skip_action():
+			get_viewport().set_input_as_handled()
+			return
 		# G7: com acao ao alcance o mesmo E age (try_interact ja encerra o olhar); sem acao, o E so encerra o olhar.
 		if try_interact() or guide.skip_look():
 			get_viewport().set_input_as_handled()
