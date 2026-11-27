@@ -63,4 +63,9 @@ Publicação em loja; ajuste fino de desempenho; UX de toque definitiva; ícones
 - `ux` + `gameplay`: controle por toque. Não mexe em `export_presets.cfg` nem em `.github/`; no `project.godot` só toca o que for necessário de entrada, e o lead serializa.
 
 ## Evidências
-(preencher)
+### build-qa (2026-11-27, nuvem Linux, Godot 4.7.2.stable.official.ed1daf0bf, OpenJDK 21 do sistema)
+- **Medido:** `tools/mobile_icons.gd` gerou 4 PNGs em `game/ui/brand/app_icon/` (manifesto `app_icon_m1`). Export iOS (projeto Xcode, `export_project_only`) **concluiu no Linux** com Team ID fictício: esquema `RotaBrava`, assinatura `Automatic`, bundle `com.thiagomendes.rotabrava`, `RotaBrava.pck` de 307 MB. Export Android parou só por falta de SDK (sem erro de preset, ícone ou ETC2/ASTC).
+- **Bloqueado:** `dl.google.com` recusado pelo proxy da nuvem (403): sem Android SDK local, sem APK local e sem o SHA-256 das platform-tools Windows (`toolchain.json` marca `PENDENTE`; o `android.yml` mede e mostra no resumo do job).
+- **Sintaxe:** `actionlint 1.7` + `shellcheck`: só 2 avisos informativos (SC2012, `ls` em vez de `find`).
+- **Testes:** `bash tools/test.sh foundation` OK (72 PASS); `bash tools/test.sh test_assets` OK (280 PASS).
+- **Pendente:** `android.yml` e `ios.yml` verdes no GitHub (depois do push e merge em `main`); APK: tamanho e SHA-256; `android-install.ps1` não foi executado (sem `pwsh` aqui); instalação, visual e desempenho no aparelho (Thiago).
