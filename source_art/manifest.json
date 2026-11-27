@@ -4240,6 +4240,43 @@
         "b_bg_16x9.jpg": "f35d2f930b2c18a02468c2f439b0df5273c6eb9093c7a8d10a1606ad221c0f4c"
       },
       "origem": "render do proprio jogo (geometria 100% do projeto)"
+    },
+    {
+      "id": "touch_icons_m1",
+      "nome": "RB-M1 · desenhos do controle por toque: pular, mao (agir sem acao), base e ponta do joystick, dica de girar a camera",
+      "agente": "ux",
+      "processo": {
+        "script": null,
+        "ferramenta": "SVG escrito a mao (texto), viewBox 100x100, 256 px; paleta 0B2440 / FFD23A / E2453A / branco",
+        "exportador": "importador de textura SVG da Godot (svg/scale 1.0)"
+      },
+      "origem": [
+        "game/ui/touch/icons/jump.svg",
+        "game/ui/touch/icons/hand.svg",
+        "game/ui/touch/icons/stick_base.svg",
+        "game/ui/touch/icons/stick_knob.svg",
+        "game/ui/touch/icons/cam_turn.svg"
+      ],
+      "saida": "game/ui/touch/icons",
+      "arquivos_sha256": {
+        "jump.svg": "8a183a2cb3ecf6849d04524ac1a2f055b9e8b072e3d00f73594bcec7fdf0f7be",
+        "hand.svg": "9fbd02c90c2b8ca5d17c0f48ab0101928ed45d6d3426b47a9098202129f416ad",
+        "stick_base.svg": "75eb7ee7ccc5230b985eff3be3931f6487205476bc0c190b17ed6b6158bca83b",
+        "stick_knob.svg": "8a7c32d7bdaf80cdc437f3dae77a4f33743571b292a0447f2d81eea18b57097b",
+        "cam_turn.svg": "0a00946e80d7469ea7d74adddf72586dbcebb29a192e68004d171be6e8e35d81"
+      },
+      "arquivos_bytes": {
+        "jump.svg": 395,
+        "hand.svg": 544,
+        "stick_base.svg": 401,
+        "stick_knob.svg": 354,
+        "cam_turn.svg": 622
+      },
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago, no aparelho)",
+      "originalidade": "formas desenhadas no projeto, sem referencia, fonte ou imagem de terceiros; sem modelo de imagem",
+      "data": "2026-11-27",
+      "nota": "RB-M1 item 4 (ux). Usados por game/ui/touch/touch_controls.gd; a pausa reusa game/ui/brand/icons/pause.svg. Prova: game/tests/test_touch_controls.gd e captures/m1-toque/ (fora do Git)."
     }
   ]
 }
