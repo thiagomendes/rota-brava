@@ -29,8 +29,17 @@ const HULL := 1.0
 const BOW_HULL := 0.5
 const BUOY_RADIUS := 3.0
 const APPROACH_RADIUS := 3.5
+## G24b: ponta da corda (m) que pode encostar onde ela esta presa ou na mao.
+const ROPE_END := 0.12
+## G24b: centro da torre do farol no plano (o mesmo de lens_mount_xf) e corrida do filhote (m/s).
+const TOWER_XZ := Vector2(31.0, -24.0)
+const PUP_RUN_MPS := 2.2
+## G24b: o chao onde a peca pousa pode ficar ate isto acima/abaixo do pedido (rua com degrau, cais).
+const DROP_DY := 1.0
 const DOCK_TIME := 1.4
 const TOW_TIME := 2.4
+## G24c: recuo do reboque (m); o bote vem 1 m a menos (encurta a corda).
+const TOW_BACK := 4.0
 const FADE_TIME := 0.35
 ## Visao de barco: mais alta e mais longe (o casco tem 5 m).
 const BOAT_VIEW := Vector3(0, 3.4, 8.0)
@@ -92,7 +101,8 @@ func setup(m: Ep01V3Main) -> void:
 	pup = StoryFigure.spawn(_keep, "pup_model", "Pup")
 	captain.visible = false
 	pup.visible = false
-	main.boat.clearance_func = boat_clearance
+	main.boat.clearance_func = boat_clearance_all
+	main.boat.process_physics_priority = -10   # G24c: o barco anda antes da guarda de giro (_guard_boat_turn)
 	var layer := CanvasLayer.new()
 	layer.layer = 50
 	add_child(layer)
@@ -211,6 +221,7 @@ func clear() -> void:
 	_feather_next = 0
 	_lit = 0
 	_rope = null
+	_rope_more.clear()
 	_gull = null
 	_fish = null
 	amora = null
@@ -265,7 +276,26 @@ func _build_m6() -> void:
 	_spot(&"rope", _mk(&"M6_DinghyApproach"), &"rope", "ui.action.throw", &"climber", 3.0)
 	var a := _mk(&"M6_BuoyB")
 	var b := _mk(&"M6_DinghyApproach")
-	_emblem(&"emb_m6_bay", a.lerp(b, 0.5) + Vector3(0, 0.0, -0.6), &"pilot")
+	# G24c: o emblema fica em agua livre entre a boia B e o bote (antes ficava colado no barco parado rowboat_b: so dava
+	# para pegar atravessando o barco)
+	var em_at := a.lerp(b, 0.5) + Vector3(0, 0.0, -0.6)
+	var best_gap := -INF
+	for t: float in [0.5, 0.42, 0.58, 0.34, 0.66, 0.26]:
+		for off: float in [-0.6, -1.4, 0.4, -2.2, 1.2]:
+			var c := a.lerp(b, t) + Vector3(0, 0, off)
+			var g := 1000.0
+			for f in floaters():
+				g = minf(g, _pt_seg(Vector2(c.x, c.z), f["a"], f["b"]) - float(f["r"]))
+			if g >= 3.0:
+				em_at = c
+				best_gap = g
+				break
+			if g > best_gap:
+				best_gap = g
+				em_at = c
+		if best_gap >= 3.0:
+			break
+	_emblem(&"emb_m6_bay", em_at, &"pilot")
 	var em := spots[&"emb_m6_bay"] as Ep01Interactable
 	em.radius = 2.6
 	em.set_meta(&"auto", true)
@@ -302,6 +332,28 @@ func _build_m7() -> void:
 	_emblem(&"emb_m7_gallery", g, &"climber")
 
 
+## G24d: ponto no chao perto de `p` em que uma capsula de raio r e altura h (acima de 5 cm do chao) nao toca a camada 1.
+func free_spot(p: Vector3, r: float, h: float) -> Vector3:
+	if not is_inside_tree():
+		return p
+	var space := get_world_3d().direct_space_state
+	var cap := CapsuleShape3D.new()
+	cap.radius = r
+	cap.height = maxf(h, r * 2.0 + 0.01)
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = cap
+	q.collision_mask = 1
+	for ring: float in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]:
+		var n := 1 if ring == 0.0 else 8
+		for i in n:
+			var c := p + Vector3(sin(TAU * i / n), 0, cos(TAU * i / n)) * ring
+			var g := _ground(c)
+			q.transform = Transform3D(Basis(), g + Vector3(0, 0.05 + cap.height * 0.5, 0))
+			if space.intersect_shape(q, 1).is_empty():
+				return g
+	return p
+
+
 func _build_m8() -> void:
 	_dinghy_docked()
 	world.set_festival(true)
@@ -311,8 +363,9 @@ func _build_m8() -> void:
 	var plaza := _mk(&"M8_FestaPlaza")
 	captain.visible = true
 	pup.visible = true
-	captain.global_position = plaza + Vector3(1.6, 0, -1.2)
-	pup.global_position = plaza + Vector3(0.6, 0, -1.5)
+	# G24d: o filhote ficava dentro dos caixotes da praca (15 cm); os dois vao para o lugar livre mais perto
+	captain.global_position = free_spot(plaza + Vector3(1.6, 0, -1.2), 0.3, 1.5)
+	pup.global_position = free_spot(plaza + Vector3(0.6, 0, -1.5), 0.25, 0.6)
 	StoryFigure.face(captain, plaza)
 	StoryFigure.face(pup, plaza)
 	_spot(&"captain", captain.global_position, &"heart", "ui.action.talk", &"", 1.9)
@@ -523,7 +576,7 @@ func _recover_fish(a: MemberActor) -> void:
 		return
 	if is_instance_valid(_fish):
 		fish_street_gap = _fish.global_position.y + piece_low(_fish, _fish.global_basis) - _floor_y(_fish.global_position)
-	FeedbackFx.sparkle(world, down)
+	FeedbackFx.sparkle(world, _fish.global_position if is_instance_valid(_fish) else down)
 	main.say("ep01.street.climber.sees_boat")
 	# Desce escalando antes de concluir (a missao seguinte desmonta esta).
 	if not await _climb_chain(a, [_mk(&"M5_Awning"), _mk(&"M5_Crates"), points[&"CratesBase"]], s):
@@ -609,7 +662,10 @@ func _figure_hand(fig: Node3D) -> Node3D:
 
 
 ## G19 (M5/M7): baixa `thing` na corda, mao a mao (lower_rope em laco). A corda vai da mao do Pico (a ponta fica presa no
-## alto) ate o objeto, que desce a LOWER_MPS e termina apoiado em `down` (chao). Fica a corda pendurada.
+## alto) ate o objeto, que desce a LOWER_MPS e termina apoiado no chao perto de `down`.
+## G24b: nenhum trecho da corda nem o objeto atravessam a camada 1. O objeto sai da mao, vai ate a beira (`drop_spot`: um
+## ponto no ar com o prumo livre ate o chao, o mais perto possivel de `down`) e desce a prumo; a corda apoia nessa beira
+## (polilinha mao -> beira -> objeto). Sem ponto livre, desce como antes (e a auditoria G24d acusa).
 func _lower_on_rope(a: MemberActor, thing: Node3D, down: Vector3, serial: int) -> bool:
 	if thing == null or not is_instance_valid(thing):
 		return true
@@ -622,21 +678,244 @@ func _lower_on_rope(a: MemberActor, thing: Node3D, down: Vector3, serial: int) -
 		a.hands = &""
 	_rope = Ep01V3Pieces.rope(_root)
 	var from := thing.global_position
-	var end_xf := rest_xf(thing, down, rad_to_deg(thing.global_rotation.y))
-	var hang := Vector3(0, maxf(0.05, from.y - (thing.global_position.y + piece_low(thing, thing.global_basis))), 0)
+	var spot := drop_spot(top, down, piece_radius(thing), [thing])
+	var land_at: Vector3 = spot.get("ground", down)
+	var end_xf := rest_xf(thing, land_at, rad_to_deg(thing.global_rotation.y))
+	var hang := Vector3(0, 0.12, 0)
+	var way: PackedVector3Array = spot.get("way", PackedVector3Array([top, top]))
 	_clip(a, &"lower_rope", LOWER_SPEED)
-	var ok := await _over(from.distance_to(end_xf.origin) / (LOWER_MPS * LOWER_SPEED), serial, func(k: float) -> void:
+	# 1) da mao ate a beira pelo caminho livre (passa por cima do parapeito se preciso); a corda segue a peca
+	var pts := PackedVector3Array([from])
+	for i in range(1, way.size()):
+		pts.append(way[i] - hang)
+	for i in range(1, pts.size()):
+		var p0 := pts[i - 1]
+		var p1 := pts[i]
+		var bend := way.slice(1, i)   # dobras ja passadas (a corda apoia nelas)
+		var t1 := p0.distance_to(p1) / (LOWER_MPS * LOWER_SPEED * 2.0)
+		if t1 < 0.01:
+			continue
+		var ok1 := await _over(t1, serial, func(k: float) -> void:
+			if is_instance_valid(thing):
+				thing.global_position = p0.lerp(p1, k)
+				var path := PackedVector3Array([top])
+				path.append_array(bend)
+				path.append(thing.global_position + hang)
+				_aim_rope_path(path))
+		if not ok1:
+			return false
+	# 2) a prumo ate o chao. A corda nao fica esticada no ar: da mao desce ao piso sob o heroi, deita ate a borda e cai
+	# pela beira (lip, rente ao piso); sem esse apoio, a dobra no alto como antes.
+	var anchor := _floor_at(top) + Vector3(0, 0.05, 0)
+	var lip := _lip(anchor, way[way.size() - 1], land_at)
+	if absf(anchor.y - top.y) < 2.0 and lip != Vector3.INF and seg_clear(top, anchor) and seg_clear(anchor, lip):
+		way = PackedVector3Array([top, anchor, lip])
+	var start := thing.global_position
+	var ok := await _over(start.distance_to(end_xf.origin) / (LOWER_MPS * LOWER_SPEED), serial, func(k: float) -> void:
 		if is_instance_valid(thing):
-			thing.global_position = from.lerp(end_xf.origin, k)
-			if is_instance_valid(_rope):
-				Ep01V3Pieces.aim_rope(_rope, top, thing.global_position + hang * 0.0 + Vector3(0, 0.12, 0)))
+			thing.global_position = start.lerp(end_xf.origin, k)
+			_aim_rope_path(_via(way, thing.global_position + hang)))
 	if not ok:
 		return false
 	thing.global_transform = end_xf
-	if is_instance_valid(_rope):
-		Ep01V3Pieces.aim_rope(_rope, top, thing.global_position + Vector3(0, 0.12, 0))
+	_aim_rope_path(_via(way, thing.global_position + hang))
 	_rest(a)
+	# G24b: quando o heroi solta, a corda fica amarrada no piso sob a mao e cai pela borda (sem ponta no ar)
+	if way.size() >= 3 and way[1].distance_to(anchor) < 0.01:
+		_aim_rope_path(PackedVector3Array([anchor, way[2], thing.global_position + hang]))
+	else:
+		var lip2 := _lip(anchor, way[way.size() - 1], land_at)
+		if absf(anchor.y - top.y) < 2.0 and lip2 != Vector3.INF and seg_clear(anchor, lip2):
+			_aim_rope_path(PackedVector3Array([anchor, lip2, thing.global_position + hang]))
 	return true
+
+
+## G24b: ponto da beira rente ao piso: na vertical de `edge`, o mais baixo (a partir do piso `anchor`) em que o trecho
+## anchor -> beira e o prumo ate `ground` ficam livres. INF se nao houver.
+func _lip(anchor: Vector3, edge: Vector3, ground: Vector3) -> Vector3:
+	for k in 30:
+		var b := Vector3(edge.x, anchor.y + 0.04 * k, edge.z)
+		if b.y > edge.y + 0.01:
+			break
+		if seg_clear(anchor, b) and _column_clear(b, ground + Vector3(0, 0.15, 0), 0.02):
+			return b
+	return Vector3.INF
+
+
+## Corda pendurada: o caminho ate a beira (`way`, da mao a beira) e dai a prumo ate `b`.
+func _via(way: PackedVector3Array, b: Vector3) -> PackedVector3Array:
+	if way.size() < 2 or way[0].distance_to(way[way.size() - 1]) < 0.05:
+		return rope_path(way[0], b)
+	var out := way.duplicate()
+	out.append(b)
+	return out
+
+
+## G24b: trechos extras da corda (mesma peca da corda, um no por trecho: Rope_2, Rope_3...) para a polilinha.
+var _rope_more: Array[Node3D] = []
+
+
+## Estica `_rope` (e os trechos extras) pela polilinha `path`. Trechos que sobram ficam escondidos.
+func _aim_rope_path(path: PackedVector3Array) -> void:
+	if not is_instance_valid(_rope) or path.size() < 2:
+		return
+	Ep01V3Pieces.aim_rope(_rope, path[0], path[1])
+	var need := path.size() - 2
+	_rope_more = _rope_more.filter(func(r: Node3D) -> bool: return is_instance_valid(r))
+	while _rope_more.size() < need:
+		var r := Ep01V3Pieces.rope(_rope.get_parent(), "Rope_%d" % (_rope_more.size() + 2))
+		if r.get_meta(&"final_rope", false):
+			r.set("coiled", false)
+		_rope_more.append(r)
+	for i in _rope_more.size():
+		var r := _rope_more[i]
+		r.visible = i < need
+		if i < need:
+			Ep01V3Pieces.aim_rope(r, path[i + 1], path[i + 2])
+
+
+func _free_rope() -> void:
+	if is_instance_valid(_rope):
+		_rope.queue_free()
+	for r in _rope_more:
+		if is_instance_valid(r):
+			r.queue_free()
+	_rope = null
+	_rope_more.clear()
+
+
+## G24b: o segmento a-b (sem ROPE_END cm em cada ponta, onde a corda esta presa ou na mao) nao toca a camada 1.
+func seg_clear(a: Vector3, b: Vector3, exclude: Array[RID] = []) -> bool:
+	if not is_inside_tree():
+		return true
+	var L := a.distance_to(b)
+	if L <= ROPE_END * 2.0:
+		return true
+	var dir := (b - a) / L
+	var p := a + dir * ROPE_END
+	var q := b - dir * ROPE_END
+	var space := get_world_3d().direct_space_state
+	for pair: Array in [[p, q], [q, p]]:
+		var hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(pair[0], pair[1], 1, exclude))
+		if not hit.is_empty() and not _invisible_wall(hit):
+			return false
+	return true
+
+
+func _invisible_wall(hit: Dictionary) -> bool:
+	var n := hit.get("collider") as Node
+	while n != null and n != world:
+		if String(n.name).begins_with("WaterLimits") or String(n.name).begins_with("AccessRamps"):
+			return true
+		n = n.get_parent()
+	return false
+
+
+## G24b: caminho da corda de a ate b sem atravessar a camada 1: reto se der; senao apoia numa dobra no alto (ao longo de
+## a->b, acima da beira que bloqueia). Sem caminho livre: reto (a auditoria G24d acusa).
+func rope_path(a: Vector3, b: Vector3) -> PackedVector3Array:
+	var r := route(a, b)
+	return r if not r.is_empty() else PackedVector3Array([a, b])
+
+
+## Caminho livre de a ate b com no maximo uma dobra no alto; vazio se nao houver.
+func route(a: Vector3, b: Vector3) -> PackedVector3Array:
+	if seg_clear(a, b):
+		return PackedVector3Array([a, b])
+	var hi := maxf(a.y, b.y)
+	for t: float in [0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 1.0]:
+		var best := PackedVector3Array()
+		var best_len := INF
+		for h: float in [0.05, 0.2, 0.4, 0.7, 1.0, 1.4]:
+			var p := a.lerp(b, t)
+			p.y = hi + h
+			if seg_clear(a, p) and seg_clear(p, b):
+				var L := a.distance_to(p) + p.distance_to(b)
+				if L < best_len:
+					best_len = L
+					best = PackedVector3Array([a, p, b])
+		if not best.is_empty():
+			return best
+	return PackedVector3Array()
+
+
+## G24b: ponto de descida a prumo para baixar uma peca de raio `r` da mao em `top` ate o chao perto de `want`:
+## {edge: ponto no ar onde a corda dobra, ground: chao onde a peca pousa}, o mais perto de `want`; {} se nao houver.
+## Exige: mao -> beira livre (corda e peca passam), prumo livre (centro e 4 bordas da peca) e chao a ate 0,6 m da altura
+## pedida (nao pousa no toldo nem num patamar no meio).
+func drop_spot(top: Vector3, want: Vector3, r: float, _ignore: Array = []) -> Dictionary:
+	if not is_inside_tree():
+		return {}
+	var space := get_world_3d().direct_space_state
+	var cands: Array[Vector3] = []
+	for ring: float in [0.0, 0.4, 0.8, 1.2, 1.6, 2.0, 2.5, 3.0]:
+		var n := 1 if ring == 0.0 else 12
+		for i in n:
+			var ang := TAU * i / n
+			cands.append(Vector3(want.x + sin(ang) * ring, 0, want.z + cos(ang) * ring))
+	for ring: float in [0.5, 0.8, 1.1, 1.5, 2.0, 2.5]:
+		for i in 16:
+			var ang := TAU * i / 16.0
+			cands.append(Vector3(top.x + sin(ang) * ring, 0, top.z + cos(ang) * ring))
+	var best := {}
+	var best_d := INF
+	for c in cands:
+		var dw := Vector2(c.x - want.x, c.z - want.z).length()
+		if dw * 0.5 >= best_d:
+			continue
+		var hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(Vector3(c.x, top.y + 0.2, c.z),
+			Vector3(c.x, want.y - 1.0, c.z), 1))
+		if hit.is_empty() or absf((hit.position as Vector3).y - want.y) > DROP_DY or (hit.normal as Vector3).y < 0.8:
+			continue
+		var ground := hit.position as Vector3
+		for h: float in [0.0, 0.2, 0.45, 0.8, 1.2]:
+			var edge := Vector3(c.x, top.y + h, c.z)
+			var way := route(top, edge)
+			if way.is_empty():
+				continue
+			if not _column_clear(edge, ground, r):
+				continue
+			# nota: perto do pedido, corda curta e sem subir muito acima da mao
+			# corda esticada no ar (trecho horizontal) pesa mais: de preferencia desce rente a beira de onde o heroi esta
+			var span := 0.0
+			var lift := 0.0
+			for i in range(1, way.size()):
+				span += Vector2(way[i].x - way[i - 1].x, way[i].z - way[i - 1].z).length()
+				lift = maxf(lift, way[i].y - top.y)
+			var score := dw * 0.5 + span * 3.0 + lift * 2.0
+			if score < best_d:
+				best = {"edge": edge, "ground": ground, "way": way}
+				best_d = score
+			break
+	return best
+
+
+## Prumo livre para uma peca de raio r: centro e 4 bordas de `from` ate `to` (o fim e o chao, fica de fora).
+func _column_clear(from: Vector3, to: Vector3, r: float) -> bool:
+	var space := get_world_3d().direct_space_state
+	for o: Vector3 in [Vector3.ZERO, Vector3(r, 0, 0), Vector3(-r, 0, 0), Vector3(0, 0, r), Vector3(0, 0, -r)]:
+		var hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(from + o, to + o + Vector3(0, 0.08, 0), 1))
+		if not hit.is_empty():
+			return false
+	return true
+
+
+## Raio no plano da peca (metade da maior medida horizontal das malhas).
+static func piece_radius(n: Node3D) -> float:
+	var box := AABB()
+	var first := true
+	var inv := Transform3D(n.global_basis.orthonormalized(), n.global_position).affine_inverse()
+	var meshes: Array[Node] = n.find_children("*", "MeshInstance3D", true, false)
+	if n is MeshInstance3D:
+		meshes.append(n)
+	for mi: Node in meshes:
+		var m := mi as MeshInstance3D
+		if m.mesh == null:
+			continue
+		var b := (inv * m.global_transform) * m.mesh.get_aabb()
+		box = b if first else box.merge(b)
+		first = false
+	return 0.15 if first else clampf(maxf(box.size.x, box.size.z) * 0.5, 0.05, 0.6)
 
 
 # ---------------------------------------------------------------- M6
@@ -659,6 +938,252 @@ func boat_clearance(pos: Vector3) -> float:
 			var hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(p, p + d * 7.0, 1))
 			if not hit.is_empty():
 				best = minf(best, p.distance_to(hit.position) - float(o[1]))
+	return best
+
+
+## G24c: folga que o BoatActor usa (clearance_func): a da camada 1 (boat_clearance) e a do que boia. Barcos parados,
+## boias e bote nao estao na camada 1: o contato com eles e resolvido em _guard_boat_turn.
+func boat_clearance_all(pos: Vector3) -> float:
+	# so freia perto do que boia (o contato e resolvido por _guard_boat_turn, sem empurrao de volta que prende)
+	return boat_clearance(pos)
+
+
+# ---------------------------------------------------------------- G24c: o que boia na baia
+
+## Capsulas no plano (x, z) do que boia e o barco nao pode atravessar: {a: Vector2, b: Vector2, r: float, id: String}.
+## Barcos parados e boias do kit e do mundo, os barquinhos da festa e o bote (este no lugar de agora). O que fica a mais
+## de FLOAT_NEAR m da agua da baia nao entra.
+var _floaters: Array[Dictionary] = []
+const FLOAT_KINDS := ["rowboat_a", "rowboat_b", "float_buoy"]
+const FLOAT_PREFIX := ["wv3_buoy", "wv3_festa_boat"]
+
+
+func floaters() -> Array[Dictionary]:
+	if _floaters.is_empty() and world != null:
+		var kit: Dictionary = world.layout.get("kit", {})
+		for kind: String in FLOAT_KINDS:
+			var mmi := world.get_node_or_null("Kit/" + kind) as MultiMeshInstance3D
+			if mmi == null or mmi.multimesh == null or mmi.multimesh.mesh == null:
+				continue
+			var box := mmi.multimesh.mesh.get_aabb()
+			var rows: Array = kit.get(kind, [])
+			for i in rows.size():
+				var r: Array = rows[i]
+				var b := Basis(Vector3.UP, deg_to_rad(float(r[3]))).scaled(Vector3.ONE * float(r[4]))
+				_floaters.append(_capsule("kit:%s#%d" % [kind, i], Transform3D(b, Vector3(float(r[0]), float(r[1]), float(r[2]))), box))
+		for k: String in world.props:
+			for pre: String in FLOAT_PREFIX:
+				if k.begins_with(pre):
+					var n := world.props[k] as Node3D
+					if n != null:
+						_floaters.append(_capsule(k, n.global_transform, _local_box(n)))
+	var out := _floaters.duplicate()
+	var d := _dinghy()
+	if d != null and d.is_visible_in_tree():
+		out.append(_capsule("wv3_dinghy", d.global_transform, _local_box(d)))
+	return out
+
+
+## AABB das malhas no espaco do no.
+static func _local_box(n: Node3D) -> AABB:
+	var inv := n.global_transform.affine_inverse()
+	var box := AABB()
+	var first := true
+	var meshes: Array[Node] = n.find_children("*", "MeshInstance3D", true, false)
+	if n is MeshInstance3D:
+		meshes.append(n)
+	for mi: Node in meshes:
+		var m := mi as MeshInstance3D
+		if m.mesh == null:
+			continue
+		var b := (inv * m.global_transform) * m.mesh.get_aabb()
+		box = b if first else box.merge(b)
+		first = false
+	return box
+
+
+## Capsula no plano a partir de uma caixa local: eixo no lado mais comprido, raio = metade do lado curto.
+static func _capsule(id: String, xf: Transform3D, box: AABB) -> Dictionary:
+	var c := box.get_center()
+	var sx := box.size.x * xf.basis.get_scale().x
+	var sz := box.size.z * xf.basis.get_scale().z
+	var ax := Vector3(1, 0, 0) if sx >= sz else Vector3(0, 0, 1)
+	var r := minf(sx, sz) * 0.5
+	var half := maxf(maxf(sx, sz) * 0.5 - r, 0.0)
+	var dir := (xf.basis * ax).normalized()
+	var wc := xf * c
+	var a := wc - dir * half
+	var b := wc + dir * half
+	return {"id": id, "a": Vector2(a.x, a.z), "b": Vector2(b.x, b.z), "r": r}
+
+
+## Casco do barco do jogador como capsula na pose (pos, heading).
+func hull_capsule(pos: Vector3, heading: float) -> Dictionary:
+	var boat := main.boat
+	if _hull_box.size == Vector3.ZERO:
+		var col := boat.find_child("Collision", true, false) as CollisionShape3D
+		if col != null and col.shape is BoxShape3D:
+			var sz := (col.shape as BoxShape3D).size
+			var lc := boat.to_local(col.global_position)
+			_hull_box = AABB(lc - sz * 0.5, sz)
+		else:
+			_hull_box = AABB(Vector3(-1.1, -0.4, -3.0), Vector3(2.2, 0.8, 5.0))
+	var xf := Transform3D(Basis(Vector3.UP, heading), pos)
+	return _capsule("boat", xf, _hull_box)
+
+
+var _hull_box: AABB = AABB()
+
+
+## Menor folga (m) entre o casco na pose e o que boia (negativa = atravessando). `skip`: ids que nao contam.
+## O casco e a caixa Body/Collision no plano (retangulo orientado); cada obstaculo e uma capsula.
+func boat_gap(pos: Vector3, heading: float, skip: Array = []) -> float:
+	hull_capsule(pos, heading)   # garante _hull_box
+	var inv := Transform3D(Basis(Vector3.UP, heading), pos).affine_inverse()
+	var lo := Vector2(_hull_box.position.x, _hull_box.position.z)
+	var hi := Vector2(_hull_box.end.x, _hull_box.end.z)
+	var best := 1000.0
+	for f in floaters():
+		if f["id"] in skip:
+			continue
+		var a3 := inv * Vector3((f["a"] as Vector2).x, 0, (f["a"] as Vector2).y)
+		var b3 := inv * Vector3((f["b"] as Vector2).x, 0, (f["b"] as Vector2).y)
+		best = minf(best, seg_rect(Vector2(a3.x, a3.z), Vector2(b3.x, b3.z), lo, hi) - float(f["r"]))
+	return best
+
+
+## Distancia do segmento a-b ao retangulo [lo, hi] (alinhado aos eixos); 0 se toca.
+static func seg_rect(a: Vector2, b: Vector2, lo: Vector2, hi: Vector2) -> float:
+	var r := Rect2(lo, hi - lo)
+	if r.has_point(a) or r.has_point(b):
+		return 0.0
+	var c := [lo, Vector2(hi.x, lo.y), hi, Vector2(lo.x, hi.y)]
+	var best := INF
+	for i in 4:
+		var p: Vector2 = c[i]
+		var q: Vector2 = c[(i + 1) % 4]
+		best = minf(best, seg_seg(a, b, p, q))
+	return best
+
+
+## Distancia entre os segmentos p1-q1 e p2-q2 no plano.
+static func seg_seg(p1: Vector2, q1: Vector2, p2: Vector2, q2: Vector2) -> float:
+	if _cross(p1, q1, p2, q2):
+		return 0.0
+	return minf(minf(_pt_seg(p1, p2, q2), _pt_seg(q1, p2, q2)), minf(_pt_seg(p2, p1, q1), _pt_seg(q2, p1, q1)))
+
+
+static func _pt_seg(p: Vector2, a: Vector2, b: Vector2) -> float:
+	var ab := b - a
+	var t := 0.0 if ab.length_squared() < 1e-8 else clampf((p - a).dot(ab) / ab.length_squared(), 0.0, 1.0)
+	return p.distance_to(a + ab * t)
+
+
+static func _cross(p1: Vector2, q1: Vector2, p2: Vector2, q2: Vector2) -> bool:
+	var d1 := (q1 - p1).cross(p2 - p1)
+	var d2 := (q1 - p1).cross(q2 - p1)
+	var d3 := (q2 - p2).cross(p1 - p2)
+	var d4 := (q2 - p2).cross(q1 - p2)
+	return d1 * d2 < 0.0 and d3 * d4 < 0.0
+
+
+## G24c: folga do casco na camada 1 (rochas, cais, margem), sem as paredes invisiveis, na pose dada.
+func _hull_free(pos: Vector3, heading: float) -> bool:
+	var col := main.boat.find_child("Collision", true, false) as CollisionShape3D
+	if col == null:
+		return true
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = col.shape
+	var lx := main.boat.global_transform.affine_inverse() * col.global_transform
+	q.transform = Transform3D(Basis(Vector3.UP, heading), pos) * lx
+	q.transform.origin.y += 0.25   # o fundo raso sob a agua nao conta (nao aparece)
+	q.collision_mask = 1
+	for hit: Dictionary in world.get_world_3d().direct_space_state.intersect_shape(q, 8):
+		if not _invisible_wall(hit):
+			return false
+	return true
+
+
+## G24c: pose de atracacao ao lado do bote: na mesma distancia do bote que o marcador M6_DinghyApproach, girando ao
+## redor do bote ate +-80 graus, a proa para o bote; a mais perto do marcador em que o casco fica livre (folga >= 0,3 m
+## do que boia, sem tocar a camada 1) e o caminho ate ela tambem. [posicao, rumo]; sem pose livre, o marcador.
+func dock_pose(from: Vector3, from_heading: float) -> Array:
+	var mk := _mk(&"M6_DinghyApproach")
+	var dn := _mk(&"M6_Dinghy")
+	var rel := mk - dn
+	rel.y = 0.0
+	var start_gap := boat_gap(from, from_heading, ["wv3_dinghy"])
+	var d0 := dn - mk
+	var best: Array = [mk, atan2(-d0.x, -d0.z)]
+	var best_score := -INF
+	for deg: float in [0.0, 10.0, -10.0, 20.0, -20.0, 30.0, -30.0, 40.0, -40.0, 50.0, -50.0, 60.0, -60.0, 70.0, -70.0, 80.0, -80.0]:
+		var p := dn + rel.rotated(Vector3.UP, deg_to_rad(deg))
+		p.y = mk.y
+		var d := dn - p
+		var h := atan2(-d.x, -d.z)
+		var ok := true
+		var low := 1000.0
+		for i in range(1, 11):
+			var k := i / 10.0
+			var q := from.lerp(p, k)
+			var hh := lerp_angle(from_heading, h, k)
+			var g := boat_gap(q, hh, ["wv3_dinghy"])
+			low = minf(low, g)
+			# (o barco pode chegar ja encostado em algo: no comeco basta nao piorar)
+			if g < (0.3 if i == 10 else minf(0.05, start_gap - 0.005)) or not _hull_free(q, hh):
+				ok = false
+		var tow_ok := bool(tow_plan(p, h, _dinghy(), TOW_BACK, TOW_BACK - 1.0, Vector3(dn.x, _dinghy().global_position.y, dn.z) if _dinghy() != null else Vector3.INF)[3])
+		if ok and tow_ok:
+			return [p, h]
+		# sem pose perfeita: a de maior folga no caminho (com recuo livre de preferencia)
+		var score := low + (1.0 if tow_ok else 0.0)
+		if score > best_score:
+			best_score = score
+			best = [p, h]
+	return best
+
+
+## G24c: o reboque recua o barco (e o bote atras da proa) RECUO m. Em vez de ir reto para tras (passava pelo meio dos
+## barcos parados), escolhe o recuo mais reto em que o casco e o bote nao tocam nada em nenhum quadro (gira a popa para
+## a agua livre). [destino do barco, rumo final, destino do bote]; sem saida livre, reto como antes.
+func tow_plan(boat_pos: Vector3, heading: float, d: Node3D, dist: float = TOW_BACK, d_dist: float = TOW_BACK - 1.0,
+		d_from: Vector3 = Vector3.INF) -> Array:
+	var fwd := Vector3(-sin(heading), 0, -cos(heading))
+	var dpos := d_from if d_from != Vector3.INF else (d.global_position if d != null else boat_pos)
+	var best: Array = [boat_pos - fwd * dist, heading, dpos - fwd * d_dist if d != null else boat_pos, false]
+	var best_low := -INF
+	for deg: float in [0.0, 15.0, -15.0, 30.0, -30.0, 45.0, -45.0, 60.0, -60.0, 75.0, -75.0, 90.0, -90.0]:
+		var dir := (-fwd).rotated(Vector3.UP, deg_to_rad(deg))
+		var back := boat_pos + dir * dist
+		var d_end := (dpos + dir * d_dist) if d != null else back
+		var to_d := d_end - back
+		var h_end := atan2(-to_d.x, -to_d.z) if d != null else heading
+		var ok := true
+		for i in range(1, 11):
+			var k := i / 10.0
+			var p := boat_pos.lerp(back, k)
+			var hh := lerp_angle(heading, h_end, k)
+			if boat_gap(p, hh, ["wv3_dinghy"]) < 0.15 or not _hull_free(p, hh):
+				ok = false
+				break
+			if d != null:
+				var dp := dpos.lerp(d_end, k)
+				var dc := _capsule("wv3_dinghy", Transform3D(d.global_basis, dp), _local_box(d))
+				for f in _floaters:
+					if seg_seg(dc["a"], dc["b"], f["a"], f["b"]) - float(dc["r"]) - float(f["r"]) < 0.1:
+						ok = false
+						break
+			if not ok:
+				break
+		if ok:
+			return [back, h_end, d_end, true]
+		var low := 1000.0
+		for i in range(1, 11):
+			var k := i / 10.0
+			low = minf(low, boat_gap(boat_pos.lerp(back, k), lerp_angle(heading, h_end, k), ["wv3_dinghy"]))
+		if low > best_low:
+			best_low = low
+			best = [back, h_end, d_end, false]
 	return best
 
 
@@ -695,6 +1220,175 @@ func _end_sailing() -> void:
 		main.camera_rig.set_low_view(main.camera_rig.yaw)
 
 
+func _physics_process(delta: float) -> void:
+	super._physics_process(delta)
+	_guard_boat_turn()
+
+
+## G24c: contato do casco com o que boia (boias, barcos parados, bote). Em vez de travar (o BoatActor nao da re, e
+## uma trava de giro deixava o barco preso de vez com a proa na boia), o casco DESLIZA: depois do passo do barco, se a
+## folga ficou abaixo de TOUCH_GAP, ele e empurrado para fora, na direcao que separa os dois, ate a folga voltar. Assim
+## acelerar contra a boia so encosta, e girar sempre solta (a proa escorrega pela boia), para qualquer lado.
+const TOUCH_GAP := 0.03
+## Teto do empurrao de saida por quadro (m), somando boia e cais: o barco escorrega, nao salta.
+const PUSH_MAX := 0.05
+## Perto do que boia (folga em m), de frente, a velocidade cai para CONTACT_SPEED (m/s: 2 cm por quadro a 60 Hz).
+const APPROACH_SLOW := 0.6
+const CONTACT_SPEED := 1.2
+
+
+func _guard_boat_turn() -> void:
+	if main == null or main.boat == null or not sailing or main.boat.input_locked:
+		_prev_heading = NAN
+		return
+	var boat := main.boat
+	# deslocamento maximo da correcao neste quadro (o resto fica para o proximo); PUSH_MAX e por quadro de 1/60 s
+	var budget := PUSH_MAX * clampf(get_physics_process_delta_time() * 60.0, 1.0, 10.0)
+	# chegando perto de frente: o barco perde o embalo antes de encostar (a correcao de 4 cm/quadro da conta do resto)
+	var near := boat_gap(boat.global_position, boat.heading)
+	if near < APPROACH_SLOW:
+		var nn := _separation(boat.global_position, boat.heading)
+		if nn != Vector3.ZERO and (boat.forward().dot(nn) < -0.2 or near < 0.0):
+			boat.speed = minf(boat.speed, CONTACT_SPEED)
+	# cais e margem (camada 1): o giro encostado podia enfiar a quina; sai pela normal do contato
+	var col := boat.find_child("Collision", true, false) as CollisionShape3D
+	if col != null:
+		var q := PhysicsShapeQueryParameters3D.new()
+		q.shape = col.shape
+		q.collision_mask = 1
+		var lx := boat.global_transform.affine_inverse() * col.global_transform
+		var space := world.get_world_3d().direct_space_state
+		for i in 20:
+			if budget <= 0.0001:
+				break
+			q.transform = Transform3D(Basis(Vector3.UP, boat.heading), boat.global_position) * lx
+			q.transform.origin.y += 0.25
+			var ex: Array[RID] = []
+			for h: Dictionary in space.intersect_shape(q, 8):
+				if _invisible_wall(h):
+					ex.append(h["rid"])
+			q.exclude = ex
+			var info := space.get_rest_info(q)
+			if info.is_empty():
+				break
+			var n := info["normal"] as Vector3
+			n.y = 0.0
+			if n.length() < 0.1:
+				break
+			var st := minf(0.02, budget)
+			boat.global_position += n.normalized() * st
+			budget -= st
+			if boat.forward().dot(n) < 0.0:
+				boat.speed = minf(boat.speed, 0.5)
+	for i in 40:
+		if budget <= 0.0001:
+			break
+		var gap := boat_gap(boat.global_position, boat.heading)
+		if gap >= TOUCH_GAP:
+			break
+		var n := _separation(boat.global_position, boat.heading)
+		if n == Vector3.ZERO:
+			break
+		var step := minf(maxf(TOUCH_GAP - gap, 0.01), budget)
+		boat.global_position += n * step
+		if not _hull_free(boat.global_position, boat.heading):
+			# espremido entre a boia e a margem: nao empurra para dentro da margem; o passo deste quadro (giro e
+			# avanco) nao vale, se o quadro anterior estava livre
+			boat.global_position -= n * step
+			if not is_nan(_prev_heading) and _prev_pos.distance_to(boat.global_position) < 0.2:
+				boat.global_position = _prev_pos
+				boat.heading = _prev_heading
+				boat.rotation.y = boat.heading
+				boat.speed = 0.0
+			break
+		budget -= step
+		if boat.forward().dot(n) < 0.0:
+			boat.speed = minf(boat.speed, 0.5)   # bateu de frente: perde o embalo
+	# preso (acelerador ou leme acionados e ~1,5 s sem andar nem girar, ex.: espremido entre a boia e a margem): o barco
+	# recua devagar (ou desliza de lado) para fora da quina, sem passar do teto do quadro. Qualquer leme solta.
+	var dt := get_physics_process_delta_time()
+	var trying := absf(boat.throttle) > 0.05 or absf(boat.steer) > 0.05
+	if trying and _stuck_from != Vector3.INF and boat.global_position.distance_to(_stuck_from) < STUCK_MOVE \
+			and absf(wrapf(boat.heading - _stuck_h, -PI, PI)) < STUCK_TURN:
+		_stuck_t += dt
+	else:
+		_stuck_t = 0.0
+		_stuck_from = boat.global_position
+		_stuck_h = boat.heading
+	if _stuck_t > STUCK_S:
+		_backing = BACK_S
+		_stuck_t = 0.0
+	if _backing > 0.0:
+		_backing -= dt
+		var step := minf(budget, BACK_SPEED * dt)
+		var back := -boat.forward()
+		var side := Vector3(-back.z, 0, back.x)
+		for d: Vector3 in [back, (back + side).normalized(), (back - side).normalized(), side, -side]:
+			var p := boat.global_position + d * step
+			if _hull_free(p, boat.heading) and boat_gap(p, boat.heading) >= minf(boat_gap(boat.global_position, boat.heading), TOUCH_GAP):
+				boat.global_position = p
+				budget -= step
+				break
+		boat.speed = 0.0
+		_stuck_from = boat.global_position
+		_stuck_h = boat.heading
+	# giro que enfia a quina na margem alem do que a correcao do quadro tira: o giro deste quadro nao vale (o outro
+	# lado e o motor continuam livres)
+	if not is_nan(_prev_heading) and not _hull_free(boat.global_position, boat.heading) \
+			and _hull_free(boat.global_position, _prev_heading):
+		boat.heading = _prev_heading
+		boat.rotation.y = boat.heading
+	_prev_heading = boat.heading
+	_prev_pos = boat.global_position
+
+
+var _prev_heading := NAN
+var _prev_pos := Vector3.ZERO
+var _stuck_t := 0.0
+var _stuck_from := Vector3.INF
+var _stuck_h := 0.0
+var _backing := 0.0
+## Preso: STUCK_S s andando menos que STUCK_MOVE m e girando menos que STUCK_TURN rad, com comando: recua BACK_S s a
+## BACK_SPEED m/s (dentro do teto do quadro).
+const STUCK_S := 1.2
+const STUCK_MOVE := 0.15
+const STUCK_TURN := 0.15
+const BACK_S := 1.2
+const BACK_SPEED := 1.0
+
+
+## Direcao (plano) que afasta o casco do que boia mais perto: do ponto mais perto do obstaculo ao eixo do casco.
+func _separation(pos: Vector3, heading: float) -> Vector3:
+	var h := hull_capsule(pos, heading)
+	var best := INF
+	var out := Vector3.ZERO
+	for f in floaters():
+		var g := seg_seg(h["a"], h["b"], f["a"], f["b"])
+		if g < best:
+			best = g
+			var pf := _closest_on(f["a"], f["b"], h["a"], h["b"])
+			var ph := _closest_on(h["a"], h["b"], pf, pf)
+			var d := ph - pf
+			if d.length() < 0.001:
+				d = Vector2(pos.x, pos.z) - pf
+			d = d.normalized()
+			out = Vector3(d.x, 0, d.y)
+	return out
+
+
+## Ponto do segmento a-b mais perto do segmento p-q (amostrado).
+static func _closest_on(a: Vector2, b: Vector2, p: Vector2, q: Vector2) -> Vector2:
+	var best := a
+	var bd := INF
+	for i in 21:
+		var c := a.lerp(b, i / 20.0)
+		var d := _pt_seg(c, p, q)
+		if d < bd:
+			bd = d
+			best = c
+	return best
+
+
 func _process(delta: float) -> void:
 	super._process(delta)
 	if main != null and main.controlled_node == main.boat and sailing:
@@ -707,10 +1401,11 @@ func _assisted_docking() -> void:
 	_set_busy(true)
 	boat.input_locked = true
 	boat.speed = 0.0
-	var to := _mk(&"M6_DinghyApproach")
 	var dinghy := _mk(&"M6_Dinghy")
-	var d := dinghy - to
-	var want := atan2(-d.x, -d.z)
+	# G24c: encosta numa pose em que o casco nao toca nada (no marcador a popa ficava dentro do barco parado rowboat_b)
+	var pose := dock_pose(boat.global_position, boat.heading)
+	var to: Vector3 = pose[0]
+	var want: float = pose[1]
 	var from_heading := boat.heading
 	var tw := boat.create_tween().set_parallel(true)
 	tw.tween_property(boat, "global_position", Vector3(to.x, boat.global_position.y, to.z), DOCK_TIME) \
@@ -729,6 +1424,57 @@ func _assisted_docking() -> void:
 	main.notify_mission(&"dinghy_reached")
 
 
+## G24b: a corda sai do cunho da proa (RopeBow, no conves) e passa por cima da roda de proa ate `end`: dobra no bico do
+## casco (frente da malha do barco, um pouco acima do cunho) em vez de atravessar a proa. O casco nao esta na camada 1.
+func _bow_path(bow: Vector3, end: Vector3) -> PackedVector3Array:
+	var boat := main.boat
+	var lb := boat.to_local(bow)
+	# (sai do cunho para cima e passa ao lado do mastro da luz de proa, que fica no eixo do barco)
+	var tip := boat.to_global(Vector3(BOW_SIDE, lb.y + 0.32, _stem_z()))
+	var lift := boat.to_global(Vector3(BOW_SIDE, lb.y + 0.28, lb.z))
+	var le := boat.to_local(end)
+	if le.z > _stem_z() + 0.05:
+		# a ponta ainda esta sobre o conves (comeco do arremesso): sobe do cunho antes de ir a mao
+		# (por cima da cabine e da borda: dobra no alto entre o cunho e a mao)
+		var up := bow + Vector3(0, 0.3, 0)
+		var mid := up.lerp(end, 0.5)
+		mid.y = maxf(up.y, end.y) + 0.45
+		return PackedVector3Array([bow, up, mid, end])
+	return PackedVector3Array([bow, lift, tip, end])
+
+
+var _stem_cache: float = INF
+## G24b: desvio lateral da corda na proa (m), ao lado do mastro da luz de proa.
+const BOW_SIDE := 0.12
+
+
+## G24b: a corda amarra na ponta do bote mais perto do barco, por cima da borda (antes ia ao meio do bote, por dentro
+## da borda).
+func _dinghy_tie(d: Node3D) -> Vector3:
+	var z := d.global_basis.z.normalized()
+	var tip := main.boat.to_global(Vector3(0, 0, _stem_z()))
+	var p1 := d.global_position - z * 1.1 + Vector3(0, 0.45, 0)
+	var p2 := d.global_position + z * 1.1 + Vector3(0, 0.45, 0)
+	return p1 if p1.distance_to(tip) < p2.distance_to(tip) else p2
+
+
+## Bico da proa no espaco do barco (menor z das malhas do modelo; a frente e -Z).
+func _stem_z() -> float:
+	if _stem_cache != INF:
+		return _stem_cache
+	var boat := main.boat
+	var z := 0.0
+	var inv := boat.global_transform.affine_inverse()
+	for mi: Node in boat.find_children("*", "MeshInstance3D", true, false):
+		var m := mi as MeshInstance3D
+		if m.mesh == null or not m.is_visible_in_tree():
+			continue
+		var b := (inv * m.global_transform) * m.mesh.get_aabb()
+		z = minf(z, b.position.z)
+	_stem_cache = z - 0.15
+	return _stem_cache
+
+
 func _throw_rope_and_tow(a: MemberActor) -> void:
 	var boat := main.boat
 	var d := _dinghy()
@@ -737,7 +1483,7 @@ func _throw_rope_and_tow(a: MemberActor) -> void:
 	var bow_node := boat.find_child("RopeBow", true, false) as Node3D
 	if bow_node != null:
 		bow = bow_node.global_position
-	var tie := (d.global_position if d != null else _mk(&"M6_Dinghy")) + Vector3(0, 0.3, 0)
+	var tie := _dinghy_tie(d) if d != null else _mk(&"M6_Dinghy") + Vector3(0, 0.3, 0)
 	# G19: o Pico gira o rolo de corda e lanca (throw_rope); a ponta sai da mao no instante do lancamento (0,74 s do
 	# clipe) e voa em arco ate o bote; a outra ponta fica presa na proa.
 	_rope = Ep01V3Pieces.rope(_root)
@@ -762,10 +1508,10 @@ func _throw_rope_and_tow(a: MemberActor) -> void:
 			if is_instance_valid(_rope):
 				var e := hand.lerp(tie, k)
 				e.y += 1.2 * 4.0 * k * (1.0 - k)
-				Ep01V3Pieces.aim_rope(_rope, bow, e)):
+				_aim_rope_path(_bow_path(bow, e))):
 			_act_end(a, s)
 			return
-	Ep01V3Pieces.aim_rope(_rope, bow, tie)
+	_aim_rope_path(_bow_path(bow, tie))
 	FeedbackFx.sparkle(world, tie)
 	var cv := StoryFigure.visual(captain)
 	if cv != null and cv.has_animation(&"thanks"):
@@ -779,14 +1525,20 @@ func _throw_rope_and_tow(a: MemberActor) -> void:
 	if pilot != null and pilot.model != null and pilot.model.has_animation(&"steer_left"):
 		pilot.play_action(&"steer_left", pilot.model.animation_length(&"steer_left") / TOW_TIME)
 	# Reboque curto: o barco recua e o bote desencalha atras dele; depois corte para o cais (a volta inteira nao aparece).
-	var back := boat.global_position - boat.forward() * 4.0
+	# G24c: recuo que nao passa pelos barcos parados (tow_plan); a popa gira para a agua livre e a proa segue o bote.
+	var plan := tow_plan(boat.global_position, boat.heading, d)
+	var b0 := boat.global_position
+	var h0 := boat.heading
+	var d0 := d.global_position if d != null else Vector3.ZERO
 	var tw := boat.create_tween().set_parallel(true)
-	tw.tween_property(boat, "global_position", back, TOW_TIME).set_trans(Tween.TRANS_SINE)
-	if d != null:
-		tw.tween_property(d, "global_position", d.global_position - boat.forward() * 3.0, TOW_TIME).set_trans(Tween.TRANS_SINE)
+	tw.tween_method(func(k: float) -> void:
+		boat.global_position = b0.lerp(plan[0] as Vector3, k)
+		boat.heading = lerp_angle(h0, float(plan[1]), k)
+		if d != null:
+			d.global_position = d0.lerp(plan[2] as Vector3, k), 0.0, 1.0, TOW_TIME).set_trans(Tween.TRANS_SINE)
 	var follow := func(_t: float) -> void:
 		if is_instance_valid(_rope) and bow_node != null and d != null:
-			Ep01V3Pieces.aim_rope(_rope, bow_node.global_position, d.global_position + Vector3(0, 0.3, 0))
+			_aim_rope_path(_bow_path(bow_node.global_position, _dinghy_tie(d)))
 		if d != null and captain.visible:
 			captain.global_position = d.global_position + Vector3(0, 0.25, 0)
 	tw.tween_method(follow, 0.0, 1.0, TOW_TIME)
@@ -810,9 +1562,7 @@ func _land_on_dock() -> void:
 	boat.place(berth.global_position, berth.global_rotation.y)
 	_dinghy_docked()
 	# G19: a corda do reboque fica: amarrada da proa do bote a estaca do cais (antes sumia no corte)
-	if is_instance_valid(_rope):
-		_rope.queue_free()
-	_rope = null
+	_free_rope()
 	var land := points[&"DockLanding"] as Vector3
 	for m: StringName in [&"pilot", &"climber"]:
 		(main.actors[m] as MemberActor).dismount(land + (Ep01V3Main.TRIO_OFFSETS[m] as Vector3) + Vector3(0, 0.05, 0))
@@ -884,12 +1634,57 @@ func _rescue_pup(a: MemberActor) -> void:
 	if not await _lower_on_rope(a, pup, _floor_at(foot + Vector3(0.8, 0.3, 0.4)), s):
 		_act_end(a, s)
 		return
+	# G24b: a corda desce a prumo da beira da galeria (antes cruzava a torre ate o pe da escada); no chao o filhote
+	# solta e corre em volta da torre ate o pe da escada.
+	if not await _pup_run_to(foot + Vector3(0.8, 0.0, 0.4), s):
+		_act_end(a, s)
+		return
 	main.notify_mission(&"pup_rescued")
 	if not await _climb_chain(a, [_mk(&"M7_Landing_3"), _mk(&"M7_Landing_2"), _mk(&"M7_Landing_1"), _mk(&"M7_StairBase"),
 			_mk(&"M7_StairStep"), points[&"StairFoot"]], s):
 		_act_end(a, s)
 		return
 	_act_end(a, s)
+
+
+## G24b: o filhote corre pelo chao em arco ao redor da torre (centro TOWER_XZ) ate `to`.
+func _pup_run_to(to: Vector3, serial: int) -> bool:
+	var from := pup.global_position
+	var c := Vector3(TOWER_XZ.x, from.y, TOWER_XZ.y)
+	var r0 := Vector2(from.x - c.x, from.z - c.z)
+	var r1 := Vector2(to.x - c.x, to.z - c.z)
+	if r0.distance_to(r1) < 0.5:
+		return true
+	var a0 := r0.angle()
+	var da := wrapf(r1.angle() - a0, -PI, PI)
+	var steps := maxi(2, int(absf(da) / 0.25))
+	var pts := PackedVector3Array()
+	for i in steps + 1:
+		var k := float(i) / steps
+		var rad := lerpf(r0.length(), r1.length(), k)
+		var ang := a0 + da * k
+		pts.append(_ground(Vector3(c.x + cos(ang) * rad, from.y + 0.5, c.z + sin(ang) * rad)))
+	var L := 0.0
+	for i in range(1, pts.size()):
+		L += pts[i - 1].distance_to(pts[i])
+	var cv := StoryFigure.visual(pup)
+	if cv != null and cv.has_animation(&"run"):
+		cv.play(&"run")
+	var ok := await _over(L / PUP_RUN_MPS, serial, func(k: float) -> void:
+		if not is_instance_valid(pup):
+			return
+		var d := k * L
+		for i in range(1, pts.size()):
+			var seg := pts[i - 1].distance_to(pts[i])
+			if d <= seg or i == pts.size() - 1:
+				var p := pts[i - 1].lerp(pts[i], clampf(d / maxf(seg, 0.001), 0.0, 1.0))
+				StoryFigure.face(pup, p + (pts[i] - pts[i - 1]))
+				pup.global_position = p
+				return
+			d -= seg)
+	if cv != null and cv.has_animation(&"idle"):
+		cv.play(&"idle")
+	return ok
 
 
 ## Encaixe da lente na parede da torre, na altura da mao erguida (place_high) acima do piso da galeria; frente = para fora.

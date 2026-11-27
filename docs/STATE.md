@@ -55,7 +55,7 @@
   - G21: Lumi aprovado por Thiago. G21i (plano na abertura) revisado e integrado; falas novas pendentes para o lote de 28/11; G23 (pés) revisado e integrado (dívida: build do cabelo do Lumi não determinístico).
   - G24 (iPhone, jogado até o resgate do capitão):
     - G24a parte 1 (corrida) integrada; G24a2 (obstáculo com objeto transparente) com `gameplay`, build seguinte.
-    - G24b/c/d, corda que atravessa, barco de ré no meio dos outros e auditoria dinâmica de interpenetração: com `gameplay`.
+    - G24b/c/d (cordas, barcos, auditoria dinâmica `motion_audit`) revisados e integrados; restantes da auditoria na lista KNOWN com teto.
     - G24e: proposta pronta (`docs/proposals/g24_roteiro.md`). G25 (pacote mínimo) revisado e integrado, fio do filhote fujão, varal de bandeirinhas (no médio) e vozes novas primeiro. G25 feito na `feature/rb-r1-g25-roteiro-min` (sem merge; aguarda revisão).
   - G22 (iPhone, build 3):
     - G22b (rádio no nível das vozes, −0,26 LU) e G22c (Vila Maré) estão revisados e integrados; falta Thiago ouvir.

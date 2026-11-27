@@ -20,6 +20,7 @@ const WEIGHTS := {
 	"test_ep01_v3_dialogue.gd": 49.6,
 	"test_camera_wall.gd": 43.1,
 	"test_prop_overlap.gd": 41.3,
+	"test_motion_audit.gd": 70.4,
 	"test_game_feel.gd": 37.5,
 	"test_playthrough.gd": 35.6,
 	"test_ep01_v3_f2_play.gd": 29.2,
