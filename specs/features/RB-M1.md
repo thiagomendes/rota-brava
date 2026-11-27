@@ -92,3 +92,4 @@ O GitHub só mostra o "Run workflow" quando o arquivo do workflow existe na bran
   - Artefato `rota-brava-android-apk`: 323.341.262 bytes compactados. Digest do zip: `sha256:d0ef6878…04a8`.
   - Tamanho e SHA-256 do APK e das platform-tools do Windows ficam no resumo do job; não aparecem no log.
   - Aviso do GitHub: as actions fixadas rodam em Node 20, que está obsoleto e é forçado para Node 24. Não é erro.
+- **Instalação real** (Thiago, 2026-11-27): o APK da execução nº 1 foi instalado num tablet Samsung Galaxy Tab FE pelo cabo. Foi preciso desligar o "Bloqueador automático" da Samsung (Segurança e privacidade) para ligar a depuração USB. Thiago não relatou erro no `android-install.ps1`. Ainda faltam desempenho e visual no aparelho.
