@@ -25,7 +25,10 @@ const RADIO_CLOSE_S := 0.19
 ## Tempo extra que uma fala de radio ocupa alem da voz (abrir + fechar).
 const RADIO_EXTRA_S := RADIO_OPEN_S + RADIO_CLOSE_S
 ## Chiado de fundo: o arquivo ja esta em -42 dBFS RMS; ganho extra no player.
-const RADIO_HISS_DB := -4.0
+## G22b: o bus Radio ganhou +24 dB (bus + make-up); chiado e cliques descem no player para ficarem abaixo da voz
+## como antes (medido na Godot: tests/capture_g22b.gd).
+const RADIO_HISS_DB := -13.0
+const RADIO_CLICK_DB := -12.0
 const AMBIENCE_NAMES: Array[String] = ["amb_dock_water", "amb_wind_light", "amb_dock_creaks", "amb_gulls_far"]
 const STEP_NAMES: Array[String] = ["sfx_step_wood_01", "sfx_step_wood_02", "sfx_step_wood_03", "sfx_step_wood_04", "sfx_step_wood_05", "sfx_step_wood_06"]
 const SURFACES: Array[StringName] = [&"wood", &"stone", &"sand", &"grass"]
@@ -340,6 +343,8 @@ func _ensure_radio_players() -> void:
 		RadioBus.ensure()
 		_radio_player = _make_player(BUS_RADIO)
 		_radio_close_player = _make_player(BUS_RADIO)
+		_radio_player.volume_db = RADIO_CLICK_DB
+		_radio_close_player.volume_db = RADIO_CLICK_DB
 		_hiss_player = _make_player(BUS_RADIO)
 		_hiss_player.volume_db = RADIO_HISS_DB
 
