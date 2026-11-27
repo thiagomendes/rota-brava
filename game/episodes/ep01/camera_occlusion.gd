@@ -32,6 +32,9 @@ var _stamp: PackedInt32Array = []
 var _frame := 0
 ## indice de peca -> {amount: float, want: float, proxy: MeshInstance3D, xf: Transform3D, orig: Array}
 var _active: Dictionary = {}
+## Pecas de missao (no inteiro; caixa recalculada a cada quadro porque o carrinho anda): no -> {amount, orig}
+var _dyn: Array[Node3D] = []
+var _dyn_active: Dictionary = {}
 var swaps_frame := 0
 var swapped_now := 0
 var usec_frame := 0
@@ -220,6 +223,7 @@ func update(cam: Vector3, hero_feet: Vector3, delta: float, instant: bool, on: b
 		if not _active.has(idx) and _swap(idx):
 			swaps_frame += 1
 	var center := hero_feet + Vector3(0, CENTER_Y, 0)
+	_update_dynamic(cam, hero_feet, center, delta, instant, on)
 	var done: Array[int] = []
 	for idx: int in _active:
 		var a: Dictionary = _active[idx]
@@ -235,7 +239,7 @@ func update(cam: Vector3, hero_feet: Vector3, delta: float, instant: bool, on: b
 		gi.set_instance_shader_parameter(&"occl_amount", amt)
 	for idx in done:
 		_restore(idx)
-	swapped_now = _active.size()
+	swapped_now = _active.size() + _dyn_active.size()
 	usec_frame = Time.get_ticks_usec() - t0
 
 
@@ -335,6 +339,8 @@ func mid_fade() -> int:
 func restore_all() -> void:
 	for idx: int in _active.keys():
 		_restore(idx)
+	for n: Node3D in _dyn_active.keys():
+		_dyn_restore(n)
 	swapped_now = 0
 
 
@@ -346,14 +352,112 @@ func covers_point(point: Vector3, cam: Vector3, hero_feet: Vector3) -> bool:
 	var in_cone := t > 0.0 and t < 1.0 and (cam + seg * t).distance_to(point) < RADIUS * lerpf(0.5, 1.0, t)
 	if not in_cone and point.distance_to(cam) >= NEAR * 0.6:
 		return false
+	if _dyn_covers(point, GROW):
+		return true
 	for idx: int in _active:
 		if float((_active[idx] as Dictionary)["amount"]) >= 0.5 and (_pieces[idx]["box"] as AABB).grow(GROW).has_point(point):
 			return true
 	return false
 
 
+## Pecas de missao (nos com malhas); as que sairam da lista voltam ao normal. Variantes criadas aqui (carga da missao).
+func set_dynamic(nodes: Array[Node3D]) -> void:
+	for n: Node3D in _dyn_active.keys():
+		if not nodes.has(n):
+			_dyn_restore(n)
+	_dyn = nodes
+	for n in _dyn:
+		for mi in _meshes_of(n):
+			for s in mi.mesh.get_surface_count():
+				var m := mi.get_surface_override_material(s)
+				var base := m if m != null else mi.mesh.surface_get_material(s)
+				if base != null:
+					WV2Materials.occl_variant(base)
+
+
+func _meshes_of(n: Node3D) -> Array[MeshInstance3D]:
+	var out: Array[MeshInstance3D] = []
+	if n is MeshInstance3D and (n as MeshInstance3D).mesh != null:
+		out.append(n as MeshInstance3D)
+	for c in n.find_children("*", "MeshInstance3D", true, false):
+		if (c as MeshInstance3D).mesh != null:
+			out.append(c as MeshInstance3D)
+	return out
+
+
+func _dyn_box(n: Node3D) -> Variant:
+	var box: Variant = null
+	for mi in _meshes_of(n):
+		if not mi.is_visible_in_tree():
+			continue
+		var b := mi.global_transform * mi.get_aabb()
+		box = b if box == null else (box as AABB).merge(b)
+	return box
+
+
+func _update_dynamic(cam: Vector3, feet: Vector3, center: Vector3, delta: float, instant: bool, on: bool) -> void:
+	for n: Node3D in _dyn_active.keys():
+		if not is_instance_valid(n):
+			_dyn_active.erase(n)
+	for n in _dyn:
+		if not is_instance_valid(n):
+			continue
+		var box: Variant = _dyn_box(n)
+		var g := KEEP if _dyn_active.has(n) else GROW
+		var hit: bool = on and box != null and _blocks((box as AABB).grow(g), cam, feet)
+		if hit and not _dyn_active.has(n):
+			var orig: Dictionary = {}
+			for mi in _meshes_of(n):
+				var arr: Array = []
+				for s in mi.mesh.get_surface_count():
+					var m := mi.get_surface_override_material(s)
+					arr.append(m)
+					var base := m if m != null else mi.mesh.surface_get_material(s)
+					if base != null:
+						mi.set_surface_override_material(s, WV2Materials.occl_variant(base))
+				orig[mi] = arr
+			_dyn_active[n] = {amount = 0.0, orig = orig, box = box}
+			swaps_frame += 1
+		if not _dyn_active.has(n):
+			continue
+		var a: Dictionary = _dyn_active[n]
+		if box != null:
+			a["box"] = box
+		var want := 1.0 if hit else 0.0
+		var amt: float = want if instant or delta <= 0.0 else move_toward(float(a["amount"]), want, delta / FADE_TIME)
+		a["amount"] = amt
+		if amt <= 0.0 and want <= 0.0:
+			_dyn_restore(n)
+			continue
+		for mi: MeshInstance3D in (a["orig"] as Dictionary):
+			mi.set_instance_shader_parameter(&"occl_cam", Vector4(cam.x, cam.y, cam.z, NEAR))
+			mi.set_instance_shader_parameter(&"occl_hero", Vector4(center.x, center.y, center.z, RADIUS))
+			mi.set_instance_shader_parameter(&"occl_amount", amt)
+
+
+func _dyn_restore(n: Node3D) -> void:
+	var a: Dictionary = _dyn_active.get(n, {})
+	var orig: Dictionary = a.get("orig", {})
+	for mi: MeshInstance3D in orig:
+		if is_instance_valid(mi):
+			var arr: Array = orig[mi]
+			for s in arr.size():
+				mi.set_surface_override_material(s, arr[s] as Material)
+	_dyn_active.erase(n)
+
+
+func _dyn_covers(point: Vector3, grow: float) -> bool:
+	for n: Node3D in _dyn_active:
+		var a: Dictionary = _dyn_active[n]
+		if float(a["amount"]) >= 0.5 and (a["box"] as AABB).grow(grow).has_point(point):
+			return true
+	return false
+
+
 ## Alguma peca pontilhada (fade >= 0,5) contem `point` (com a folga NEAR_BOX)? (testes: camera dentro de peca)
 func piece_contains(point: Vector3) -> bool:
+	if _dyn_covers(point, NEAR_BOX):
+		return true
 	for idx: int in _active:
 		if float((_active[idx] as Dictionary)["amount"]) >= 0.5 and (_pieces[idx]["box"] as AABB).grow(NEAR_BOX).has_point(point):
 			return true
@@ -362,6 +466,9 @@ func piece_contains(point: Vector3) -> bool:
 
 ## Alguma peca (trocada ou nao) contem `point`? (testes: separar estrutura de peca)
 func is_piece_point(point: Vector3) -> bool:
+	for n in _dyn:
+		if is_instance_valid(n) and _dyn_box(n) != null and (_dyn_box(n) as AABB).grow(GROW).has_point(point):
+			return true
 	var cell: Variant = _grid.get(Vector2i(floori(point.x / CELL), floori(point.z / CELL)))
 	if cell == null:
 		return false

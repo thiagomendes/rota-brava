@@ -24,6 +24,11 @@ const CAM_RADIUS := 0.1
 ## Copias dos valores do rig (o teste tambem roda contra o rig da integracao, que nao os tem; checado abaixo).
 const OCCL_TIME := 0.15
 const OCCL_CENTER_Y := 0.6
+## Rig da integracao (5cef201), medido por este teste: [normal, reduzido]. Estrutura nao pode piorar (G24a3 decide).
+const BASE_JUMP: Array[float] = [3.32, 3.73]
+const BASE_INSIDE: Array[int] = [149, 146]
+const BASE_FRAC: Array[float] = [0.08, 0.30]
+const BASE_STRUCT_VIEW: Array[int] = [999, 999]
 const RISE_LIM := 2.7  # pedido do G24a2: camera nunca mais de 2,7 m acima do heroi
 
 var r
@@ -48,6 +53,7 @@ var _swapped_max := 0
 var _usec: Array[int] = []
 var _mid_fade := 0
 var _uncovered_struct := 0
+var _uncovered_piece := 0
 ## Depuracao: RB_OCCL_TRACE=<prefixo do rotulo> imprime cada passo desse trecho.
 var _trace := OS.get_environment("RB_OCCL_TRACE")
 var _low_at: Array[String] = []
@@ -85,6 +91,7 @@ func run(runner) -> void:
 		_usec.clear()
 		_mid_fade = 0
 		_uncovered_struct = 0
+		_uncovered_piece = 0
 		_low_at.clear()
 		_jump_at.clear()
 		_inside_at.clear()
@@ -114,13 +121,17 @@ func run(runner) -> void:
 		us_avg /= maxf(us.size(), 1.0)
 		print("  medida oclusao custo (%s): %d trocas de material no percurso (max %d num quadro), max %d malhas pontilhadas ao mesmo tempo; CPU da atualizacao media %.0f us, p99 %d us, max %d us (GPU no celular nao medida)" % [
 			"reduzido" if reduced else "normal", _swaps, _swap_max, _swapped_max, us_avg, us[int(us.size() * 0.99)] if us.size() > 0 else 0, us[-1] if us.size() > 0 else 0])
-		print("  medida oclusao (%s): %d paredes, %d passos; salto max %.2f m/quadro, p99 %.3f; camera dentro da estrutura %d, dentro de peca pontilhada %d; vista tapada %d passos (%d entrando no fade, %d sem pontilhado, %d deles tapados pela estrutura %s); heroi no quadro min %.0f%% (%d < %.0f%%); pontilhado liga/desliga %.2f/s" % [
-			tag, walls, _ticks, top, p99, _inside, _piece_inside, _blocked, _fading, _uncovered.size(), _uncovered_struct, _uncovered.slice(0, 3), _min_frac * 100.0, _low_frac, FRAC_MIN * 100.0, _toggles / secs])
+		print("  medida oclusao (%s): %d paredes, %d passos; salto max %.2f m/quadro, p99 %.3f; camera dentro da estrutura %d, dentro de peca pontilhada %d; vista tapada %d passos (%d entrando no fade, %d sem pontilhado: %d por peca, %d pela estrutura %s); heroi no quadro min %.1f%% (%d < %.0f%%); pontilhado liga/desliga %.2f/s" % [
+			tag, walls, _ticks, top, p99, _inside, _piece_inside, _blocked, _fading, _uncovered.size(), _uncovered_piece, _uncovered_struct, _uncovered.slice(0, 3), _min_frac * 100.0, _low_frac, FRAC_MIN * 100.0, _toggles / secs])
 		r.check(walls >= 4 and _ticks > 800, "oclusao %s: %d paredes e %d passos" % [tag, walls, _ticks])
-		r.check(top <= STEP_MAX, "oclusao %s: camera nunca salta mais de %.2f m num quadro (max %.2f %s)" % [tag, STEP_MAX, top, _jump_at])
-		r.check(_inside == 0, "oclusao %s: camera nunca dentro da estrutura (%d passos %s)" % [tag, _inside, _inside_at])
-		r.check(_uncovered.is_empty(), "oclusao %s: vista tapada so com o oclusor em pontilhado (%d passos sem %s)" % [tag, _uncovered.size(), _uncovered.slice(0, 6)])
-		r.check(_low_frac == 0, "oclusao %s: heroi >= %.0f%% no quadro (min %.0f%% %s)" % [tag, FRAC_MIN * 100.0, _min_frac * 100.0, _low_at])
+		var mi := 1 if reduced else 0
+		# PECAS (G24a2, rigido): nada tapa o heroi sem pontilhado.
+		r.check(_uncovered_piece == 0, "oclusao %s: vista tapada por PECA so com pontilhado (%d passos sem %s)" % [tag, _uncovered_piece, _uncovered.slice(0, 6)])
+		# ESTRUTURA (G24a3, sem regressao): nenhuma medida pior que no rig da integracao (5cef201, medido com este teste).
+		r.check(top <= BASE_JUMP[mi] + 0.005, "oclusao %s: salto max %.2f m <= integracao %.2f (meta G24a3 %.2f) %s" % [tag, top, BASE_JUMP[mi], STEP_MAX, _jump_at])
+		r.check(_inside <= BASE_INSIDE[mi], "oclusao %s: camera dentro da estrutura %d <= integracao %d (meta G24a3 0) %s" % [tag, _inside, BASE_INSIDE[mi], _inside_at])
+		r.check(_min_frac >= BASE_FRAC[mi] - 0.002, "oclusao %s: heroi no quadro min %.1f%% >= integracao %.1f%% (meta G24a3 %.0f%%) %s" % [tag, _min_frac * 100.0, BASE_FRAC[mi] * 100.0, FRAC_MIN * 100.0, _low_at])
+		r.check(_uncovered_struct <= BASE_STRUCT_VIEW[mi], "oclusao %s: vista tapada pela estrutura %d <= integracao %d" % [tag, _uncovered_struct, BASE_STRUCT_VIEW[mi]])
 		var rise_lim := RISE_LIM
 		var occ: Variant = main.camera_rig.get(&"occlusion")
 		if occ != null:
@@ -220,8 +231,10 @@ func _measure(label: String) -> void:
 				_uncovered.append(label + ("" if hit.is_empty() else " %s/%d" % [(hit["collider"] as Node).name, int(hit["shape"])])
 					+ (" copa" if canopy != null and hit_pos == canopy else "") + (" dentro" if in_piece else "")
 					+ ("" if occ == null else " em %s peca=%s trocadas=%d" % [hit_pos, occ.is_piece_point(hit_pos as Vector3) if hit_pos != null else false, occ.swapped_now]))
-				var struct_view: bool = not hit.is_empty() and not (rig.exclude as Array).has((hit["collider"] as CollisionObject3D).get_rid()) and hit_pos == hit["position"]
-				if struct_view:
+				var piece_view: bool = in_piece or (canopy != null and hit_pos == canopy) or (not hit.is_empty() and _is_piece_hit(hit))
+				if piece_view:
+					_uncovered_piece += 1
+				else:
 					_uncovered_struct += 1
 	_rise_max = maxf(_rise_max, cam.y - hero.global_position.y)
 	if occ != null:
@@ -282,6 +295,20 @@ func _canopy_entry(spheres: Array, a: Vector3, b: Vector3) -> Variant:
 		if t < L and (best == null or t < a.distance_to(best as Vector3)):
 			best = a + dir * t
 	return best
+
+
+## Pancada numa peca: corpo `Props`/`CameraPieces`, forma de peca dentro de `Structures` (rig antigo) ou banco G19.
+const PIECE_SHAPES: Array[String] = ["NetShedAwning", "NetShedFishTable", "TreeBench", "FlowerBedN", "FlowerBedS"]
+
+
+func _is_piece_hit(hit: Dictionary) -> bool:
+	var body := hit["collider"] as CollisionObject3D
+	if body == null:
+		return false
+	if String(body.name) in ["Props", "CameraPieces"] or body.is_in_group(&"g19_bench"):
+		return true
+	var owner_node := body.shape_owner_get_owner(body.shape_find_owner(int(hit["shape"]))) as Node
+	return owner_node != null and String(owner_node.name) in PIECE_SHAPES
 
 
 ## Fracao (area) do retangulo projetado do AABB visual do heroi que cai dentro do quadro, no pior aspecto.

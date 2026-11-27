@@ -63,6 +63,7 @@ var world: VillageWorld
 var camera_rig: CameraRig
 ## Corpos invisiveis fora do desvio (agua, limites, rampas), sem as pecas do G24a2: cenas desviam de tudo.
 var _solid_exclude: Array[RID] = []
+var _mission_rids: Array[RID] = []
 var boat: BoatActor
 var hud: Hud
 var touch: TouchControls
@@ -199,6 +200,26 @@ func _setup_camera_avoidance() -> void:
 	camera_rig.avoid_canopies = false
 	camera_rig.occlusion = CameraOcclusion.new(world)
 	camera_rig.occlusion.warm_up(camera_rig.camera)
+
+
+## G24a2 v2: pecas de missao (carrinho do M4, banco do varal do G19) pontilham como as do kit e saem do desvio
+## da camera. Refeito a cada `land.build` (as pecas sao recriadas por missao).
+func _link_mission_pieces() -> void:
+	if camera_rig == null or camera_rig.occlusion == null:
+		return
+	for rid in _mission_rids:
+		camera_rig.exclude.erase(rid)
+	_mission_rids.clear()
+	var nodes: Array[Node3D] = []
+	if land.cart != null and is_instance_valid(land.cart):
+		nodes.append(land.cart)
+	for b in get_tree().get_nodes_in_group(&"g19_bench"):
+		var body := b as CollisionObject3D
+		if body != null and body.get_parent() is Node3D:
+			nodes.append(body.get_parent() as Node3D)
+			_mission_rids.append(body.get_rid())
+	camera_rig.exclude.append_array(_mission_rids)
+	camera_rig.occlusion.set_dynamic(nodes)
 
 
 ## Copas das arvores do kit como esferas (centro, raio), da caixa da malha de cada tipo e do layout do mundo.
@@ -377,6 +398,7 @@ func _start_mission(index: int) -> void:
 		return
 	current = missions[index]
 	land.build(current.id)
+	_link_mission_pieces()
 	var data: Dictionary = mission_data.get(current.id, {})
 	hud.set_objective(Loc.t(String(current.title_key)), StringName(str(data.get("icon", "notebook"))))
 	help.attach(current)
@@ -453,6 +475,7 @@ func _start_after_hops(index: int) -> void:
 
 func _finish_episode() -> void:
 	land.build(&"")
+	_link_mission_pieces()
 	current = null
 	complete = true
 	world.set_festival(true)

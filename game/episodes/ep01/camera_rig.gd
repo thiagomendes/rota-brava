@@ -242,7 +242,8 @@ func _smooth_arm(look: Vector3, free_pos: Vector3, hard_pos: Vector3, soft_pos: 
 		return free_pos
 	var hard := hard_pos.distance_to(look)
 	var want := minf(soft_pos.distance_to(look), hard)
-	if _arm < 0.0 or reduced_motion or delta <= 0.0:
+	# G24a2 v2: tambem com movimento reduzido a mola e suave (reduzido nunca pode saltar mais que o normal).
+	if _arm < 0.0 or delta <= 0.0:
 		_arm = want
 		_arm_vel = 0.0
 	elif want < _arm:
