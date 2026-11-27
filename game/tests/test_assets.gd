@@ -336,6 +336,7 @@ func _test_farol7_base() -> void:
 		var y0 := s0.rotation.y
 		await r.frames(5)
 		r.check(absf(s0.rotation.y - y0) > 0.001, "assets: luz giratoria da base gira")
+	r.check(base.get_node_or_null(^"Chair/Seat") is Marker3D, "assets: cadeira da base tem o assento Chair/Seat (pai do Lumi sentado)")
 	base.set_chair_yaw(0.0)
 	r.check(absf((base.get_node("Chair") as Node3D).rotation.y) < 0.001, "assets: set_chair_yaw gira a cadeira")
 	base.queue_free()

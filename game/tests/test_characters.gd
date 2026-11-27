@@ -7,7 +7,7 @@ const DIR := "res://actors/characters/"
 const BONES := ["root", "hips", "spine", "chest", "neck", "head", "shoulder.L", "shoulder.R", "upper_arm.L", "upper_arm.R",
 	"forearm.L", "forearm.R", "hand.L", "hand.R", "thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R", "toe.L", "toe.R"]
 const SHAPES := ["neutra", "atenta", "surpresa", "alegre", "blink"]
-const LOOPS := ["idle", "walk", "run", "idle_wheel", "chat", "wag"]
+const LOOPS := ["idle", "walk", "run", "idle_wheel", "chat", "wag", "idle_seated"]
 ## RB-R1: rosto completo (expressoes + visemas da fala + olhar) em todo o elenco novo.
 const FULL_SHAPES := ["neutra", "atenta", "surpresa", "alegre", "triste", "brava_leve", "blink", "mouth_A", "mouth_E", "mouth_O",
 	"mouth_M", "look_left", "look_right", "look_up"]
@@ -49,7 +49,7 @@ const CHARS := {
 			"mat_amora_v2_cloth", "mat_amora_v2_skin", "mat_amora_v2_hair", "mat_amora_v2_gear"]},
 	# RB-R1 G21: Lumi, o operador do radio do Farol 7 (adulto, padrao dos secundarios v2)
 	"lumi": {"scene": "lumi_model", "glb": "res://assets/models/characters/lumi_v2.glb", "v2": true, "skinned": 5, "head_part": "Lumi_Hair",
-		"root": "Lumi", "prefix": "Lumi", "anims": ["idle", "talk", "wave", "point"], "shapes": FULL_SHAPES, "height": [1.60, 1.85],
+		"root": "Lumi", "prefix": "Lumi", "anims": ["idle", "talk", "wave", "point", "idle_seated", "turn_chair"], "shapes": FULL_SHAPES, "height": [1.60, 1.85],
 		"tris": [15000, 24999],
 		"materials": ["mat_lumi_v2_face_eye", "mat_lumi_v2_face_iris", "mat_lumi_v2_face_dark", "mat_lumi_v2_face_skin", "mat_lumi_v2_face_mouth",
 			"mat_lumi_v2_cloth", "mat_lumi_v2_skin", "mat_lumi_v2_hair", "mat_lumi_v2_gear"]},
@@ -703,6 +703,19 @@ func _test_lumi() -> void:
 	var t0 := vis.bone_position(&"hand.R")
 	vis.seek_clip(&"talk", 3.0 - 0.001)
 	r.check(vis.bone_position(&"hand.R").distance_to(t0) < 0.02, "chars: talk do Lumi termina na pose do inicio")
+	# sentado (plano 9a): assento a 0,45 m, pes no chao, turn_chair de 1,0 s termina na pose do idle_seated
+	r.check(vis.is_looping(&"idle_seated") and not vis.is_looping(&"turn_chair") and absf(vis.animation_length(&"turn_chair") - 1.0) < 0.02,
+		"chars: Lumi idle_seated em laco e turn_chair de 1,0 s")
+	vis.seek_clip(&"idle_seated", 0.0)
+	var hs := vis.bone_position(&"hips")
+	var ks := vis.bone_position(&"shin.R")
+	r.check(hs.y > 0.46 and hs.y < 0.60, "chars: Lumi sentado com o quadril sobre o assento (%.2f m)" % hs.y)
+	r.check(absf(ks.y - hs.y) < 0.12, "chars: Lumi sentado com a coxa quase horizontal (joelho %.2f, quadril %.2f)" % [ks.y, hs.y])
+	r.check(absf(vis.lowest_foot_height()) < 0.03, "chars: Lumi sentado com os pes no chao (%.1f mm)" % (vis.lowest_foot_height() * 1000))
+	var s0 := vis.bone_position(&"hand.R")
+	vis.seek_clip(&"turn_chair", 1.0 - 0.001)
+	r.check(vis.bone_position(&"hand.R").distance_to(s0) < 0.03 and vis.bone_position(&"hips").distance_to(hs) < 0.02,
+		"chars: turn_chair termina na pose do idle_seated")
 	root.queue_free()
 	await r.frames(1)
 

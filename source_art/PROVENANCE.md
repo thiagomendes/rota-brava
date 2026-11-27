@@ -154,7 +154,7 @@
 
 ## RB-R1 G21: Lumi v2 e a base Farol 7 (PROVISORIO, 2026-11-27, `art3d`)
 - **Lumi v2** (operador do radio do Farol 7, homem de ~30 anos, decisao de Thiago): `source_art/characters/secondary_v2/build_lumi_v2.py`,
-  mesmo pipeline dos secundarios v2. `lumi_v2.glb` `a2f8ef332717a950d38cd089cee7975354516e8170bc5576b8365b28639b5f6b` (24 037 tris). Retratos `game/ui/portraits/lumi_*.png`.
+  mesmo pipeline dos secundarios v2. `lumi_v2.glb` `1bd3af3b3ce3a2309a74696aa03045ab04f5b91484bf407b408caf7d64cb7f64` (22 823 tris). Retratos `game/ui/portraits/lumi_*.png`.
   Detalhes em `source_art/characters/secondary_v2/PROVENANCE.md`.
 - **Base Farol 7** (sala do radio, cadeira, luz giratoria, casa-torre, fundo): `source_art/farol7_base/build_farol7_base.py`,
   cena `game/worlds/farol7_base/farol7_base.tscn`. Detalhes em `source_art/farol7_base/PROVENANCE.md`.

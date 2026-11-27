@@ -4329,16 +4329,16 @@
         "source_art/characters/secondary_v2/render_lineup_g21.py"
       ],
       "saida_glb": "game/assets/models/characters/lumi_v2.glb",
-      "glb_sha256": "a2f8ef332717a950d38cd089cee7975354516e8170bc5576b8365b28639b5f6b",
-      "glb_bytes": 4437628,
+      "glb_sha256": "1bd3af3b3ce3a2309a74696aa03045ab04f5b91484bf407b408caf7d64cb7f64",
+      "glb_bytes": 4443772,
       "cena": "game/actors/characters/lumi_model.tscn",
       "importacao": "game/lookdev/gltf_pbr_import.gd (mipmaps e verniz, como no trio v2)",
-      "triangulos": 24037,
+      "triangulos": 22823,
       "triangulos_por_objeto": {
-        "Lumi_Skin": 5092,
-        "Lumi_Hair": 4195,
+        "Lumi_Skin": 5116,
+        "Lumi_Hair": 4073,
         "Lumi_Gear": 5976,
-        "Lumi_Cloth": 6406,
+        "Lumi_Cloth": 5290,
         "Lumi_Face": 2368
       },
       "materiais": [
@@ -4442,8 +4442,10 @@
       "quantidade_ossos": 28,
       "animacoes_duracao_s": {
         "idle": 3.6,
+        "idle_seated": 3.6,
         "point": 1.2,
         "talk": 3.0,
+        "turn_chair": 1.0,
         "wave": 1.6
       },
       "shape_keys": [
@@ -4463,8 +4465,8 @@
         "look_right",
         "look_up"
       ],
-      "altura_m": 1.7347,
-      "razao_cabeca_altura": 0.2075,
+      "altura_m": 1.7151,
+      "razao_cabeca_altura": 0.2099,
       "velocidade_walk_mps": 0.0,
       "velocidade_run_mps": 0.0,
       "aprovacao": "pendente (reviewer, depois Thiago)",
@@ -4490,14 +4492,14 @@
       ],
       "saida": "game/ui/portraits",
       "arquivos_sha256": {
-        "lumi_neutra.png": "35b7260b90bc1b5e04d3d6d85b296349952bb363c88cdbcbea319f51d9090e8b",
-        "lumi_alegre.png": "fd0723683946bb975183d9d4c71915c8ede9b267ecf7e781871760de0193c1f3",
-        "lumi_surpresa.png": "bb80e5d7df08828c78d1ab5edac52ca7f886f0ef205a66be76d25b523a563083"
+        "lumi_neutra.png": "af928701cd09920824a824d847a74d28d8dcfff60a7d7ad0f27770e7b0237c83",
+        "lumi_alegre.png": "10da1eb7761892404f06983660918934a701c3c7469ea08acf423679bd05be6b",
+        "lumi_surpresa.png": "e65e8df71dde02edfb201aa792248b9d745c82ed19402bda8c135611312954af"
       },
       "arquivos_bytes": {
-        "lumi_neutra.png": 320736,
-        "lumi_alegre.png": 315677,
-        "lumi_surpresa.png": 321729
+        "lumi_neutra.png": 307792,
+        "lumi_alegre.png": 303082,
+        "lumi_surpresa.png": 308745
       },
       "luz": "luz de cena das provas v2 (rv2_render.scene_lights), sem o chao de prova",
       "aprovacao": "pendente (Thiago)",
@@ -4540,7 +4542,7 @@
       "glb_sha256": {
         "farol7_backdrop.glb": "ce20add678e5c99aeca61f05de4e60846f8aa07ff2357a6ca56c3a3f58882a74",
         "farol7_beacon.glb": "3cf005086c08edf398fafe0ee2267092147f2728d29ae324541a26f6f9cdd956",
-        "farol7_chair.glb": "1eaf49058f20cc2809fbca2b9f3645ecec33af47fe97ed6cc4924466d702b528",
+        "farol7_chair.glb": "a9fad38d387798e28939dfea87467c139e589a9eca0e391a7f45b43d6a906577",
         "farol7_room.glb": "414111bc60ed5eda870be1f982707eaf8912984157318088fb4b2f896bff7360",
         "farol7_tower.glb": "517c3740b05114699b01c8d56695ff14575752b37790592d592fa90a41273b22"
       },
@@ -4552,8 +4554,8 @@
         "farol7_tower.glb": 229684
       },
       "cena": "game/worlds/farol7_base/farol7_base.tscn",
-      "cena_sha256": "9571ecd7e4a8b6f782e6b4d2df4294eff945fc37da64c142872025f7cfe5bce4",
-      "cena_bytes": 4838,
+      "cena_sha256": "b7be64859eea25783f8a3d8cee690ecc660fa4ad539f15b022c5644050806f5a",
+      "cena_bytes": 4970,
       "triangulos": 21730,
       "triangulos_por_peca": {
         "farol7_backdrop": 2334,
