@@ -35,6 +35,11 @@ func run(runner) -> void:
 	await _m1_boot()
 	await _m5_fish()
 	await _m7_lens_pup_compass()
+	await _g19b_pause()
+	await _g19b_exit_frees()
+	await _g19b_swap_m2()
+	await _g19b_swap_m4()
+	await _g19b_save_mid_action()
 	Ep01V3Main.start_mission = &""
 
 
@@ -632,3 +637,269 @@ func _m7_lens_pup_compass() -> void:
 	po.free_probes()
 	land.call("_set_busy", false)
 	await _free(main)
+
+
+# ------------------------------------------------------------------ G19b: ressalvas da revisao (A-D)
+
+## Espera a Land sem acoes (ou `limit` s). Devolve o tempo.
+func _until_free(land: Node, limit: float = 12.0) -> float:
+	var t := 0.0
+	while t < limit and int(land.get("_acts")) > 0:
+		await r.tree.physics_frame
+		t += r.tree.root.get_physics_process_delta_time()
+	await r.frames(2)
+	return t
+
+
+## M2 ate o passo de pendurar, com as 3 roupas no cesto (pelo evento; o cesto so recebe as pecas).
+func _m2_at_hang(main: Ep01V3Main) -> void:
+	var land := main.land
+	await _notify_all(main, [&"piece_freed", &"piece_freed", &"piece_found"])
+	for p: Node3D in land.get("_pieces"):
+		p.set_meta(&"freed", true)
+		p.reparent(land.get("_root"), true)
+		p.global_transform = land.basket_xf(p)
+		p.set_meta(&"in_basket", true)
+	land.refresh()
+
+
+## A: na pausa a acao congela (escalada e pendurar); ao despausar termina normalmente.
+func _g19b_pause() -> void:
+	var main := await _new_main(&"M2")
+	var land := main.land
+	var pico := _hero(main, &"climber")
+	pico.teleport(land.points[&"ShedBase"] + Vector3(0, 0.05, 0))
+	await r.frames(2)
+	land.call("_on_spot", &"shed_climb", pico)
+	for i in 12:
+		await r.tree.physics_frame
+	r.tree.paused = true
+	var p0 := pico.global_position
+	for i in 40:
+		await r.tree.physics_frame
+	var moved := pico.global_position.distance_to(p0)
+	r.tree.paused = false
+	await _until_free(land)
+	r.check(moved < 0.001, "G19b A: pausado no meio da escalada o Pico nao se move (%.1f cm)" % (moved * 100.0))
+	r.check(land.call("_on_shed") and _free_actor(pico) and not land.busy, "G19b A: despausado, a escalada termina no alto e solta o Pico")
+	await _free(main)
+	main = await _new_main(&"M2")
+	land = main.land
+	await _m2_at_hang(main)
+	var rastro := _hero(main, &"tracker")
+	rastro.teleport(main.floor_at(land.points[&"Basket"] + Vector3(0, 0, 0.55)) + Vector3(0, 0.05, 0))
+	await r.frames(2)
+	await _act(main, &"tracker", &"basket")
+	var piece: Node3D = land.get("carried")
+	land.call("_set_busy", true)
+	land.call("_on_spot", &"hang", rastro)
+	for i in 25:
+		await r.tree.physics_frame
+	r.tree.paused = true
+	var a0 := rastro.global_position
+	var c0 := piece.global_position if piece != null else Vector3.ZERO
+	for i in 40:
+		await r.tree.physics_frame
+	var da := rastro.global_position.distance_to(a0)
+	var dc := piece.global_position.distance_to(c0) if piece != null else INF
+	r.tree.paused = false
+	await _until_free(land)
+	r.check(piece != null and da < 0.001 and dc < 0.001,
+		"G19b A: pausado no meio do pendurar heroi e roupa ficam parados (%.1f / %.1f cm)" % [da * 100.0, dc * 100.0])
+	r.check(piece != null and piece.get_meta(&"hung", false) and _free_actor(rastro),
+		"G19b A: despausado, a roupa termina pendurada e o Rastro livre")
+	land.call("_set_busy", false)
+	await _free(main)
+
+
+## B: a peca some no meio da acao (_put falha): a acao sai e solta busy e scripted.
+func _g19b_exit_frees() -> void:
+	var main := await _new_main(&"M2")
+	var land := main.land
+	await _m2_at_hang(main)
+	var rastro := _hero(main, &"tracker")
+	rastro.teleport(main.floor_at(land.points[&"Basket"] + Vector3(0, 0, 0.55)) + Vector3(0, 0.05, 0))
+	await r.frames(2)
+	await _act(main, &"tracker", &"basket")
+	var piece: Node3D = land.get("carried")
+	land.call("_on_spot", &"hang", rastro)
+	for i in 3:
+		await r.tree.physics_frame
+	var had := piece != null
+	if had:
+		piece.free()   # peca invalida no meio da acao
+	await _until_free(land, 6.0)
+	r.check(had and int(land.get("_acts")) == 0 and not land.busy and not rastro.scripted,
+		"G19b B: peca invalida no meio do pendurar: busy %s, scripted %s, acoes %d" % [land.busy, rastro.scripted, int(land.get("_acts"))])
+	await _free(main)
+
+
+func _ground_ok(main: Ep01V3Main, piece: Node3D, label: String) -> void:
+	var po := PropOverlap.new()
+	po.collect(main)
+	for i in 3:
+		await r.tree.physics_frame
+	var id := "mission:" + String((main.land.get("_root") as Node).get_path_to(piece))
+	var fl := po.floating(main.world.get_world_3d().direct_space_state, [id])
+	var ov := po.overlaps([id])
+	ov.append_array(po.structure_hits([id]))
+	var found := false
+	for p in po.props:
+		if String(p["id"]) == id:
+			found = true
+	r.check(found and fl.is_empty() and ov.is_empty(), "%s: apoiada no chao sem atravessar nada (%s; %s %s)" % [label, id, fl, ov])
+	po.free_probes()
+
+
+## C (M2): so quem carrega poe no cesto; trocar de heroi faz o antigo pousar a roupa no chao; outro heroi a pega.
+func _g19b_swap_m2() -> void:
+	var main := await _new_main(&"M2")
+	var land := main.land
+	var pieces: Array = land.get("_pieces")
+	var pico := main.actors[&"climber"] as MemberActor
+	var rastro := main.actors[&"tracker"] as MemberActor
+	pico.teleport(land.points[&"ShedBase"] + Vector3(0, 0.05, 0))
+	await r.frames(2)
+	await _act(main, &"climber", &"shed_climb")
+	await _act(main, &"climber", &"shed_free")
+	var shirt: Node3D = pieces[0]
+	pico.teleport(main.floor_at(land.points[&"Basket"] + Vector3(0, 0, 1.3)) + Vector3(0, 0.05, 0))
+	rastro.teleport(main.floor_at(land.points[&"Basket"] + Vector3(0, 0, 0.55)) + Vector3(0.4, 0.05, 0))
+	await r.frames(2)
+	r.check(land.get("carried") == shirt and land.get("carrier") == pico, "G19b C M2: o Pico esta com a camiseta na mao")
+	land.call("_on_spot", &"basket", rastro)   # outro heroi age no cesto
+	await _until_free(land, 3.0)
+	r.check(land.get("carried") == shirt and not shirt.get_meta(&"in_basket", false) and main.current.step_progress == 0,
+		"G19b C M2: outro heroi agindo no cesto nao tira a roupa da mao do Pico")
+	var clips_before := (land.get("clip_log") as Array).size()
+	_hero(main, &"tracker")   # troca de heroi com a roupa na mao do Pico
+	await r.frames(2)
+	await _until_free(land, 4.0)
+	var laid := false
+	for e: Dictionary in (land.get("clip_log") as Array).slice(clips_before):
+		if e["member"] == &"climber" and e["clip"] == &"place_low":
+			laid = true
+	r.check(land.get("carried") == null and land.get("ground_piece") == shirt and laid and pico.hands == &"" and _free_actor(pico),
+		"G19b C M2: na troca o Pico pousa a camiseta no chao com place_low (pousou %s)" % laid)
+	r.check(shirt.get_parent() == land.get("_root") and shirt.global_position.distance_to(pico.global_position) < 0.9,
+		"G19b C M2: a camiseta fica junto do Pico (%.2f m)" % shirt.global_position.distance_to(pico.global_position))
+	await _ground_ok(main, shirt, "G19b C M2: camiseta pousada")
+	await _act(main, &"tracker", &"pick_ground")
+	r.check(land.get("carried") == shirt and land.get("carrier") == rastro and _passed_hand(land, shirt, &"tracker"),
+		"G19b C M2: o Rastro pega a camiseta do chao")
+	# de volta ao Pico (o passo e dele): o Rastro pousa de novo e o Pico pega e leva ao cesto
+	_hero(main, &"climber")
+	await r.frames(2)
+	await _until_free(land, 4.0)
+	r.check(land.get("ground_piece") == shirt and rastro.hands == &"", "G19b C M2: na volta o Rastro pousa a camiseta no chao")
+	await _act(main, &"climber", &"pick_ground")
+	pico.teleport(main.floor_at(land.points[&"Basket"] + Vector3(0, 0, 0.55)) + Vector3(0, 0.05, 0))
+	await r.frames(2)
+	await _act(main, &"climber", &"basket")
+	r.check(shirt.get_meta(&"in_basket", false) and main.current.step_progress == 1,
+		"G19b C M2: e quem carrega poe no cesto, e conta (%d)" % main.current.step_progress)
+	await _free(main)
+
+
+## C (M4): a caixinha erguida pela Leme vai ao chao na troca, apoiada; a Leme volta, pega e entrega.
+func _g19b_swap_m4() -> void:
+	var main := await _new_main(&"M4")
+	var land := main.land
+	main.current.notify(&"icons_read", &"tracker")
+	await r.frames(3)
+	if main.hud.handoff_open:
+		main.hud._handoff_since = -100.0
+		main.hud._confirm_handoff()
+		await r.frames(3)
+	var leme := _hero(main, &"pilot")
+	var st: StringName = Ep01V3Land.CARGO_ORDER[0]
+	land.call("_attach_cart", leme)
+	var m := land._mk(st)
+	leme.teleport(main.floor_at(m + (land.cart.global_position - m).normalized() * 1.5) + Vector3(0, 0.05, 0))
+	await r.frames(40)
+	var box: Node3D = land.call("cargo_box", st)
+	await _act(main, &"pilot", StringName("deliver_" + String(st)))
+	r.check(box != null and land.get("carried") == box, "G19b C M4: a Leme ergue a caixinha")
+	var cargo := _cargo_state(land)
+	_hero(main, &"tracker")
+	await r.frames(2)
+	await _until_free(land, 4.0)
+	r.check(box != null and land.get("carried") == null and land.get("ground_piece") == box and leme.hands == &""
+		and _free_actor(leme) and box.get_parent() == land.get("_root") and box.global_position.distance_to(leme.global_position) < 0.9,
+		"G19b C M4: na troca a Leme pousa a caixinha no chao junto dela")
+	var same := _cargo_state(land)
+	r.check(same.size() == cargo.size(), "G19b C M4: o resto do carrinho fica (%d -> %d)" % [cargo.size(), same.size()])
+	if box == null:
+		await _free(main)
+		return
+	await _ground_ok(main, box, "G19b C M4: caixinha pousada")
+	land.call("_on_spot", StringName("deliver_" + String(st)), main.actors[&"tracker"])
+	await _until_free(land, 3.0)
+	r.check(not box.get_meta(&"delivered", false), "G19b C M4: a entrega nao acontece sem a caixinha na mao")
+	await _act(main, &"pilot", &"pick_ground")
+	r.check(land.get("carried") == box and land.get("carrier") == leme, "G19b C M4: a Leme pega a caixinha do chao")
+	land.call("_set_busy", true)
+	await _act(main, &"pilot", StringName("deliver_" + String(st)))
+	r.check(box.get_meta(&"delivered", false) and land.get("carried") == null and _free_actor(leme),
+		"G19b C M4: e entrega na barraca")
+	land.call("_set_busy", false)
+	await _free(main)
+
+
+## D: salvar e sair (pausado) no meio de uma acao com peca na mao; recarregar retoma a missao sem travar.
+func _g19b_save_mid_action() -> void:
+	var path := "user://test_ep01_v3_g19b.save.json"
+	if FileAccess.file_exists(path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	Ep01V3Main.save_path = path
+	var main := await _new_main(&"")
+	var evs := {&"M0": [&"marker_reached"], &"M1": [&"paw_examined", &"boot_examined", &"paw_followed", &"paw_followed",
+		&"paw_followed", &"paw_followed"]}
+	for mid: StringName in [&"M0", &"M1"]:
+		for ev: StringName in evs[mid]:
+			if main.current != null and main.current.id == mid:
+				for who: StringName in [&"tracker", &"climber", &"pilot"]:
+					if main.current.notify(ev, who):
+						break
+		await r.frames(2)
+	while main.land.busy:
+		await r.tree.physics_frame
+	await r.frames(3)
+	if main.hud.handoff_open:
+		main.hud._handoff_since = -100.0
+		main.hud._confirm_handoff()
+		await r.frames(3)
+	main.hud.clear_speech()
+	r.check(main.current != null and main.current.id == &"M2", "G19b D: chega ao M2 pelo jogo")
+	var land := main.land
+	var pico := main.actors[&"climber"] as MemberActor
+	pico.teleport(land.points[&"ShedBase"] + Vector3(0, 0.05, 0))
+	await r.frames(2)
+	await _act(main, &"climber", &"shed_climb")
+	await _act(main, &"climber", &"shed_free")
+	pico.teleport(main.floor_at(land.points[&"Basket"] + Vector3(0, 0, 0.55)) + Vector3(0, 0.05, 0))
+	await r.frames(2)
+	land.call("_on_spot", &"basket", pico)
+	for i in 6:
+		await r.tree.physics_frame
+	r.check(land.busy and land.get("carried") != null, "G19b D: no meio de por no cesto, com a roupa na mao")
+	r.tree.paused = true
+	r.check(MissionSave.save(path, Ep01V3Main.EPISODE_ID, main.missions), "G19b D: salva no meio da acao")
+	await _free(main)
+	var again := await _new_main(&"")
+	land = again.land
+	r.check(again.current != null and again.current.id == &"M2" and not land.busy and land.get("carried") == null,
+		"G19b D: recarregar retoma no M2, sem acao presa nem peca na mao (%s, busy %s)" % [
+		again.current.id if again.current else &"-", land.busy])
+	var shirt: Node3D = (land.get("_pieces") as Array)[0]
+	r.check(not shirt.get_meta(&"freed", false) and shirt.global_position.y > 1.2,
+		"G19b D: a camiseta volta ao lugar de origem (telhado, y %.2f)" % shirt.global_position.y)
+	pico = _hero(again, &"climber")
+	pico.teleport(land.points[&"ShedBase"] + Vector3(0, 0.05, 0))
+	await r.frames(2)
+	await _act(again, &"climber", &"shed_climb")
+	await _act(again, &"climber", &"shed_free")
+	r.check(land.get("carried") == shirt and _free_actor(pico), "G19b D: depois de recarregar a missao segue (solta e leva a camiseta)")
+	await _free(again)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	Ep01V3Main.save_path = ""
