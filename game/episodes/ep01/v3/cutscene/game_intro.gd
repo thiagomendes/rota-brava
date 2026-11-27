@@ -30,6 +30,8 @@ var audio: AudioDirector
 var cutscene: Ep01V3Cutscene
 var actors: Dictionary = {}
 var stage: Farol7Base
+## O palco veio da fila em segundo plano (testes); false = teve de carregar na hora.
+var stage_from_queue: bool = false
 ## No da vila -> visivel antes do plano da base.
 var _village_hidden: Dictionary = {}
 var _chair_tween: Tween
@@ -83,9 +85,12 @@ func _ready() -> void:
 			cutscene.exclude.append(b.get_rid())
 	cutscene.finished.connect(_on_finished)
 	cutscene.shot_entered.connect(_on_shot)
-	# G21i: o palco carrega em segundo plano (nao entra no tempo da tela de carregamento); o plano 9 so vem ~20 s depois.
+	# G21i: o palco carrega em segundo plano pela fila unica do SceneLoader (G16), fora do tempo da tela de
+	# carregamento; o plano 9 so vem ~20 s depois. Fica pronto em _process assim que a fila entrega.
 	if _stage_needed():
-		ResourceLoader.load_threaded_request(STAGE_SCENE)
+		SceneLoaderService.bg_request(STAGE_SCENE, "PackedScene")
+	else:
+		set_process(false)
 	if not cutscene.play(SCENE_ID):
 		_on_finished.call_deferred(SCENE_ID, true)
 
@@ -105,15 +110,34 @@ func _stage_needed() -> bool:
 	return false
 
 
-## Monta o palco da base (se ainda nao) e entrega ao player de cutscene. Espera a carga em segundo plano se preciso.
+func _process(_delta: float) -> void:
+	if stage != null:
+		set_process(false)
+		return
+	var ps := SceneLoaderService.bg_get(STAGE_SCENE) as PackedScene
+	if ps != null:
+		stage_from_queue = true
+		_build_stage(ps)
+
+
+func _exit_tree() -> void:
+	if stage == null:
+		SceneLoaderService.bg_cancel(STAGE_SCENE)
+
+
+## Palco da base pronto para o plano (o normal e ja ter vindo pela fila; se a cena chegar antes, carrega na hora).
 func ensure_stage() -> Farol7Base:
 	if stage != null:
 		return stage
-	var ps: PackedScene = null
-	if ResourceLoader.load_threaded_get_status(STAGE_SCENE) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
-		ps = ResourceLoader.load_threaded_get(STAGE_SCENE) as PackedScene
+	var ps := SceneLoaderService.bg_get(STAGE_SCENE) as PackedScene
+	stage_from_queue = ps != null
 	if ps == null:
-		ps = load(STAGE_SCENE) as PackedScene
+		SceneLoaderService.bg_cancel(STAGE_SCENE)
+		ps = SceneLoaderService.sync_load(STAGE_SCENE, "PackedScene") as PackedScene
+	return _build_stage(ps)
+
+
+func _build_stage(ps: PackedScene) -> Farol7Base:
 	stage = ps.instantiate() as Farol7Base
 	stage.use_own_environment = false  # ceu e sol da vila (iguais aos do palco), um so WorldEnvironment
 	stage.name = "Farol7Base"

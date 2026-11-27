@@ -101,8 +101,8 @@ func _play() -> void:
 	var intro := (load(GameIntroScene.SELF_SCENE) as PackedScene).instantiate() as GameIntroScene
 	r.tree.root.add_child(intro)
 	r.tree.current_scene = intro
-	r.check(intro.stage == null and ResourceLoader.load_threaded_get_status(GameIntroScene.STAGE_SCENE) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
-		"G21i: o palco carrega em segundo plano, fora do _ready da abertura")
+	r.check(intro.stage == null and (SceneLoaderService.bg_pending() or SceneLoaderService.bg_status(GameIntroScene.STAGE_SCENE) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE),
+		"G21i: o palco carrega em segundo plano pela fila do SceneLoader, fora do _ready da abertura")
 	var cs := intro.cutscene
 	var hud := intro.hud
 	var shots := _intro_shots()
@@ -119,6 +119,8 @@ func _play() -> void:
 			await r.tree.process_frame
 		await r.frames(2)
 		var st := intro.stage
+		if i == 8:
+			r.check(st != null and intro.stage_from_queue, "G21i: palco veio da fila em segundo plano (sem load sincrono)")
 		r.check(st != null and st.visible and intro.village_hidden() and not (intro.world.get_node("Static") as Node3D).visible,
 			"G21i %s: palco da base visivel, vila escondida" % id)
 		var lumi := cs.actors.get(&"radio") as Node3D
