@@ -6,6 +6,7 @@ extends Node
 ##                                   game = parametros da camera baixa do jogo (CameraRig.LOW_OFFSET, LOW_LOOK_Y, LOW_FOV)
 ##                                   apontada para o centro da fila; close:<id> = ~1,5 m do personagem, com o vizinho do trio
 ##   <id>_old = modelo da geracao anterior (cena copiada em res://tests/g4_old/, nao versionada) para o "antes"
+##   feet:<id> = pes do personagem de perto, de 3/4 (G23)
 ##   --g4-anim=idle  --g4-yaw=0  --g4-at=M0_RastroStart  --g4-dx=0 --g4-dz=0  --g4-dist=1.5
 ## Uso: xvfb-run -a -s "-screen 0 1600x900x24" bash tools/godot.sh --path game --rendering-driver vulkan \
 ##   res://tests/capture_g4.tscn --write-movie /ABS/f.png --fixed-fps 10 --quit-after 40 -- --g4-shots=game,close:pup
@@ -112,13 +113,19 @@ func _set_shot(i: int) -> void:
 		cam.look_at(center + Vector3(0, CameraRig.LOW_LOOK_Y, 0))
 		return
 	var face_shot := s.begins_with("face:")
-	var focus := s.trim_prefix("close:").trim_prefix("face:").trim_suffix("_old")
+	var focus := s.trim_prefix("close:").trim_prefix("face:").trim_prefix("feet:").trim_suffix("_old")
 	if not figures.has(focus) and figures.has(focus + "_old"):
 		figures[focus] = figures[focus + "_old"]
 	var f := figures.get(focus, figures["tracker"]) as Node3D
 	const TOPS := {"pup": 0.42, "captain": 1.55, "amora": 1.45, "lumi": 1.50, "villager_a": 1.45, "villager_b": 1.45}
 	var top: float = TOPS.get(focus, 0.95)
 	cam.fov = 40.0
+	if s.begins_with("feet:"):
+		# G23: pes de perto, de 3/4 e um pouco de cima, na luz do jogo
+		var dir := (view_dir * 0.8 + side * 0.6).normalized()
+		cam.global_position = f.global_position + dir * 1.1 + Vector3(0, 0.45, 0)
+		cam.look_at(f.global_position + Vector3(0, 0.14, 0))
+		return
 	if face_shot:
 		# rosto de perto (TOPS ~ centro da cabeca dos secundarios)
 		var hz_head := top

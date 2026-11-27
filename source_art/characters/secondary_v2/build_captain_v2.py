@@ -217,7 +217,7 @@ class Captain(Adult):
         HEM = F.hz - 0.22
         self.coat = self.torso_shell("coat", HEM, hem_flare=1.12, belly_k=1.06, chest_k=1.04)
         self.trousers()
-        self.shoes()
+        self.shoes(shaft=(0.125, 0.045))   # G23: bota de cano por dentro da barra
 
     def uniform_details(self):
         F, k = self.F, self.F.k

@@ -236,7 +236,7 @@ class Lumi(Adult):
         HEM = F.hz - 0.05
         self.jacket = self.torso_shell("jacket", HEM, hem_flare=1.00, belly_k=0.98, chest_k=1.07, cuff_k=1.04)
         self.trousers()
-        self.shoes(high=0.046)
+        self.shoes(high=0.046, shaft=(0.125, 0.047))   # G23: tenis de cano por dentro da barra
 
     def uniform_details(self):
         F, k = self.F, self.F.k
