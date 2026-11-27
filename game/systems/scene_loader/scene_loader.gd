@@ -171,10 +171,11 @@ func change_scene(path: String) -> bool:
 	_pending.clear()
 	_begin_block()
 	for dep: String in WARM.get(path, []):
-		if ResourceLoader.exists(dep) and ResourceLoader.load_threaded_request(dep, "", true) == OK:
+		if ResourceLoader.exists(dep) and ResourceLoader.load_threaded_request(dep, "", false) == OK:
 			_pending.append(dep)
 	print("[RB] loader request %s" % path)
-	var err := ResourceLoader.load_threaded_request(path, "PackedScene", true)
+	# G14: sem sub-threads (use_sub_threads=true faz a Godot 4.7.2 abortar ao fechar, codigo 134)
+	var err := ResourceLoader.load_threaded_request(path, "PackedScene", false)
 	if err != OK:
 		_fail("pedido recusado (%d)" % err)
 	return true

@@ -97,7 +97,8 @@ func _build() -> void:
 		_key_pending.append_array(Array(KeyArtStage.resource_paths()))
 		_key_pending.append_array(KEY_ART_GLBS)
 		for path: String in _key_pending:
-			ResourceLoader.load_threaded_request(path, "", true)
+			# G14: sem sub-threads (use_sub_threads=true faz a Godot 4.7.2 abortar ao fechar, codigo 134)
+			ResourceLoader.load_threaded_request(path, "", false)
 	_safe = Control.new()
 	_safe.name = "Safe"
 	_safe.set_anchors_preset(Control.PRESET_FULL_RECT)
