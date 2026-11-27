@@ -87,7 +87,7 @@
     "wv2_deck",
     "wv2_bark"
    ],
-   "triangulos": 4574
+   "triangulos": 4598
   },
   "wv2_dock": {
    "materiais": [
@@ -1378,6 +1378,6 @@
    "resolucao_dados": 512
   }
  },
- "triangulos_estatico": 206126,
+ "triangulos_estatico": 206150,
  "triangulos_instancias": 2031516
 }

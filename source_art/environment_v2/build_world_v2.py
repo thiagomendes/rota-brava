@@ -67,6 +67,10 @@ LOD = {"wv2_back": 2, "wv2_street": 1, "wv2_plaza": 1}
 
 lights = []      # (tipo, (x, y, z))
 bank_info = {}
+## G18: varal da margem (M2). Polilinha da corda (13 pontos, y para cima, metros) e as 3 vagas das pecas do M2 (parametro
+## t ao longo da corda: 0 = galpao, 1 = arvore). Vai como metadado do marcador M2_Clothesline (wv3_collision).
+CLOTHESLINE_SLOTS = (0.385, 0.5, 0.615)
+CLOTHESLINE = {}
 houses = []      # (pos, ry, W, D, H) de cada casa: colisao do mundo jogavel (E3)
 
 
@@ -956,14 +960,50 @@ def build_bank():
         pts.append(Vector((a.x + (b.x - a.x) * t, ya + (yb - ya) * t - 0.25 * math.sin(math.pi * t), a.z + (b.z - a.z) * t)))
     m.tube(pts, 0.008, "wv2_rope", hexc("#F2EAD8"), seg=5)
     ang = math.degrees(math.atan2(-(b.z - a.z), b.x - a.x))
-    cloth = [(0.18, 0.55, 0.42, PAL["red"]), (0.32, 0.6, 0.7, hexc("#FFFFFF")), (0.5, 0.45, 0.5, PAL["blue"]),
-             (0.66, 0.5, 0.6, PAL["yellow"]), (0.82, 0.4, 0.45, PAL["green"])]
+    span = math.hypot(b.x - a.x, b.z - a.z)
+
+    def rope_at(t):
+        """Ponto e tangente da corda (a mesma polilinha do tubo) no parametro t (0 = galpao, 1 = arvore)."""
+        f = min(max(t, 0.0), 1.0) * 12
+        i = min(11, int(f))
+        return pts[i].lerp(pts[i + 1], f - i), (pts[i + 1] - pts[i]).normalized()
+
+    def rope_rot(t):
+        """Rotacao de uma peca pendurada em t: X ao longo da corda (com a inclinacao dela), Y para cima."""
+        tan = rope_at(t)[1]
+        return R(ry=ang, rz=math.degrees(math.atan2(tan.y, math.hypot(tan.x, tan.z))))
+
+    # G18: roupas fixas do cenario so nas pontas; o meio (CLOTHESLINE_SLOTS) fica livre para as 3 pecas do M2. Cada pano
+    # pendura com a borda de cima NA corda e inclinado como ela; 2 prendedores sobre a corda (antes: 5 panos, um no meio
+    # das vagas do M2, borda reta na corda curva e prendedor deslocado 0,15 m em x, fora da corda).
+    cloth = [(0.12, 0.55, 0.42, PAL["red"]), (0.235, 0.6, 0.7, hexc("#FFFFFF")), (0.765, 0.5, 0.6, PAL["yellow"]),
+             (0.885, 0.4, 0.45, PAL["green"])]
+    for _ in range(5):
+        rng.uniform(-3, 3)   # mesma sequencia do rng de antes (cerca e barco abaixo nao mudam)
+    rand_state = random.getstate()
     for t, w, h, c in cloth:
+        p0, _tan = rope_at(t)
+        rot = rope_rot(t)
+        ctr = p0 + rot.to_3x3() @ Vector((0.0, -h / 2, 0.0))
+        m.box(tuple(ctr), (w, h, 0.012), "wv2_canvas", c, 0.0, 1, rot=rot, uvoff=(0.13, 0))
+        for s in (-1, 1):
+            tp = t + s * (w / 2 - 0.07) / span
+            pp = rope_at(tp)[0] + rope_rot(tp).to_3x3() @ Vector((0.0, 0.012, 0.0))
+            m.box(tuple(pp), (0.03, 0.08, 0.02), "wv2_wood", hexc("#C8A27A"), 0.0, 1, rot=rope_rot(tp))
+    # o random global (UV de caixa sem rng) volta ao ponto em que os panos antigos o deixavam (refeitos numa malha
+    # descartada): o resto do mundo e o barco saem identicos, so o varal muda no wv2_static
+    random.setstate(rand_state)
+    old_rng = random.Random(0)
+    scratch = MB("wv2_scratch")
+    for t, w, h, c in [(0.18, 0.55, 0.42, PAL["red"]), (0.32, 0.6, 0.7, PAL["red"]), (0.5, 0.45, 0.5, PAL["red"]),
+                       (0.66, 0.5, 0.6, PAL["red"]), (0.82, 0.4, 0.45, PAL["red"])]:
         i = int(t * 12)
         p0 = pts[i].lerp(pts[min(12, i + 1)], t * 12 - i)
-        m.box((p0.x, p0.y - h / 2, p0.z), (w, h, 0.012), "wv2_canvas", c, 0.0, 1, rot=R(ry=ang, rz=rng.uniform(-3, 3)),
-              uvoff=(0.13, 0))
-        m.box((p0.x - 0.15, p0.y + 0.02, p0.z), (0.03, 0.08, 0.02), "wv2_wood", hexc("#C8A27A"), 0.0, 1, rot=R(ry=ang))
+        scratch.box((p0.x, p0.y - h / 2, p0.z), (w, h, 0.012), "wv2_canvas", c, 0.0, 1,
+                    rot=R(ry=ang, rz=old_rng.uniform(-3, 3)), uvoff=(0.13, 0))
+        scratch.box((p0.x - 0.15, p0.y + 0.02, p0.z), (0.03, 0.08, 0.02), "wv2_wood", hexc("#C8A27A"), 0.0, 1, rot=R(ry=ang))
+    global CLOTHESLINE
+    CLOTHESLINE = {"rope": [tuple(round(c, 4) for c in p) for p in pts], "slots": list(CLOTHESLINE_SLOTS)}
     # cerca rustica ao longo do caminho (lado sul)
     fence = [(-4.0, 9.8), (-6.0, 11.8), (-9.5, 11.5), (-12.0, 10.6)]
     for (ax, az), (bx, bz) in zip(fence[:-1], fence[1:]):
@@ -989,6 +1029,7 @@ def build_bank():
     put("barrel", 12.1, bank_h(12.1, 7.4), 7.4, 0)
     global bank_info
     bank_info = W3.bank_extras(m, bank_h, random.Random(35))   # E3, M2: anexo de topo plano + 2 degraus + galho baixo
+    bank_info["clothesline"] = CLOTHESLINE
     return m
 
 

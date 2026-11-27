@@ -21,11 +21,31 @@ const HOP_HEIGHT := 0.55
 const HOP_GRACE := 0.6
 ## Teto da espera de um salto ainda no ar, em multiplos de HOP_TIME + HOP_GRACE.
 const HOP_HARD_LIMIT := 4.0
-## Varal: o marcador e o centro; 3 ganchos a 0,6 m ao longo da corda real do mundo (diagonal a -23 graus em Y, corda a
-## ~1,75 m; aviso do lead na E5, nao medido aqui); a peca pendura com o centro 0,17 m abaixo da corda; cesto 0,9 m ao norte.
-const LINE_SLOTS: Array[float] = [-0.6, 0.0, 0.6]
-const LINE_YAW_DEG := -23.0
-const LINE_HEIGHT := 1.58
+## Varal (G18): as pecas penduram na corda REAL do mundo, lida do marcador M2_Clothesline (metadados `rope`, a polilinha
+## de 13 pontos do tubo do wv2_static, e `rope_slots`, as 3 vagas livres em t ao longo dela; ambos gerados por
+## source_art/environment_v2/build_world_v2.py). O pivo de cada roupa (props_v3) e a boca do prendedor: vai no centro da
+## corda, com X ao longo dela (inclinacao incluida). Antes: 3 ganchos numa reta a -23 graus (a corda vai a +23), 1,58 m
+## sobre o marcador (a corda passa a ~1,75 m) e com o centro da peca 0,17 m abaixo, no meio de 5 panos fixos do cenario.
+## Cesto ao pe do varal (fora do barril e da moita vizinhos); as pecas soltas deitam dentro dele, dobradas (escala
+## BASKET_FOLD: o cesto oval tem 0,62 x 0,47 m por dentro e a camiseta aberta 0,57 x 0,43) e empilhadas sem se atravessar;
+## no voo para o varal elas desdobram (escala volta a 1).
+const BASKET_FROM_LINE := Vector3(0.6, 0, -0.9)
+const BASKET_YAW_DEG := 23.0
+## Altura do fundo util do cesto (topo da toalha dobrada do modelo `basket`, source_art/props_v3/build_props_v3.py).
+const BASKET_FLOOR := 0.197
+## Onde cada peca deita no cesto (local do cesto: x ao longo do comprimento, z na largura) e o giro dela em graus.
+const BASKET_SPOTS: Array[Vector3] = [Vector3(0.0, 0.0, 0.0), Vector3(-0.14, 0.0, 0.0), Vector3(0.15, 0.0, 0.0)]
+const BASKET_TURN: Array[float] = [0.0, 90.0, -80.0]
+const BASKET_FOLD: Array[float] = [0.7, 0.8, 0.95]
+## Galho da arvore do varal (wv3_world.bank_extras): rumo horizontal e raio no ponto do marcador M2_TreeBranch, que fica
+## 0,12 m acima do eixo do galho.
+const BRANCH_DIR := Vector3(-0.86, 0.0, 0.5)
+const BRANCH_RADIUS := 0.107
+const BRANCH_MARKER_LIFT := 0.12
+## Fallback sem metadado: reta antiga corrigida (rumo +23 graus, corda a 1,75 m).
+const LINE_YAW_DEG := 23.0
+const LINE_HEIGHT := 1.75
+const LINE_SLOTS: Array[float] = [-0.7, 0.0, 0.7]
 ## Carrinho a frente da Leme (m) e cores das cargas (barraca -> cor do caixote).
 const CART_AHEAD := 1.05
 const STALL_COLORS := {&"M4_Stall_Apple": Color("e0412b"), &"M4_Stall_Lemon": Color("f2c81d"), &"M4_Stall_Grapes": Color("4a6fd8")}
@@ -38,6 +58,8 @@ const CARGO_FLOOR := 0.652
 const CARGO_SCALE := 0.92
 const CARGO_SLOTS: Array[float] = [-0.4, 0.0, 0.4]
 const CART_KIT_INDEX := 1
+## G18: onde o caixote entregue fica, no local da barraca (+z = lado do cliente; balcao ate z 0,63 m).
+const STALL_DROP := Vector3(0.7, 0.0, 0.95)
 ## G6: topo da grade do M3 acima do marcador M3_Grate (medido por tests/prop_overlap.gd). A bola final tem origem no chao
 ## e recebia +0,16 m como o bloco provisorio (origem no centro): flutuava 4,1 cm na grade e 15,6 cm nas barracas.
 const BALL_GRATE_TOP := 0.119
@@ -70,6 +92,9 @@ var _cargo_box: Node3D
 var _ball: Node3D
 var _cart_xf: Transform3D
 var _hop_serial: int = 0
+## Pecas que ficam no mundo depois da missao (roupas no varal depois do M2); `clear()` nao apaga.
+var _after: Node3D
+var _basket: Node3D
 
 
 func setup(m: Ep01V3Main) -> void:
@@ -97,10 +122,9 @@ func _derive_points() -> void:
 	var to_line := line - branch
 	to_line.y = 0.0
 	points[&"TreeBase"] = Vector3(branch.x, 0.0, branch.z) + to_line.normalized() * 1.3
-	points[&"Basket"] = line + Vector3(0, 0.0, -0.9)
-	for i in LINE_SLOTS.size():
-		points[StringName("LineSlot_%d" % i)] = line + Basis(Vector3.UP, deg_to_rad(LINE_YAW_DEG)) * Vector3(LINE_SLOTS[i], 0, 0) \
-			+ Vector3(0, LINE_HEIGHT, 0)
+	points[&"Basket"] = line + BASKET_FROM_LINE
+	for i in 3:
+		points[StringName("LineSlot_%d" % i)] = line_slot(i).origin
 	var f1 := _mk(&"M3_FountainStep_1")
 	var f2 := _mk(&"M3_FountainStep_2")
 	var out := f1 - f2
@@ -126,10 +150,96 @@ func start_position(id: StringName) -> Vector3:
 		&"M2":
 			return _mk(&"M1_PawTrail_4")
 		&"M3":
-			return points[&"Basket"] + Vector3(-1.2, 0, 0)
+			return _mk(&"M2_Clothesline") + Vector3(-1.2, 0, -0.9)
 		&"M4":
 			return _mk(&"M3_BallStop") + Vector3(1.2, 0, 0.6)
 	return Vector3.INF
+
+
+## G18: polilinha da corda do varal (mundo). Vazia se o mundo nao trouxer o metadado.
+func rope_points() -> PackedVector3Array:
+	var mk := world.marker(&"M2_Clothesline") if world != null else null
+	if mk == null or not mk.has_meta(&"rope"):
+		return PackedVector3Array()
+	return mk.get_meta(&"rope") as PackedVector3Array
+
+
+## G18: ponto da corda no parametro t (0..1, polilinha de passos iguais) com a base da peca pendurada: X ao longo da
+## corda (com a inclinacao), Y para cima, Z = frente do pano.
+func rope_frame(t: float) -> Transform3D:
+	var pts := rope_points()
+	if pts.size() < 2:
+		var line := _mk(&"M2_Clothesline")
+		var b := Basis(Vector3.UP, deg_to_rad(LINE_YAW_DEG))
+		return Transform3D(b, line + b * Vector3((t - 0.5) * 2.0 * LINE_SLOTS[2] / 0.115, LINE_HEIGHT, 0))
+	var f := clampf(t, 0.0, 1.0) * (pts.size() - 1)
+	var i := mini(pts.size() - 2, int(f))
+	var p := pts[i].lerp(pts[i + 1], f - i)
+	var x := (pts[i + 1] - pts[i]).normalized()
+	var z := x.cross(Vector3.UP).normalized()
+	return Transform3D(Basis(x, z.cross(x), z), p)
+
+
+## G18: vaga `i` (0..2) do varal: transformacao da raiz da roupa pendurada (pivo = boca do prendedor no centro da corda).
+func line_slot(i: int) -> Transform3D:
+	var mk := world.marker(&"M2_Clothesline") if world != null else null
+	var slots := PackedFloat32Array([0.385, 0.5, 0.615])
+	if mk != null and mk.has_meta(&"rope_slots"):
+		slots = mk.get_meta(&"rope_slots") as PackedFloat32Array
+	if rope_points().size() < 2:
+		var b := Basis(Vector3.UP, deg_to_rad(LINE_YAW_DEG))
+		return Transform3D(b, _mk(&"M2_Clothesline") + b * Vector3(LINE_SLOTS[i], LINE_HEIGHT, 0))
+	return rope_frame(slots[i])
+
+
+## Caixa da peca no espaco local da raiz dela (todas as malhas, sem a animacao do no `Cloth`).
+static func piece_local_aabb(n: Node3D) -> AABB:
+	var out := AABB()
+	var first := true
+	var inv := n.global_transform.affine_inverse()
+	for mi: Node in n.find_children("*", "MeshInstance3D", true, false):
+		var m := mi as MeshInstance3D
+		if m.mesh == null:
+			continue
+		var b: AABB = (inv * m.global_transform) * m.mesh.get_aabb()
+		out = b if first else out.merge(b)
+		first = false
+	return out
+
+
+## Para a animacao da peca (sway/shake) e zera a pose do no `Cloth`: deitada no cesto, no telhado ou no chao.
+static func still(n: Node3D) -> void:
+	var ap := n.find_child("AnimationPlayer", true, false) as AnimationPlayer
+	if ap != null:
+		ap.stop()
+	var c := n.get_node_or_null(^"Cloth") as Node3D
+	if c != null:
+		c.rotation = Vector3.ZERO
+
+
+## Menor y (no espaco da base `b`) dos vertices da peca: o ponto que encosta no apoio.
+static func piece_low(n: Node3D, b: Basis) -> float:
+	var low := INF
+	var inv := n.global_transform.affine_inverse()
+	for mi: Node in n.find_children("*", "MeshInstance3D", true, false):
+		var m := mi as MeshInstance3D
+		if m.mesh == null:
+			continue
+		var xf := inv * m.global_transform
+		for v in m.mesh.get_faces():
+			low = minf(low, (b * (xf * v)).y)
+	return 0.0 if low == INF else low
+
+
+## Roupa deitada (pano na horizontal) com o meio em `at` (x, z) e o ponto mais baixo em `at.y`; `yaw` em graus; `fold` =
+## escala (roupa dobrada). `tilt` (graus) levanta o pano da horizontal (0 = deitado, 90 = em pe, pendurada).
+func lay_flat_xf(n: Node3D, at: Vector3, yaw: float, fold: float = 1.0, tilt: float = 0.0) -> Transform3D:
+	var bx := piece_local_aabb(n)
+	var b := Basis(Vector3.UP, deg_to_rad(yaw)) * Basis(Vector3.RIGHT, deg_to_rad(tilt) - PI / 2.0) \
+		* Basis.from_scale(Vector3.ONE * fold)
+	var c := b * bx.get_center()
+	var o := Vector3(at.x - c.x, at.y - piece_low(n, b) + 0.002, at.z - c.z)
+	return Transform3D(b, o)
 
 
 func handles(id: StringName) -> bool:
@@ -141,6 +251,7 @@ func handles(id: StringName) -> bool:
 func build(id: StringName) -> void:
 	clear()
 	mission_id = id
+	_ensure_after()
 	if not handles(id):
 		return
 	_root = Node3D.new()
@@ -162,6 +273,7 @@ func build(id: StringName) -> void:
 func clear() -> void:
 	if cart_holder != null:
 		_release_cart()
+	_keep_after()
 	spots.clear()
 	_pieces.clear()
 	_hung = 0
@@ -169,11 +281,115 @@ func clear() -> void:
 	_stream_next = 0
 	_cargo = 0
 	_hop_serial += 1
+	_basket = null
 	_set_busy(false)
 	if _root != null:
 		_root.queue_free()
 		_root = null
 	mission_id = &""
+
+
+# ---------------------------------------------------------------- estado depois da missao (G18)
+
+## Holder das pecas que ficam no mundo depois da missao (fora do `_root`, que `clear()` apaga).
+func _after_root() -> Node3D:
+	if _after == null or not is_instance_valid(_after):
+		_after = Node3D.new()
+		_after.name = "After"
+		add_child(_after)
+	return _after
+
+
+## Missao concluida: o que ela deixou no mundo fica (antes sumia quando a missao seguinte montava): M2 as 3 roupas no
+## varal e o cesto; M4 os 3 caixotes entregues na frente das barracas.
+func _keep_after() -> void:
+	var keep: Array = []
+	if mission_id == &"M2" and _hung >= 3:
+		keep = _pieces + ([_basket] if _basket != null else [])
+	elif mission_id == &"M4" and _cargo >= CARGO_ORDER.size() and _root != null:
+		for c in _root.get_children():
+			if c.get_meta(&"delivered", false):
+				keep.append(c)
+	if keep.is_empty():
+		return
+	var h := _after_root()
+	for p: Node in keep:
+		if is_instance_valid(p):
+			p.reparent(h, true)
+			p.set_meta(&"after_of", mission_id)
+	_basket = null
+
+
+## Retomada pelo salvo (ou missao comecada depois): monta o que as missoes ja concluidas deixaram no mundo.
+func _ensure_after() -> void:
+	if main == null:
+		return
+	if _mission_done(&"M2") and not _has_after(&"M2"):
+		var h := _after_root()
+		for i in Ep01V3Pieces.CLOTHS.size():
+			var c := Ep01V3Pieces.cloth(h, "ClothHung_%d" % i, Color.WHITE, i)
+			c.set_meta(&"after_of", &"M2")
+			c.global_transform = line_slot(i)
+			Ep01V3Pieces.play(c, &"sway")
+		var b := Ep01V3Pieces.final(h, "basket", "Basket")
+		if b != null:
+			b.set_meta(&"after_of", &"M2")
+			b.global_position = _floor_at(points[&"Basket"])
+			b.rotation.y = deg_to_rad(BASKET_YAW_DEG)
+	if _mission_done(&"M4") and not _has_after(&"M4"):
+		var h := _after_root()
+		for st: StringName in CARGO_ORDER:
+			var c := Ep01V3Pieces.crate(h, "Crate_" + String(st), STALL_COLORS[st], st)
+			c.set_meta(&"after_of", &"M4")
+			c.scale = Vector3.ONE * CARGO_SCALE
+			c.global_transform = stall_drop_xf(st, c)
+
+
+func _has_after(id: StringName) -> bool:
+	if _after == null or not is_instance_valid(_after):
+		return false
+	for c in _after.get_children():
+		if c.get_meta(&"after_of", &"") == id and not c.is_queued_for_deletion():
+			return true
+	return false
+
+
+## G18: caixote entregue no chao, na frente da barraca (lado do cliente), ao lado do painel do balcao. O balcao e todo
+## ocupado pelos caixotes de produtos do kit `stall`; antes o caixote ia para 0,95 m acima do marcador e 0,5 m alem dele,
+## no ar (95 cm sem apoio).
+func stall_drop_xf(stall: StringName, crate: Node3D) -> Transform3D:
+	var m := _mk(stall)
+	var c := Vector3(m.x, 0.0, m.z)
+	var yaw := 0.0
+	var kind := {&"M4_Stall_Apple": "stall_red", &"M4_Stall_Lemon": "stall_yellow", &"M4_Stall_Grapes": "stall_blue"}
+	var best := INF
+	for r: Array in (world.layout.get("kit", {}) as Dictionary).get(kind.get(stall, ""), []):
+		var p := Vector3(float(r[0]), 0.0, float(r[2]))
+		var d := p.distance_to(c)
+		if d < best and d < 2.5:
+			best = d
+			yaw = deg_to_rad(float(r[3]))
+			c = p
+	if best == INF:
+		c = m - (m - Vector3(c.x, 0, c.z)).normalized() * 1.4
+	var b := Basis(Vector3.UP, yaw)
+	var at := _floor_at(c + b * STALL_DROP + Vector3(0, m.y, 0))
+	return Transform3D(Basis(Vector3.UP, yaw + deg_to_rad(6.0)).scaled(crate.scale), at)
+
+
+## O M2 monta de novo (retomada no proprio M2): as roupas do varal saem do estado "depois".
+func _drop_after() -> void:
+	if _after != null and is_instance_valid(_after):
+		for c in _after.get_children():
+			if c.get_meta(&"after_of", &"") == &"M2":
+				c.queue_free()
+
+
+func _mission_done(id: StringName) -> bool:
+	for m: Mission in main.missions:
+		if m.id == id:
+			return m.is_completed()
+	return false
 
 
 func _spot(id: StringName, pos: Vector3, icon: StringName, label_key: String, member: StringName, radius: float = 1.4,
@@ -307,10 +523,23 @@ func _build_m1() -> void:
 
 
 # M2: Pico solta 2 pecas (galpao, arvore); Rastro acha a 3a nos juncos; qualquer um pendura as 3.
+# G18: camiseta deitada no telhado do anexo, lenco preso pelo lado do galho baixo, meia deitada no chao dos juncos; cesto
+# no chao ao pe do varal (as soltas deitam nele).
 func _build_m2() -> void:
-	_cloth(_mk(&"M2_ShedTop") + Vector3(0, 0.25, 0.3), Color("e85d75"), "ClothShed")
-	_cloth(_mk(&"M2_TreeBranch") + Vector3(0, 0.15, 0), Color("4fa3e0"), "ClothTree")
-	_cloth(_mk(&"M2_ReedsPiece") + Vector3(0, 0.25, 0), Color("f2c81d"), "ClothReeds")
+	_drop_after()
+	var shed := _cloth(_mk(&"M2_ShedTop"), Color("e85d75"), "ClothShed")
+	still(shed)
+	shed.global_transform = lay_flat_xf(shed, _mk(&"M2_ShedTop") + Vector3(0.05, 0, 0.3), 200.0)
+	var tree := _cloth(_mk(&"M2_TreeBranch"), Color("4fa3e0"), "ClothTree")
+	tree.global_transform = branch_xf()
+	var reeds := _cloth(_mk(&"M2_ReedsPiece"), Color("f2c81d"), "ClothReeds")
+	still(reeds)
+	# meia caida de pe entre os juncos, inclinada (deitada ela some no capim alto)
+	reeds.global_transform = lay_flat_xf(reeds, _floor_at(_mk(&"M2_ReedsPiece") + Vector3(-0.1, 0, 0.15)), 35.0, 1.0, 62.0)
+	_basket = Ep01V3Pieces.final(_root, "basket", "Basket")
+	if _basket != null:
+		_basket.global_position = _floor_at(points[&"Basket"])
+		_basket.rotation.y = deg_to_rad(BASKET_YAW_DEG)
 	_spot(&"shed_climb", points[&"ShedBase"], &"carabiner", "ui.action.climb", &"climber")
 	_spot(&"shed_free", _mk(&"M2_ShedTop"), &"rope", "ui.action.free", &"climber", 1.2)
 	_spot(&"tree_climb", points[&"TreeBase"], &"carabiner", "ui.action.climb", &"climber")
@@ -564,9 +793,8 @@ func _on_spot(id: StringName, actor: Node3D) -> void:
 			await _hop_chain(actor as MemberActor, [_mk(&"M2_TreeBranch")])
 		&"shed_free", &"tree_free":
 			var piece := _pieces[0] if id == &"shed_free" else _pieces[1]
-			piece.set_meta(&"freed", true)
 			FeedbackFx.sparkle(world, piece.global_position)
-			_fly(piece, _basket_slot(), 0.6)
+			_to_basket(piece)
 			main.notify_mission(&"piece_freed")
 			if id == &"shed_free":
 				main.say("ep01.bank.climber.sock_high")
@@ -574,14 +802,12 @@ func _on_spot(id: StringName, actor: Node3D) -> void:
 			await _hop_chain(actor as MemberActor, [base])
 		&"reeds":
 			_examine(actor, it)
-			_pieces[2].set_meta(&"freed", true)
-			_fly(_pieces[2], _basket_slot(), 0.6)
+			_to_basket(_pieces[2])
 			if main.notify_mission(&"piece_found"):
 				main.say("ep01.bank.tracker.wet_paw")
 		&"hang":
 			if _hung < 3:
-				_fly(_pieces[_hung], points[StringName("LineSlot_%d" % _hung)], 0.45)
-				_pieces[_hung].rotation = Vector3(0, deg_to_rad(LINE_YAW_DEG), 0)
+				_fly_xf(_pieces[_hung], line_slot(_hung), 0.45)
 				Ep01V3Pieces.play(_pieces[_hung], &"sway")
 				_hung += 1
 				FeedbackFx.sparkle(world, points[StringName("LineSlot_%d" % (_hung - 1))])
@@ -631,7 +857,8 @@ func _deliver(stall: StringName) -> void:
 		_cargo_box.remove_child(crate)
 		_root.add_child(crate)
 		crate.global_position = cart.global_position + Vector3(0, 1.0, 0)
-		_fly(crate, _mk(stall) + Vector3(0, 0.95, 0) + (_mk(stall) - cart.global_position).normalized() * 0.5, 0.5)
+		crate.set_meta(&"delivered", true)
+		_fly_xf(crate, stall_drop_xf(stall, crate), 0.5)
 	FeedbackFx.sparkle(world, _mk(stall) + Vector3(0, 1.0, 0))
 	_cargo += 1
 	_refresh_cargo()
@@ -641,12 +868,53 @@ func _deliver(stall: StringName) -> void:
 	main.notify_mission(&"cargo_delivered")
 
 
-func _basket_slot() -> Vector3:
-	var n := 0
-	for p in _pieces:
-		if p.get_meta(&"freed", false):
-			n += 1
-	return points[&"Basket"] + Vector3(-0.3 + 0.3 * (n - 1), 0.08 + 0.03 * n, 0)
+## G18: a peca solta voa e deita no cesto, na vaga dela, por cima do que ja esta embaixo (caixas no mundo).
+func _to_basket(piece: Node3D) -> void:
+	piece.set_meta(&"freed", true)
+	_fly_xf(piece, basket_xf(piece), 0.6)
+
+
+## Onde a peca deita no cesto: vaga fixa por peca (BASKET_SPOTS) e altura = topo do que ja esta no cesto sob ela.
+func basket_xf(piece: Node3D) -> Transform3D:
+	var k := maxi(0, _pieces.find(piece))
+	var bb := Basis(Vector3.UP, deg_to_rad(BASKET_YAW_DEG))
+	var base := _floor_at(points[&"Basket"]) if _basket == null else _basket.global_position
+	var at := base + bb * BASKET_SPOTS[k] + Vector3(0, BASKET_FLOOR, 0)
+	var xf := lay_flat_xf(piece, at, BASKET_YAW_DEG + BASKET_TURN[k], BASKET_FOLD[k])
+	var mine: AABB = xf * piece_local_aabb(piece)
+	for other in _pieces:
+		if other == piece or not other.get_meta(&"in_basket", false):
+			continue
+		var ob: AABB = (other.get_meta(&"basket_xf") as Transform3D) * piece_local_aabb(other)
+		var flat_a := Rect2(mine.position.x, mine.position.z, mine.size.x, mine.size.z)
+		var flat_b := Rect2(ob.position.x, ob.position.z, ob.size.x, ob.size.z)
+		if flat_a.intersects(flat_b):
+			at.y = maxf(at.y, ob.end.y + 0.004)
+	xf = lay_flat_xf(piece, at, BASKET_YAW_DEG + BASKET_TURN[k], BASKET_FOLD[k])
+	piece.set_meta(&"in_basket", true)
+	piece.set_meta(&"basket_xf", xf)
+	still(piece)
+	return xf
+
+
+## G18: lenco preso pelo lado do galho baixo (fora da casca), com X ao longo do galho e o pano virado para o varal.
+func branch_xf() -> Transform3D:
+	var axis := _mk(&"M2_TreeBranch") - Vector3(0, BRANCH_MARKER_LIFT, 0)
+	var x := BRANCH_DIR.normalized()
+	var out := Vector3(-x.z, 0, x.x)
+	if out.dot(_mk(&"M2_Clothesline") - axis) < 0.0:
+		out = -out
+	var z := out
+	return Transform3D(Basis(x, Vector3.UP, z) if x.cross(Vector3.UP).dot(z) > 0.0 else Basis(-x, Vector3.UP, z),
+		axis + out * (BRANCH_RADIUS + 0.03) + Vector3(0, 0.02, 0))
+
+
+## Voo com giro (quaternio) e escala ate a transformacao final; a raiz das pecas e identidade (local = mundo).
+func _fly_xf(node: Node3D, to: Transform3D, t: float) -> void:
+	var tw := node.create_tween().set_parallel(true)
+	tw.tween_property(node, "global_position", to.origin, t).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tw.tween_property(node, "quaternion", to.basis.get_rotation_quaternion(), t)
+	tw.tween_property(node, "scale", to.basis.get_scale(), t)
 
 
 func _fly(node: Node3D, to: Vector3, t: float) -> void:

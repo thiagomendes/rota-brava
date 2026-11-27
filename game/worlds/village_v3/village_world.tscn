@@ -73,6 +73,8 @@ metadata/mission = "M2"
 [node name="M2_Clothesline" type="Marker3D" parent="Markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, -0.006, 7.85)
 metadata/mission = "M2"
+metadata/rope = PackedVector3Array(9.75, 1.9855, 9, 10.2142, 1.9214, 8.8017, 10.6783, 1.8617, 8.6033, 11.1425, 1.8105, 8.405, 11.6067, 1.7714, 8.2067, 12.0708, 1.7471, 8.0083, 12.535, 1.7392, 7.81, 12.9992, 1.7483, 7.6117, 13.4633, 1.7739, 7.4133, 13.9275, 1.8142, 7.215, 14.3917, 1.8666, 7.0167, 14.8558, 1.9275, 6.8183, 15.32, 1.9928, 6.62)
+metadata/rope_slots = PackedFloat32Array(0.385, 0.5, 0.615)
 
 [node name="M2_ReedsPiece" type="Marker3D" parent="Markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.4, -0.012, 3.6)

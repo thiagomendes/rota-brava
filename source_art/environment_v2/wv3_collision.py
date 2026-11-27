@@ -482,6 +482,11 @@ def write_scenes(repo, inst, houses, lights, props_info, bank_info, terr):
                   "transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, %g, %g, %g)" % p, 'metadata/mission = "%s"' % mis]
         if water:
             lines.append("metadata/water = true")
+        cl = bank_info.get("clothesline")
+        if name == "M2_Clothesline" and cl:
+            # G18: corda real do varal (mesma polilinha do tubo do wv2_static) e vagas das pecas do M2 (t ao longo dela)
+            lines.append("metadata/rope = PackedVector3Array(%s)" % ", ".join("%g, %g, %g" % p for p in cl["rope"]))
+            lines.append("metadata/rope_slots = PackedFloat32Array(%s)" % ", ".join("%g" % t for t in cl["slots"]))
         lines.append("")
     for name, mis, p, ry, meta in EXTRA_MARKERS:
         c, s_ = math.cos(math.radians(ry)), math.sin(math.radians(ry))
