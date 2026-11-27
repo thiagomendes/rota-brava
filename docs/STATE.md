@@ -52,7 +52,10 @@
 - **Em andamento:**
   - G18: varal do M2.
   - G19: clipes de carregar e escalar, e depois a integração das 31 ações da auditoria, todas na ordem, por decisão de Thiago.
-  - G21: Lumi, operador do Farol 7 (homem), a base e a Vila Maré.
+  - G21: a arte do Lumi e da base já está integrada; falta o plano na abertura, que espera o aval visual de Thiago.
+  - G22 (iPhone, build 3):
+    - G22b (rádio no nível das vozes, −0,26 LU) e G22c (Vila Maré) estão revisados e integrados; falta Thiago ouvir.
+    - G22a ("?" no lugar do "H" e disco de 128 px no toque) está em revisão.
 - **Próximo:**
   - Thiago dispara os builds iOS/Android e confere a abertura no iPhone.
   - Lote de vozes de 2026-11-28 08:20 UTC.
