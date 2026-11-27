@@ -904,3 +904,11 @@ Critérios de aceite:
 - `ep01_v3`, `voice_v3` e `cutscene` OK, mais a suíte completa;
 - o lote de vozes de 28/11 prioriza essas chaves.
 - **Decisão de Thiago sobre o G21i (2026-11-27):** a fala da ajuda não cita tecla nem botão, porque o jogo é multiplataforma. Legenda e voz dizem o mesmo: "Precisou? Aperte o botão de ajuda que eu ajudo!". É o disco "?" pulsando, com o selo do aparelho em uso, que mostra onde fica a ajuda.
+- **Revisão G23** (`reviewer`, 2026-11-27): **APROVADO** com ressalvas, nenhuma bloqueante. `characters,assets,feet_gap,cutscene` deu 1929 PASS, e o teste falha nos GLB antigos (+37,4 a +41,5 mm). Nos 3 GLB, ossos, skins e animações estão idênticos byte a byte. O manifesto confere com sha e bytes. Os tris estão no orçamento; o capitão tem 24 242, a 758 do teto. Ressalvas (dívida do `art3d`):
+  - **`Lumi_Hair` derivou, e "resto da malha igual" é falso aqui:** 154 vértices, até 5,6 mm, mais pesos e texturas do cabelo. A provável causa é não determinismo no build do cabelo.
+  - **`Amora_Face`:** 4 normais invertidas.
+  - **Atlas de roupa e equipamento refeitos:** é esperado pelo UV novo.
+  - **Manifesto:** não lista os scripts de medida e de render.
+  - **Visual:** sai como bota ou tênis de cano, não tornozelo, e fica para Thiago.
+
+  A mensagem do `63b7612` tem o "antes" errado; o certo está aqui e no PROVENANCE. Merge em `feature/rb-r1-reorientacao`.
