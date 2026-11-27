@@ -132,13 +132,13 @@ func run(runner) -> void:
 		r.check(not sub.get_global_rect().intersects(hud.action_button().get_global_rect()), "[%s] balao e botao de acao nao se sobrepoem" % ratio)
 		# glifo por dispositivo, sem mudar estado
 		var before := hud.prompt_text()
-		hud.set_device(&"pad")
-		r.check(hud.glyph_text() == Loc.t("ui.glyph.pad"), "[%s] controle: glifo '%s'" % [ratio, hud.glyph_text()])
+		hud.set_device(&"pad", InputDevice.XBOX)
+		r.check(hud.glyph_id() == &"xbox_west", "[%s] controle: glifo '%s'" % [ratio, hud.glyph_id()])
 		hud.set_device(&"touch")
 		var badge := hud.find_child("GlyphBadge", true, false) as Control
 		r.check(not badge.visible and hud.prompt_text() == before and hud.prompt_visible(), "[%s] toque: sem glifo e o prompt nao muda" % ratio)
 		hud.set_device(&"keyboard")
-		r.check(hud.glyph_text() == Loc.t("ui.glyph.keyboard"), "[%s] teclado: glifo '%s'" % [ratio, hud.glyph_text()])
+		r.check(hud.glyph_id() == &"key_e", "[%s] teclado: glifo '%s'" % [ratio, hud.glyph_id()])
 		# retrato renderizado
 		var tex := IconView.texture_for(&"star")
 		hud.set_portrait_texture(&"climber", tex)
