@@ -19,6 +19,9 @@ func run(runner) -> void:
 	await _case("game_intro", "res://episodes/ep01/v3/cutscene/game_intro.tscn")
 	Ep01V3Cutscene.reset_seen()
 	await _case("ep01", "res://episodes/ep01/v3/ep01_v3_main.tscn")
+	await _skip_while_waiting()
+	await _released_by(&"hold_timeout")
+	await _released_by(&"fail")
 	GameIntroScene.next_scene = prev_next
 	Ep01V3Cutscene.enabled = was
 	Ep01V3Cutscene.reset_seen()
@@ -93,4 +96,92 @@ func _case(label: String, path: String) -> void:
 	r.tree.current_scene = null
 	scene.queue_free()
 	holder.queue_free()
+	await r.frames(3)
+
+
+## Palco leve: vila + HUD + player de cenas (sem o jogo).
+func _stage() -> Array:
+	var root := Node3D.new()
+	r.tree.root.add_child(root)
+	var world := (load(GameIntroScene.WORLD_SCENE) as PackedScene).instantiate() as VillageWorld
+	root.add_child(world)
+	var hud := Hud.new()
+	root.add_child(hud)
+	var cs := Ep01V3Cutscene.new()
+	root.add_child(cs)
+	cs.setup(world, hud, {})
+	return [root, hud, cs]
+
+
+func _cover() -> SceneLoaderService:
+	var loader := SceneLoaderService.instance()
+	loader.cover_current()
+	loader._settle_left = 100000
+	return loader
+
+
+func _settle(loader: SceneLoaderService) -> void:
+	var t0 := Time.get_ticks_msec()
+	while loader.is_busy() and Time.get_ticks_msec() - t0 < 10000:
+		await r.tree.process_frame
+
+
+## Pular (cena ja vista) durante a espera da tela: termina na hora, sem fala, e a cena nao recomeca depois.
+func _skip_while_waiting() -> void:
+	var st := _stage()
+	var hud := st[1] as Hud
+	var cs := st[2] as Ep01V3Cutscene
+	var lines: Array[String] = []
+	hud.line_started.connect(func(k: String) -> void: lines.append(k))
+	Ep01V3Cutscene.mark_seen(&"m1_intro")
+	var loader := _cover()
+	var ended: Array = []
+	cs.finished.connect(func(id: StringName, skipped: bool) -> void: ended.append([id, skipped]))
+	r.check(cs.play(&"m1_intro") and cs.waiting_screen, "cutscene cover: cena vista espera a tela")
+	await r.frames(3)
+	r.check(cs.skip(), "cutscene cover: pular funciona durante a espera da tela")
+	r.check(not cs.playing and not cs.waiting_screen and ended.size() == 1 and bool(ended[0][1]),
+		"cutscene cover: pular na espera termina a cena (pulada) %s" % str(ended))
+	loader._settle_left = 0
+	await _settle(loader)
+	await r.frames(3)
+	r.check(lines.is_empty() and cs.shot_index < 0 and ended.size() == 1,
+		"cutscene cover: cena pulada na espera nao fala nem recomeca ao liberar %s" % str(lines))
+	(st[0] as Node).queue_free()
+	await r.frames(3)
+
+
+## Teto da tela segurada (loading_hold) ou falha de carga: o loader vai a FADING_OUT e a cena comeca.
+func _released_by(how: StringName) -> void:
+	var st := _stage()
+	var cs := st[2] as Ep01V3Cutscene
+	var holder := Node.new()
+	var gd := GDScript.new()
+	gd.source_code = "extends Node\nfunc loading_hold() -> bool:\n\treturn true\n"
+	gd.reload()
+	holder.set_script(gd)
+	r.tree.root.add_child(holder)
+	var prev_scene: Node = r.tree.current_scene
+	r.tree.current_scene = holder
+	var loader := _cover()
+	var prev_max := loader.hold_max_ms
+	r.check(cs.play(&"m1_intro") and cs.waiting_screen, "cutscene cover %s: cena espera a tela" % how)
+	await r.frames(5)
+	r.check(cs.shot_index < 0, "cutscene cover %s: sem plano enquanto a tela segura" % how)
+	if how == &"hold_timeout":
+		loader.hold_max_ms = 50
+		loader._settle_left = 0
+	else:
+		loader._fail("teste G17")
+	var t0 := Time.get_ticks_msec()
+	while cs.shot_index < 0 and Time.get_ticks_msec() - t0 < 5000:
+		await r.tree.process_frame
+	r.check(cs.shot_index == 0 and not cs.waiting_screen,
+		"cutscene cover %s: tela liberada (fase %d) e a cena comeca" % [how, loader.phase])
+	await _settle(loader)
+	loader.hold_max_ms = prev_max
+	cs._finish(true)
+	r.tree.current_scene = prev_scene
+	holder.queue_free()
+	(st[0] as Node).queue_free()
 	await r.frames(3)

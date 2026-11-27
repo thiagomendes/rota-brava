@@ -36,6 +36,7 @@ func run(runner) -> void:
 		_key_t = _cs.time
 		line_frames.append([k, _cs.time, _cs.shot_index]))
 	hud.line_finished.connect(func() -> void: _key = "")
+	_radio_shot_length()
 	var voiced := 0
 	for id in Ep01V3Cutscene.scene_ids():
 		voiced += await _scene(id, hud, line_frames)
@@ -45,6 +46,26 @@ func run(runner) -> void:
 	await r.frames(3)
 	Ep01V3Cutscene.enabled = was_enabled
 	Ep01V3Cutscene.reset_seen()
+
+
+## G20/G17: shot_length sem o piso da ficha (duration 0) em toda fala de radio com voz das cenas: tem de caber
+## voz + cliques + folga. (Com a duracao da ficha o max esconderia um plano planejado sem os cliques.)
+func _radio_shot_length() -> void:
+	var checked := 0
+	var bad: Array[String] = []
+	for id in Ep01V3Cutscene.scene_ids():
+		for sh: Variant in Ep01V3Cutscene.scene_data(id).get("shots", []):
+			var k := Ep01V3Cutscene.line_key(sh as Dictionary)
+			var v := _voice(k) if k != "" else 0.0
+			if v <= 0.0 or not AudioDirector.is_radio_line(k):
+				continue
+			checked += 1
+			var need := v + Hud.radio_extra_seconds(k) + Hud.VOICE_TAIL
+			var got := Ep01V3Cutscene.shot_length({"duration": 0.0, "line": {"key": k}})
+			if got + 0.0001 < need:
+				bad.append("%s %.3f < %.3f" % [k, got, need])
+	r.check(checked >= 1 and bad.is_empty(),
+		"cutscene sync: plano de radio sem piso da ficha cabe voz + cliques + folga (%d falas) %s" % [checked, str(bad)])
 
 
 static func _voice(key: String) -> float:
