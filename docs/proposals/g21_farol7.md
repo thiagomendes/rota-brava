@@ -37,7 +37,7 @@ Nenhuma das três lembra um personagem infantil conhecido, até onde sei. **Não
 - Voz Schedar, versão crua (aprovada em 2026-11-25). O tom muda de "locutor de notícias da vila" para "colega que cuida da equipe".
 
 ### Visual (para o `art3d`, no padrão dos secundários v2)
-- **Silhueta-chave:** **coque alto e redondo** no topo da cabeça. Na lateral do fone sai uma **antena curta com bolinha coral**, e a bolinha acende quando ela fala. De costas e a 48 px, o contorno fica "coque + antena", diferente de todos:
+- **Silhueta-chave:** **coque alto e redondo** no topo da cabeça. Na lateral do fone sai uma **antena curta com bolinha coral**, e a bolinha é uma esfera simples na cor coral da atlas (o "acender" é opcional, ver seção 5). De costas e a 48 px, o contorno fica "coque + antena", diferente de todos:
   - Rastro: chapéu de aba larga.
   - Pico: capacete com lanterna.
   - Leme: boné náutico e fones. Os fones da Leme são de ouvido; os da [NOME] são de **arco com microfone de haste**.
@@ -87,7 +87,7 @@ O lugar é bom porque vem depois de o trio se apresentar (a criança já conhece
 | # | s | Câmera | Quem e clipe | Fala (chave · texto) |
 |---|---|---|---|---|
 | 9a | 3,0 | Fora: a casa-torre na ponta das pedras, com a luz amarela girando. Corte para dentro com `dolly` lento, da escotilha até a cadeira de costas. | [NOME] de costas, girando a cadeira para a câmera (`turn_chair`) | `ep01.narrator.intro.base` (narrator) · **E aqui é o Farol 7, a base da equipe!** (8 palavras) |
-| 9b | 3,5 | Plano médio frontal: ela na cadeira, com o mapa com os pinos do trio atrás à esquerda. | [NOME] `wave` e depois `talk`, com a antena acesa | `ep01.radio.intro.hello` (radio) · **Na escuta! Sou a [NOME], do rádio.** (7 palavras) |
+| 9b | 3,5 | Plano médio frontal: ela na cadeira, com o mapa com os pinos do trio atrás à esquerda. | [NOME] `wave` e depois `talk` | `ep01.radio.intro.hello` (radio) · **Na escuta! Sou a [NOME], do rádio.** (7 palavras) |
 | 9c | 3,5 | Aproxima da mão no microfone, com a escotilha e a vila longe ao fundo. **O disco da ajuda do HUD aparece e pulsa durante o plano.** | [NOME] `point` para a câmera e depois `thumbs_up` | `ep01.radio.intro.help` (radio) · **Precisou? Aperte {help} que eu ajudo!** (6 palavras com o glifo) |
 
 - A fala 9c usa o marcador `{help}`. O G15 desenha o glifo do aparelho em uso: a tecla H no teclado, o botão do controle ou a mão no toque.
@@ -102,7 +102,7 @@ O lugar é bom porque vem depois de o trio se apresentar (a criança já conhece
 ### 4.1 Regra
 - As **dicas de missão** (`ep01.radio.v3_m*`) **ficam como estão**. Já começam pelo nome do herói e são concretas; pôr o nome dela em cada dica alongaria as frases sem ajudar. Quem fala aparece no **retrato da legenda**.
 - O **nome dela** entra só onde ela **chega ao rádio**: a apresentação e os convites da ajuda.
-- `member.radio.name`: "Farol 7" → "**[NOME]**". O retrato do HUD passa a ser o rosto dela, com a antena acesa. O `speaker_for` não muda, porque a chave continua `radio`.
+- `member.radio.name`: "Farol 7" → "**[NOME]**". O retrato do HUD passa a ser o rosto dela. O `speaker_for` não muda, porque a chave continua `radio`.
 
 ### 4.2 Trocas propostas (não aplicadas)
 | Chave | Hoje | Proposta | Voz? |
@@ -132,14 +132,19 @@ Trocar "Voz de Farol 7, o rádio amigo da vila, locutor gentil…" por "Voz de [
 ## 5. O que cada agente precisa
 
 ### `art3d`
-1. **Modelo da [NOME]** no padrão dos secundários v2 (G4: mesmo pipeline do capitão e da Amora, olhos abertos do G1):
-   - Malha com coque alto, fone de arco com haste de microfone e antena com bolinha coral. A bolinha usa um material próprio (`antenna_tip`) para o `gameplay` acender quando ela fala.
+1. **Modelo da [NOME]: critério de qualidade explícito (pedido de Thiago).** Ela tem de seguir o padrão dos outros personagens, e o modelo só entra no jogo se cumprir todos os pontos:
+   - **Mesmo pipeline** do trio e dos secundários v2: SKIN + SUBSURF, atlas assada em PBR, sem contorno. Usar `source_art/characters/secondary_v2/sv2_human.py` (adulta, como o capitão e a Dona Amora) ou o gerador do trio, conforme a idade; para uma adulta de cerca de 30 anos, o `sv2_human.py`.
+   - **Mãos encaixadas na manga, sem vão.**
+   - **Olhos abertos (G1)** e **idle com braços relaxados.**
+   - **Proporção coerente com o elenco:** mais alta que o trio, perto da altura da Dona Amora, com cabeça e olhos na mesma família de formas.
+   - **Captura lado a lado** com o trio, o capitão e a Dona Amora (de frente, de costas e de perfil) e **revisão antes de entrar no jogo** (`reviewer`, depois Thiago).
+   - **Realizável nesse padrão:** coque alto, fone de arco e haste do microfone são formas simples (esfera, toro e cilindro chanfrados) presas ao esqueleto pela cabeça, sem cabelo solto nem fio. A antena é um cilindro curto com uma esfera coral, pintados na atlas. Não precisa de material próprio: se o "acender ao falar" exigir material separado e quebrar a atlas única, ele fica de fora e quem fala continua sendo mostrado pelo retrato da legenda. Faixa coral no ombro e emblema no peito vão pintados na atlas, sem geometria extra. Se algum detalhe não sustentar o padrão, o `art3d` simplifica e avisa.
    - Clipes: `idle_seated`, `turn_chair` (de costas para a frente, cerca de 1 s), `wave`, `talk` (loop), `point`, `thumbs_up`, `idle_standing` (reserva).
    - Visemas, ou pelo menos boca que abre, como os outros que falam.
    - Rodar a auditoria `prop_overlap` (G6) no cenário.
 2. **Cenário `base_farol7`**, separado da vila. Sala com cerca de 10 peças (seção 2), cadeira com pivô de giro e luz própria. O fundo visto pela escotilha pode ser uma imagem da vila tirada da cena real, com o farol da vila visível.
 3. **Exterior da casa-torre** para o começo do plano 9a: uma peça pequena na ponta das pedras com a luz amarela giratória. Basta para um plano de 1 a 1,5 s.
-4. **Retrato do HUD** no formato dos retratos v2 (E7), com a antena acesa. Substitui o retrato atual do Farol 7.
+4. **Retrato do HUD** no formato dos retratos v2 (E7), no mesmo padrão dos retratos do trio. Substitui o retrato atual do Farol 7.
 5. Marcadores do cenário: `Base_Chair`, `Base_CamWide`, `Base_CamMic` e `Base_Exterior` (este último na vila, se a casa-torre entrar no mundo).
 
 ### `gameplay`
@@ -149,7 +154,7 @@ Trocar "Voz de Farol 7, o rádio amigo da vila, locutor gentil…" por "Voz de [
 
    A escolha e o teste são do `gameplay`.
 2. **Ficha:** substituir o plano 9 de `game_intro` em `ep01_v3_cutscenes.json` pelos planos 9a, 9b e 9c (seção 3). Atualizar `total_duration` (123,0 → 129,0) e o orçamento do `ep01_v3_cutscenes.md`.
-3. **Ator novo `operator`** (ou `radio`) no elenco da cutscene, com os clipes da seção 5 e a antena acesa enquanto a fala dela toca.
+3. **Ator novo `operator`** (ou `radio`) no elenco da cutscene, com os clipes da seção 5. Acender a antena enquanto ela fala só se o `art3d` entregar isso sem sair do padrão (item 1 do `art3d`).
 4. **Glifo na legenda.**
    - O `_sub_text` do HUD é um `Label` (`game/ui/hud.gd`, linha 88) e mostraria `{help}` escrito. A legenda precisa passar a usar o `GlyphText` (G15) quando o texto tiver um marcador.
    - Conferi que a intenção `help` existe na Input Map e que o `GlyphText` aceita qualquer intenção que ela tenha.
