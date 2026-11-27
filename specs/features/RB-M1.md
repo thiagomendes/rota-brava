@@ -120,3 +120,15 @@ O GitHub só mostra o "Run workflow" quando o arquivo do workflow existe na bran
   - 2ª: APROVADO. A mutação remove o `_notification` e o teste falha (3 falhas). O alvo do "H" tem 128 px.
   - Resultados: `touch_controls` 65, `ui_` 248 e `assets` 282.
   - Pendente no aparelho: o conforto do toque e se o herói fica parado quando o app vai para segundo plano.
+- **G16 integrado** (`feature/rb-r1-g16-carga-segura`, autor `gameplay`): carga segura contra impasse.
+  - Fila única no `SceneLoader`: um `load_threaded_request` por vez, sem sub-threads, e nenhum outro ponto do jogo faz esse pedido.
+  - O `title_screen` carrega a imagem parada, o logo e o shader antes de qualquer pedido.
+  - No celular (`OS.has_feature("mobile")`), o menu usa só a imagem parada (`MOBILE_KEY_ART_3D = false` em `title_screen.gd`).
+  - Teste `test_scene_loader_safety`: no código antigo dá 6 falhas (menu com 7 pedidos simultâneos, loader com 6). Suíte completa do autor: `OK (4359 PASS)`.
+  - Revisão (`reviewer`): APROVADO, refazendo a prova do código antigo.
+  - Ressalvas abertas:
+    - um órfão recolhido pode roubar a vila de uma volta rápida ao menu; isso só degrada para o palco antigo e não trava;
+    - cerca de 120 `load()` síncronos fora da fila, de risco baixo no desktop e quase nulo no celular;
+    - "Parse Error" no fechamento: um pedido ainda vivo ao sair, que já existia antes do G16;
+    - cancelamento e falha de carga não são exercitados pelo teste.
+  - **Confirmar no iPhone que o travamento sumiu** é o próximo passo, com o build 2.
