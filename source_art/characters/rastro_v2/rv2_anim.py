@@ -135,11 +135,17 @@ for _n, (_a, _b) in {"wave": (0.68, 1.01), "celebrate": (0.50, 0.83), "team_pose
     CLIPS[_n] = (CLIPS[_n][0], CLIPS[_n][1], short_squint(CLIPS[_n][2], _a, _b))
 CLIPS["point"] = (CLIPS["point"][0], CLIPS["point"][1], blink_once(CLIPS["point"][2], 0.80))
 CLIP_SET = ["idle", "walk", "run", "stop", "crouch", "inspect_touch", "look_to_leme", "react_surprise", "point", "wave", "celebrate", "team_pose"]
+# RB-R1 G19: pegar, levar, pousar e examinar (hero_anim.g19_clips; carry_walk com o mesmo passo do WALK acima)
+G19 = ha.g19_clips(WALK)
+CLIPS.update(G19)
+CLIP_SET = ha.g19_names() + CLIP_SET   # G19 antes: o ultimo clipe gravado (pose em que o info.json mede a altura) segue o de antes
 GEAR_KEYS = ("fist_R", "fist_L")
 
 
 def author(rig, face_ob, F, names=CLIP_SET, gear_ob=None):
-    """Grava cada clipe como Action + faixa NLA (corpo), Action de shape keys do rosto e, se houver, das luvas (punho)."""
+    """Grava cada clipe como Action + faixa NLA (corpo), Action de shape keys do rosto e, se houver, das luvas (punho).
+    G19: cria antes os ossos HoldPoint/HoldPoint_L (sem deformacao) e mede os clipes novos em report["g19"]."""
+    ha.add_hold_points(rig)
     R = cl.Rigger(rig)
     sk = face_ob.data.shape_keys
     sk.animation_data_create()
@@ -175,7 +181,7 @@ def author(rig, face_ob, F, names=CLIP_SET, gear_ob=None):
             if name == "inspect_touch":
                 best = min(best, (R.tip("hand.R") - ha.TOUCH_TARGET).length)
             R.apply(i, prev)
-            for kn in ha.FACE_KEYS:
+            for kn in ha.FACE_KEYS + ha.G19_FACE_EXTRA:
                 kb = sk.key_blocks[kn]
                 kb.value = max(0.0, min(1.0, fc.get(kn, 0.0)))
                 kb.keyframe_insert("value", frame=i)
@@ -196,4 +202,5 @@ def author(rig, face_ob, F, names=CLIP_SET, gear_ob=None):
             tr.name = name
             st = tr.strips.new(name, 0, a_)
             st.name = name
+    report["g19"] = {n: ha.g19_measure(R, F, n, CLIPS[n][2], CLIPS[n][0]) for n in names if n in G19}
     return report

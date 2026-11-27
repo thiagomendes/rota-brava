@@ -237,6 +237,11 @@ for _n, (_a, _b) in {"wave": (0.68, 1.01), "celebrate": (0.50, 0.83), "team_pose
     CLIPS[_n] = (CLIPS[_n][0], CLIPS[_n][1], short_squint(CLIPS[_n][2], _a, _b))
 CLIPS["point"] = (CLIPS["point"][0], CLIPS["point"][1], blink_once(CLIPS["point"][2], 0.80))
 CLIP_SET = ["idle", "walk", "run", "stop", "idle_wheel", "steer_left", "steer_right", "react_horn", "celebrate", "wave", "point", "team_pose"]
+# RB-R1 G19: pegar, levar, pousar, examinar e empurrar o carrinho (hero_anim.g19_clips; carry_walk e push_cart com o
+# mesmo passo do WALK acima)
+G19 = ha.g19_clips(WALK, pilot=True)
+CLIPS.update(G19)
+CLIP_SET = ha.g19_names(pilot=True) + CLIP_SET   # G19 antes: o ultimo clipe gravado (pose em que o info.json mede a altura) segue o de antes
 HAND_KEYS = ("fist_R", "fist_L", "thumb_up_R", "thumb_up_L")
 
 
@@ -245,6 +250,7 @@ def author(rig, face_ob, F, names=CLIP_SET, hand_ob=None, sole=None):
     maos (<clipe>_hand), como no Rastro v2.1. `sole`: pontos de repouso da sola por lado (ver fix_soles)."""
     if sole is not None:
         fix_soles(sole)
+    ha.add_hold_points(rig)       # G19: HoldPoint/HoldPoint_L (sem deformacao) antes de montar o Rigger
     R = cl.Rigger(rig)
     sk = face_ob.data.shape_keys
     sk.animation_data_create()
@@ -280,7 +286,7 @@ def author(rig, face_ob, F, names=CLIP_SET, hand_ob=None, sole=None):
             if name == "idle_wheel":
                 best = min(best, ((R.tip("hand.R") + R.tip("hand.L")) * 0.5 - ha.WHEEL_C).length)
             R.apply(i, prev)
-            for kn in ha.FACE_KEYS:
+            for kn in ha.FACE_KEYS + ha.G19_FACE_EXTRA:
                 kb = sk.key_blocks[kn]
                 kb.value = max(0.0, min(1.0, fc.get(kn, 0.0)))
                 kb.keyframe_insert("value", frame=i)
@@ -301,6 +307,7 @@ def author(rig, face_ob, F, names=CLIP_SET, hand_ob=None, sole=None):
             tr.name = name
             st = tr.strips.new(name, 0, a_)
             st.name = name
+    report["g19"] = {n: ha.g19_measure(R, F, n, CLIPS[n][2], CLIPS[n][0]) for n in names if n in G19}
     return report
 
 

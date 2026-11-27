@@ -130,5 +130,28 @@ def build(glb=None, blend=None, renders=None, textures=True):
     return b, groups, info
 
 
+def anim_only(glb, blend):
+    """RB-R1 G19: regrava so os clipes (e os ossos HoldPoint) sobre o .blend versionado; malha e texturas intactas."""
+    import g19_rebuild
+    t0 = time.time()
+    b, rig, groups = g19_rebuild.reopen(blend, rv2_body.build)
+    bpy.context.scene.render.fps = rv2_anim.FPS
+    rep = rv2_anim.author(rig, groups["face"], b.F, gear_ob=groups["gear"])
+    bpy.context.view_layer.update()
+    info = measure(b, groups, rig)
+    info.update(rep)
+    print("CHAR_INFO", json.dumps(info))
+    bpy.ops.wm.save_as_mainfile(filepath=blend, compress=True)
+    with open(os.path.splitext(blend)[0] + ".info.json", "w", encoding="utf-8") as f:
+        json.dump(info, f, indent=2)
+    if glb:
+        export_glb(glb)
+        print("GLB", glb, os.path.getsize(glb))
+    print("TOTAL s", round(time.time() - t0, 1))
+
+
 if __name__ == "__main__":
-    build(arg_value("--glb"), arg_value("--blend"), arg_value("--renders"), "--no-tex" not in sys.argv)
+    if "--anim-only" in sys.argv:
+        anim_only(arg_value("--glb"), arg_value("--blend"))
+    else:
+        build(arg_value("--glb"), arg_value("--blend"), arg_value("--renders"), "--no-tex" not in sys.argv)
