@@ -68,10 +68,9 @@ func _speaker_checks() -> void:
 	r.check(first.size() >= 7, "v3 E7: ficha com %d falantes (3 herois + capitao, filhote, Dona Amora, Farol 7)" % first.size())
 	r.check(bad.is_empty(), "v3 E7: todo falante tem retrato na legenda que nao e o caderno %s" % str(bad))
 	r.check(mismatch.is_empty(), "v3 E7: o HUD acha pela chave o mesmo falante da ficha %s" % str(mismatch))
-	r.check(_effective(hud, &"captain") == "tex" and _effective(hud, &"pup") == "tex",
-		"v3 E7: capitao e filhote usam retrato renderizado do modelo 3D")
-	r.check(_effective(hud, &"vendor") == "vendor" and _effective(hud, &"radio") == "radio",
-		"v3 E7: Dona Amora e Farol 7 usam retrato-icone da marca (vendor, radio)")
+	r.check(_effective(hud, &"captain") == "tex" and _effective(hud, &"pup") == "tex" and _effective(hud, &"radio") == "tex",
+		"v3 E7/G21i: capitao, filhote e o Lumi (radio) usam retrato renderizado do modelo 3D")
+	r.check(_effective(hud, &"vendor") == "vendor", "v3 E7: Dona Amora usa retrato-icone da marca (vendor)")
 	# portrait/icon declarados na ficha existem
 	var missing: Array[String] = []
 	for who: Variant in speakers:
@@ -94,7 +93,7 @@ func _speaker_checks() -> void:
 		hud.say(key)
 		await r.frames(2)
 		var ok := portrait != null and portrait.is_visible_in_tree() and portrait.kind != &"notebook"
-		if who in [&"captain", &"pup"]:
+		if who in [&"captain", &"pup", &"radio"]:
 			ok = ok and portrait.texture_override != null
 		else:
 			ok = ok and portrait.texture_override == null and portrait.kind == hud.speaker_icon(who)

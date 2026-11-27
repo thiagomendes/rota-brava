@@ -80,7 +80,7 @@ def main(argv: list[str] | None = None) -> int:
         res = []
         for e in cat["lines"]:
             f = ROOT / "game" / e["file"].removeprefix("res://")
-            r = analyze(f, e["text_at_generation"])
+            r = analyze(f, e.get("spoken_at_generation", e["text_at_generation"]))
             r["id"] = e["id"]
             res.append(r)
             print(f"{'REPROVA' if r['reprova'] else 'ok     '} {e['id']:42s} {r['duracao_s']:5.2f} s / {r['esperada_s']:4.2f} "

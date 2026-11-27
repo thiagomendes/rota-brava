@@ -34,7 +34,9 @@ const MEMBER_COLORS := {&"tracker": Color("FF8A1F"), &"climber": Color("3DBE5A")
 const SKILL_ICONS := {&"tracker": &"notebook", &"climber": &"rope", &"pilot": &"helm"}
 ## Retrato da legenda de quem nao e heroi (RB-R1 E7, PROVISORIO): render do modelo 3D (capitao, filhote; mesmo
 ## enquadramento dos retratos v2) ou retrato-icone da marca (Dona Amora sem modelo; Farol 7 = farol com ondas de radio).
-const SPEAKER_PORTRAITS := {&"captain": "res://ui/portraits/captain_neutra.png", &"pup": "res://ui/portraits/pup_neutra.png"}
+## G21i: o radio e o Lumi (rosto dele na legenda, nao mais o farol).
+const SPEAKER_PORTRAITS := {&"captain": "res://ui/portraits/captain_neutra.png", &"pup": "res://ui/portraits/pup_neutra.png",
+	&"radio": "res://ui/portraits/lumi_neutra.png"}
 const SPEAKER_ICONS := {&"captain": &"helm", &"pup": &"paw", &"vendor": &"vendor", &"radio": &"radio",
 	&"narrator": &"storybook"}
 ## Anel e nome do falante; cores escolhidas para o nome (escurecido 20%) ler sobre o papel do balao.
@@ -89,6 +91,11 @@ var _sub_panel: PanelContainer
 var _sub_portrait: IconView
 var _sub_speaker: Label
 var _sub_text: Label
+## G21i: legenda com marcador de intencao (`{help}`) desenhada com o glifo do aparelho em uso (G15) no lugar do Label.
+var _sub_glyph: GlyphText
+## G21i: disco da ajuda em destaque (plano 9c da abertura): aparece mesmo com o HUD de jogo escondido e pulsa.
+var _help_spot_tween: Tween
+var _help_spot_hidden: Dictionary = {}
 var _emote_box: HBoxContainer
 ## Contador de emblemas (colecionaveis): aparece no primeiro emblema achado e pulsa a cada novo.
 var _emblem_panel: PanelContainer
@@ -498,6 +505,10 @@ func _build_bottom_stack(safe: Control) -> void:
 	_sub_text = _label(sv, FONT)
 	_sub_text.custom_minimum_size = Vector2(900, 0)
 	_sub_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_sub_glyph = GlyphText.new(FONT, ThemeV2.NAVY)
+	_sub_glyph.name = "SubtitleGlyphs"
+	_sub_glyph.visible = false
+	sv.add_child(_sub_glyph)
 	_sub_panel.visible = false
 
 
@@ -815,6 +826,56 @@ func help_slot_rect() -> Rect2:
 	return _help_button.get_global_rect()
 
 
+## G21i: legenda desenhada com glifos (null se a fala atual nao tem marcador). Testes.
+func subtitle_glyphs() -> GlyphText:
+	return _sub_glyph if _sub_glyph != null and _sub_glyph.visible and _sub_panel.visible else null
+
+
+## G21i: poe o disco da ajuda em destaque (`on`) e faz ele pulsar; os vizinhos do canto (objetivo, emblemas, pular)
+## ficam escondidos enquanto isso. Com movimento reduzido o disco aparece sem pulsar. Desligar devolve tudo.
+func spotlight_help(on: bool) -> void:
+	var top := find_child("TopLeft", true, false) as Control
+	if _help_spot_tween != null:
+		_help_spot_tween.kill()
+		_help_spot_tween = null
+	_help_button.scale = Vector2.ONE
+	if on:
+		if top != null:
+			for n: String in ["TopLeft", "ObjectivePanel", "SkipPanel", "EmblemCounter"]:
+				var c := find_child(n, true, false) as CanvasItem
+				if c != null and not _help_spot_hidden.has(n):
+					_help_spot_hidden[n] = c.visible
+			for n: String in ["ObjectivePanel", "SkipPanel", "EmblemCounter"]:
+				var c := find_child(n, true, false) as CanvasItem
+				if c != null:
+					c.visible = false
+			top.visible = true
+		_help_icon.visible = true
+		_help_button.self_modulate.a = 1.0
+		_help_button.pivot_offset = _help_button.size * 0.5 if _help_button.size != Vector2.ZERO else Vector2(MIN_TOUCH, MIN_TOUCH) * 0.5
+		if not Options.reduced_motion():
+			_help_spot_tween = create_tween().set_loops()
+			_help_spot_tween.tween_property(_help_button, "scale", Vector2(1.18, 1.18), 0.35).set_trans(Tween.TRANS_SINE)
+			_help_spot_tween.tween_property(_help_button, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_SINE)
+	else:
+		for n: String in _help_spot_hidden:
+			var c := find_child(n, true, false) as CanvasItem
+			if c != null:
+				c.visible = bool(_help_spot_hidden[n])
+		_help_spot_hidden.clear()
+		_help_icon.visible = not touch_mode
+		_help_button.self_modulate.a = 0.0 if touch_mode else 1.0
+
+
+## G21i: o disco da ajuda esta em destaque (visivel na tela) e pulsando? Testes.
+func help_spotlit() -> bool:
+	return not _help_spot_hidden.is_empty() and _help_button.is_visible_in_tree() and _help_icon.visible
+
+
+func help_pulsing() -> bool:
+	return _help_spot_tween != null and _help_spot_tween.is_valid() and _help_spot_tween.is_running()
+
+
 ## Pedir ajuda, de onde vier (clique, toque no HUD ou na camada de toque): som, sinal e a intencao `help` da Input Map.
 func trigger_help() -> void:
 	ui_sound.emit(&"confirm")
@@ -1045,6 +1106,12 @@ func _show_line(entry: Dictionary) -> void:
 		ui_sound.emit(&"emote")
 	_sub_text.add_theme_font_size_override("font_size", int(round(FONT * Options.subtitle_scale())))
 	_sub_text.text = Loc.t(key, entry["params"])
+	var glyphs := not GlyphText.markers(_sub_text.text).is_empty()
+	_sub_text.visible = not glyphs
+	_sub_glyph.visible = glyphs
+	if glyphs:
+		_sub_glyph.font_size = int(round(FONT * Options.subtitle_scale()))
+		_sub_glyph.set_text(_sub_text.text)
 	var was := _sub_panel.visible
 	_sub_panel.visible = true
 	if not was:

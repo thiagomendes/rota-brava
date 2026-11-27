@@ -526,7 +526,7 @@
    "emotion": "alegria",
    "energy": 2,
    "pace": "normal",
-   "note": "voz amiga do rádio, acolhe a equipe"
+   "note": "Lumi se apresenta no radio, acolhe a equipe"
   },
   "ep01.narrator.intro.call": {
    "emotion": "chamado heroico",
@@ -827,6 +827,18 @@
    "energy": 2,
    "pace": "normal",
    "note": "capitão gentil acenando de longe, voz um pouco rouca"
+  },
+  "ep01.radio.intro.help": {
+   "emotion": "confiança alegre",
+   "energy": 2,
+   "pace": "normal",
+   "note": "Lumi aponta para quem joga: pode chamar quando precisar"
+  },
+  "ep01.narrator.intro.base": {
+   "emotion": "descoberta",
+   "energy": 2,
+   "pace": "normal",
+   "note": "apresenta a base da equipe, a casa-torre na ponta das pedras"
   }
  },
  "demo": {
