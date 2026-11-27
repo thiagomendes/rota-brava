@@ -1103,3 +1103,4 @@ Critérios de aceite:
     - tempo real do M6 não medido;
     - crash sinal 11 visto 2 vezes pelo autor e não reproduzido em 6 rodadas.
   - Conflito no merge: `ep01_v3_late.gd`, no fim do M5. Somei o `fish_street_gap` do G25 com o brilho na posição real do peixe do G24.
+- **Suíte integrada depois do merge do G24b/c/d (`a89b828`):** `FALHOU (5448 PASS, 1)`. A auditoria `motion_audit` acusou 5 pares novos no M5: na entrega do peixe à Amora (G25), o Pico e o peixe atravessam os caixotes `kit:crate#8/#9` da rua, até 17 cm. O defeito é real e não vai para a `KNOWN`. A correção é o **G25b** (`gameplay`). Até o G25b entrar, a integração fica com esse teste falhando.
