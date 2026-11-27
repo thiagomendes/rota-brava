@@ -99,7 +99,7 @@ O GitHub só mostra o "Run workflow" quando o arquivo do workflow existe na bran
   - o `android-install.ps1` nunca foi executado (não há pwsh na nuvem);
   - o SHA-256 das platform-tools do Windows segue PENDENTE (`dl.google.com` bloqueado aqui);
   - tamanho e SHA-256 do APK só existem depois da 1ª execução;
-  - o toque básico está em andamento.
+  - o toque básico foi integrado depois (ver abaixo).
 - **1ª execução do `android.yml`** (Thiago, run 45921259074, `e917b2a`): verde em 1 min 57 s.
   - APK exportado e assinado com a keystore temporária (CN=Rota Brava teste), porque não há segredo de keystore. Cada build sai com assinatura diferente, então reinstalar apaga o save do aparelho.
   - Artefato `rota-brava-android-apk`: 323.341.262 bytes compactados. Digest do zip: `sha256:d0ef6878…04a8`.
@@ -115,3 +115,8 @@ O GitHub só mostra o "Run workflow" quando o arquivo do workflow existe na bran
   - O relatório `.ips` mostra a thread principal e as `WorkerThread 0, 1, 3, 4 e 5` todas paradas no mesmo `recursive_mutex::lock()`. É um impasse entre threads durante o carregamento em segundo plano. Não falta memória: são 294 MB de regiões graváveis.
   - Causa provável: o `ResourceLoader.load_threaded_request(..., use_sub_threads=true)` do `SceneLoader` e do `title_screen.gd`. O G14 (`feature/rb-r1-g14-controle`, commit `aa45972`) já trocou para `use_sub_threads=false`, depois de achar SIGBUS e um travamento no fechamento com sub-threads no Linux.
   - Correção: integrar o G14 e gerar o build 2. Pendente: confirmar no iPhone.
+- **Toque básico integrado** (`feature/rb-m1-toque`, autor `ux`). Revisão (`reviewer`, 2 rodadas):
+  - 1ª: REPROVADO. Sem soltar o toque na perda de foco nem na pausa do app.
+  - 2ª: APROVADO. A mutação remove o `_notification` e o teste falha (3 falhas). O alvo do "H" tem 128 px.
+  - Resultados: `touch_controls` 65, `ui_` 248 e `assets` 282.
+  - Pendente no aparelho: o conforto do toque e se o herói fica parado quando o app vai para segundo plano.
