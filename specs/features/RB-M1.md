@@ -63,4 +63,14 @@ Publicação em loja; ajuste fino de desempenho; UX de toque definitiva; ícones
 - `ux` + `gameplay`: controle por toque. Não mexe em `export_presets.cfg` nem em `.github/`; no `project.godot` só toca o que for necessário de entrada, e o lead serializa.
 
 ## Evidências
-(preencher)
+### Item 4 · toque básico (ux, branch `feature/rb-m1-toque`, 2026-11-27)
+- **Camada** `game/ui/touch/touch_controls.gd` (`TouchControls`, CanvasLayer 11, acima do HUD 10), criada só pelo `Ep01V3Main`. Aparece no primeiro `InputEventScreenTouch`; some com tecla, clique/movimento de mouse real (≥ 4 px lógicos) ou controle (botão ou alavanca ≥ 0,5); some e solta tudo com `MouseLock.blocked()`, pausa, cena ou sem herói em controle.
+- **Último dispositivo:** `game/ui/touch/input_device.gd` (`InputDevice`, classe estática; `last`, `classify`, `note`, `family`). O mouse emulado do toque (`DEVICE_ID_EMULATION`) não conta. O HUD passou a usar a mesma detecção. Base para o G15.
+- **Joystick** flutuante na metade esquerda (raio 130 px, ponta 128 px de diâmetro): `Input.action_press(move_*, força)`, força remapeada para fora da zona morta de 0,5 da Input Map; `run` a partir de 85% do raio (volta a andar abaixo de 78%); a base acompanha o dedo além de 1,25 raio.
+- **Botões** (desenho no código + SVG, sem texto): agir 224 px embaixo à direita (mesmo lugar do botão de ação do HUD, que sai de cena no modo toque; amarelo com o pictograma da ação e rótulo "Examinar" quando há o que fazer, apagado com a mão quando não há); pular 180 px logo acima; pausa 120 px no alto, à esquerda dos retratos. A ajuda é o botão H do próprio HUD (128 px), que agora envia a intenção `help` (antes só emitia um sinal sem ouvinte).
+- **Câmera:** arrastar a metade direita, fora dos botões, chama `CameraRig.orbit_by` (a mesma usada pelo mouse preso). A câmera ignora o mouse emulado, que antes prendia o cursor e girava junto.
+- **Multitoque:** cada dedo tem um dono (joystick, câmera ou botão).
+- **Cena pulável:** um toque pula a cena (equivale ao E), porque a camada está escondida durante a cena.
+- **Testes:** `game/tests/test_touch_controls.gd`, com 59 checagens por toque simulado em `Input.parse_input_event` (passa pela emulação de mouse da Godot). Cobre: joystick move o herói e corre, pular, agir aciona o Examinar, arrastar gira a câmera, dois dedos, some com teclado, controle e mouse, painel bloqueia, ajuda, pausa, Opções, Continuar, Confirmar da troca, menu (Opções e Jogar), cartão do espaço, Apagar segurando 1,5 s com o dedo e Não da confirmação.
+- **Capturas** (fora do Git): `captures/m1-toque/ep01_toque_16x9.png`, `ep01_toque_20x9.png`, `ep01_toque_4x3.png` (xvfb + Vulkan lavapipe, `game/tests/capture_m1_touch.tscn`).
+- **Pendente de Thiago no aparelho:** conforto, tamanho e sensibilidade da câmera ao toque. Também a área segura real com entalhe (lida de `DisplayServer.get_display_safe_area()` só em `mobile`; não medida).
