@@ -61,3 +61,35 @@ byte idêntico entre exportações (JPEG e ordem interna), mas malha, materiais 
 - r3b: Dona Amora sem orelhas modeladas (`EARS = False`; o cabelo puxado as cobre; a orelha furava o cabelo na lateral);
   grisalho em mechas irregulares (duas familias de faixas, uma inclinada que cruza; largura, posicao, comeco e fim
   sorteados por faixa). `amora_v2.glb` `084dfbb49a8f48f76b0f7101cf9b62b3909a15d7167b3522f4e54421541fdd4c` (22 630 tris).
+
+## G21 · Lumi v2 (operador do rádio do Farol 7)
+Decisão de Thiago (2026-11-27): homem de uns 30 anos, nome Lumi. Mesmo pipeline do capitão e da Dona Amora
+(`sv2_human.py` + `sv2_lib.py` + `rv2_tex.py`), sem contorno, atlas assada em PBR com verniz.
+- Fonte: `build_lumi_v2.py`, `lumi_v2.blend`, `lumi_v2.info.json`; provas lado a lado: `render_lineup_g21.py`.
+- Silhueta: cabelo crespo curto com o alto arredondado, fone de arco amarelo por cima do cabelo (perfil varrido com raycast
+  no cabelo), conchas azuis por torno, haste do microfone coral até o canto da boca (6,5 cm do centro; não cobre a boca),
+  antena com bolinha coral na concha direita. Cavanhaque por metaballs colado ao queixo, sombra de barba pintada.
+- Roupa: jaqueta 0B2440 com gola amarela (raycast na jaqueta + solidify), emblema do peito por prisma, faixa coral da gola
+  ao punho pintada, emblema grande nas costas pintado (escudo por distância com sinal ao contorno), zíper, ribanas e bolsos
+  pintados; calça clara; tênis branco com sola amarela.
+- Clipes: `idle` (3,6 s, laço, `pose_idle_adult`), `talk` (3,0 s, visemas A/O/E), `wave` (1,6 s, sorriso com olho aberto),
+  `point` (1,2 s); sentado (rodada 2, abaixo): `idle_seated` e `turn_chair`.
+- Retratos: `bash tools/blender.sh --background source_art/characters/secondary_v2/lumi_v2.blend --python
+  source_art/scripts/hero_portraits_v2.py -- lumi` → `game/ui/portraits/lumi_{neutra,alegre,surpresa}.png`.
+```bash
+bash tools/blender.sh --background --factory-startup --python source_art/characters/secondary_v2/build_lumi_v2.py -- \
+  --glb $PWD/game/assets/models/characters/lumi_v2.glb --blend $PWD/source_art/characters/secondary_v2/lumi_v2.blend
+bash tools/blender.sh --background --factory-startup --python source_art/characters/secondary_v2/render_lineup_g21.py -- $PWD/captures/g21
+python3 -I source_art/farol7_base/manifest_g21.py
+```
+
+### G21 rodada 2 (retorno do coordenador)
+- Proporção da família do capitão e da Dona Amora: pernas mais curtas e grossas (perna 0,75 m, membro 0,062), tronco e
+  ombros com mais volume (tronco 0,52, barriga 0,168, ombro 0,208). Altura 1,715 m, 22 823 tris.
+- Calça caqui `#A9844E`; gola em pé trocada por gola baixa canelada pintada com filete amarelo; cavanhaque pequeno e
+  arredondado na cor do cabelo (castanho bem escuro `#2A1E18`/`#4E3829`); cabelo fosco (rugosidade ~0,85, verniz 0,02).
+- `talk` refeito: braços junto ao corpo, mão direita aberta na altura do peito gesticulando, esquerda solta.
+- `wave`/`turn_chair` sorriem pela boca (o `alegre` acima de ~0,3 fecha o olho em arco na Godot: regra G1).
+- Clipes sentados para o plano 9a: `idle_seated` (3,6 s, laço) e `turn_chair` (1,0 s), assento a 0,40 m; o Lumi sentado é
+  filho de `Chair/Seat` em `farol7_base.tscn` e gira com a cadeira (`Farol7Base.set_chair_yaw`). `idle_seated` entrou em
+  `CharacterVisual.LOOPING`.

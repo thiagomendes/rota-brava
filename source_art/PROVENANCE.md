@@ -151,3 +151,11 @@
 - GLB: `captain_v2.glb` `e6822f04e19f073a869f1f2ebc924e592e538070d3193a9dc322edbf4196e827` (23 976 tris, 4,24 MB),
   `pup_v2.glb` `65d155db9d1f58384096aebad9a3ba78a9dfffe5211d5dc919645c646e041db7` (16 892 tris, 3,08 MB),
   `amora_v2.glb` `90eb7f9044713dcb0cc08863ee421a8effa39cd27e1548c56d378dda6ff29404` (23 072 tris, 4,09 MB).
+
+## RB-R1 G21: Lumi v2 e a base Farol 7 (PROVISORIO, 2026-11-27, `art3d`)
+- **Lumi v2** (operador do radio do Farol 7, homem de ~30 anos, decisao de Thiago): `source_art/characters/secondary_v2/build_lumi_v2.py`,
+  mesmo pipeline dos secundarios v2. `lumi_v2.glb` `1bd3af3b3ce3a2309a74696aa03045ab04f5b91484bf407b408caf7d64cb7f64` (22 823 tris). Retratos `game/ui/portraits/lumi_*.png`.
+  Detalhes em `source_art/characters/secondary_v2/PROVENANCE.md`.
+- **Base Farol 7** (sala do radio, cadeira, luz giratoria, casa-torre, fundo): `source_art/farol7_base/build_farol7_base.py`,
+  cena `game/worlds/farol7_base/farol7_base.tscn`. Detalhes em `source_art/farol7_base/PROVENANCE.md`.
+- Geometria, textura e animacao 100% por script; nada de terceiros. Manifesto: `python3 -I source_art/farol7_base/manifest_g21.py`.

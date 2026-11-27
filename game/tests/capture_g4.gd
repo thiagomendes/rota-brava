@@ -116,7 +116,7 @@ func _set_shot(i: int) -> void:
 	if not figures.has(focus) and figures.has(focus + "_old"):
 		figures[focus] = figures[focus + "_old"]
 	var f := figures.get(focus, figures["tracker"]) as Node3D
-	const TOPS := {"pup": 0.42, "captain": 1.55, "amora": 1.45, "villager_a": 1.45, "villager_b": 1.45}
+	const TOPS := {"pup": 0.42, "captain": 1.55, "amora": 1.45, "lumi": 1.50, "villager_a": 1.45, "villager_b": 1.45}
 	var top: float = TOPS.get(focus, 0.95)
 	cam.fov = 40.0
 	if face_shot:

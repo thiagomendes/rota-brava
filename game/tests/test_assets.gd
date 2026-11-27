@@ -126,6 +126,7 @@ func run(runner) -> void:
 	_test_rastro()
 	_test_boat()
 	_test_external_meshes()
+	await _test_farol7_base()
 
 
 func _test_rastro() -> void:
@@ -294,3 +295,49 @@ func _test_manifest() -> void:
 
 
 
+
+
+## RB-R1 G21: palco da base Farol 7 (fora da vila). Carrega, tem os marcadores dos planos 9a/9b/9c, toda malha vem dos GLB
+## do projeto em assets/models/farol7_base, todo material do GLB e trocado pela biblioteca (wv2_*/pv3_*/f7_*), a luz da base
+## gira e os triangulos ficam no orcamento. Nao comprova aparencia (ver captures/g21).
+func _test_farol7_base() -> void:
+	var ps := load("res://worlds/farol7_base/farol7_base.tscn") as PackedScene
+	r.check(ps != null, "assets: farol7_base.tscn carrega")
+	if ps == null:
+		return
+	var base := ps.instantiate() as Farol7Base
+	base.use_own_environment = false
+	r.tree.root.add_child(base)
+	await r.frames(2)
+	r.check(base.has_meta("provisional"), "assets: base Farol 7 marcada provisoria")
+	for m in ["Base_Chair", "Base_Seat", "Base_LumiStand", "Base_CamWide", "Base_CamFront", "Base_CamMic", "Base_Exterior",
+			"Base_CamExterior", "Base_Porthole", "Base_Mic"]:
+		r.check(base.marker(StringName(m)) != null, "assets: base Farol 7 tem o marcador %s" % m)
+	var foreign := 0
+	var unswapped: Array = []
+	var tris := 0
+	for n in base.find_children("*", "MeshInstance3D", true, false):
+		var mi := n as MeshInstance3D
+		if not mi.mesh.resource_path.begins_with("res://assets/models/farol7_base/"):
+			foreign += 1
+		for i in mi.mesh.get_surface_count():
+			var src := mi.mesh.surface_get_material(i)
+			if src != null and mi.get_surface_override_material(i) == null and not unswapped.has(src.resource_name):
+				unswapped.append(src.resource_name)
+			var idx: Variant = mi.mesh.surface_get_arrays(i)[Mesh.ARRAY_INDEX]
+			tris += (idx as PackedInt32Array).size() / 3 if idx != null else 0
+	r.check(foreign == 0, "assets: toda malha da base Farol 7 vem dos GLB do projeto (%d de fora)" % foreign)
+	r.check(unswapped.is_empty(), "assets: todo material da base Farol 7 trocado pela biblioteca %s" % [unswapped])
+	r.check(tris > 5000 and tris < 60000, "assets: base Farol 7 com %d triangulos (orcamento < 60000)" % tris)
+	var spins := base.find_children("BeaconSpin", "", true, false)
+	r.check(spins.size() == 2, "assets: base Farol 7 tem 2 luzes giratorias (claraboia e torre): %d" % spins.size())
+	if not spins.is_empty():
+		var s0 := spins[0] as Node3D
+		var y0 := s0.rotation.y
+		await r.frames(5)
+		r.check(absf(s0.rotation.y - y0) > 0.001, "assets: luz giratoria da base gira")
+	r.check(base.get_node_or_null(^"Chair/Seat") is Marker3D, "assets: cadeira da base tem o assento Chair/Seat (pai do Lumi sentado)")
+	base.set_chair_yaw(0.0)
+	r.check(absf((base.get_node("Chair") as Node3D).rotation.y) < 0.001, "assets: set_chair_yaw gira a cadeira")
+	base.queue_free()
+	await r.frames(1)

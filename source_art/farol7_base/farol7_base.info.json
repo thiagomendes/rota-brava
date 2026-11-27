@@ -1,0 +1,140 @@
+{
+ "blender": "4.5.16 LTS",
+ "data": "2026-11-27",
+ "marcos": {
+  "Base_Chair": [
+   0.6,
+   0.0,
+   -1.0
+  ],
+  "Base_Porthole": [
+   0.55,
+   1.62,
+   -2.1
+  ],
+  "Base_Skylight": [
+   0.0,
+   2.8,
+   -0.55
+  ],
+  "Beacon_Y": 3.3499999999999996,
+  "Desk": [
+   -0.15,
+   0.76,
+   2.2,
+   0.72
+  ],
+  "Mic": [
+   0.62,
+   1.07,
+   -1.5
+  ]
+ },
+ "pecas": {
+  "farol7_backdrop": {
+   "glb": "game/assets/models/farol7_base/farol7_backdrop.glb",
+   "glb_bytes": 115748,
+   "materiais": [
+    "f7_lamp",
+    "f7_sea",
+    "pv3_cloth",
+    "wv2_deck",
+    "wv2_glossy",
+    "wv2_leaf",
+    "wv2_paint",
+    "wv2_plaster",
+    "wv2_roof",
+    "wv2_stone",
+    "wv2_wood"
+   ],
+   "objetos": {
+    "Farol7_Backdrop": 2334
+   },
+   "orcamento_tris": 12000,
+   "pivo": "mesma origem da sala; mar em y = -3; vila a ~60 m ao norte",
+   "triangulos": 2334
+  },
+  "farol7_beacon": {
+   "glb": "game/assets/models/farol7_base/farol7_beacon.glb",
+   "glb_bytes": 42220,
+   "materiais": [
+    "f7_beam",
+    "f7_glass",
+    "f7_lamp",
+    "wv2_glossy",
+    "wv2_metal"
+   ],
+   "objetos": {
+    "BeaconBase": 578,
+    "BeaconSpin": 280
+   },
+   "orcamento_tris": 2500,
+   "pivo": "eixo em x = z = 0, base em y = 0; BeaconSpin gira em Y",
+   "triangulos": 858
+  },
+  "farol7_chair": {
+   "glb": "game/assets/models/farol7_base/farol7_chair.glb",
+   "glb_bytes": 42972,
+   "materiais": [
+    "pv3_vinyl",
+    "wv2_glossy",
+    "wv2_metal",
+    "wv2_paint"
+   ],
+   "objetos": {
+    "Farol7_Chair": 824
+   },
+   "orcamento_tris": 4000,
+   "pivo": "eixo do pe no chao; assento virado para +Z",
+   "triangulos": 824
+  },
+  "farol7_room": {
+   "glb": "game/assets/models/farol7_base/farol7_room.glb",
+   "glb_bytes": 588732,
+   "materiais": [
+    "f7_lamp",
+    "f7_led",
+    "f7_pin_leme",
+    "f7_pin_pico",
+    "f7_pin_rastro",
+    "f7_screen",
+    "pv3_cloth",
+    "pv3_vinyl",
+    "wv2_deck",
+    "wv2_glossy",
+    "wv2_metal",
+    "wv2_paint",
+    "wv2_plaster",
+    "wv2_slats",
+    "wv2_wood"
+   ],
+   "objetos": {
+    "Farol7_Room": 11984
+   },
+   "orcamento_tris": 60000,
+   "pivo": "chao da sala em y = 0, centro em x = z = 0; camera olha para -Z",
+   "triangulos": 11984
+  },
+  "farol7_tower": {
+   "glb": "game/assets/models/farol7_base/farol7_tower.glb",
+   "glb_bytes": 229684,
+   "materiais": [
+    "pv3_cloth",
+    "wv2_glossy",
+    "wv2_interior_lit",
+    "wv2_metal",
+    "wv2_paint",
+    "wv2_plaster",
+    "wv2_rock",
+    "wv2_roof",
+    "wv2_stone"
+   ],
+   "objetos": {
+    "Farol7_Tower": 5730
+   },
+   "orcamento_tris": 30000,
+   "pivo": "eixo da torre, chao da torre em y = 0 (mar em y = -3)",
+   "triangulos": 5730
+  }
+ }
+}

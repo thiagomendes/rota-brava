@@ -4346,6 +4346,338 @@
         "icon_ios_1024.png": "f3e94597484c489c65b8fd8d3354c2800eeb9273d5a7d6ec7e8b9ebf45162159"
       },
       "licenca": "original do projeto (lettering de source_art/ui/keyart/make_logos.py); sem marca de terceiros"
+    },
+    {
+      "id": "lumi_v2",
+      "nome": "Lumi v2 (operador do radio da base Farol 7)",
+      "papel": "radio",
+      "agente": "art3d",
+      "status": "provisorio",
+      "processo": {
+        "script": "source_art/characters/secondary_v2/build_lumi_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, skin, shape keys, animacoes por NLA, texturas JPEG embutidas, KHR_materials_clearcoat",
+        "tecnicas": "base adulta v2 (sv2_human: cabeca adulta, tronco+mangas SKIN + SUBSURF 3 com forma em numpy, calca, maos encaixadas na manga, tenis); cabelo crespo e cavanhaque por metaballs; fone de arco por perfil varrido sobre o cabelo (raycast), conchas por torno, haste do microfone e antena por tubo; gola por raycast na jaqueta + solidify; emblema do peito por prisma; faixa coral, emblema das costas, ziper, ribanas e sombra de barba pintados; textura assada e pintada no pipeline do trio v2 (rv2_tex)"
+      },
+      "origem": [
+        "source_art/characters/secondary_v2/build_lumi_v2.py",
+        "source_art/characters/secondary_v2/sv2_human.py",
+        "source_art/characters/secondary_v2/sv2_lib.py",
+        "source_art/characters/rastro_v2/rv2_tex.py",
+        "source_art/scripts/hero_lib.py",
+        "source_art/scripts/hero_face.py",
+        "source_art/scripts/hero_anim.py",
+        "source_art/scripts/char_anim.py",
+        "source_art/scripts/char_lib.py",
+        "source_art/scripts/rbart.py",
+        "source_art/characters/secondary_v2/lumi_v2.blend",
+        "source_art/characters/secondary_v2/render_lineup_g21.py"
+      ],
+      "saida_glb": "game/assets/models/characters/lumi_v2.glb",
+      "glb_sha256": "1bd3af3b3ce3a2309a74696aa03045ab04f5b91484bf407b408caf7d64cb7f64",
+      "glb_bytes": 4443772,
+      "cena": "game/actors/characters/lumi_model.tscn",
+      "importacao": "game/lookdev/gltf_pbr_import.gd (mipmaps e verniz, como no trio v2)",
+      "triangulos": 22823,
+      "triangulos_por_objeto": {
+        "Lumi_Skin": 5116,
+        "Lumi_Hair": 4073,
+        "Lumi_Gear": 5976,
+        "Lumi_Cloth": 5290,
+        "Lumi_Face": 2368
+      },
+      "materiais": [
+        "mat_lumi_v2_cloth",
+        "mat_lumi_v2_face_dark",
+        "mat_lumi_v2_face_eye",
+        "mat_lumi_v2_face_iris",
+        "mat_lumi_v2_face_mouth",
+        "mat_lumi_v2_face_skin",
+        "mat_lumi_v2_gear",
+        "mat_lumi_v2_hair",
+        "mat_lumi_v2_skin"
+      ],
+      "texturas": {
+        "lumi_v2_cloth_color": [
+          2048,
+          2048
+        ],
+        "lumi_v2_cloth_normal": [
+          2048,
+          2048
+        ],
+        "lumi_v2_cloth_orm": [
+          2048,
+          2048
+        ],
+        "lumi_v2_gear_color": [
+          1024,
+          1024
+        ],
+        "lumi_v2_gear_normal": [
+          1024,
+          1024
+        ],
+        "lumi_v2_gear_orm": [
+          1024,
+          1024
+        ],
+        "lumi_v2_hair_color": [
+          1024,
+          1024
+        ],
+        "lumi_v2_hair_normal": [
+          1024,
+          1024
+        ],
+        "lumi_v2_hair_orm": [
+          1024,
+          1024
+        ],
+        "lumi_v2_skin_color": [
+          1024,
+          1024
+        ],
+        "lumi_v2_skin_normal": [
+          1024,
+          1024
+        ],
+        "lumi_v2_skin_orm": [
+          1024,
+          1024
+        ]
+      },
+      "objetos": [
+        "Lumi_Cloth",
+        "Lumi_Face",
+        "Lumi_Gear",
+        "Lumi_Hair",
+        "Lumi_Skin"
+      ],
+      "ossos": [
+        "root",
+        "hips",
+        "spine",
+        "chest",
+        "neck",
+        "head",
+        "shoulder.R",
+        "upper_arm.R",
+        "forearm.R",
+        "hand.R",
+        "hand_tip.R",
+        "shoulder.L",
+        "upper_arm.L",
+        "forearm.L",
+        "hand.L",
+        "hand_tip.L",
+        "thigh.R",
+        "shin.R",
+        "foot.R",
+        "toe.R",
+        "toe_tip.R",
+        "heel.R",
+        "thigh.L",
+        "shin.L",
+        "foot.L",
+        "toe.L",
+        "toe_tip.L",
+        "heel.L"
+      ],
+      "quantidade_ossos": 28,
+      "animacoes_duracao_s": {
+        "idle": 3.6,
+        "idle_seated": 3.6,
+        "point": 1.2,
+        "talk": 3.0,
+        "turn_chair": 1.0,
+        "wave": 1.6
+      },
+      "shape_keys": [
+        "Basis",
+        "neutra",
+        "atenta",
+        "surpresa",
+        "alegre",
+        "triste",
+        "brava_leve",
+        "blink",
+        "mouth_A",
+        "mouth_E",
+        "mouth_O",
+        "mouth_M",
+        "look_left",
+        "look_right",
+        "look_up"
+      ],
+      "altura_m": 1.7151,
+      "razao_cabeca_altura": 0.2099,
+      "velocidade_walk_mps": 0.0,
+      "velocidade_run_mps": 0.0,
+      "aprovacao": "pendente (reviewer, depois Thiago)",
+      "originalidade": "geometria procedural propria (SKIN + SUBSURF, metaballs, torno, bmesh, deslocamento em numpy); texturas pintadas por formula; rig e animacoes autorais por script; nenhum modelo, malha, rig, mocap, textura, HDRI ou personagem-base de terceiros",
+      "data": "2026-11-27",
+      "nota": "RB-R1 G21: operador do Farol 7 (decisao de Thiago: homem, ~30 anos, nome Lumi). Clipes idle (loop, braços relaxados), talk (3,0 s, visemas), wave (1,6 s), point (1,2 s) e, sentado na cadeira da base (plano 9a, filho de Chair/Seat), idle_seated (3,6 s, loop) e turn_chair (1,0 s)."
+    },
+    {
+      "id": "portraits_v2_lumi",
+      "nome": "Retratos da legenda do Lumi (operador do radio do Farol 7)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "processo": {
+        "script": "source_art/scripts/hero_portraits_v2.py",
+        "ferramenta": "Blender 4.5.16 (tools/blender.sh, headless), Cycles CPU 96 amostras + OpenImageDenoise",
+        "exportador": "PNG RGBA 512x512, fundo transparente (mesmo formato e caminho dos retratos v2)",
+        "comando": "bash tools/blender.sh --background source_art/characters/secondary_v2/lumi_v2.blend --python source_art/scripts/hero_portraits_v2.py -- lumi"
+      },
+      "origem": [
+        "source_art/characters/secondary_v2/lumi_v2.blend",
+        "source_art/characters/rastro_v2/rv2_render.py",
+        "source_art/scripts/hero_portraits_v2.py"
+      ],
+      "saida": "game/ui/portraits",
+      "arquivos_sha256": {
+        "lumi_neutra.png": "af928701cd09920824a824d847a74d28d8dcfff60a7d7ad0f27770e7b0237c83",
+        "lumi_alegre.png": "10da1eb7761892404f06983660918934a701c3c7469ea08acf423679bd05be6b",
+        "lumi_surpresa.png": "e65e8df71dde02edfb201aa792248b9d745c82ed19402bda8c135611312954af"
+      },
+      "arquivos_bytes": {
+        "lumi_neutra.png": 307792,
+        "lumi_alegre.png": 303082,
+        "lumi_surpresa.png": 308745
+      },
+      "luz": "luz de cena das provas v2 (rv2_render.scene_lights), sem o chao de prova",
+      "aprovacao": "pendente (Thiago)",
+      "originalidade": "render do personagem procedural do projeto (lumi_v2.blend); nada de terceiros",
+      "data": "2026-11-27",
+      "nota": "RB-R1 G21: substituem o icone de farol na legenda do radio quando o gameplay ligar `radio` ao Lumi."
+    },
+    {
+      "id": "farol7_base",
+      "nome": "Base Farol 7: sala do radio, cadeira, luz giratoria, casa-torre e fundo (mar e Vila Mare ao longe)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "pendente (reviewer, depois Thiago)",
+      "data": "2026-11-27",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias, wv2lib); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + materiais f7_* da Godot; pinos do mapa usam os retratos do HUD do proprio projeto",
+      "processo": {
+        "script": "source_art/farol7_base/build_farol7_base.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros",
+        "cena": "python3 -I source_art/farol7_base/gen_scene.py"
+      },
+      "origem": [
+        "source_art/farol7_base/build_farol7_base.py",
+        "source_art/farol7_base/gen_scene.py",
+        "source_art/farol7_base/manifest_g21.py",
+        "source_art/farol7_base/farol7_base.blend",
+        "source_art/farol7_base/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py",
+        "source_art/props_v3/build_props_v3.py",
+        "game/worlds/farol7_base/farol7_base.gd",
+        "game/worlds/farol7_base/f7_pin.gdshader"
+      ],
+      "saida_glb": [
+        "game/assets/models/farol7_base/farol7_backdrop.glb",
+        "game/assets/models/farol7_base/farol7_beacon.glb",
+        "game/assets/models/farol7_base/farol7_chair.glb",
+        "game/assets/models/farol7_base/farol7_room.glb",
+        "game/assets/models/farol7_base/farol7_tower.glb"
+      ],
+      "glb_sha256": {
+        "farol7_backdrop.glb": "ce20add678e5c99aeca61f05de4e60846f8aa07ff2357a6ca56c3a3f58882a74",
+        "farol7_beacon.glb": "3cf005086c08edf398fafe0ee2267092147f2728d29ae324541a26f6f9cdd956",
+        "farol7_chair.glb": "a9fad38d387798e28939dfea87467c139e589a9eca0e391a7f45b43d6a906577",
+        "farol7_room.glb": "414111bc60ed5eda870be1f982707eaf8912984157318088fb4b2f896bff7360",
+        "farol7_tower.glb": "517c3740b05114699b01c8d56695ff14575752b37790592d592fa90a41273b22"
+      },
+      "glb_bytes": {
+        "farol7_backdrop.glb": 115748,
+        "farol7_beacon.glb": 42220,
+        "farol7_chair.glb": 42972,
+        "farol7_room.glb": 588732,
+        "farol7_tower.glb": 229684
+      },
+      "cena": "game/worlds/farol7_base/farol7_base.tscn",
+      "cena_sha256": "b7be64859eea25783f8a3d8cee690ecc660fa4ad539f15b022c5644050806f5a",
+      "cena_bytes": 4970,
+      "triangulos": 21730,
+      "triangulos_por_peca": {
+        "farol7_backdrop": 2334,
+        "farol7_beacon": 858,
+        "farol7_chair": 824,
+        "farol7_room": 11984,
+        "farol7_tower": 5730
+      },
+      "orcamento_tris": {
+        "farol7_backdrop": 12000,
+        "farol7_beacon": 2500,
+        "farol7_chair": 4000,
+        "farol7_room": 60000,
+        "farol7_tower": 30000
+      },
+      "materiais": [
+        "f7_beam",
+        "f7_glass",
+        "f7_lamp",
+        "f7_led",
+        "f7_pin_leme",
+        "f7_pin_pico",
+        "f7_pin_rastro",
+        "f7_screen",
+        "f7_sea",
+        "pv3_cloth",
+        "pv3_vinyl",
+        "wv2_deck",
+        "wv2_glossy",
+        "wv2_interior_lit",
+        "wv2_leaf",
+        "wv2_metal",
+        "wv2_paint",
+        "wv2_plaster",
+        "wv2_rock",
+        "wv2_roof",
+        "wv2_slats",
+        "wv2_stone",
+        "wv2_wood"
+      ],
+      "pivo": {
+        "farol7_backdrop": "mesma origem da sala; mar em y = -3; vila a ~60 m ao norte",
+        "farol7_beacon": "eixo em x = z = 0, base em y = 0; BeaconSpin gira em Y",
+        "farol7_chair": "eixo do pe no chao; assento virado para +Z",
+        "farol7_room": "chao da sala em y = 0, centro em x = z = 0; camera olha para -Z",
+        "farol7_tower": "eixo da torre, chao da torre em y = 0 (mar em y = -3)"
+      },
+      "marcos": {
+        "Base_Chair": [
+          0.6,
+          0.0,
+          -1.0
+        ],
+        "Base_Porthole": [
+          0.55,
+          1.62,
+          -2.1
+        ],
+        "Base_Skylight": [
+          0.0,
+          2.8,
+          -0.55
+        ],
+        "Beacon_Y": 3.3499999999999996,
+        "Desk": [
+          -0.15,
+          0.76,
+          2.2,
+          0.72
+        ],
+        "Mic": [
+          0.62,
+          1.07,
+          -1.5
+        ]
+      },
+      "nota": "RB-R1 G21: palco de cutscene fora da vila para os planos 9a/9b/9c da abertura (docs/proposals/g21_farol7.md secao 2). A ligacao com a ficha da cutscene e do gameplay."
     }
   ]
 }
