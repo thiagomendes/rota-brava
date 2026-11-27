@@ -1,13 +1,15 @@
 // RB-R1 G24a2: o que fica entre a camera e o heroi some em pontilhado (dither 4x4), como nos jogos do Mario.
 // So os fragmentos dentro de um cone estreito ao longo do segmento camera -> heroi (raio occl_hero.w no heroi, metade
 // na camera) e antes do heroi; o resto do mundo nao muda. Parametros escritos por CameraRig via WV2Materials.
-// Custo: alguns ALU e um discard por fragmento; occl_amount 0 sai na primeira linha.
+// So entra na VARIANTE pontilhada do material (WV2Materials.occl_variant), aplicada as malhas que estao tapando o heroi
+// enquanto o fade dura; os materiais normais nao tem discard (early-Z intacto). No passe de sombra (projecao
+// ortografica do sol) nao pontilha: a sombra do oclusor fica inteira.
 uniform vec4 occl_hero = vec4(0.0);
 uniform vec3 occl_cam = vec3(0.0);
 uniform float occl_amount = 0.0;
 
-void occl_discard(vec3 world, vec2 frag) {
-	if (occl_amount <= 0.001 || occl_hero.w <= 0.0) {
+void occl_discard(vec3 world, vec2 frag, mat4 proj) {
+	if (occl_amount <= 0.001 || occl_hero.w <= 0.0 || proj[3][3] == 1.0) {
 		return;
 	}
 	vec3 seg = occl_hero.xyz - occl_cam;

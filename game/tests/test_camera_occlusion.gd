@@ -7,7 +7,8 @@ extends RefCounted
 ##  - vista tapada (raio da camera ao centro do heroi bate em algo): so vale se o ponto que tapa esta no pontilhado
 ##    (`CameraRig.occlusion_covers`, mesma conta do shader); nos OCCL_TIME s depois de tapar, conta como entrada do fade;
 ##  - heroi no quadro (AABB visual, pior entre 16:9 e 4:3; oclusor em pontilhado nao conta como oclusao) >= FRAC_MIN;
-##  - trocas do pontilhado (liga/desliga) por segundo, so medidas.
+##  - altura da camera acima do heroi <= braco livre + CAM_RISE_MAX (nao sobe em telhado/toldo);
+##  - trocas do pontilhado e custo da troca de material (malhas por quadro, us de CPU), so medidos.
 ## Mede estado e a conta do shader; nao comprova o que se ve na tela (ver capturas no ticket).
 
 const MARKERS: Array[StringName] = [&"M5_Crates", &"M4_Cart", &"M1_BenchClue", &"M8_FestaPlaza", &"M3_BallStop"]
@@ -16,6 +17,10 @@ const RUN_TICKS := 90
 const STEP_MAX := 0.25
 const FRAC_MIN := 0.9
 const CAM_RADIUS := 0.1
+## Copias dos valores do rig (o teste tambem roda contra o rig da integracao, que nao os tem; checado abaixo).
+const OCCL_TIME := 0.15
+const OCCL_CENTER_Y := 0.6
+const RISE_LIM := 2.7  # LOW_OFFSET.y 1,95 x (1 + RUN_ARM 0,10) + CAM_RISE_MAX 0,5 + 0,05
 
 var r
 var main: Ep01V3Main
@@ -32,6 +37,11 @@ var _toggles := 0
 var _since_block := 0.0
 var _was := false
 var _last_cam := Vector3.INF
+var _swaps := 0
+var _rise_max := 0.0
+var _swap_max := 0
+var _swapped_max := 0
+var _usec: Array[int] = []
 
 
 func run(runner) -> void:
@@ -56,6 +66,11 @@ func run(runner) -> void:
 		_low_frac = 0
 		_min_frac = 1.0
 		_toggles = 0
+		_swaps = 0
+		_rise_max = 0.0
+		_swap_max = 0
+		_swapped_max = 0
+		_usec.clear()
 		var walls := 0
 		for mk in MARKERS:
 			var m := main.world.marker(mk)
@@ -73,6 +88,14 @@ func run(runner) -> void:
 		var top: float = sorted[-1] if sorted.size() > 0 else 0.0
 		var p99: float = sorted[int(sorted.size() * 0.99)] if sorted.size() > 0 else 0.0
 		var secs := maxf(_ticks / float(Engine.physics_ticks_per_second), 0.001)
+		var us := _usec.duplicate()
+		us.sort()
+		var us_avg := 0.0
+		for u: int in us:
+			us_avg += u
+		us_avg /= maxf(us.size(), 1.0)
+		print("  medida oclusao custo (%s): %d trocas de material no percurso (max %d num quadro), max %d malhas pontilhadas ao mesmo tempo; CPU da atualizacao media %.0f us, p99 %d us, max %d us (GPU no celular nao medida)" % [
+			"reduzido" if reduced else "normal", _swaps, _swap_max, _swapped_max, us_avg, us[int(us.size() * 0.99)] if us.size() > 0 else 0, us[-1] if us.size() > 0 else 0])
 		print("  medida oclusao (%s): %d paredes, %d passos; salto max %.2f m/quadro, p99 %.3f; camera dentro %d; vista tapada %d passos (%d entrando no fade, %d sem pontilhado %s); heroi no quadro min %.0f%% (%d < %.0f%%); pontilhado liga/desliga %.2f/s" % [
 			tag, walls, _ticks, top, p99, _inside, _blocked, _fading, _uncovered.size(), _uncovered.slice(0, 3), _min_frac * 100.0, _low_frac, FRAC_MIN * 100.0, _toggles / secs])
 		r.check(walls >= 4 and _ticks > 800, "oclusao %s: %d paredes e %d passos" % [tag, walls, _ticks])
@@ -80,6 +103,14 @@ func run(runner) -> void:
 		r.check(_inside == 0, "oclusao %s: camera nunca dentro de obstaculo ou copa (%d passos)" % [tag, _inside])
 		r.check(_uncovered.is_empty(), "oclusao %s: vista tapada so com o oclusor em pontilhado (%d passos sem)" % [tag, _uncovered.size()])
 		r.check(_low_frac == 0, "oclusao %s: heroi >= %.0f%% no quadro (min %.0f%%)" % [tag, FRAC_MIN * 100.0, _min_frac * 100.0])
+		var rise_lim := RISE_LIM
+		var consts: Dictionary = (CameraRig as Script).get_script_constant_map()
+		if consts.has("OCCL_TIME"):
+			r.check(is_equal_approx(float(consts["OCCL_TIME"]), OCCL_TIME) and is_equal_approx(float(consts["OCCL_CENTER_Y"]), OCCL_CENTER_Y)
+				and absf(CameraRig.LOW_OFFSET.y * (1.0 + float(consts["RUN_ARM"])) + float(consts["CAM_RISE_MAX"]) + 0.05 - RISE_LIM) < 0.01,
+				"oclusao %s: copias dos valores do rig conferem" % tag)
+		print("  medida oclusao altura (%s): camera ate %.2f m acima do heroi (limite %.2f)" % [tag, _rise_max, rise_lim])
+		r.check(_rise_max <= rise_lim, "oclusao %s: camera nao sobe em telhado/toldo (%.2f <= %.2f m acima do heroi)" % [tag, _rise_max, rise_lim])
 		r.check(_blocked > 20, "oclusao %s: percurso teve vista tapada para testar o pontilhado (%d passos)" % [tag, _blocked])
 		main.queue_free()
 		await r.frames(2)
@@ -110,8 +141,8 @@ func _along(label: String, stand: Vector3, normal: Vector3) -> void:
 
 
 func _measure(label: String) -> void:
-	var rig := main.camera_rig
-	var cam := rig.camera.global_position
+	var rig: Variant = main.camera_rig  # sem tipo: roda tambem contra o rig da integracao
+	var cam: Vector3 = rig.camera.global_position
 	var hero := main.controlled_node
 	_ticks += 1
 	if _last_cam != Vector3.INF:
@@ -129,7 +160,7 @@ func _measure(label: String) -> void:
 			inside = true
 	if inside:
 		_inside += 1
-	var center := hero.global_position + Vector3(0, CameraRig.OCCL_CENTER_Y, 0)
+	var center := hero.global_position + Vector3(0, OCCL_CENTER_Y, 0)
 	var ray := PhysicsRayQueryParameters3D.create(cam, center, rig.collision_mask, rig.exclude)
 	var hit := space.intersect_ray(ray)
 	var blocked := not hit.is_empty()
@@ -140,11 +171,18 @@ func _measure(label: String) -> void:
 	_since_block += 1.0 / Engine.physics_ticks_per_second
 	if blocked:
 		_blocked += 1
-		if not rig.occlusion_covers(hit["position"] as Vector3):
-			if _since_block <= CameraRig.OCCL_TIME + 0.02:
+		# Rig sem pontilhado (integracao antiga): toda vista tapada conta como sem pontilhado.
+		if not (rig.has_method(&"occlusion_covers") and rig.occlusion_covers(hit["position"] as Vector3)):
+			if _since_block <= OCCL_TIME + 0.02:
 				_fading += 1
 			else:
 				_uncovered.append(label)
+	_rise_max = maxf(_rise_max, cam.y - hero.global_position.y)
+	if rig.get(&"occlusion") != null:
+		_swaps += rig.occlusion.swaps_frame
+		_swap_max = maxi(_swap_max, rig.occlusion.swaps_frame)
+		_swapped_max = maxi(_swapped_max, rig.occlusion.swapped_now)
+		_usec.append(rig.occlusion.usec_frame)
 	var f := _hero_fraction(rig.camera, hero)
 	_min_frac = minf(_min_frac, f)
 	if f < FRAC_MIN:

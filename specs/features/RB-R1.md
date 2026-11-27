@@ -980,3 +980,23 @@ Critérios de aceite:
   - A outra é `test_movement_f1.gd:312` ("0 vistas com lugar livre a 1,6 m"): com a câmera atrás do oclusor em vez de encurtada, o anel de 1,6 m em volta do herói fica todo à vista na praça. É uma suposição do teste sobre a geometria da câmera, e não mexi nele.
 - **Capturas** em `captures/g24a2/` (Vulkan em xvfb): `depois_M5_Crates.png` (câmera sobre o toldo, toldo e parede em pontilhado no cone, herói visível) e `depois_M4_Cart.png` (chafariz em pontilhado no canto, herói inteiro).
 - **Não medido:** custo do discard no celular. Como o discard fica em todos os materiais do mundo, ele pode desligar o early-Z mesmo com `occl_amount` 0. A sombra também passa pelo discard.
+- **G24a2, rodada 2** (pedido do lead):
+  - **Desempenho:** os 5 shaders do mundo voltaram ao original, sem `discard`.
+    - A variante pontilhada é montada em tempo de execução (`WV2Materials.occl_variant`/`occl_mesh`, cache por material e por malha) e criada já na carga.
+    - `CameraOcclusion` (`game/episodes/ep01/camera_occlusion.gd`) troca a variante só nas malhas cuja caixa cruza o cone câmera → herói: por superfície no `MeshInstance3D`, pela malha no `MultiMeshInstance3D`. Devolve tudo quando o fade termina.
+    - No passe de sombra do sol (projeção ortográfica) o shader não pontilha.
+    - Medido no `test_camera_occlusion`: 30 trocas no percurso, no máximo 5 malhas num quadro e 5 ao mesmo tempo; CPU da atualização com média de 75 µs, p99 de 320 µs e máximo de 677 µs. Antes de criar as variantes na carga, o máximo era 8,7 ms.
+    - Na captura da vila (Vulkan), 26 malhas ficaram pontilhadas ao mesmo tempo, porque as caixas de MultiMesh são grandes.
+    - **Pendente:** custo de GPU no celular, e a compilação de cada variante no primeiro desenho (pode dar tranco).
+  - **G3 "vai-e-volta": continua em 3,3/s, limite 3.**
+    - Filtrar a altura do herói piorou para 9,3/s: a câmera passa a atrasar a altura do passo, e o herói se mexe na tela.
+    - O balanço lateral não existe no corpo-raiz do herói; só o visual anima.
+    - Com a câmera presa ao herói, o resto da variação vem da abertura da corrida (`run_open`) acompanhando a velocidade, que oscila nos desvios do percurso.
+    - Histerese na abertura, rampa linear e velocidade média de 0,8 s pioraram o resultado (5,6 a 6,4/s; p99 de até 154 m/s²). O percurso do teste reage de forma caótica a mudanças pequenas.
+    - Ficou o estado de 3,3/s (p99 de 63,3 m/s², 0,50 inversões/s do braço). Não mexi no limite.
+  - **`test_movement_f1.gd:312`:** com a câmera baixa normal o anel de 1,6 m fica todo à vista na praça. A checagem passou a usar câmera de braço curto (como encostada numa parede), com o mesmo giro e a mesma mira, para existir lugar livre fora da vista. Agora 4 vistas são testadas e todas escolhem 1,60 m.
+  - **Telhado e toldo:** a câmera não sobe escorregando além de `CAM_RISE_MAX` 0,5 m acima do braço livre. Teste: altura máxima 2,49 m (normal) e 2,54 m (reduzido), com limite de 2,70 m.
+    - Na captura `captures/g24a2/v2_M5_Crates.png` a câmera está a 2,02 m acima do herói, a altura normal. O toldo é que é mais baixo que ela.
+    - Não provei que o teste falharia sem o limite.
+  - **Prova contra o rig da integração (`775223a`)**, mesmo teste adaptado: salto máximo de 3,32 m (normal) e 3,73 m (reduzido); câmera dentro em 149 e 146 passos; vista tapada sem pontilhado em 68 e 69 passos; herói no quadro com mínimo de 8% e 30%. **Agora:** salto máximo de 0,20 m, 0 passos dentro, 0 sem pontilhado, mínimo de 97% no quadro.
+  - **Suíte completa:** `FALHOU (5380 PASS, 1 FALHA(S))` em 555 s. A única falha é o "vai-e-volta" do G3.

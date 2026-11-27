@@ -294,7 +294,11 @@ func _nearest_teleport_ring() -> void:
 	await _place(base, base + Vector3(0, 0, -3))
 	var checked := 0
 	for yaw_deg: float in [0.0, 90.0, 180.0, 270.0]:
-		main.camera_rig.set_low_view(deg_to_rad(yaw_deg))
+		# G24a2: a camera nao encurta mais por objeto no meio (fica atras dele, em pontilhado), entao na praca o anel de
+		# 1,6 m fica todo a vista com a camera baixa normal. O que esta checagem protege e a ESCOLHA do anel de 1,6 m quando
+		# ha lugar livre fora da vista; para existir esse lugar, a camera fica perto (braco curto, como encostada numa
+		# parede), com o mesmo giro e a mesma mira.
+		main.camera_rig.set_view(Vector3(0, 1.2, 1.3), deg_to_rad(yaw_deg), CameraRig.LOW_LOOK_Y)
 		main.camera_rig.follow(lead, true)
 		await _steps(2)
 		var free16 := false

@@ -1,6 +1,5 @@
 shader_type spatial;
 render_mode diffuse_burley, specular_schlick_ggx;
-#include "res://lookdev/world_v2/wv2_occlusion.gdshaderinc"
 // Rota Brava · Mundo v2 (RB-R1 W1) · superficie com textura de verdade (UV em metros do Blender).
 // albedo_tex = cor (sRGB); data_tex = R,G normal (OpenGL) · B mascara de tingimento · A rugosidade.
 // A cor de vertice (tinta da parede, cor da veneziana...) so tinge onde a mascara manda (lascas mostram madeira).
@@ -48,7 +47,6 @@ void vertex() {
 }
 
 void fragment() {
-	occl_discard((INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz, FRAGCOORD.xy);
 	vec2 uv = UV / tex_meters;
 	vec3 a = texture(albedo_tex, uv).rgb;
 	vec4 d = texture(data_tex, uv);

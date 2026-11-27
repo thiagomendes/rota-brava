@@ -52,12 +52,16 @@ var occluded: bool = false
 var _rel_s: Vector3 = Vector3.ZERO
 var _rel_fresh: bool = true
 var occlusion_amount: float = 0.0
+## Quem troca o material das malhas que tapam (Ep01 v3: CameraOcclusion do mundo); null = so calcula `occluded`.
+var occlusion: CameraOcclusion
 const OCCL_RADIUS := 0.7
 const OCCL_CENTER_Y := 0.6
 const OCCL_TIME := 0.15
 ## Deslocamento maximo da camera por quadro de fisica com `occlusion_fade` (m).
 const STEP_MAX := 0.2
 const CLOSE_LOOK_Y := 0.55
+## Quanto a camera pode subir acima do braco livre escorregando por superficie (m).
+const CAM_RISE_MAX := 0.5
 ## Encurtamento do ultimo quadro (m; 0 = livre), para testes e depuracao.
 var last_pull: float = 0.0
 var _probe: SphereShape3D
@@ -317,6 +321,7 @@ func _slide(from: Vector3, to: Vector3) -> Vector3:
 	if motion.length() > STEP_MAX:
 		motion = motion.normalized() * STEP_MAX
 	for i in 3:
+		motion.y = minf(motion.y, maxf(to.y + CAM_RISE_MAX - p.y, 0.0))
 		if motion.length() < 0.0005:
 			break
 		q.transform = Transform3D(Basis(), p)
@@ -333,6 +338,14 @@ func _slide(from: Vector3, to: Vector3) -> Vector3:
 			break
 		motion = (motion * (1.0 - res[0])).slide((info["normal"] as Vector3).normalized())
 	p = _out_of_canopies(_depenetrate(p))
+	# Nao sobe por cima de telhado/toldo escorregando: no maximo CAM_RISE_MAX acima do braco livre.
+	if p.y > to.y + CAM_RISE_MAX:
+		var low := Vector3(p.x, to.y + CAM_RISE_MAX, p.z)
+		var down := low - p
+		q.transform = Transform3D(Basis(), p)
+		q.motion = down
+		var rd := space.cast_motion(q)
+		p += down * (rd[0] if rd.size() == 2 else 1.0)
 	if _inside(p):
 		# A varredura nao viu (forma concava/fina): fica onde estava, se la estava livre.
 		var back := _out_of_canopies(_depenetrate(from))
@@ -410,7 +423,8 @@ func _update_occlusion(cam: Vector3, delta: float) -> void:
 			break
 	var want := 1.0 if occluded else 0.0
 	occlusion_amount = want if delta <= 0.0 else move_toward(occlusion_amount, want, delta / OCCL_TIME)
-	WV2Materials.set_occlusion(cam, hero + Vector3(0, OCCL_CENTER_Y, 0), OCCL_RADIUS, occlusion_amount)
+	if occlusion != null:
+		occlusion.update(cam, hero + Vector3(0, OCCL_CENTER_Y, 0), OCCL_RADIUS, occlusion_amount)
 
 
 func _segment_hits_canopy(a: Vector3, b: Vector3) -> bool:
@@ -423,7 +437,8 @@ func _segment_hits_canopy(a: Vector3, b: Vector3) -> bool:
 	return false
 
 
-## G24a2: `point` some no pontilhado agora? (mesma conta do wv2_occlusion.gdshaderinc, para testes.)
+## G24a2: `point` some no pontilhado agora? (mesma conta do wv2_occlusion.gdshaderinc e a malha dele esta com a
+## variante pontilhada; para testes.)
 func occlusion_covers(point: Vector3) -> bool:
 	if occlusion_amount < 0.5:
 		return false
@@ -433,7 +448,9 @@ func occlusion_covers(point: Vector3) -> bool:
 	var t := (point - cam).dot(seg) / maxf(seg.length_squared(), 1e-4)
 	if t <= 0.0 or t >= 1.0:
 		return false
-	return (cam + seg * t).distance_to(point) < OCCL_RADIUS * lerpf(0.5, 1.0, t)
+	if (cam + seg * t).distance_to(point) >= OCCL_RADIUS * lerpf(0.5, 1.0, t):
+		return false
+	return occlusion == null or occlusion.covers_point(point)
 
 
 ## Mola criticamente amortecida (sem salto de velocidade): `smooth_time` ~ tempo para chegar ao alvo.

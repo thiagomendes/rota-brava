@@ -1,6 +1,5 @@
 shader_type spatial;
 render_mode cull_disabled, diffuse_lambert_wrap, specular_schlick_ggx;
-#include "res://lookdev/world_v2/wv2_occlusion.gdshaderinc"
 // Rota Brava · Mundo v2 (RB-R1 W1) · tufos de grama, flores e juncos (MultiMesh). Cor de vertice com base escura e
 // ponta clara (assada no Blender), normal puxada para cima (o tufo acende como o gramado), luz que atravessa e vento.
 // PROVISORIO ate aprovacao de Thiago.
@@ -24,7 +23,6 @@ void vertex() {
 }
 
 void fragment() {
-	occl_discard((INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz, FRAGCOORD.xy);
 	ALBEDO = COLOR.rgb * tint;
 	ROUGHNESS = roughness_value;
 	SPECULAR = 0.3;

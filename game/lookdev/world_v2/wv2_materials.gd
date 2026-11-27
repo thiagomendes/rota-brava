@@ -157,16 +157,51 @@ static func set_festival(on: bool) -> void:
 
 
 ## Troca os materiais de toda malha sob `root` pelo material da biblioteca com o mesmo nome. Devolve quantas superficies.
-## RB-R1 G24a2: pontilhado do que fica entre a camera e o heroi (wv2_occlusion.gdshaderinc). `hero` = centro do heroi,
-## `radius` no heroi (m), `amount` 0..1 (0 desliga). Uma escrita por material da biblioteca (dezenas, nao por malha).
+## RB-R1 G24a2: variante pontilhada de um material da biblioteca (mesmos parametros, shader com
+## wv2_occlusion.gdshaderinc). So as malhas que tapam o heroi usam a variante, e so enquanto o fade dura.
+const OCCL_INC := "res://lookdev/world_v2/wv2_occlusion.gdshaderinc"
+static var _occl_shaders: Dictionary = {}
+static var _occl_mats: Dictionary = {}
+
+
+static func occl_variant(m: Material) -> Material:
+	var sm := m as ShaderMaterial
+	if sm == null or sm.shader == null or not sm.shader.code.contains("void fragment() {"):
+		return m
+	if _occl_mats.has(sm):
+		return _occl_mats[sm]
+	var sh: Shader = _occl_shaders.get(sm.shader)
+	if sh == null:
+		var code := sm.shader.code
+		var nl := code.find("\n")
+		code = code.substr(0, nl + 1) + "#include \"%s\"\n" % OCCL_INC + code.substr(nl + 1)
+		code = code.replace("void fragment() {", "void fragment() {\n\tocc" + "l_discard((INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz, FRAGCOORD.xy, PROJECTION_MATRIX);")
+		sh = Shader.new()
+		sh.code = code
+		_occl_shaders[sm.shader] = sh
+	var v := sm.duplicate() as ShaderMaterial
+	v.shader = sh
+	_occl_mats[sm] = v
+	return v
+
+
+## Parametros do pontilhado nas variantes ja criadas (dezenas no maximo; nao por malha).
 static func set_occlusion(cam: Vector3, hero: Vector3, radius: float, amount: float) -> void:
-	for k in _cache:
-		var m := _cache[k] as ShaderMaterial
-		if m == null:
-			continue
+	for k in _occl_mats:
+		var m := _occl_mats[k] as ShaderMaterial
 		m.set_shader_parameter("occl_cam", cam)
 		m.set_shader_parameter("occl_hero", Vector4(hero.x, hero.y, hero.z, radius))
 		m.set_shader_parameter("occl_amount", amount)
+
+
+## Malha com cada material trocado pela variante pontilhada (MultiMesh: nao ha override por superficie).
+static func occl_mesh(src: Mesh) -> Mesh:
+	var mesh := src.duplicate() as Mesh
+	for i in mesh.get_surface_count():
+		var m := mesh.surface_get_material(i)
+		if m != null:
+			mesh.surface_set_material(i, occl_variant(m))
+	return mesh
 
 
 static func apply(root: Node) -> int:

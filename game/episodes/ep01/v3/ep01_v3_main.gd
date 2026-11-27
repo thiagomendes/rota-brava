@@ -191,6 +191,7 @@ func _setup_camera_avoidance() -> void:
 			camera_rig.exclude.append(b.get_rid())
 	camera_rig.occluders = tree_canopies()
 	camera_rig.occlusion_fade = true  # G24a2: o que tapa o heroi vira pontilhado; o braco so encurta para nao entrar em nada
+	camera_rig.occlusion = CameraOcclusion.new(world)
 
 
 ## Copas das arvores do kit como esferas (centro, raio), da caixa da malha de cada tipo e do layout do mundo.
