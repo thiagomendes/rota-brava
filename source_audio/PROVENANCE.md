@@ -200,6 +200,9 @@ Nao usado (licenca diferente de CC0): `picture.jpg` do pacote World Percussion (
 | `res://audio/voice/ep01_river_pilot_slow_down.wav` | original | Balbucio sintetizado (formantes) — nenhuma amostra de terceiros | `source_audio/babble/babble.py (sintese formante original)` |
 | `res://audio/voice/ep01_river_pilot_spot_captain.wav` | original | Balbucio sintetizado (formantes) — nenhuma amostra de terceiros | `source_audio/babble/babble.py (sintese formante original)` |
 | `res://audio/voice/ep01_river_pilot_start.wav` | original | Balbucio sintetizado (formantes) — nenhuma amostra de terceiros | `source_audio/babble/babble.py (sintese formante original)` |
+| `res://audio/radio/sfx_radio_open.ogg` | original | original: "kssh" de abrir o radio: ruido em banda 900-4200 Hz + clique de tecla; gerado pelo projeto (semente 7007), sha256 `98c8dd3753eb83d6468845b419066cd0e7959ae4c61c7d574d3961a1ee7544fb` | `tools/audio/radio_fx.py` |
+| `res://audio/radio/sfx_radio_close.ogg` | original | original: clique de fechar o radio + cauda curta de chiado (700-3800 Hz); gerado pelo projeto (semente 7007), sha256 `da172b4bf7fd03463babb5a437c6961b317768f2600e7db0133e7a50f8cd8570` | `tools/audio/radio_fx.py` |
+| `res://audio/radio/amb_radio_hiss.ogg` | original | original: chiado de fundo do radio em laco (ruido 300-3400 Hz, -42 dBFS RMS, estalos raros); gerado pelo projeto (semente 7007), sha256 `b78fc7a358e48a3126d5b8342077b60c91abeb560f7668c028e2ebc2cf7e38f2` | `tools/audio/radio_fx.py` |
 
 Total: 145 arquivos de audio. Data de download/geracao: 2026-11-23.
 
@@ -327,3 +330,8 @@ Gemini API (TTS, vozes pre-prontas) com o elenco aprovado por Thiago (`tools/voi
 | `res://audio/voice/v3/ep01_radio_v3_m6_buoys.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Schedar, 2026-11-27T08:33:24+00:00 | `tools/voice/gen_v3.py` | `ff8510721c1c7521…` |
 | `res://audio/voice/v3/ep01_radio_v3_m6_approach.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Schedar, 2026-11-27T08:33:30+00:00 | `tools/voice/gen_v3.py` | `41bda94c2d0f9183…` |
 | `res://audio/voice/v3/ep01_radio_v3_m6_rope.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Schedar, 2026-11-27T08:33:37+00:00 | `tools/voice/gen_v3.py` | `2166c1b57e3ab4c6…` |
+
+## Sons de radio do Farol 7 (G20)
+Gerados pelo projeto, sem amostras de terceiros: `tools/audio/radio_fx.py` (numpy/scipy/soundfile em `.tools/audio-venv`),
+semente fixa 7007, OGG Vorbis 44,1 kHz mono. Parametros, medidas e sha256 por arquivo em `source_audio/radio/g20_generated.json`.
+Data de geracao: 2026-11-27. Nada foi ouvido por agentes; aceite perceptual com Thiago.
