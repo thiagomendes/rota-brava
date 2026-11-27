@@ -47,6 +47,12 @@ const CHARS := {
 		"tris": [12000, 23999],
 		"materials": ["mat_amora_v2_face_eye", "mat_amora_v2_face_iris", "mat_amora_v2_face_dark", "mat_amora_v2_face_skin", "mat_amora_v2_face_mouth",
 			"mat_amora_v2_cloth", "mat_amora_v2_skin", "mat_amora_v2_hair", "mat_amora_v2_gear"]},
+	# RB-R1 G21: Lumi, o operador do radio do Farol 7 (adulto, padrao dos secundarios v2)
+	"lumi": {"scene": "lumi_model", "glb": "res://assets/models/characters/lumi_v2.glb", "v2": true, "skinned": 5, "head_part": "Lumi_Hair",
+		"root": "Lumi", "prefix": "Lumi", "anims": ["idle", "talk", "wave", "point"], "shapes": FULL_SHAPES, "height": [1.60, 1.85],
+		"tris": [15000, 24999],
+		"materials": ["mat_lumi_v2_face_eye", "mat_lumi_v2_face_iris", "mat_lumi_v2_face_dark", "mat_lumi_v2_face_skin", "mat_lumi_v2_face_mouth",
+			"mat_lumi_v2_cloth", "mat_lumi_v2_skin", "mat_lumi_v2_hair", "mat_lumi_v2_gear"]},
 	"villager_a": {"scene": "villager_a", "glb": "res://assets/models/characters/villager_a.glb", "root": "VillagerA", "prefix": "VillagerA",
 		"anims": ["idle", "walk", "wave", "chat"], "shapes": FULL_SHAPES, "height": [1.45, 1.9],
 		"materials": ["mat_villager_a_pele", "mat_villager_a_uniforme", "mat_villager_a_cabelo"]},
@@ -57,7 +63,7 @@ const CHARS := {
 		"anims": ["idle", "walk", "wave", "chat"], "shapes": FULL_SHAPES, "height": [0.8, 1.1],
 		"materials": ["mat_villager_c_pele", "mat_villager_c_uniforme", "mat_villager_c_cabelo"]},
 }
-const PORTRAIT_IDS := ["rastro", "pico", "leme", "captain", "pup"]
+const PORTRAIT_IDS := ["rastro", "pico", "leme", "captain", "pup", "lumi"]
 const PORTRAIT_EXPRS := ["neutra", "alegre", "surpresa"]
 
 var r
@@ -74,13 +80,14 @@ func run(runner) -> void:
 		await _test_hero_child(id)
 		await _test_loops_close(id)
 		await _test_eyes_open_loops(id)
-	for id in ["rastro", "pico", "leme", "captain", "villager_a", "villager_b", "villager_c"]:
+	for id in ["rastro", "pico", "leme", "captain", "lumi", "villager_a", "villager_b", "villager_c"]:
 		await _test_idle_upright(id)
 	await _test_pico()
 	await _test_pup()
 	await _test_pup_gaits()
 	await _test_point_gestures()
 	await _test_amora()
+	await _test_lumi()
 	await _test_member_actor_idle()
 	await _test_inspect_real_pawmark()
 	await _test_leme_wheel()
@@ -591,7 +598,7 @@ func _test_pup_gaits() -> void:
 ## RB-R1 arte das cenas: `point` de Pico (novo), Rastro e Leme (existentes): ~1,2 s, sem loop, a mao direita vai para a frente
 ## (-Z) e para fora na altura do peito e volta para perto da pose inicial.
 func _test_point_gestures() -> void:
-	for id in ["pico", "rastro", "leme", "amora"]:
+	for id in ["pico", "rastro", "leme", "amora", "lumi"]:
 		var root := await _spawn(id)
 		var vis := root.find_child("Model", false, false) as CharacterVisual
 		var len := vis.animation_length(&"point")
@@ -651,6 +658,51 @@ func _test_amora() -> void:
 	var t0 := vis.bone_position(&"hand.R")
 	vis.seek_clip(&"talk", 3.0 - 0.001)
 	r.check(vis.bone_position(&"hand.R").distance_to(t0) < 0.02, "chars: talk da Amora termina na pose do inicio (pode repetir sem salto)")
+	root.queue_free()
+	await r.frames(1)
+
+
+## RB-R1 G21: Lumi (operador do Farol 7). PBR com verniz, olhos abertos em todo clipe (G1), loop do idle fechado, aceno
+## que ergue a mao, talk que abre a boca e volta a pose, altura entre a Dona Amora e o capitao, HeadAnchor na cabeca.
+func _test_lumi() -> void:
+	await _test_eyes_open_loops("lumi")
+	await _test_loops_close("lumi")
+	var root := await _spawn("lumi")
+	var vis := root.find_child("Model", false, false) as CharacterVisual
+	r.check(vis.is_pbr(), "chars: Lumi marcado PBR (acabamento dos v2)")
+	var coat := 0
+	for m in _glb_json("res://assets/models/characters/lumi_v2.glb").get("materials", []):
+		if ((m as Dictionary).get("extensions", {}) as Dictionary).has("KHR_materials_clearcoat"):
+			coat += 1
+	r.check(coat >= 8, "chars: Lumi com verniz (clearcoat no GLB) em %d materiais" % coat)
+	r.check(absf(vis.animation_length(&"talk") - 3.0) < 0.02 and absf(vis.animation_length(&"wave") - 1.6) < 0.02
+		and absf(vis.animation_length(&"idle") - 3.6) < 0.02, "chars: Lumi talk 3,0 s, wave 1,6 s, idle 3,6 s")
+	var h := _aabb(root).size.y
+	r.check(h > 1.66 and h < 1.78, "chars: Lumi entre a Dona Amora (1,68) e o capitao (1,77): %.3f m" % h)
+	var anchor := root.find_child("HeadAnchor", false, false) as Node3D
+	var head := vis.bone_position(&"head")
+	r.check(anchor != null and anchor.position.y > head.y and anchor.position.y < h, "chars: HeadAnchor do Lumi na cabeca (%.2f m; osso head %.2f, topo %.2f)"
+		% [anchor.position.y if anchor != null else -1.0, head.y, h])
+	vis.seek_clip(&"wave", 0.0)
+	var h0 := vis.bone_position(&"hand.R")
+	vis.seek_clip(&"wave", 0.8)
+	r.check(vis.bone_position(&"hand.R").y > vis.bone_position(&"head").y - 0.15, "chars: wave do Lumi ergue a mao a altura da cabeca")
+	vis.seek_clip(&"wave", 1.6 - 0.001)
+	r.check(vis.bone_position(&"hand.R").distance_to(h0) < 0.06, "chars: wave do Lumi volta a pose inicial")
+	var anim := vis.animation_player().get_animation(&"talk")
+	var mouth_tracks := 0
+	for i in anim.get_track_count():
+		if anim.track_get_type(i) == Animation.TYPE_BLEND_SHAPE and String(anim.track_get_path(i)).contains("mouth_"):
+			var mx := 0.0
+			for k in anim.track_get_key_count(i):
+				mx = maxf(mx, float(anim.track_get_key_value(i, k)))
+			if mx > 0.3:
+				mouth_tracks += 1
+	r.check(mouth_tracks >= 2, "chars: talk do Lumi abre a boca (visemas animados: %d)" % mouth_tracks)
+	vis.seek_clip(&"talk", 0.0)
+	var t0 := vis.bone_position(&"hand.R")
+	vis.seek_clip(&"talk", 3.0 - 0.001)
+	r.check(vis.bone_position(&"hand.R").distance_to(t0) < 0.02, "chars: talk do Lumi termina na pose do inicio")
 	root.queue_free()
 	await r.frames(1)
 
@@ -855,7 +907,7 @@ func _test_no_foreign_models() -> void:
 		if f.ends_with(".import") or f.ends_with(".uid"):
 			continue
 		if not (f in ["rastro.glb", "leme.glb", "pico.glb", "captain.glb", "pup.glb", "villager_a.glb", "villager_b.glb", "villager_c.glb", "rastro_v2.glb", "pico_v2.glb", "leme_v2.glb", "amora.glb",
-				"captain_v2.glb", "pup_v2.glb", "amora_v2.glb"]):
+				"captain_v2.glb", "pup_v2.glb", "amora_v2.glb", "lumi_v2.glb"]):
 			foreign.append(f)
 	r.check(foreign.is_empty(), "chars: pasta de personagens so tem GLB do manifesto %s" % [foreign])
 	var man: Variant = JSON.parse_string(FileAccess.get_file_as_string(ProjectSettings.globalize_path("res://").path_join("../source_art/manifest.json")))
@@ -868,7 +920,8 @@ func _test_no_foreign_models() -> void:
 				r.check(int(d.get("quantidade_ossos", 0)) >= 22 and (d.get("animacoes_duracao_s", {}) as Dictionary).size() >= 2 and (d.get("shape_keys", []) as Array).has("blink"),
 					"chars: manifesto de %s registra ossos, animacoes e shape keys" % d["id"])
 	for id in CHARS:
-		r.check(ids.has(id), "chars: manifesto lista %s" % id)
+		# RB-R1 G21: personagem que ja nasceu v2 (Lumi) entra no manifesto so como <id>_v2
+		r.check(ids.has(id) or ids.has(id + "_v2"), "chars: manifesto lista %s" % id)
 
 
 
@@ -883,7 +936,7 @@ func _test_pbr_and_accessories() -> void:
 		r.check(vis.is_pbr(), "chars: %s v2 marcado metadata/pbr no Model" % id)
 		root.queue_free()
 	# RB-R1 G4: capitao, filhote e Dona Amora v2 sao PBR (sem Stylize/contorno); os moradores antigos seguem toon
-	for id in ["captain", "pup", "amora"]:
+	for id in ["captain", "pup", "amora", "lumi"]:
 		var sec := await _spawn(id)
 		r.check((sec.find_child("Model", false, false) as CharacterVisual).is_pbr(), "chars: %s v2 marcado PBR" % id)
 		sec.queue_free()
@@ -903,7 +956,7 @@ func _test_pbr_and_accessories() -> void:
 						outlined += 1
 			r.check(outlined == 0, "chars: %s v2 montado sem Stylize/contorno (%d superficies com next_pass)" % [member, outlined])
 		a.queue_free()
-	for id in ["captain_model", "pup_model", "amora_model"]:
+	for id in ["captain_model", "pup_model", "amora_model", "lumi_model"]:
 		var sf := StoryFigure.spawn(r.tree.root, id, "SecondaryProbe")
 		var passes := 0
 		for n in sf.find_children("*", "MeshInstance3D", true, false):
