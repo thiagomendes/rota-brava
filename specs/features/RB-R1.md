@@ -850,3 +850,23 @@ Print: `captures/g24/thiago_corda_m5.png` (fora do Git). No M5, a corda do Pico 
 - Pacotes: mínimo 20 falas (13 TTS, 7 balbucio) e 3 cortes, ~1 dia; médio 27 falas + cena de chamado, relance do filhote, varal de lanternas, bandeirinhas no M2; completo ~30 falas + capitão acende a festa e contador.
 - Fontes lidas: `ep01_v3_missions.json`, `ep01_v3_dialogue.json`, `ep01_v3_cutscenes.json`, `pt_BR*.json`, `ep01_v3_cutscenes.md`, `g21_farol7.md`. Dos scripts `ep01_v3_land.gd`/`ep01_v3_late.gd` só os eventos `notify_mission`. Contagem de palavras das falas feita à mão; não rodei o tempo de leitura do jogo.
 - Pendente: 3 perguntas para Thiago (seção 5 do documento).
+- **Decisões de Thiago sobre o G24e** (2026-11-27), a partir de `docs/proposals/g24_roteiro.md`:
+  1. **Pacote mínimo hoje e médio depois.** O mínimo vira o G25 (abaixo). O médio vira um ticket próprio depois que Thiago jogar o mínimo.
+  2. **Quem move a história é o filhote fujão.** O capitão pede ajuda pelo rádio já na abertura, e a ordem das missões continua a mesma.
+  3. **O varal do M2 vira bandeirinhas da festa.** Isso entra no pacote médio. Fica a mecânica do banquinho e da corda; só as peças são trocadas.
+  4. **Vozes: as novas primeiro.** O lote de 28/11 grava primeiro Lumi, Vila Maré e as falas do G25; as pendentes antigas ficam para os dias seguintes.
+
+### G25 · roteiro, pacote mínimo (dono `adventure` para textos → `gameplay` para o que não é texto; depois do G21i, porque mexe nos mesmos arquivos)
+Escopo: a seção "pacote mínimo" de `docs/proposals/g24_roteiro.md`.
+- Falas novas e reescritas, com IDs `ep01.call.c1..c3.*` e `ep01.lumi.lantern_*`, e as falas cortadas.
+- O lenço do filhote substitui a meia como pista do M2.
+- O peixe volta para a Amora no fim do M5.
+
+Critérios de aceite:
+- textos no catálogo i18n e no diálogo v3;
+- takes obsoletos fora e as falas novas em `pending.keys`, no padrão do G22c;
+- falas de mais de 8 palavras divididas;
+- o tempo de leitura medido com `Hud.line_seconds_for_text`;
+- o bot completa M0–M8;
+- `ep01_v3`, `voice_v3` e `cutscene` OK, mais a suíte completa;
+- o lote de vozes de 28/11 prioriza essas chaves.
