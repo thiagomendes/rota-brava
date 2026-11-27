@@ -982,3 +982,8 @@ Critérios de aceite:
     - "perto das lanternas" (`see_captain`, `v3_m8.thanks_2`, `captain.wave`) precisa ser conferido na tela da praça.
     - A nota `_note_g25` em `ep01_v3_dialogue.json:2736` está desatualizada.
   - Merge em `feature/rb-r1-reorientacao`.
+- **G24a2, mudança de abordagem (lead, 2026-11-27).** O WIP ficou em `feature/rb-r1-g24a2-transparencia` (`1fd71c2`) e não é integrado. Depois de 3 rodadas, a câmera "esfera que desliza" continuava sem fechar, porque o G3, o toldo e o salto brigam entre si. Causa: ela desvia de tudo, inclusive de peças pequenas (caixotes, carrinho, toldos, barracas), que são justamente o que deveria ficar transparente. **Nova abordagem:** dividir os obstáculos em duas classes.
+  - **Estrutura** (prédios, terreno, cais, muros): continua com a mola de braço de sempre (G6).
+  - **Peças** (caixotes, carrinho, toldos, barracas, barris, árvores pequenas): a câmera não desvia delas. Quando uma peça fica entre a câmera e o herói, ou contém a câmera, ela fica pontilhada; o código das variantes por malha do WIP é reaproveitado.
+
+  O critério de Thiago não muda: a câmera não pula, o herói fica visível e nada tapa o herói sem ficar transparente.
