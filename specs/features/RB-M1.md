@@ -98,3 +98,7 @@ O GitHub só mostra o "Run workflow" quando o arquivo do workflow existe na bran
   - O passo de máscara foi pulado porque não houve falha. Nenhum artefato.
   - **Avisos da Apple, válidos a partir de abril de 2027:** o build usou o SDK do iOS 26.5, e passará a ser exigido o SDK 27 (Xcode 27). O alvo é iOS 14.0, e o mínimo passará a ser 15.0. Subir o alvo para 15.0 numa próxima rodada.
   - Pendente de Thiago: processamento no TestFlight, conformidade de exportação, instalar no iPhone e jogar.
+- **Travamento no iOS** (Thiago, 2026-11-27, iPhone14,8 com iOS 27.0.1, TestFlight build 1): o app ficou cerca de 2 min 17 s na estrela de carregamento sem chegar ao menu. Quando o app foi fechado, o sistema o encerrou por watchdog (`0x8BADF00D`, "Failed to terminate gracefully after 5.0s").
+  - O relatório `.ips` mostra a thread principal e as `WorkerThread 0, 1, 3, 4 e 5` todas paradas no mesmo `recursive_mutex::lock()`. É um impasse entre threads durante o carregamento em segundo plano. Não falta memória: são 294 MB de regiões graváveis.
+  - Causa provável: o `ResourceLoader.load_threaded_request(..., use_sub_threads=true)` do `SceneLoader` e do `title_screen.gd`. O G14 (`feature/rb-r1-g14-controle`, commit `aa45972`) já trocou para `use_sub_threads=false`, depois de achar SIGBUS e um travamento no fechamento com sub-threads no Linux.
+  - Correção: integrar o G14 e gerar o build 2. Pendente: confirmar no iPhone.
