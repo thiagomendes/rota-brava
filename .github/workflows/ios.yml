@@ -1,0 +1,158 @@
+# RB-M1: build iOS para o TestFlight. So sob demanda (decisao de Thiago, 2026-11-27): aba Actions > iOS TestFlight > Run workflow.
+# Custo: minutos de macOS em repositorio privado contam com multiplicador alto (veja docs/mobile.md).
+name: iOS TestFlight
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-testflight
+  cancel-in-progress: true
+
+jobs:
+  testflight:
+    runs-on: macos-latest
+    timeout-minutes: 90
+    steps:
+      - name: Conferir segredos da Apple
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_B64: ${{ secrets.ASC_KEY_P8_B64 }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          missing=""
+          for n in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8_B64 APPLE_TEAM_ID; do
+            if [ -z "${!n}" ]; then missing="$missing $n"; fi
+          done
+          if [ -n "$missing" ]; then
+            msg="Faltam segredos do GitHub:$missing. Cadastre em Settings > Secrets and variables > Actions (passo a passo em docs/mobile.md) e rode de novo."
+            echo "::error::$msg"
+            echo "### Falhou: segredo ausente" >> "$GITHUB_STEP_SUMMARY"
+            echo "$msg" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "Segredos presentes."
+
+      - uses: actions/checkout@v4
+
+      - name: Godot 4.7.2 (macOS) e templates, com SHA-256
+        run: |
+          set -euo pipefail
+          T=tools/toolchain.json
+          mkdir -p /tmp/dl "$RUNNER_TEMP/godot"
+          curl -fL --retry 3 -o /tmp/dl/godot.zip "$(jq -r .godot.editorMacos.url $T)"
+          echo "$(jq -r .godot.editorMacos.sha256 $T)  /tmp/dl/godot.zip" | shasum -a 256 -c -
+          curl -fL --retry 3 -o /tmp/dl/tpl.tpz "$(jq -r .godot.templates.url $T)"
+          echo "$(jq -r .godot.templates.sha256 $T)  /tmp/dl/tpl.tpz" | shasum -a 256 -c -
+          unzip -oq /tmp/dl/godot.zip -d "$RUNNER_TEMP/godot"
+          TPL="$HOME/Library/Application Support/Godot/export_templates/$(jq -r .godot.templatesDir $T)"
+          mkdir -p "$TPL" /tmp/tpl
+          unzip -oq /tmp/dl/tpl.tpz -d /tmp/tpl
+          cp /tmp/tpl/templates/ios.zip /tmp/tpl/templates/version.txt "$TPL/"
+          echo "GODOT=$RUNNER_TEMP/godot/$(jq -r .godot.editorMacos.exe $T)" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/godot/$(jq -r .godot.editorMacos.exe $T)" --headless --version
+          xcodebuild -version
+
+      - name: Exportar o projeto Xcode pela Godot
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          P=game/export_presets.cfg
+          sed -i '' "s/^application\/app_store_team_id=.*/application\/app_store_team_id=\"$APPLE_TEAM_ID\"/" $P
+          sed -i '' "s/^application\/version=.*/application\/version=\"${{ github.run_number }}\"/" $P
+          mkdir -p build/ios
+          "$GODOT" --headless --path game --import
+          "$GODOT" --headless --path game --export-release "iOS" "$PWD/build/ios/RotaBrava.ipa" 2>&1 | tee build/ios/godot-export.log
+          PROJ="$(ls -d build/ios/*.xcodeproj | head -1)"
+          test -n "$PROJ"
+          SCHEME="$(xcodebuild -list -json -project "$PROJ" | jq -r '.project.schemes[0]')"
+          echo "PROJ=$PROJ" >> "$GITHUB_ENV"
+          echo "SCHEME=$SCHEME" >> "$GITHUB_ENV"
+          echo "Projeto: $PROJ, esquema: $SCHEME"
+
+      - name: Chave da App Store Connect API
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_KEY_P8_B64: ${{ secrets.ASC_KEY_P8_B64 }}
+        run: |
+          set -euo pipefail
+          K="$RUNNER_TEMP/AuthKey_${ASC_KEY_ID}.p8"
+          echo "$ASC_KEY_P8_B64" | base64 --decode > "$K"
+          chmod 600 "$K"
+          echo "ASC_KEY_PATH=$K" >> "$GITHUB_ENV"
+
+      - name: xcodebuild archive
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          xcodebuild archive \
+            -project "$PROJ" -scheme "$SCHEME" -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath "$PWD/build/ios/RotaBrava.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CODE_SIGN_STYLE=Automatic \
+            CODE_SIGN_IDENTITY="Apple Development" PROVISIONING_PROFILE_SPECIFIER="" \
+            PRODUCT_BUNDLE_IDENTIFIER=com.thiagomendes.rotabrava \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            2>&1 | tee build/ios/xcodebuild-archive.log
+
+      - name: Exportar e enviar ao App Store Connect (TestFlight)
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          cat > build/ios/ExportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>${APPLE_TEAM_ID}</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict>
+          </plist>
+          EOF
+          xcodebuild -exportArchive \
+            -archivePath "$PWD/build/ios/RotaBrava.xcarchive" \
+            -exportOptionsPlist build/ios/ExportOptions.plist \
+            -exportPath "$PWD/build/ios/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            2>&1 | tee build/ios/xcodebuild-export.log
+          {
+            echo "### Enviado ao App Store Connect"
+            echo "- Commit: \`${GITHUB_SHA}\`, build ${{ github.run_number }}"
+            echo "- A build aparece no TestFlight depois do processamento da Apple (costuma levar de 5 a 30 min)."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Apagar a chave
+        if: always()
+        run: rm -f "$RUNNER_TEMP"/AuthKey_*.p8
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: ios-logs-e-xcarchive
+          path: |
+            build/ios/*.log
+            build/ios/ExportOptions.plist
+            build/ios/RotaBrava.xcarchive
+          if-no-files-found: ignore
+          retention-days: 14
