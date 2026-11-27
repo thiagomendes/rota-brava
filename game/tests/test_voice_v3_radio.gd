@@ -38,7 +38,7 @@ func run(r) -> void:
 	var old_db := AudioServer.get_bus_volume_db(voz)
 	var old_mute := AudioServer.is_bus_mute(voz)
 	Options.apply_bus("Voz", 0.0)
-	r.check(AudioServer.is_bus_mute(voz) and AudioServer.get_bus_send(idx) == &"Voz" and AudioServer.get_bus_volume_db(idx) == 0.0, "radio: voz em 0 nas Opcoes silencia o radio (bus Radio passa pela Voz)")
+	r.check(AudioServer.is_bus_mute(voz) and AudioServer.get_bus_send(idx) == &"Voz" and AudioServer.get_bus_volume_db(idx) == RadioBus.BUS_GAIN_DB, "radio: voz em 0 nas Opcoes silencia o radio (bus Radio passa pela Voz)")
 	AudioServer.set_bus_volume_db(voz, old_db)
 	AudioServer.set_bus_mute(voz, old_mute)
 

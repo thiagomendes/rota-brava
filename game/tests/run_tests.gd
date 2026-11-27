@@ -57,6 +57,7 @@ const WEIGHTS := {
 	"test_clues_v3.gd": 0.1,
 	"test_ui_glyphs.gd": 0.1,
 	"test_voice_v3.gd": 0.1,
+	"test_audio_radio_level.gd": 11.0,
 	"test_save_slots.gd": 0.1,
 	"test_audio_babble.gd": 0.1,
 	"test_content.gd": 0.1,

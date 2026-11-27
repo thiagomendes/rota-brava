@@ -26,7 +26,9 @@ OUT = ROOT / "game/audio/radio"
 SR = 44100
 SEED = 7007
 CLICK_OFFSET_MS = 3.0
-# Mesmos valores do bus Radio em game/audio/radio_bus.gd (mantenha em sincronia).
+# Cadeia do G20 (modelo aproximado em Python do bus Radio de game/audio/radio_bus.gd).
+# G22b: na Godot a cadeia atenua ~13 LU a mais que este modelo; o ganho do bus (+10 dB) e o make-up (+14 dB) de la
+# foram medidos na propria Godot (game/tests/capture_g22b.gd) e NAO valem aqui. Nao use este modelo para nivel.
 CHAIN = {"hp_hz": 300.0, "lp_hz": 3400.0, "order": 2, "drive": 0.2, "pre_gain_db": 0.0, "post_gain_db": -1.0,
          "comp_threshold_db": -18.0, "comp_ratio": 3.0, "comp_attack_ms": 5.0, "comp_release_ms": 150.0,
          "comp_gain_db": 2.0}

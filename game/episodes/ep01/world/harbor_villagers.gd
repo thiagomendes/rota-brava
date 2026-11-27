@@ -1,6 +1,6 @@
 class_name HarborVillagers
 extends Node3D
-## Moradores animados da vila Farol 7 (RB-R1). Rotinas baratas: conversa em dupla (`chat`), passeio num laco curto
+## Moradores animados da Vila Maré (RB-R1). Rotinas baratas: conversa em dupla (`chat`), passeio num laco curto
 ## entre dois pontos (`walk` com velocidade casada) e espectadores que viram para o barco quando ele se aproxima.
 ## Sem colisao (camada/mascara 0): nunca bloqueiam o caminho jogavel. Fora da tela a animacao para (VisibleOnScreenNotifier3D).
 
