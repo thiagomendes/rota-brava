@@ -770,3 +770,4 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - (C) no M2, se outro herói age, a roupa voa da mão do antigo para o cesto ou a corda, e isso é "mágica" contra o pedido de Thiago;
   - (D) salvar e sair com peça na mão não tem teste.
   Gesto e leitura visual ficam com Thiago. Merge em `feature/rb-r1-reorientacao`.
+- **Correção no merge do G19** (lead): a suíte completa integrada falhou em 2 testes, `test_ep01_v3_dialogue` (E6) e `test_ep01_v3_portraits` (E7). O G22a renomeou o pictograma `help` para `help_balloon`, mas 6 legendas (`ep01.radio.help.invite_1..5` e `ep01.plaza.vendor.help_call`) ainda citavam `help`. Isso escapou porque, no merge do G22a, rodei só `ui,touch,hud,audio,cutscene`. A correção trocou o emote no diálogo e no catálogo v3. Resultado: `ep01_v3,voice_v3` OK (335 PASS).

@@ -2533,7 +2533,7 @@
    "visemes": "res://audio/voice/v3/ep01_plaza_vendor_help_call.visemes.json",
    "emotes": [
     "vendor",
-    "help"
+    "help_balloon"
    ],
    "group": null,
    "origin": "dialogue",

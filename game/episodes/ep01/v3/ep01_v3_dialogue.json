@@ -1316,7 +1316,7 @@
    "speaker": "radio",
    "emotes": [
     "radio",
-    "help"
+    "help_balloon"
    ],
    "take": null,
    "group": "help.radio.invite"
@@ -1325,7 +1325,7 @@
    "speaker": "radio",
    "emotes": [
     "radio",
-    "help"
+    "help_balloon"
    ],
    "take": null,
    "group": "help.radio.invite"
@@ -1334,7 +1334,7 @@
    "speaker": "radio",
    "emotes": [
     "radio",
-    "help"
+    "help_balloon"
    ],
    "take": null,
    "group": "help.radio.invite"
@@ -1343,7 +1343,7 @@
    "speaker": "radio",
    "emotes": [
     "radio",
-    "help"
+    "help_balloon"
    ],
    "take": null,
    "group": "help.radio.invite"
@@ -1352,7 +1352,7 @@
    "speaker": "radio",
    "emotes": [
     "radio",
-    "help"
+    "help_balloon"
    ],
    "take": null,
    "group": "help.radio.invite"
@@ -2289,7 +2289,7 @@
    "speaker": "vendor",
    "emotes": [
     "vendor",
-    "help"
+    "help_balloon"
    ],
    "take": null,
    "mission": "M3",
