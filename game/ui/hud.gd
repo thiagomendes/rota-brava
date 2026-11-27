@@ -45,6 +45,8 @@ const FONT := 34
 ## Alvo de toque minimo em unidades virtuais (>= 48 dp em aparelho com lado curto >= ~410 dp; ver README).
 const MIN_TOUCH := 128.0
 const ACTION_SIZE := 236.0
+## G15: largura extra (e margem do texto) dos botoes de painel que levam selo de glifo.
+const GLYPH_BUTTON_PAD := 76.0
 const PORTRAIT_ACTIVE := 148.0
 const PORTRAIT_IDLE := 96.0
 ## Margem da area segura: fracao do lado, com minimo em unidades virtuais.
@@ -160,6 +162,21 @@ func _ready() -> void:
 func apply_theme(th: Theme) -> void:
 	ui_theme = th
 	_root.theme = th
+	_pad_glyph_buttons()
+
+
+## G15: botoes com selo ganham margem a direita (o selo fica na borda e nao cobre o texto).
+func _pad_glyph_buttons() -> void:
+	for g in _button_glyphs:
+		var b := g.get_parent().get_parent() as Button
+		for st: String in ["normal", "hover", "pressed", "hover_pressed", "focus", "disabled"]:
+			b.remove_theme_stylebox_override(st)
+			var sb := b.get_theme_stylebox(st)
+			if sb == null:
+				continue
+			sb = sb.duplicate() as StyleBox
+			sb.content_margin_right = maxf(sb.content_margin_right, 0.0) + GLYPH_BUTTON_PAD
+			b.add_theme_stylebox_override(st, sb)
 
 
 func accent_color() -> Color:
@@ -434,14 +451,14 @@ func _glyph_badge_for(parent: Control, action: StringName, px: float) -> PanelCo
 	return badge
 
 
-## G15: selo do glifo na ponta direita de um botao de painel (dentro do botao, centrado na altura).
+## G15: selo do glifo na borda direita de um botao de painel (centrado na altura).
 func _button_glyph(b: Button, action: StringName) -> void:
 	var badge := _glyph_badge_for(b, action, 50)
-	badge.set_anchors_preset(Control.PRESET_CENTER_RIGHT)
 	badge.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	badge.grow_vertical = Control.GROW_DIRECTION_BOTH
-	badge.offset_right = -18
-	badge.offset_left = -18
+	# dentro da ponta direita; o botao ganha largura e margem de texto (_pad_glyph_buttons, em apply_theme)
+	badge.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT, Control.PRESET_MODE_MINSIZE, 16)
+	b.custom_minimum_size.x += GLYPH_BUTTON_PAD
 	_button_glyphs.append(badge.get_child(0) as GlyphView)
 
 
