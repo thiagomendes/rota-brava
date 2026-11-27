@@ -163,6 +163,11 @@ func run(runner) -> void:
 		var scr := (load(path) as PackedScene).instantiate() as TitleScreen
 		r.tree.root.add_child(scr)
 		await r.frames(3)
+		# o trio e o da arte-chave (carrega em segundo plano): espera ela entrar
+		var waited := 0
+		while scr.hero_models.is_empty() and waited < 900:
+			await r.frames(1)
+			waited += 1
 		var f := scr.get_viewport().gui_get_focus_owner()
 		r.check(f == scr.play_button, "%s: foco inicial em Jogar" % path.get_file())
 		r.check(scr.logo.texture != null and scr.hero_root != null, "%s: logo SVG e palco dos herois presentes" % path.get_file())
