@@ -9,7 +9,11 @@ Catalogo: game/audio/voice/v3/voice_v3_catalog.json (formato do voice_catalog.js
 Excecoes explicitas (sem take): filhote (late com o som que ja existe).
 Para em erro de cota (gemini_tts.QuotaError), grava o que ja fez e informa quantas faltam.
 
-Uso: gen_v3.py [--limit N] [--only prefixo]
+Fala que ja tem take no catalogo com o mesmo texto (text_at_generation == i18n) e OGG presente e reaproveitada
+sem chamar a API (o cache fica fora do Git e pode nao existir na sessao). Texto mudou ou --force: gera de novo;
+o take antigo so e substituido depois de o novo passar no detector (senao o antigo fica, se o texto nao mudou).
+
+Uso: gen_v3.py [--limit N] [--max-calls N] [--only prefixo] [--force chave,chave]
 """
 from __future__ import annotations
 
@@ -118,6 +122,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--only", default="")
+    ap.add_argument("--max-calls", type=int, default=0, help="para antes de passar deste numero de pedidos a API")
+    ap.add_argument("--force", default="", help="chaves separadas por virgula para gerar de novo mesmo com take")
     a = ap.parse_args(argv)
     cast, dr, tx = g.load_json("cast.json"), g.load_json("direction.json"), texts()
     OUT.mkdir(parents=True, exist_ok=True)
@@ -138,7 +144,12 @@ def main(argv: list[str] | None = None) -> int:
         style = g.directed_style(ch, direction=d) if d else g.directed_style(ch)
         stem = key.replace(".", "_")
         raw = WORK / "raw" / f"{stem}.wav"
-        if stopped or (a.limit and made >= a.limit):
+        force = key in {k for k in a.force.split(",") if k}
+        ogg = OUT / f"{stem}.ogg"
+        if key in done and not force and done[key].get("text_at_generation") == tx[key] and ogg.exists():
+            lines.append(done[key])
+            continue
+        if stopped or (a.limit and made >= a.limit) or (a.max_calls and calls + g.MAX_TRIES > a.max_calls):
             if key in done:
                 lines.append(done[key])
             continue
@@ -151,7 +162,12 @@ def main(argv: list[str] | None = None) -> int:
             continue
         calls += p["api_calls"]
         made += 1
-        ogg = OUT / f"{stem}.ogg"
+        if p["suspect_instruction_read"]:
+            # reprovado pelo detector depois de 3 tentativas: o OGG antigo nao e tocado; fica so se o texto nao mudou
+            suspects.append(key)
+            if key in done and done[key].get("text_at_generation") == tx[key]:
+                lines.append(done[key])
+            continue
         if not (key in done and done[key].get("raw_sha256") == p["sha256"] and ogg.exists()):
             tw = WORK / f"{stem}_raw.wav"
             treat(c["preset"], raw, tw)
@@ -164,9 +180,6 @@ def main(argv: list[str] | None = None) -> int:
         else:
             loud = {"lufs": done[key]["lufs"], "true_peak_dbtp": done[key]["true_peak_dbtp"]}
             dur = done[key]["duration"]
-        if p["suspect_instruction_read"]:
-            suspects.append(key)  # reprovado pelo detector depois de 3 tentativas: fica fora do catalogo (pendente)
-            continue
         lines.append({
             "id": key, "character": ch, "speaker": sp, "intent": intent_of(d, sp), "language": "pt_BR", "subtitle": key,
             "type": "gemini_tts", "file": f"res://audio/voice/v3/{stem}.ogg", "duration": dur,
