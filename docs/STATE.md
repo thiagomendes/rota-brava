@@ -53,6 +53,10 @@
   - G18: varal do M2.
   - G19 e G19b: ações no jogo revisadas e integradas (pausa congela, sem mágica na troca de herói). Lente do M7 na parede da galeria (decisão de Thiago).
   - G21: Lumi aprovado por Thiago. G21i (plano na abertura, falas novas pendentes para o lote de 28/11) com `gameplay`; G23 (pés soltos do capitão, Amora e Lumi) com `art3d`.
+  - G24 (iPhone, jogado até o resgate do capitão):
+    - G24a, câmera ao correr: com `gameplay`.
+    - G24b/c/d, corda que atravessa, barco de ré no meio dos outros e auditoria dinâmica de interpenetração: com `gameplay`.
+    - G24e, análise de roteiro: com `adventure`; Thiago aprova antes de qualquer código.
   - G22 (iPhone, build 3):
     - G22b (rádio no nível das vozes, −0,26 LU) e G22c (Vila Maré) estão revisados e integrados; falta Thiago ouvir.
     - G22a ("?" no lugar do "H" e disco de 128 px no toque) revisado e integrado; falta Thiago ver no iPhone.
