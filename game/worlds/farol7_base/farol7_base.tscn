@@ -1,0 +1,116 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://worlds/farol7_base/farol7_base.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/farol7_base/farol7_room.glb" id="2_room"]
+[ext_resource type="PackedScene" path="res://assets/models/farol7_base/farol7_chair.glb" id="3_chair"]
+[ext_resource type="PackedScene" path="res://assets/models/farol7_base/farol7_beacon.glb" id="4_beacon"]
+[ext_resource type="PackedScene" path="res://assets/models/farol7_base/farol7_tower.glb" id="5_tower"]
+[ext_resource type="PackedScene" path="res://assets/models/farol7_base/farol7_backdrop.glb" id="6_backdrop"]
+
+[node name="Farol7Base" type="Node3D"]
+script = ExtResource("1_script")
+metadata/provisional = true
+metadata/agent = "art3d"
+metadata/stage = "base_farol7"
+
+[node name="StageEnvironment" type="Node3D" parent="."]
+
+[node name="Room" parent="." instance=ExtResource("2_room")]
+
+[node name="Backdrop" parent="." instance=ExtResource("6_backdrop")]
+
+[node name="Chair" parent="." instance=ExtResource("3_chair")]
+transform = Transform3D(-1, 0, 1.2246e-16, 0, 1, 0, -1.2246e-16, 0, -1, 0.6, 0, -1)
+
+[node name="SkylightBeacon" parent="." instance=ExtResource("4_beacon")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3, -0.55)
+
+[node name="SkylightPool" type="SpotLight3D" parent="."]
+transform = Transform3D(-0.91915, 0.39147, -0.043844, 0, 0.1113, 0.99379, 0.39392, 0.91343, -0.1023, 0, 3.4, -0.55)
+light_color = Color(1, 0.86, 0.42, 1)
+light_energy = 12.0
+spot_range = 5.0
+spot_angle = 24.0
+spot_attenuation = 0.6
+shadow_enabled = true
+
+[node name="SkylightGlow" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -0.55)
+light_color = Color(1, 0.84, 0.36, 1)
+light_energy = 0.9
+omni_range = 3.2
+
+[node name="DeskLamp" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 1.05, -1.75)
+light_color = Color(1, 0.88, 0.62, 1)
+light_energy = 0.9
+omni_range = 1.6
+shadow_enabled = true
+
+[node name="Key" type="SpotLight3D" parent="."]
+transform = Transform3D(0.87929, 0.22939, -0.4174, -0, 0.87638, 0.48162, 0.47628, -0.42349, 0.77059, -1.3, 2.5, 1.2)
+light_color = Color(1, 0.95, 0.86, 1)
+light_energy = 3.0
+spot_range = 7.0
+spot_angle = 40.0
+shadow_enabled = true
+
+[node name="Fill" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9, 2.1, 1.4)
+light_color = Color(0.8, 0.88, 1, 1)
+light_energy = 0.7
+omni_range = 6.0
+
+[node name="PortholeSpill" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 1.62, -1.75)
+light_color = Color(0.85, 0.93, 1, 1)
+light_energy = 0.6
+omni_range = 2.4
+
+[node name="Exterior" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, 0)
+
+[node name="Tower" parent="Exterior" instance=ExtResource("5_tower")]
+
+[node name="TowerBeacon" parent="Exterior" instance=ExtResource("4_beacon")]
+transform = Transform3D(1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, 0, 7.32, 0)
+
+[node name="TowerBeaconLight" type="OmniLight3D" parent="Exterior"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.75, 0)
+light_color = Color(1, 0.85, 0.35, 1)
+light_energy = 2.0
+omni_range = 5.0
+
+[node name="Markers" type="Node3D" parent="."]
+
+[node name="Base_Chair" type="Marker3D" parent="Markers"]
+transform = Transform3D(-1, 0, 1.2246e-16, 0, 1, 0, -1.2246e-16, 0, -1, 0.6, 0, -1)
+
+[node name="Base_Seat" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0.6, 0.47, -0.98)
+
+[node name="Base_LumiStand" type="Marker3D" parent="Markers"]
+transform = Transform3D(-1, 0, 1.2246e-16, 0, 1, 0, -1.2246e-16, 0, -1, -0.3, 0, -0.95)
+
+[node name="Base_Porthole" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 1.62, -2.1)
+
+[node name="Base_Mic" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 1.07, -1.5)
+
+[node name="Base_CamWide" type="Marker3D" parent="Markers"]
+transform = Transform3D(0.97999, -0.033063, 0.19629, 0, 0.98611, 0.1661, -0.19906, -0.16277, 0.96637, 0.7, 1.75, 1.9)
+
+[node name="Base_CamFront" type="Marker3D" parent="Markers"]
+transform = Transform3D(0.95073, -0.029342, 0.30863, 0, 0.99551, 0.094646, -0.31002, -0.089983, 0.94646, 0.45, 1.45, 1.3)
+
+[node name="Base_CamMic" type="Marker3D" parent="Markers"]
+transform = Transform3D(0.76194, -0.16688, 0.62578, 0, 0.96623, 0.25767, -0.64765, -0.19633, 0.73621, 1.35, 1.5, -0.8)
+
+[node name="Base_Exterior" type="Marker3D" parent="Markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 0, 0)
+
+[node name="Base_CamExterior" type="Marker3D" parent="Markers"]
+transform = Transform3D(-0.90618, 0.070531, 0.41696, 0, 0.98599, -0.16678, -0.42289, -0.15114, -0.89349, 87, 1.2, -15)
+
+[node name="Actors" type="Node3D" parent="."]
