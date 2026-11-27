@@ -3,6 +3,9 @@ extends Node3D
 ## Camera em terceira pessoa dirigida por area: segue `target` com deslocamento e giro definidos pelo estagio.
 ## Sensacao (RB-R1): leve atraso (suavizacao) e antecipacao na direcao do movimento do alvo; tremor curto opcional.
 ## Com `reduced_motion`: sem atraso, sem antecipacao e sem tremor.
+## G24a (RB-R1): a antecipacao (`lead`) move so a MIRA, nunca a camera; o atraso do lerp e compensado pela velocidade
+## suavizada e a distancia horizontal ao heroi nunca fica abaixo do braco pedido. Ao correr o braco abre RUN_ARM e o
+## FOV abre RUN_FOV graus (sem variacao de FOV em `reduced_motion`), com transicao suave de ~RUN_TIME s.
 
 var camera: Camera3D
 var target: Node3D
@@ -58,6 +61,17 @@ const PITCH_SPEED := 1.4
 const PITCH_MIN := -0.22
 const PITCH_MAX := 0.55
 const MOUSE_SENS := 0.004
+
+## G24a: abertura na corrida (0 = andando/parado, 1 = correndo), entre RUN_FROM e RUN_TO m/s de velocidade planar.
+const RUN_FROM := 1.8
+const RUN_TO := 3.0
+const RUN_ARM := 0.10
+const RUN_FOV := 4.0
+const RUN_TIME := 0.6
+var run_open: float = 0.0
+var _vel: Vector3 = Vector3.ZERO
+var _fov_base: float = -1.0
+var _fov_written: float = -1.0
 
 var lead: Vector3 = Vector3.ZERO
 var _last_focus: Vector3 = Vector3.ZERO
@@ -141,18 +155,26 @@ func _update(weight: float, delta: float) -> void:
 	_clock += delta
 	var focus := target.global_position
 	_update_lead(focus, delta)
-	var base := focus + (lead if not framing_world else Vector3.ZERO)
+	_update_run(delta)
 	var rel := offset if framing_world else Basis(Vector3.UP, yaw) * (Basis(Vector3.RIGHT, -pitch) * offset)
-	var wanted := base + rel
+	if not framing_world:
+		rel *= 1.0 + RUN_ARM * run_open
+	# Compensa o atraso do lerp (v / smooth em regime) com a velocidade suavizada: sem isso a camera fica para tras
+	# (ou, correndo para ela, chega perto). Nada da antecipacao entra aqui.
+	var lag := Vector3.ZERO if weight >= 1.0 else _vel / smooth
+	var wanted := focus + rel + lag
 	# Alguem moveu a camera por fora (captura, cena): parte de onde ela esta.
 	if camera.global_position.distance_to(_written) > 0.0001:
 		_follow_pos = camera.global_position
 	_follow_pos = _follow_pos.lerp(wanted, weight)
-	var look := base + look_offset
+	if not framing_world:
+		_follow_pos = _keep_arm(focus, _follow_pos, Vector2(rel.x, rel.z).length())
+	var pivot := focus + look_offset
+	var look := pivot + (lead if not framing_world else Vector3.ZERO)
 	var pos := _follow_pos
 	if collision_mask != 0:
-		var soft := avoid(look, _follow_pos, SOFT_RADIUS, SOFT_RADIUS - PROBE_RADIUS)
-		pos = _smooth_arm(look, _follow_pos, avoid(look, _follow_pos), soft, delta)
+		var soft := avoid(pivot, _follow_pos, SOFT_RADIUS, SOFT_RADIUS - PROBE_RADIUS)
+		pos = _smooth_arm(pivot, _follow_pos, avoid(pivot, _follow_pos), soft, delta)
 	camera.global_position = pos
 	_written = pos
 	if _shake_time > 0.0 and not reduced_motion:
@@ -163,6 +185,35 @@ func _update(weight: float, delta: float) -> void:
 			_shake_amp = 0.0
 	if camera.global_position.distance_to(look) > 0.01:
 		camera.look_at(look, Vector3.UP)
+	_apply_fov()
+
+
+## G24a: o atraso nunca aproxima a camera do heroi (distancia horizontal >= `arm`); so a mola de obstaculo encurta.
+func _keep_arm(focus: Vector3, pos: Vector3, arm: float) -> Vector3:
+	var flat := Vector3(pos.x - focus.x, 0.0, pos.z - focus.z)
+	var h := flat.length()
+	if h >= arm or h < 0.001:
+		return pos
+	var out := focus + flat * (arm / h)
+	out.y = pos.y
+	return out
+
+
+## G24a: abertura suave na corrida pela velocidade planar suavizada.
+func _update_run(delta: float) -> void:
+	var want := 0.0 if framing_world else smoothstep(RUN_FROM, RUN_TO, Vector2(_vel.x, _vel.z).length())
+	if delta <= 0.0:
+		run_open = want
+		return
+	run_open = lerpf(run_open, want, 1.0 - exp(-3.0 / RUN_TIME * delta))
+
+
+## FOV base = o que o estagio pediu (set_low_view, cenas); a corrida soma ate RUN_FOV, exceto em `reduced_motion`.
+func _apply_fov() -> void:
+	if absf(camera.fov - _fov_written) > 0.001:
+		_fov_base = camera.fov
+	camera.fov = _fov_base + (0.0 if reduced_motion else RUN_FOV * run_open)
+	_fov_written = camera.fov
 
 
 ## Braco suavizado: a mola encurta (ARM_IN_TIME) e volta devagar (ARM_OUT_TIME) rumo a zona macia, com histerese de
@@ -290,18 +341,22 @@ func _exit_tree() -> void:
 
 
 func _update_lead(focus: Vector3, delta: float) -> void:
-	if reduced_motion or delta <= 0.0:
+	if delta <= 0.0 or not _has_last:
 		lead = Vector3.ZERO
-		_last_focus = focus
-		_has_last = true
-		return
-	if not _has_last:
+		_vel = Vector3.ZERO
 		_last_focus = focus
 		_has_last = true
 		return
 	var v := (focus - _last_focus) / delta
 	_last_focus = focus
 	v.y = 0.0
+	if v.length() > 40.0:
+		v = Vector3.ZERO
+		_vel = Vector3.ZERO
+	_vel = _vel.lerp(v, 1.0 - exp(-8.0 * delta))
+	if reduced_motion:
+		lead = Vector3.ZERO
+		return
 	var want := v * lead_time
 	if want.length() > LEAD_MAX:
 		want = want.normalized() * LEAD_MAX
