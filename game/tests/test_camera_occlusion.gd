@@ -27,8 +27,8 @@ const OCCL_CENTER_Y := 0.6
 ## Rig da integracao (5cef201), medido por este teste: [normal, reduzido]. Estrutura nao pode piorar (G24a3 decide).
 const BASE_JUMP: Array[float] = [3.32, 3.73]
 const BASE_INSIDE: Array[int] = [149, 146]
-const BASE_FRAC: Array[float] = [0.08, 0.30]
-const BASE_STRUCT_VIEW: Array[int] = [999, 999]
+const BASE_FRAC: Array[float] = [0.081, 0.301]
+const BASE_STRUCT_VIEW: Array[int] = [0, 1]
 const RISE_LIM := 2.7  # pedido do G24a2: camera nunca mais de 2,7 m acima do heroi
 
 var r

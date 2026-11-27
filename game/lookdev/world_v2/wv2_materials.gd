@@ -188,24 +188,19 @@ static func occl_variant(m: Material) -> Material:
 	return v
 
 
-## Peca de missao com StandardMaterial3D: o codigo que a Godot gerou para o material vira ShaderMaterial com o
-## pontilhado, com os mesmos parametros. Sem servidor de render (headless) nao ha codigo: volta o proprio material.
+## Peca de missao com StandardMaterial3D (a 4.7 nao expoe o codigo gerado ao GDScript): copia com o pontilhado de
+## distancia da propria Godot (PIXEL_DITHER), some perto da camera e fica inteira a OCCL_BASE_FAR m. Nao segue o cone
+## nem o fade de 0,15 s: liga e desliga com a troca. PROVISORIO, revisar com `art3d`.
+const OCCL_BASE_FAR := 8.0
+
+
 static func _occl_base(m: BaseMaterial3D) -> Material:
 	if _occl_mats.has(m):
 		return _occl_mats[m]
-	var code := RenderingServer.shader_get_code(RenderingServer.material_get_shader(m.get_rid()))
-	if not code.contains("void fragment() {"):
-		return m
-	var sh := Shader.new()
-	var nl := code.find("\n")
-	sh.code = code.substr(0, nl + 1) + "#include \"%s\"\n" % OCCL_INC + code.substr(nl + 1).replace("void fragment() {",
-		"void fragment() {\n\tocc" + "l_discard((INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz, FRAGCOORD.xy, PROJECTION_MATRIX);")
-	var v := ShaderMaterial.new()
-	v.shader = sh
-	for u: Dictionary in sh.get_shader_uniform_list():
-		var val: Variant = RenderingServer.material_get_param(m.get_rid(), StringName(u["name"]))
-		if val != null:
-			v.set_shader_parameter(StringName(u["name"]), val)
+	var v := m.duplicate() as BaseMaterial3D
+	v.distance_fade_mode = BaseMaterial3D.DISTANCE_FADE_PIXEL_DITHER
+	v.distance_fade_min_distance = 0.0
+	v.distance_fade_max_distance = OCCL_BASE_FAR
 	_occl_mats[m] = v
 	return v
 
