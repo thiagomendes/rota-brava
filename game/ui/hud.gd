@@ -1002,6 +1002,16 @@ func _show_line(entry: Dictionary) -> void:
 		ThemeV2.pop_in(_sub_panel, 0.85, 0.3)
 
 
+## Tempo que uma fala fica na tela: leitura da legenda e, com voz, a voz inteira + folga (a legenda nunca some antes
+## do tempo de leitura). G17: as cutscenes usam a mesma conta para a duracao do plano.
+const VOICE_TAIL := 0.35
+static func line_seconds(text: String, voice_len: float) -> float:
+	var seconds := maxf(2.4, 1.3 + 0.055 * text.length())
+	if voice_len > 0.0:
+		seconds = maxf(seconds, voice_len + VOICE_TAIL)
+	return seconds
+
+
 func _pump() -> void:
 	_speaking = true
 	while not _queue.is_empty():
@@ -1011,11 +1021,10 @@ func _pump() -> void:
 		_hint_active = bool(entry["hint"])
 		_skip_current = false
 		line_started.emit(String(entry["key"]))
-		var seconds := maxf(2.4, 1.3 + 0.055 * text.length())
+		var voice_len := 0.0
 		if voice_hook.is_valid():
-			var voice_len := float(voice_hook.call(String(entry["key"])))
-			if voice_len > 0.0:
-				seconds = maxf(seconds, voice_len + 0.35)  # a legenda nunca some antes do tempo de leitura
+			voice_len = float(voice_hook.call(String(entry["key"])))
+		var seconds := line_seconds(text, voice_len)
 		var t := 0.0
 		while t < seconds and not _skip_current:
 			await get_tree().process_frame
