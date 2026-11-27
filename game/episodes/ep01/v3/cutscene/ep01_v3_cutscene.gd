@@ -72,7 +72,8 @@ var _moved: Dictionary = {}
 var _bars: CanvasLayer
 var _bar_top: ColorRect
 var _bar_bottom: ColorRect
-var _skip_label: Label
+## G15: "pular a cena" com o desenho do botao de agir do aparelho em uso.
+var _skip_label: GlyphText
 ## Oclusao (como no CameraRig): camadas do mundo, corpos ignorados e copas das arvores (centro xyz, raio w).
 var collision_mask: int = 1
 var exclude: Array[RID] = []
@@ -203,12 +204,10 @@ func _build_bars() -> void:
 		b.color = Color(ThemeV2.NAVY_DEEP, 0.85)
 		b.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_bars.add_child(b)
-	_skip_label = Label.new()
+	_skip_label = GlyphText.new(26, ThemeV2.PAPER)
 	_skip_label.name = "SkipHint"
-	_skip_label.text = Loc.t("ui.cutscene.skip")
-	_skip_label.add_theme_color_override("font_color", ThemeV2.PAPER)
-	_skip_label.add_theme_font_size_override("font_size", 26)
-	_skip_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_skip_label.alignment = BoxContainer.ALIGNMENT_END
+	_skip_label.set_text(Loc.t("ui.cutscene.skip"))
 	_bars.add_child(_skip_label)
 
 
@@ -219,8 +218,8 @@ func _layout_bars(fraction: float) -> void:
 	_bar_top.size = Vector2(vp.x, h)
 	_bar_bottom.position = Vector2(0, vp.y - h)
 	_bar_bottom.size = Vector2(vp.x, h)
-	_skip_label.position = Vector2(vp.x - 520.0, maxf(4.0, h * 0.5 - 18.0))
-	_skip_label.size = Vector2(500.0, 36.0)
+	_skip_label.position = Vector2(vp.x - 520.0, maxf(4.0, h * 0.5 - 22.0))
+	_skip_label.size = Vector2(500.0, 44.0)
 
 
 ## Altura atual de cada barra em pixels (testes/capturas).
@@ -230,6 +229,10 @@ func bar_height() -> float:
 
 func skip_hint_visible() -> bool:
 	return _bars.visible and _skip_label.visible
+
+
+func skip_hint() -> GlyphText:
+	return _skip_label
 
 
 # ---------- tocar ----------

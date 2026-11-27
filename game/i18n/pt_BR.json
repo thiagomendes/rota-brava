@@ -76,10 +76,9 @@
   "ep01.complete.objective": "Missão cumprida.",
   "ui.swap.look": "{name} olha para {other}.",
   "ui.swap.confirm": "Assumir {name}? Habilidade: {skill}.",
-  "ui.skip": "E: pular a abertura",
+  "ui.skip": "{interact} pular a abertura",
   "ui.swap.active": "Agora você controla {name}.",
   "ui.help.repeat": "Repetir instrução",
-  "ui.help.repeat_button": "Repetir instrução ({control})",
   "ui.hud.objective": "Objetivo: {text}",
   "ui.hud.controls_label": "Quem controla: {name}",
   "ui.menu.play": "Jogar",
@@ -101,10 +100,5 @@
   "ui.action.take_over": "Assumir",
   "ui.action.board": "Embarcar",
   "ui.action.depart": "Partir",
-  "ui.action.choose": "Escolher",
-  "ui.control.keyboard": "Teclado: {key}",
-  "ui.control.gamepad": "Controle: botão {button}",
-  "ui.control.interact": "Teclado: E / Controle: botão A",
-  "ui.control.pause": "Teclado: Esc / Controle: botão Start",
-  "ui.control.move": "Teclado: WASD ou setas / Controle: analógico esquerdo"
+  "ui.action.choose": "Escolher"
 }

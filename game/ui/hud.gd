@@ -23,6 +23,7 @@ signal action_pressed
 ## Novo: sons de UI (&"pop", &"confirm", &"focus", &"handoff", &"star", &"emote"). O lead liga ao AudioDirector.
 signal ui_sound(name: StringName)
 ## Novo: ultimo dispositivo usado (&"keyboard", &"pad", &"touch") mudou. Nao altera estado do jogo.
+## G15: os glifos se trocam sozinhos (GlyphView escuta `InputDevice.events`); este sinal segue para quem ja ouvia.
 signal device_changed(device: StringName)
 ## Novo: uma fala com emotes comecou (para o lead disparar o balbucio/emote 3D se quiser).
 signal emotes_shown(speaker: StringName, emotes: Array[StringName])
@@ -74,13 +75,16 @@ var _prompt_icon: IconView
 var _prompt_label: Label
 var _action_button: Button
 var _glyph_badge: PanelContainer
-var _glyph_label: Label
+var _glyph: GlyphView
+var _help_glyph: GlyphView
+var _skip_text: GlyphText
+## G15: selos de glifo em botoes de painel (pausa, fim, cartao de equipe): intencao -> GlyphView.
+var _button_glyphs: Array[GlyphView] = []
 var _sub_panel: PanelContainer
 var _sub_portrait: IconView
 var _sub_speaker: Label
 var _sub_text: Label
 var _emote_box: HBoxContainer
-var _skip_label: Label
 ## Contador de emblemas (colecionaveis): aparece no primeiro emblema achado e pulsa a cada novo.
 var _emblem_panel: PanelContainer
 var _emblem_label: Label
@@ -146,6 +150,8 @@ func _ready() -> void:
 	_build_pause(_root)
 	_root.resized.connect(_layout)
 	apply_theme(ThemeV2.build())
+	InputDevice.events.changed.connect(_on_input_device_changed)
+	last_device = InputDevice.family()
 	_update_glyph()
 	_layout()
 
@@ -283,7 +289,7 @@ func _build_top_left(safe: Control) -> void:
 	_help_button.theme_type_variation = &"GhostButton"
 	_help_button.custom_minimum_size = Vector2(MIN_TOUCH, MIN_TOUCH)
 	_help_button.focus_mode = Control.FOCUS_NONE
-	_help_button.tooltip_text = Loc.t("ui.help.repeat_button", {"control": "H"})
+	_help_button.tooltip_text = Loc.t("ui.help.repeat")
 	_help_button.pressed.connect(func() -> void:
 		ui_sound.emit(&"confirm")
 		help_requested.emit()
@@ -297,12 +303,17 @@ func _build_top_left(safe: Control) -> void:
 	hi.offset_right = 36
 	hi.offset_bottom = 36
 	hi.ring = 0.05
+	# G15: a tecla/botao da ajuda no canto do disco (some no toque: o proprio disco e o botao).
+	var help_badge := _glyph_badge_for(_help_button, &"help", 44)
+	help_badge.position = Vector2(MIN_TOUCH - 60, MIN_TOUCH - 58)
+	_help_glyph = help_badge.get_child(0) as GlyphView
 	var skip_panel := _panel(row, &"PillPanel")
 	skip_panel.name = "SkipPanel"
 	skip_panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_skip_label = _label(skip_panel, 30, &"LightLabel")
-	_skip_label.name = "SkipHint"
-	_skip_label.text = Loc.t("ui.skip")
+	_skip_text = GlyphText.new(30, Color.WHITE, &"LightLabel")
+	_skip_text.name = "SkipHint"
+	_skip_text.set_text(Loc.t("ui.skip"))
+	skip_panel.add_child(_skip_text)
 	skip_panel.visible = false
 	_emblem_panel = _panel(row, &"PillPanel")
 	_emblem_panel.name = "EmblemCounter"
@@ -401,18 +412,37 @@ func _build_action(safe: Control) -> void:
 	_prompt_icon = _icon(_action_button, &"magnifier", ACTION_SIZE * 0.6, ThemeV2.ACTION, true)
 	_prompt_icon.position = Vector2(ACTION_SIZE * 0.2, ACTION_SIZE * 0.2)
 	_prompt_icon.size = Vector2(ACTION_SIZE * 0.6, ACTION_SIZE * 0.6)
-	_glyph_badge = PanelContainer.new()
-	_glyph_badge.name = "GlyphBadge"
-	_glyph_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_glyph_badge.add_theme_stylebox_override("panel", ThemeV2.box(ThemeV2.NAVY, 34, 4, 5, Color.WHITE, 0))
-	_glyph_badge.custom_minimum_size = Vector2(68, 68)
-	_glyph_badge.position = Vector2(4, ACTION_SIZE - 72)
-	_action_button.add_child(_glyph_badge)
-	_glyph_label = _label(_glyph_badge, 38, &"LightLabel")
-	_glyph_label.name = "KeyHint"
-	_glyph_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_glyph_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	# G15: desenho do botao de agir no aparelho em uso (E, X azul, quadrado...). No toque o botao ja e o alvo.
+	_glyph_badge = _glyph_badge_for(_action_button, &"interact", 72)
+	_glyph_badge.position = Vector2(-6, ACTION_SIZE - 86)
+	_glyph = _glyph_badge.get_child(0) as GlyphView
+	_glyph.name = "KeyHint"
 	_prompt_panel.visible = false
+
+
+## G15: selo azul-marinho com o glifo da intencao, preso a um botao. Some no toque (o botao ja e o que se toca).
+func _glyph_badge_for(parent: Control, action: StringName, px: float) -> PanelContainer:
+	var badge := PanelContainer.new()
+	badge.name = "GlyphBadge" if action == &"interact" else "GlyphBadge_" + String(action)
+	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	badge.add_theme_stylebox_override("panel", ThemeV2.box(ThemeV2.NAVY, int(px * 0.5) + 4, 3, 4, Color.WHITE, 0))
+	var g := GlyphView.new(action, px, true)
+	badge.add_child(g)
+	parent.add_child(badge)
+	g.visibility_changed.connect(func() -> void: badge.visible = g.visible)
+	badge.visible = g.visible
+	return badge
+
+
+## G15: selo do glifo na ponta direita de um botao de painel (dentro do botao, centrado na altura).
+func _button_glyph(b: Button, action: StringName) -> void:
+	var badge := _glyph_badge_for(b, action, 50)
+	badge.set_anchors_preset(Control.PRESET_CENTER_RIGHT)
+	badge.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	badge.grow_vertical = Control.GROW_DIRECTION_BOTH
+	badge.offset_right = -18
+	badge.offset_left = -18
+	_button_glyphs.append(badge.get_child(0) as GlyphView)
 
 
 ## Base ao centro: balao de legenda (retrato do falante, nome, emotes e texto). Fica entre os polegares.
@@ -530,6 +560,7 @@ func _build_handoff(root: Control) -> void:
 	_handoff_button.name = "ConfirmButton"
 	_handoff_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	_handoff_button.pressed.connect(_confirm_handoff)
+	_button_glyph(_handoff_button, &"interact")
 
 
 func _build_complete(root: Control) -> void:
@@ -584,6 +615,7 @@ func _build_complete(root: Control) -> void:
 	v.add_child(row)
 	_complete_replay = _button(row, Loc.t("ui.menu.review"), 400, &"star", &"PrimaryButton")
 	_complete_replay.pressed.connect(func() -> void: replay_requested.emit())
+	_button_glyph(_complete_replay, &"ui_accept")
 	var menu := _button(row, Loc.t("ui.menu.menu"), 320, &"home")
 	menu.pressed.connect(func() -> void: menu_requested.emit())
 
@@ -602,6 +634,7 @@ func _build_pause(root: Control) -> void:
 	_pause_resume = _button(v, Loc.t("ui.pause.resume"), 520, &"boat", &"PrimaryButton")
 	_pause_resume.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_pause_resume.pressed.connect(func() -> void: resume_requested.emit())
+	_button_glyph(_pause_resume, &"pause")
 	_pause_options = _button(v, Loc.t("ui.menu.options"), 520, &"gear")
 	_pause_options.name = "PauseOptions"
 	_pause_options.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -791,46 +824,51 @@ func action_button() -> Button:
 
 
 func set_skip_hint(on: bool) -> void:
-	_skip_label.get_parent().visible = on
+	_skip_text.get_parent().visible = on
+
+
+func skip_hint() -> GlyphText:
+	return _skip_text
 
 
 # ---------- dispositivo ----------
 
 func _input(event: InputEvent) -> void:
 	# RB-M1: deteccao unica em InputDevice (mouse emulado pelo toque nao conta como mouse; mouse = glifo do teclado).
+	# G15: a troca chega por `InputDevice.events.changed` (_on_input_device_changed), no mesmo quadro.
 	InputDevice.note(event)
-	var dev := InputDevice.family()
-	if InputDevice.classify(event) != &"" and dev != last_device:
-		set_device(dev)
 
 
-## RB-M1: alinha o glifo com InputDevice quando outro no consumiu o evento antes do HUD (camada de toque).
+## RB-M1: alinha o HUD com InputDevice (compatibilidade; a troca ja chega pelo sinal de InputDevice).
 func sync_device() -> void:
-	var dev := InputDevice.family()
-	if dev != last_device:
-		set_device(dev)
+	_on_input_device_changed(InputDevice.last, InputDevice.pad_family)
 
 
-## Troca o glifo exibido (teclado E / controle A / toque sem glifo). Nao altera estado do jogo.
-func set_device(dev: StringName) -> void:
-	last_device = dev
+## Troca o aparelho (testes/capturas). Os glifos seguem `InputDevice`. Nao altera estado do jogo.
+func set_device(dev: StringName, pad_family: StringName = &"") -> void:
+	InputDevice.set_device(dev, pad_family)
+	_on_input_device_changed(InputDevice.last, InputDevice.pad_family)
+
+
+func _on_input_device_changed(_dev: StringName, _fam: StringName) -> void:
+	var fam := InputDevice.family()
 	_update_glyph()
-	device_changed.emit(dev)
+	if fam != last_device:
+		last_device = fam
+		device_changed.emit(fam)
 
 
-func glyph_text() -> String:
-	return _glyph_label.text
+## Id do glifo no botao de agir (ex.: &"key_e", &"xbox_west"); vazio no toque (o selo some).
+func glyph_id() -> StringName:
+	return _glyph.glyph_id() if _glyph_badge.visible else &""
 
 
 func _update_glyph() -> void:
-	match last_device:
-		&"pad":
-			_glyph_label.text = Loc.t("ui.glyph.pad")
-		&"touch":
-			_glyph_label.text = ""
-		_:
-			_glyph_label.text = Loc.t("ui.glyph.keyboard")
-	_glyph_badge.visible = not _glyph_label.text.is_empty()
+	_glyph.refresh()
+	_help_glyph.refresh()
+	for g in _button_glyphs:
+		g.refresh()
+	_glyph_badge.visible = _glyph.visible
 
 
 # ---------- legendas ----------
@@ -1112,6 +1150,15 @@ func close_complete() -> void:
 func _exit_tree() -> void:
 	for id: StringName in [&"hud_options", &"hud_choice", &"hud_handoff", &"hud_pause", &"hud_complete"]:
 		MouseLock.unblock(id)
+	if InputDevice.events.changed.is_connected(_on_input_device_changed):
+		InputDevice.events.changed.disconnect(_on_input_device_changed)
+
+
+func _enter_tree() -> void:
+	# G15: de volta a arvore (ja montado): volta a ouvir a troca de aparelho e se alinha.
+	if _glyph != null and not InputDevice.events.changed.is_connected(_on_input_device_changed):
+		InputDevice.events.changed.connect(_on_input_device_changed)
+		sync_device()
 
 
 func _unhandled_input(event: InputEvent) -> void:

@@ -175,10 +175,10 @@ func _build_column(slot: int) -> void:
 	hint.theme_type_variation = &"PillPanel"
 	hint.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var hl := Label.new()
-	hl.text = Loc.t("ui.slots.erase_hold")
-	hl.add_theme_color_override("font_color", Color.WHITE)
-	hl.add_theme_font_size_override("font_size", 30)
+	# G15: "Segure [botao] para apagar" com o desenho do aparelho em uso (Enter, A verde, X azul claro, mao...).
+	var hl := GlyphText.new(30, Color.WHITE)
+	hl.name = "HintText"
+	hl.set_text(Loc.t("ui.slots.erase_hold"))
 	hint.add_child(hl)
 	hint.modulate.a = 0.0
 	col.add_child(hint)
