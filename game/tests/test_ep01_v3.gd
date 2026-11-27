@@ -297,10 +297,12 @@ func _market_wrong_stall() -> void:
 	r.check(main.current.step_progress == before and main.land.cargo_stall() == &"M4_Stall_Apple",
 		"v3 M4: barraca errada nao conta e a carga fica no carrinho")
 	r.check(main.arrow.visible, "v3 M4: barraca errada mostra a seta na barraca certa")
-	main.land._on_spot(&"deliver_M4_Stall_Apple", main.actors[&"pilot"])
+	# G19: dois "agir" na barraca certa: ergue a caixinha do carrinho e pousa na barraca
+	await main.land._on_spot(&"deliver_M4_Stall_Apple", main.actors[&"pilot"])
+	await main.land._on_spot(&"deliver_M4_Stall_Apple", main.actors[&"pilot"])
 	await r.frames(2)
 	r.check(main.current.step_progress == before + 1 and main.land.cargo_stall() == &"M4_Stall_Lemon",
-		"v3 M4: barraca certa conta e passa para a proxima carga")
+		"v3 M4: barraca certa conta e passa para a proxima carga (%d/%d, %s, carried %s)" % [main.current.step_progress, before + 1, main.land.cargo_stall(), main.land.carried])
 	main.land.build(&"M5")
 	await r.frames(2)
 	r.check(shape != null and not shape.disabled, "v3 M4: fora do M4 a caixa estatica do carrinho volta")

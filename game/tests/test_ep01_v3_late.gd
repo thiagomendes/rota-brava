@@ -49,7 +49,7 @@ func _confirm(main: Ep01V3Main) -> void:
 		await r.tree.create_timer(Ep01V3Main.TEAM_POSE_SECONDS + 0.2).timeout
 
 
-func _wait_free(main: Ep01V3Main, limit: float = 8.0) -> void:
+func _wait_free(main: Ep01V3Main, limit: float = 25.0) -> void:
 	var t := 0.0
 	while (main.land.busy or main.hud.handoff_open) and t < limit:
 		if main.hud.handoff_open:
@@ -201,6 +201,7 @@ func _m7_lighthouse() -> void:
 	var land := main.land
 	r.check(not main.world.access_ramps_enabled(), "v3 M7: subida do farol por saltos (rampas AccessRamps desligadas)")
 	land._on_spot(&"lens", main.actors[&"tracker"])
+	await _wait_free(main)   # G19: o Rastro examina e pega a lente (gesto no jogo)
 	await _confirm(main)
 	r.check(_step(main) == &"climb" and main.active_member == &"climber", "v3 M7: lente achada; Pico sobe")
 	var pico := main.actors[&"climber"] as MemberActor
@@ -221,8 +222,12 @@ func _m7_lighthouse() -> void:
 		land._on_spot(&"aim", main.actors[&"pilot"])
 		if i < 3:
 			await r.tree.create_timer(0.7).timeout
+			while main.land.busy:
+				await r.tree.process_frame
 			r.check(absf(wrapf(main.world.lantern.rotation.y - land.lantern_yaw_to(i), -PI, PI)) < 0.05,
 				"v3 M7: feixe virado para o barquinho %d" % (i + 1))
+	while main.land.busy:
+		await r.tree.process_frame
 	r.check(main.missions[7].is_completed(), "v3 M7: 4 barquinhos acesos concluem o farol")
 	await _free(main)
 
@@ -288,21 +293,23 @@ func _camera_shed_top() -> void:
 	await _free(main)
 
 
-## Ressalva da E4: um salto interrompido (teleporte no meio) nao deixa `busy` preso.
+## Ressalva da E4 (G19: escalada no lugar dos saltos): um teleporte no meio da subida nao deixa `busy` preso; a acao
+## termina sozinha e solta o heroi.
 func _hop_interrupted() -> void:
 	var main := await _new_main(&"M2")
 	await _confirm(main)
 	var pico := main.actors[&"climber"] as MemberActor
-	var aborted := [false]
-	main.land.hop_aborted.connect(func() -> void: aborted[0] = true)
 	var base: Vector3 = main.land.points[&"ShedBase"]
 	pico.teleport(base + Vector3(0, 0.05, 0))
 	main.land._hop_chain(pico, [main.world.marker(&"M2_ShedStep_1").global_position, main.world.marker(&"M2_ShedStep_2").global_position])
 	await r.frames(3)
-	r.check(main.land.busy, "v3 salto: cadeia em curso deixa o episodio ocupado")
+	r.check(main.land.busy, "v3 escalada: subida em curso deixa o episodio ocupado")
 	pico.teleport(base + Vector3(0, 0.05, 0))
-	await r.tree.create_timer(Ep01V3Land.HOP_TIME + Ep01V3Land.HOP_GRACE + 0.3).timeout
-	r.check(not main.land.busy and aborted[0], "v3 salto: interrompido, a cadeia para e solta o controle")
+	var t := 0.0
+	while main.land.busy and t < 8.0:
+		await r.tree.process_frame
+		t += r.tree.root.get_process_delta_time()
+	r.check(not main.land.busy and not pico.scripted, "v3 escalada: teleporte no meio, a acao termina e solta o controle (%.1f s)" % t)
 	await _free(main)
 
 

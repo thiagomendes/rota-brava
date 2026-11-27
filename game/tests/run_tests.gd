@@ -16,6 +16,7 @@ const WEIGHTS := {
 	"test_ep01_v3.gd": 58.3,
 	"test_camera_tremor.gd": 52.1,
 	"test_ep01_v3_late.gd": 51.4,
+	"test_ep01_v3_g19.gd": 75.0,
 	"test_ep01_v3_dialogue.gd": 49.6,
 	"test_camera_wall.gd": 43.1,
 	"test_prop_overlap.gd": 41.3,
