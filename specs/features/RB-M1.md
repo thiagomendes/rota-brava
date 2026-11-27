@@ -64,3 +64,6 @@ Publicação em loja; ajuste fino de desempenho; UX de toque definitiva; ícones
 
 ## Evidências
 (preencher)
+
+## Decisão de Thiago (2026-11-27): workflows na main
+O GitHub só mostra o "Run workflow" quando o arquivo do workflow existe na branch padrão. Thiago autorizou mandar para a `main` **só** `.github/workflows/android.yml` e `ios.yml`, depois da revisão, sem o resto do RB-R1 e do RB-M1. Para rodar, ele escolhe a branch de integração em "Use workflow from".
