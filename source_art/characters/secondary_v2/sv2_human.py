@@ -230,7 +230,7 @@ class Adult(hero_lib.Builder):
     EARS = True
 
     # ------------------------------------------------------------ calca e sapatos
-    def trousers(self, part="trousers", top_r=None, hem_up=0.055):
+    def trousers(self, part="trousers", top_r=None, hem_up=0.055, ankle_r=None):
         F, v = self.F, self.v
         hz = F.hz
         lk = (v["limb"] / 0.050)
@@ -240,7 +240,10 @@ class Adult(hero_lib.Builder):
         chain = []
         for sx in (-1, 1):
             x = sx * F.hip_x
-            leg = [((x, -0.002, F.ankle_z + hem_up), 0.058 * lk), ((x, 0.006, F.knee_z - 0.02), 0.060 * lk),
+            # G23: com `ankle_r`, a perna (meia) continua por um tornozelo mais fino que desce para DENTRO do sapato (sem o
+            # vao entre a barra e o sapato, que deixava o fundo aparecer)
+            foot = [((x, -0.004, F.ankle_z - 0.012), ankle_r * lk)] if ankle_r else []
+            leg = foot + [((x, -0.002, F.ankle_z + hem_up), 0.058 * lk), ((x, 0.006, F.knee_z - 0.02), 0.060 * lk),
                    ((x, 0.004, F.knee_z + 0.03), 0.063 * lk), ((x * 0.95, 0, hz - 0.11), 0.066 * lk)]
             chain += leg if sx < 0 else list(reversed(leg))
             if sx < 0:
@@ -248,7 +251,7 @@ class Adult(hero_lib.Builder):
                 chain.append(((0, -0.004, hz - 0.125), 0.062 * lk))
         nodes = chain
         edges = [(i, i + 1) for i in range(len(chain) - 1)]
-        roots = [4]
+        roots = [len(chain) // 2]
         ob = cl.skin_obj(self.name(part.capitalize()), nodes, edges, self.M["calca"], levels=3, scale=(1, 0.92, 1), roots=tuple(roots))
         self.pants = ob
         P = S.verts_np(ob)
@@ -269,14 +272,24 @@ class Adult(hero_lib.Builder):
         self.reg(self.t(ob, part, "cloth"), "dist")
         return ob
 
-    def shoes(self, part="shoe", sole_part="sole", high=0.050):
+    def shoes(self, part="shoe", sole_part="sole", high=0.050, shaft=None):
+        """Sapato SKIN com sola chanfrada. G23: `shaft=(z_topo, raio)` sobe um cano (bota/tenis de cano) por DENTRO da barra
+        da calca, ate `z_topo` acima do tornozelo, com raio menor que o da calca: a barra cobre o topo do cano em toda a volta
+        e em todos os quadros, e nao sobra vao entre a calca e o sapato."""
         F, v = self.F, self.v
         bk = v["boot"]
         for sx, sd in ((1, "R"), (-1, "L")):
             x = sx * F.hip_x
             nn = [((x, -0.006, F.ankle_z + high), 0.050 * bk), ((x, -0.012, F.ankle_z - 0.010), 0.055 * bk),
                   ((x, F.ball_y * 0.70, 0.042 * bk), 0.054 * bk), ((x, F.toe_y - 0.036 * bk, 0.040 * bk), 0.046 * bk)]
-            ob = cl.skin_obj(self.name("Shoe" + sd), nn, [(0, 1), (1, 2), (2, 3)], self.M["botas"], levels=3, floor=0.020 * bk)
+            ee = [(0, 1), (1, 2), (2, 3)]
+            if shaft:
+                # o cano vira a ponta da corrente (raiz do SKIN): sem ramificacao no tornozelo, que dobrava a malha em quina;
+                # o no do peito do pe afina para o cano sair sem degrau
+                nn[0] = (nn[0][0], 0.5 * (nn[0][1] + shaft[1]))
+                nn.insert(0, ((x, -0.004, F.ankle_z + shaft[0]), shaft[1]))
+                ee = [(0, 1), (1, 2), (2, 3), (3, 4)]
+            ob = cl.skin_obj(self.name("Shoe" + sd), nn, ee, self.M["botas"], levels=3, floor=0.020 * bk)
             S.decimate(ob, 0.20)
             self.reg(self.t(ob, part, "gear"), "dist")
             bm = bmesh.new()

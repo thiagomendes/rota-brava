@@ -806,6 +806,39 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 |---|---|---|---|
 | G23 | No capitão, na Dona Amora e no Lumi o sapato fica separado da perna: aparece um vão com o fundo passando entre a barra da calça e o sapato (conferido pelo lead em `captures/g21/g21_fila_frente.png`). Nos três heróis o sapato está encaixado. É a mesma família do G4, das mãos soltas | Perna e sapato contínuos em idle, walk e nos clipes próprios: a barra da calça ou da saia entra no cano do sapato, ou um tornozelo ou meia fecha o vão, sem vão visível de frente, de lado e de 3/4. Medição por script do vão perna-sapato em todos os quadros dos clipes (máximo ≤ 0 mm, isto é, sobreposição), com mutação que falha no modelo atual. O brilho de plástico do sapato fica igual ao dos heróis. Os mesmos 3 adultos e também os outros NPCs que tiverem o mesmo esquema de perna. Geometria por script, sem mexer no rig nem nos clipes. Capturas antes e depois: fila de frente, de lado e close dos pés | `art3d` |
 - **Decisão de Thiago (2026-11-27):** o Lumi da rodada 2 está aprovado ("ficou legal"). O único ajuste é o pé solto, sem tornozelo, que vira o G23. A integração do plano do Lumi na abertura (G21) pode seguir em paralelo com o G23.
+- **G23 feito (`art3d`, branch `feature/rb-r1-g23-pes`, 2026-11-27, sem merge):**
+  - Causa: em `sv2_human.py` a calça (ou meia) terminava numa calota redonda 5,5 cm acima do tornozelo e o sapato numa
+    calota redonda 5 cm acima dele; as duas pontas arredondadas deixavam uma faixa sem nada em volta da perna.
+  - Correção só de geometria (rig, pesos por distância e clipes iguais): `shoes(shaft=...)` sobe um cano por dentro da
+    barra (o cano é a ponta da corrente SKIN, sem ramificação, para não dobrar em quina) e `trousers(ankle_r=...)` continua
+    a meia por um tornozelo que entra no sapato. Capitão: bota de cano; Lumi: tênis de cano; Dona Amora: meia dentro do
+    sapato. Pintura e verniz do sapato iguais (mesma parte `shoe`). Tris: capitão 24 038 → 24 242, Dona Amora
+    22 630 → 22 876, Lumi 22 823 → 23 027; o resto da malha saiu igual (tris por objeto).
+  - Medida (vão perna-sapato no pior setor de 24 em volta da canela, só a borda a ≥ 30 mm do eixo, todos os quadros de
+    todos os clipes; `source_art/characters/secondary_v2/measure_feet_g23.py` no .blend e `game/tests/test_feet_gap.gd` no
+    GLB, mesma conta e os mesmos números nos dois):
+
+    | Personagem | Clipes | Antes | Depois |
+    |---|---|---|---|
+    | Capitão | idle, walk, wave, thanks | +39,5 a +41,5 mm | −20,5 mm |
+    | Dona Amora | idle, wave, thanks, point, talk | +37,4 a +38,6 mm | −15,7 a −15,8 mm |
+    | Lumi | idle, talk, wave, point, idle_seated, turn_chair | +37,8 a +39,7 mm | −23,0 a −26,3 mm |
+
+    Dona Amora e Lumi não têm `walk`. Mutação: `test_feet_gap` roda nos GLB antigos e falha (15 FAIL, os números acima); a
+    mutação embutida (sapato baixado 60 mm) acusa vão de +37,0 a +43,2 mm nos modelos novos.
+  - Outros NPCs: só capitão, Dona Amora e Lumi usam `sv2_human`. Os moradores `villager_a/b/c` são do `hero_lib` antigo, com
+    a calça terminando dentro de uma bota mais larga (esquema diferente) e fora do v3; o filhote não tem sapato.
+  - Provas (fora do Git, `captures/g23/`, todas abertas): `g23_{antes,depois}_idle_fila_{frente,perfil,tres_quartos}.png`;
+    close dos pés de frente, de lado, de 3/4 e de baixo `g23_{antes,depois}_idle_pes.png`, nos clipes
+    `g23_{antes,depois}_clipes_pes.png` (capitão `walk` q9, Amora `thanks` q28, Lumi `turn_chair` q15) e
+    `g23_{antes,depois}_sentado_pes.png` (capitão `walk` q21, Amora `wave` q24, Lumi `idle_seated` q40); malha
+    `g23_depois_idle_pes_malha.png`; câmera do jogo no cais `g23_jogo_pes_{captain,amora,lumi}.png` (`capture_g4.gd`
+    ganhou a tomada `feet:<id>`).
+  - Testes: `bash tools/test.sh characters,assets,feet_gap` → `RESULTADO: OK (1662 PASS, 0 FALHA(S))`; nos GLB antigos,
+    `RB_TEST_JOBS=1 bash tools/test.sh feet_gap` → `FALHOU (12 PASS, 15 FALHA(S))`. Cenas não mudaram (sem `cutscene`).
+  - Fraco: o cano aparece como bota/tênis de cano (2–4 cm entre o sapato e a barra), não como tornozelo de pele; no Lumi
+    sentado a vista de perfil do close não enquadrou os pés (sem cadeira no render do Blender); retratos não mudam (só
+    rosto).
 
 ### G21i · plano do Lumi na abertura (dono `gameplay`; texto e voz seguem o padrão do G22c)
 Fonte: `docs/proposals/g21_farol7.md` §3 e §4, **trocando a personagem por um homem, o Lumi**.
@@ -851,3 +884,68 @@ Print: `captures/g24/thiago_corda_m5.png` (fora do Git). No M5, a corda do Pico 
 - **Capturas** em `captures/g24a/` (fora do Git), `antes_*`/`depois_*` × `169`/`43` × `parado`/`reta`/`curva`/`re`, vila v3 com `--ep01-cutscenes=off`, Rastro correndo pela Input Map de `M3_BallStop` rumo a `M5_Crates`, **com o desvio de obstáculo da câmera desligado** (mede só seguimento/antecipação/corrida). Medido pelo AABB visual do herói: reta 16:9 antes 4,23 m / 50° / herói com 34% da altura da tela, depois 4,74 m / 53,8° / 28%; curva antes 3,95 m, depois 4,72 m; ré antes 4,41 m, depois 4,75 m; herói 100% no quadro em todas. Vistas: `antes_169_reta.png` (poste entre câmera e herói, que some) e `depois_169_reta.png` (herói inteiro de costas).
 - **Limite:** nas tentativas com o desvio de obstáculo ligado, o herói encostado em caixotes/carroça deixou o braço no mínimo (0,9 a 1,4 m, `last_pull` > 3 m, herói com 33% a 70% no quadro), parecido com o relato de "primeira pessoa". Isso é a mola de obstáculo (G6), fora da decisão "sem obstáculo"; não mudei. A curva e a ré do teste são sintéticas (alvo sem colisão), e o AABB do teste é uma caixa de 0,5 × 1,15 × 0,4 m, não a malha.
 - **Suíte completa** (`bash tools/test.sh`, 505 s): `FALHOU (5279 PASS, 1 FALHA(S))`. A falha é `test_ep01_v3_late.gd:291` ("no cais fica a câmera baixa ... sem encurtar", `last_pull` 0,011 m). Medido: no código antigo, nesse ponto o braço livre tinha só 3,53 m (a câmera estava mais perto que o pedido) e por isso a zona macia não tocava nada; com a mudança o braço livre tem os 4,20 m pedidos e a esfera de 0,9 m da zona macia toca algo do cais a 4,11 m. Esse arquivo está fora da área do G24a e não foi mexido: cabe ao lead decidir entre tolerância no teste ou ajuste da zona macia. `camera,movement,touch_controls`: `OK (189 PASS)`, com G3 (`test_camera_tremor`, p99 55,3 m/s², 0,24 inversões/s) e G6 (`test_camera_wall`, 0 de 2500 passos dentro de obstáculo) passando.
+### Evidência G24e (`adventure`, 2026-11-27)
+- Documento: `docs/proposals/g24_roteiro.md` (só proposta; nada aplicado em código, cenas, catálogo ou vozes).
+- Diagnóstico M0–M8 em tabela; quebras marcadas em M1 (bota abre o fio do capitão e o jogo manda seguir o filhote) e M2 (varal sem dono, pista repetida). Causas: dois problemas sem hierarquia, filhote nunca visto, festa só em risco no M7, rádio sem chamados, progresso sem acúmulo visível.
+- Fio proposto: "o filhote fugiu, o capitão foi atrás; sem o capitão o farol não acende e os barcos não acham a festa". Três chamados do Lumi (C1 abertura, C2 fim do M5, C3 fim do M6) e varal de lanternas na praça como progresso.
+- Pacotes: mínimo 20 falas (13 TTS, 7 balbucio) e 3 cortes, ~1 dia; médio 27 falas + cena de chamado, relance do filhote, varal de lanternas, bandeirinhas no M2; completo ~30 falas + capitão acende a festa e contador.
+- Fontes lidas: `ep01_v3_missions.json`, `ep01_v3_dialogue.json`, `ep01_v3_cutscenes.json`, `pt_BR*.json`, `ep01_v3_cutscenes.md`, `g21_farol7.md`. Dos scripts `ep01_v3_land.gd`/`ep01_v3_late.gd` só os eventos `notify_mission`. Contagem de palavras das falas feita à mão; não rodei o tempo de leitura do jogo.
+- Pendente: 3 perguntas para Thiago (seção 5 do documento).
+- **Decisões de Thiago sobre o G24e** (2026-11-27), a partir de `docs/proposals/g24_roteiro.md`:
+  1. **Pacote mínimo hoje e médio depois.** O mínimo vira o G25 (abaixo). O médio vira um ticket próprio depois que Thiago jogar o mínimo.
+  2. **Quem move a história é o filhote fujão.** O capitão pede ajuda pelo rádio já na abertura, e a ordem das missões continua a mesma.
+  3. **O varal do M2 vira bandeirinhas da festa.** Isso entra no pacote médio. Fica a mecânica do banquinho e da corda; só as peças são trocadas.
+  4. **Vozes: as novas primeiro.** O lote de 28/11 grava primeiro Lumi, Vila Maré e as falas do G25; as pendentes antigas ficam para os dias seguintes.
+
+### G25 · roteiro, pacote mínimo (dono `adventure` para textos → `gameplay` para o que não é texto; depois do G21i, porque mexe nos mesmos arquivos)
+Escopo: a seção "pacote mínimo" de `docs/proposals/g24_roteiro.md`.
+- Falas novas e reescritas, com IDs `ep01.call.c1..c3.*` e `ep01.lumi.lantern_*`, e as falas cortadas.
+- O lenço do filhote substitui a meia como pista do M2.
+- O peixe volta para a Amora no fim do M5.
+
+Critérios de aceite:
+- textos no catálogo i18n e no diálogo v3;
+- takes obsoletos fora e as falas novas em `pending.keys`, no padrão do G22c;
+- falas de mais de 8 palavras divididas;
+- o tempo de leitura medido com `Hud.line_seconds_for_text`;
+- o bot completa M0–M8;
+- `ep01_v3`, `voice_v3` e `cutscene` OK, mais a suíte completa;
+- o lote de vozes de 28/11 prioriza essas chaves.
+- **Decisão de Thiago sobre o G21i (2026-11-27):** a fala da ajuda não cita tecla nem botão, porque o jogo é multiplataforma. Legenda e voz dizem o mesmo: "Precisou? Aperte o botão de ajuda que eu ajudo!". É o disco "?" pulsando, com o selo do aparelho em uso, que mostra onde fica a ajuda.
+- **Revisão G23** (`reviewer`, 2026-11-27): **APROVADO** com ressalvas, nenhuma bloqueante. `characters,assets,feet_gap,cutscene` deu 1929 PASS, e o teste falha nos GLB antigos (+37,4 a +41,5 mm). Nos 3 GLB, ossos, skins e animações estão idênticos byte a byte. O manifesto confere com sha e bytes. Os tris estão no orçamento; o capitão tem 24 242, a 758 do teto. Ressalvas (dívida do `art3d`):
+  - **`Lumi_Hair` derivou, e "resto da malha igual" é falso aqui:** 154 vértices, até 5,6 mm, mais pesos e texturas do cabelo. A provável causa é não determinismo no build do cabelo.
+  - **`Amora_Face`:** 4 normais invertidas.
+  - **Atlas de roupa e equipamento refeitos:** é esperado pelo UV novo.
+  - **Manifesto:** não lista os scripts de medida e de render.
+  - **Visual:** sai como bota ou tênis de cano, não tornozelo, e fica para Thiago.
+
+  A mensagem do `63b7612` tem o "antes" errado; o certo está aqui e no PROVENANCE. Merge em `feature/rb-r1-reorientacao`.
+
+
+#### Evidência G21i (`gameplay`, 2026-11-27, branch `feature/rb-r1-g21i-abertura`, sem merge; nada foi ouvido)
+- **Textos e voz** (commit separado, antes do lote de 2026-11-28 08:20 UTC): as seis chaves do ticket com o texto exato; `cast.json` (`farol7`) descreve o Lumi. O take antigo da `ep01.radio.intro.hello` saiu (OGG, `.import`, visemas, linha do PROVENANCE). `pending.keys` ganhou `ep01.narrator.intro.base`, `ep01.radio.intro.hello`, `ep01.radio.intro.help` (`invite_1` e `invite_4` já estavam pendentes, sem take). Texto falado: `ep01_v3_dialogue.json` → `"spoken"`; o `gen_v3.py` manda esse texto à API, guarda `spoken_at_generation` (o `text_at_generation` continua sendo a legenda, como o `test_voice_v3` exige), recusa legenda com `{...}` sem texto falado e ganhou `--dry-run` (sem API, sem gravar). O detector de leitura dupla usa o texto falado. `python3 tools/voice/gen_v3.py --dry-run` (API não chamada) lista 155 pendentes, entre elas `ep01.radio.intro.help [radio/Schedar] fala: Precisou? Aperte o botão de ajuda que eu ajudo!  (legenda: Precisou? Aperte {help} que eu ajudo!)`.
+- **Cena:** o plano 9 virou `9_out` (a casa-torre por fora, 2,0 s, sem fala; o palco tem `Base_Exterior`), `9a` (Lumi sentado em `Chair/Seat`, `turn_chair` → `idle_seated`, a cadeira gira de 180° para 0° em 1,0 s), `9b` (de pé em `Base_LumiStand`, `wave` → `talk`) e `9c` (`point` → `talk`; **`thumbs_up` não existe no `lumi_v2`, ficou `talk`**). O Lumi se levanta no corte 9a→9b, porque os clipes `wave`/`talk`/`point` são de pé. O palco carrega em segundo plano pela fila única do `SceneLoader` (`bg_request` no `_ready`, `bg_get` no `_process`; G16) e é montado assim que chega, invisível até o `9_out`, em `y = +200`, longe da vila. Nos planos da base a vila e os heróis ficam escondidos e o céu e o sol da vila continuam. O plano 10 e o `exit_look` não mudaram. Com movimento reduzido os planos são cortes, e o disco aparece sem pulsar.
+- **Legenda e ajuda:** o `Hud` desenha a legenda com marcador por `GlyphText` (G15). No 9c, `spotlight_help` mostra só o disco da ajuda no canto (o objetivo, os emblemas e o "pular" ficam escondidos) e o faz pulsar de 1,0 a 1,18.
+- **Duração da abertura:** a ficha soma **42,5 s** (antes 34,5); o `ep01.narrator.intro.base` tem 10 palavras (o limite do teste é 8), e foi aceito como exceção explícita, porque é o texto decidido. Com o G17 e as vozes de hoje (as 5 falas novas e a `intro.village` sem take, contando o tempo de leitura) `scene_length` dá **47,06 s** (antes 38,7 s). No teste a cena terminou em t = 47,25 s. O número muda quando o lote gerar as vozes.
+- **Testes:** `test_cutscene_g21i.gd` (47 checagens) roda a `GameIntroScene` de verdade: palco e vila, Lumi filho do palco e sentado no 9a, clipe de cada plano, cabeça no quadro, fala no corte, duração G17 medida corte a corte (±0,25 s), glifo `help` na legenda, disco pulsando só no 9c, vila de volta no plano 10, carga em segundo plano, cortes com movimento reduzido, textos, pendências e texto falado. Falha no código anterior (não há 9_out/9a/9b/9c nem Lumi). Ajustes: `test_cutscenes` e `test_ep01_v3_f2_text` conferem os marcadores `Base_*` no palco; `test_cutscene_sync` confere os cliques do rádio também nos takes do catálogo, porque a única fala de rádio com voz nas cenas era a `intro.hello`.
+- **Capturas** (xvfb + Vulkan, 1920×1080, `cutscene_capture.gd` agora por índice de plano): `captures/g21i/game_intro_9_out.png`, `game_intro_9a.png`, `game_intro_9b.png`, `game_intro_9c.png`. Olhei as quatro: a casa-torre com o facho; o Lumi sentado de frente com a legenda do narrador; o Lumi de pé com o mapa dos pinos e a escotilha; o Lumi em close com a legenda "Precisou? Aperte [H] que eu ajudo!" e o disco "?" com o H no canto.
+- **Fraco:** no quadro do 9b (55% do plano) o `wave` já acabou e o `talk` deixa o braço numa pose estranha, na altura da cintura. O `point` do 9c, a 60% do plano, também já virou `talk` e não aponta. O retrato da legenda do rádio continua com o ícone do farol, não com o rosto do Lumi (fora do ticket). Por fora, o céu sem mar perto do horizonte depende do fundo do palco.
+- **Comandos:** `bash tools/test.sh cutscene,voice_v3,ep01_v3,ui` → `OK` depois das correções (a primeira rodada deu 2 falhas, a regra de 8 palavras e o teste de cliques do rádio, as duas corrigidas). `bash tools/test.sh cutscene_g21i,scene_loader` → `OK (102 PASS)`. A suíte completa em série pegou o `load_threaded_request` direto, proibido pelo G16, e o código passou a usar a fila. Depois disso, `bash tools/test.sh` → `RESULTADO: OK (5306 PASS, 0 FALHA(S))` em 533 s. Quatro rodadas paralelas antes dessa morreram com SIGTERM/SIGKILL vindos de fora (código 143/137), com outros agentes usando a mesma máquina.
+- **Rodada 2 (pedido do lead depois das capturas, mais uma decisão de Thiago):**
+  - **Fala sem tecla.** O jogo é multiplataforma, então `ep01.radio.intro.help` = "Precisou? Aperte o botão de ajuda que eu ajudo!", com a legenda igual ao que a voz diz. A chave `spoken` saiu do `ep01_v3_dialogue.json`. O suporte genérico continua no `gen_v3.py`, e nenhuma fala do Ep01 v3 usa `{...}` (teste). A frase tem 9 palavras e 48 caracteres, acima do limite do `test_ep01_v3_f2_text`, e entrou como exceção explícita no `LONG_OK`, como a `intro.base`. `python3 tools/voice/gen_v3.py --dry-run` (API não chamada): `[  4] ep01.radio.intro.help [radio/Schedar] fala: Precisou? Aperte o botão de ajuda que eu ajudo!`. O disco "?" continua pulsando no 9c, com o selo do aparelho em uso. O `GlyphText` na legenda ficou no HUD como suporte genérico, mas nenhuma fala o usa hoje.
+  - **Mar no 9_out.** Um plano de água de 1600 m, com o material da água da vila em cópia opaca (alpha 1), fica em y = −2,9 da torre e só aparece nesse plano. O teste lança os raios dos cantos de baixo da câmera em 11 pontos do plano e confere que todos batem no mar, com a câmera acima da água. Isso garante que a laje fica sempre abaixo de um mar opaco.
+  - **Braço.** A ficha ganhou `hold`/`hold_until`. No 9b o aceno fica em laço (0,45–1,25 s do `wave`) até 80% do plano. No 9c o `point` fica congelado estendido em 0,55 s do clipe (a 0,7 s, da primeira captura, caía na piscada do clipe, de 0,70 a 0,88 s, e o Lumi ficava de olhos fechados) até 90% do plano. Depois os dois passam para `idle` com blend de 0,35 s, e não mais para `talk`, que deixava o braço cruzado na cintura. A pose é congelada voltando o player ao instante a cada quadro, porque com o player pausado o visual voltava ao repouso (medido: a mão caiu para y = 0,79 m). Amostras do teste no 9c, no trecho "aperte o botão de ajuda" (21% a 71% da fala): mão direita a y = 1,29 m e 0,21 m à frente em todas, contra ~0,79/0,08 em repouso. No 9b: y = 1,27 a 1,28 m, acenando.
+  - **Retrato do rádio.** `Hud.SPEAKER_PORTRAITS[radio]` = `res://ui/portraits/lumi_neutra.png`. Vale para as 72 falas `radio` do Ep01 v3 (teste) e para a abertura (retrato conferido no 9b e no 9c). O `test_ep01_v3_portraits` passou a esperar o retrato renderizado para o rádio.
+  - `bash tools/test.sh cutscene,voice_v3,ep01_v3,ui` → `RESULTADO: OK (998 PASS, 0 FALHA(S))` em 307 s. A suíte completa não foi repetida nesta rodada.
+- **Revisão G21i** (`reviewer`, 2026-11-27): **APROVADO** com ressalvas, nenhuma bloqueante.
+  - Resultados: `cutscene,voice_v3,ep01_v3,ui,scene_loader` 1053 PASS; suíte completa em `8ec12f5` 5314 PASS; o `--dry-run` não chama a API e mostra as pendentes certas.
+  - Pendências (dívidas):
+    - (1) No 9_out, uma forma escura aparece sob a faixa de cinema inferior, continuando a diagonal da ilha, e pode ser a laje do palco. O teste confere só os cantos.
+    - (2) O `test_cutscene_g21i` falha no código antigo por carga, não por asserção.
+    - (3) As exceções `LONG_OK` não têm teto próprio.
+    - (4) No 9c, a mão do Lumi fica aberta em vez de apontar.
+  - Para Thiago: leitura no aparelho.
+  - Merge em `feature/rb-r1-reorientacao`.
+- **G24a, parte 2 (obstáculo):** a revisão reprovou os cortes do `_crane`, que saltavam até 2,41 m por quadro, e até 6,27 m com movimento reduzido. A rodada 3 (`3ff0dfd`, WIP) mostrou que os critérios conflitam: salto ≤ 0,25 m, G3, G6 e distância ≥ 1,9 m não fecham juntos. **Decisões de Thiago (2026-11-27):**
+  1. Hoje entra só a parte 1, a corrida (`633a08a`): a distância não cai e a vista abre ao correr. A dependência é o ajuste de `test_ep01_v3_late.gd:291`.
+  2. O caso de obstáculo vira o **G24a2**: a câmera desliza suave e nunca pula. Quando algo fica entre a câmera e o herói, o objeto fica semitransparente (dither ou fade). O `test_camera_jump` (salto ≤ 0,25 m nos dois modos) e o G3 continuam valendo, e o G6 passa a aceitar "vista tapada" desde que o objeto que tapa esteja transparente e a câmera nunca entre na geometria. Entra num build seguinte.

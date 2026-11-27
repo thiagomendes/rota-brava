@@ -65,10 +65,12 @@ func _data_checks() -> void:
 		var refs: Array = [s.get("exit_look", {})]
 		for sh: Variant in s.get("shots", []):
 			var d := sh as Dictionary
-			for k: String in ["from", "to", "look", "look_to"]:
-				if d.has(k):
-					refs.append(d[k])
-			refs.append_array(d.get("actors", []))
+			# G21i: planos da base usam os marcadores Base_* do palco (conferidos em test_cutscene_g21i)
+			if not d.has("stage"):
+				for k: String in ["from", "to", "look", "look_to"]:
+					if d.has(k):
+						refs.append(d[k])
+				refs.append_array(d.get("actors", []))
 			var line: Variant = d.get("line")
 			if line is Dictionary and not Loc.has_key(str((line as Dictionary).get("key", ""))):
 				keys_missing.append(str((line as Dictionary).get("key", "")))
