@@ -870,3 +870,4 @@ Critérios de aceite:
 - o bot completa M0–M8;
 - `ep01_v3`, `voice_v3` e `cutscene` OK, mais a suíte completa;
 - o lote de vozes de 28/11 prioriza essas chaves.
+- **Decisão de Thiago sobre o G21i (2026-11-27):** a fala da ajuda não cita tecla nem botão, porque o jogo é multiplataforma. Legenda e voz dizem o mesmo: "Precisou? Aperte o botão de ajuda que eu ajudo!". É o disco "?" pulsando, com o selo do aparelho em uso, que mostra onde fica a ajuda.
