@@ -61,6 +61,8 @@ static var save_path: String = MissionSave.DEFAULT_PATH
 
 var world: VillageWorld
 var camera_rig: CameraRig
+## Corpos invisiveis fora do desvio (agua, limites, rampas), sem as pecas do G24a2: cenas desviam de tudo.
+var _solid_exclude: Array[RID] = []
 var boat: BoatActor
 var hud: Hud
 var touch: TouchControls
@@ -190,6 +192,13 @@ func _setup_camera_avoidance() -> void:
 		if b != null:
 			camera_rig.exclude.append(b.get_rid())
 	camera_rig.occluders = tree_canopies()
+	_solid_exclude = camera_rig.exclude.duplicate()
+	# G24a2 v2: pecas (kit e toldo/banca do galpao) saem do desvio da camera e ficam pontilhadas quando tapam o heroi;
+	# a estrutura continua na mola de braco (G6). Variantes aquecidas na frente da camera, na carga.
+	camera_rig.exclude.append_array(CameraOcclusion.piece_bodies(world))
+	camera_rig.avoid_canopies = false
+	camera_rig.occlusion = CameraOcclusion.new(world)
+	camera_rig.occlusion.warm_up(camera_rig.camera)
 
 
 ## Copas das arvores do kit como esferas (centro, raio), da caixa da malha de cada tipo e do layout do mundo.
@@ -949,7 +958,7 @@ func _cutscene_setup() -> void:
 	cutscene.setup(world, hud, {&"tracker": actors[&"tracker"], &"climber": actors[&"climber"],
 		&"pilot": actors[&"pilot"], &"captain": land.captain, &"pup": land.pup})
 	cutscene.on_step = _cutscene_hold_input
-	cutscene.exclude = camera_rig.exclude.duplicate()
+	cutscene.exclude = _solid_exclude.duplicate()  # cenas: desvio de tudo, como antes do G24a2
 	cutscene.occluders = camera_rig.occluders
 	for m in missions:
 		m.step_done.connect(func(mid: StringName, _n: int, step: StringName) -> void:
