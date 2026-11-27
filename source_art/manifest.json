@@ -4277,6 +4277,30 @@
       "originalidade": "formas desenhadas no projeto, sem referencia, fonte ou imagem de terceiros; sem modelo de imagem",
       "data": "2026-11-27",
       "nota": "RB-M1 item 4 (ux). Usados por game/ui/touch/touch_controls.gd; a pausa reusa game/ui/brand/icons/pause.svg. Prova: game/tests/test_touch_controls.gd e captures/m1-toque/ (fora do Git)."
+    },
+    {
+      "id": "app_icon_m1",
+      "nome": "Icones do app Android e iOS (RB-M1) a partir do logo C noite",
+      "agente": "ux",
+      "gerado_por": "build-qa (RB-M1)",
+      "status": "provisorio",
+      "processo": {
+        "script": "tools/mobile_icons.gd",
+        "ferramenta": "Godot 4.7.2 (Image.load_svg_from_string + blend_rect), headless",
+        "comando": "bash tools/godot.sh --headless --path game --script \"$PWD/tools/mobile_icons.gd\"",
+        "fundo": "#24507A solido; iOS sem alfa"
+      },
+      "origem": [
+        "game/ui/title/keyart/logos/logo_c_noite.svg"
+      ],
+      "saida": "game/ui/brand/app_icon",
+      "arquivos_sha256": {
+        "adaptive_background_432.png": "a92699da91181278769852ff496afbbf97b2844d7e166b6a5d5b2aa7f5ac3ef2",
+        "adaptive_foreground_432.png": "96e64a266688ada5ebd32eb836dd52b2262ff79eb7cd5a90eca41959f8ad42f4",
+        "icon_android_192.png": "255ddde26676111ac0807b630391dca8b684ab332e846e076fc96e09dc760982",
+        "icon_ios_1024.png": "f3e94597484c489c65b8fd8d3354c2800eeb9273d5a7d6ec7e8b9ebf45162159"
+      },
+      "licenca": "original do projeto (lettering de source_art/ui/keyart/make_logos.py); sem marca de terceiros"
     }
   ]
 }

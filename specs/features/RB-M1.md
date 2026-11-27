@@ -71,6 +71,47 @@ Publicação em loja; ajuste fino de desempenho; UX de toque definitiva; ícones
 - **Câmera:** arrastar a metade direita, fora dos botões, chama `CameraRig.orbit_by` (a mesma usada pelo mouse preso). A câmera ignora o mouse emulado, que antes prendia o cursor e girava junto.
 - **Multitoque:** cada dedo tem um dono (joystick, câmera ou botão).
 - **Cena pulável:** um toque pula a cena (equivale ao E), porque a camada está escondida durante a cena.
-- **Testes:** `game/tests/test_touch_controls.gd`, com 59 checagens por toque simulado em `Input.parse_input_event` (passa pela emulação de mouse da Godot). Cobre: joystick move o herói e corre, pular, agir aciona o Examinar, arrastar gira a câmera, dois dedos, some com teclado, controle e mouse, painel bloqueia, ajuda, pausa, Opções, Continuar, Confirmar da troca, menu (Opções e Jogar), cartão do espaço, Apagar segurando 1,5 s com o dedo e Não da confirmação.
+- **Testes:** `game/tests/test_touch_controls.gd`, com 65 checagens por toque simulado em `Input.parse_input_event` (passa pela emulação de mouse da Godot). Cobre: joystick move o herói e corre, pular, agir aciona o Examinar, arrastar gira a câmera, dois dedos, perda de foco, some com teclado, controle e mouse, painel bloqueia, ajuda, pausa, Opções, Continuar, Confirmar da troca, menu (Opções e Jogar), cartão do espaço, Apagar segurando 1,5 s com o dedo e Não da confirmação.
+- **Correções da revisão:**
+  - **Perda de foco:** `TouchControls._notification` chama `release_all()` em `APPLICATION_FOCUS_OUT`, `APPLICATION_PAUSED` e `WM_WINDOW_FOCUS_OUT`. O teste segura o joystick na borda e o pular, envia cada notificação e confere que nada fica pressionado e que o herói para (0,00 m em 20 quadros de física).
+  - **Botão H:** o alvo de toque já media 128 × 128 px; só o disco desenhado tem 72 px. Agora o teste mede esse alvo (≥ 110 px) e confere que um toque no canto, fora do disco, pede ajuda.
 - **Capturas** (fora do Git): `captures/m1-toque/ep01_toque_16x9.png`, `ep01_toque_20x9.png`, `ep01_toque_4x3.png` (xvfb + Vulkan lavapipe, `game/tests/capture_m1_touch.tscn`).
 - **Pendente de Thiago no aparelho:** conforto, tamanho e sensibilidade da câmera ao toque. Também a área segura real com entalhe (lida de `DisplayServer.get_display_safe_area()` só em `mobile`; não medida).
+
+## Decisão de Thiago (2026-11-27): workflows na main
+O GitHub só mostra o "Run workflow" quando o arquivo do workflow existe na branch padrão. Thiago autorizou mandar para a `main` **só** `.github/workflows/android.yml` e `ios.yml`, depois da revisão, sem o resto do RB-R1 e do RB-M1. Para rodar, ele escolhe a branch de integração em "Use workflow from".
+### build-qa (2026-11-27, nuvem Linux, Godot 4.7.2.stable.official.ed1daf0bf, OpenJDK 21 do sistema)
+- **Medido:** `tools/mobile_icons.gd` gerou 4 PNGs em `game/ui/brand/app_icon/` (manifesto `app_icon_m1`). Export iOS (projeto Xcode, `export_project_only`) **concluiu no Linux** com Team ID fictício: esquema `RotaBrava`, assinatura `Automatic`, bundle `com.thiagomendes.rotabrava`, `RotaBrava.pck` de 307 MB. Export Android parou só por falta de SDK (sem erro de preset, ícone ou ETC2/ASTC).
+- **Bloqueado:** `dl.google.com` recusado pelo proxy da nuvem (403): sem Android SDK local, sem APK local e sem o SHA-256 das platform-tools Windows (`toolchain.json` marca `PENDENTE`; o `android.yml` mede e mostra no resumo do job).
+- **Sintaxe:** `actionlint 1.7` + `shellcheck`: só 2 avisos informativos (SC2012, `ls` em vez de `find`).
+- **Testes:** `bash tools/test.sh foundation` OK (72 PASS); `bash tools/test.sh test_assets` OK (280 PASS).
+- **Pendente:** `android.yml` e `ios.yml` verdes no GitHub (depois do push e merge em `main`); APK: tamanho e SHA-256; `android-install.ps1` não foi executado (sem `pwsh` aqui); instalação, visual e desempenho no aparelho (Thiago).
+
+## Revisão e integração
+- **Revisão** (`reviewer`, 3 rodadas):
+  - 1ª, REPROVADA: o artefato de falha do iOS levava o teamID, as actions não estavam fixadas por SHA e a keystore não era apagada.
+  - 2ª, REPROVADA: os logs ainda continham Key ID e Issuer ID.
+  - 3ª, APROVADA: a máscara dos três valores foi testada com log falso, e o caso forçado de falha sai com 1 e não faz upload.
+- `foundation` 72 PASS, `test_assets` 280 PASS, `ui_` 248 PASS.
+- **Na `main`:** entraram só os dois workflows (`32969cb`), por decisão de Thiago. O resto do RB-M1 está integrado na `feature/rb-r1-reorientacao`.
+- **Ainda não validado:**
+  - nenhum dos dois workflows rodou no GitHub;
+  - o `android-install.ps1` nunca foi executado (não há pwsh na nuvem);
+  - o SHA-256 das platform-tools do Windows segue PENDENTE (`dl.google.com` bloqueado aqui);
+  - tamanho e SHA-256 do APK só existem depois da 1ª execução;
+  - o toque básico está em andamento.
+- **1ª execução do `android.yml`** (Thiago, run 45921259074, `e917b2a`): verde em 1 min 57 s.
+  - APK exportado e assinado com a keystore temporária (CN=Rota Brava teste), porque não há segredo de keystore. Cada build sai com assinatura diferente, então reinstalar apaga o save do aparelho.
+  - Artefato `rota-brava-android-apk`: 323.341.262 bytes compactados. Digest do zip: `sha256:d0ef6878…04a8`.
+  - Tamanho e SHA-256 do APK e das platform-tools do Windows ficam no resumo do job; não aparecem no log.
+  - Aviso do GitHub: as actions fixadas rodam em Node 20, que está obsoleto e é forçado para Node 24. Não é erro.
+- **Instalação real** (Thiago, 2026-11-27): o APK da execução nº 1 foi instalado num tablet Samsung Galaxy Tab FE pelo cabo. Foi preciso desligar o "Bloqueador automático" da Samsung (Segurança e privacidade) para ligar a depuração USB. Thiago não relatou erro no `android-install.ps1`. Ainda faltam desempenho e visual no aparelho.
+- **1ª execução do `ios.yml`** (Thiago, run 45921274599, `e917b2a`): verde em cerca de 6 min 45 s.
+  - Export da Godot, `xcodebuild archive` com assinatura automática e envio ao App Store Connect concluídos ("Upload succeeded", "EXPORT SUCCEEDED").
+  - O passo de máscara foi pulado porque não houve falha. Nenhum artefato.
+  - **Avisos da Apple, válidos a partir de abril de 2027:** o build usou o SDK do iOS 26.5, e passará a ser exigido o SDK 27 (Xcode 27). O alvo é iOS 14.0, e o mínimo passará a ser 15.0. Subir o alvo para 15.0 numa próxima rodada.
+  - Pendente de Thiago: processamento no TestFlight, conformidade de exportação, instalar no iPhone e jogar.
+- **Travamento no iOS** (Thiago, 2026-11-27, iPhone14,8 com iOS 27.0.1, TestFlight build 1): o app ficou cerca de 2 min 17 s na estrela de carregamento sem chegar ao menu. Quando o app foi fechado, o sistema o encerrou por watchdog (`0x8BADF00D`, "Failed to terminate gracefully after 5.0s").
+  - O relatório `.ips` mostra a thread principal e as `WorkerThread 0, 1, 3, 4 e 5` todas paradas no mesmo `recursive_mutex::lock()`. É um impasse entre threads durante o carregamento em segundo plano. Não falta memória: são 294 MB de regiões graváveis.
+  - Causa provável: o `ResourceLoader.load_threaded_request(..., use_sub_threads=true)` do `SceneLoader` e do `title_screen.gd`. O G14 (`feature/rb-r1-g14-controle`, commit `aa45972`) já trocou para `use_sub_threads=false`, depois de achar SIGBUS e um travamento no fechamento com sub-threads no Linux.
+  - Correção: integrar o G14 e gerar o build 2. Pendente: confirmar no iPhone.

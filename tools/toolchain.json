@@ -11,6 +11,29 @@
     "templates": {
       "url": "https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz",
       "sha256": "f298490b8d44d934be425a5a65a51bf15f422428b229a06a6e11d9ffea248011"
+    },
+    "editorLinux": {
+      "url": "https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip",
+      "sha256": "cadd3204e728a35d3f13adb7fd0d7902636b79f6b95c40c265eb73b6c35329e4",
+      "exe": "Godot_v4.7.2-stable_linux.x86_64"
+    },
+    "editorMacos": {
+      "_doc": "RB-M1: usado por .github/workflows/ios.yml. SHA-256 medido em 2026-11-27; SHA-512 confere com o SHA512-SUMS.txt oficial.",
+      "url": "https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_macos.universal.zip",
+      "sha256": "c58a24e31d720be9d62f60cb5627c4e695fb72f21b0cfe1bc9ccaa9a3b3ba63e",
+      "exe": "Godot.app/Contents/MacOS/Godot"
+    }
+  },
+  "android": {
+    "_doc": "RB-M1: versoes pedidas pelos templates 4.7.2 (android_source.zip/config.gradle: compileSdk/targetSdk 36, buildTools 36.1.0, Java 17, minSdk 24).",
+    "jdk": "17",
+    "buildTools": "36.1.0",
+    "platform": "android-36",
+    "platformToolsWindows": {
+      "_doc": "Usado por tools/android-install.ps1. dl.google.com e bloqueado na nuvem de desenvolvimento: o SHA-256 ainda nao foi medido. O workflow android.yml mede e mostra no resumo do job; copie aqui e troque PENDENTE.",
+      "version": "36.0.0",
+      "url": "https://dl.google.com/android/repository/platform-tools_r36.0.0-win.zip",
+      "sha256": "PENDENTE"
     }
   },
   "blender": {
