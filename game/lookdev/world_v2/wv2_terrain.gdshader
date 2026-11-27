@@ -1,5 +1,6 @@
 shader_type spatial;
 render_mode diffuse_burley, specular_schlick_ggx;
+#include "res://lookdev/world_v2/wv2_occlusion.gdshaderinc"
 // Rota Brava · Mundo v2 (RB-R1 W1) · terreno: grama, terra do caminho, areia/lama molhada e pedra, projetados
 // de cima (metros do mundo). Mascaras na cor de vertice (R caminho, G molhado, B pedra), com bordas quebradas
 // por ruido para nao ficarem retas. PROVISORIO ate aprovacao de Thiago.
@@ -43,6 +44,7 @@ vec3 unpack(vec4 d) {
 }
 
 void fragment() {
+	occl_discard((INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz, FRAGCOORD.xy);
 	vec2 p = v_wpos.xz;
 	float n = vnoise(v_wpos * 1.6) * 0.6 + vnoise(v_wpos * 5.0) * 0.4;
 	float path = smoothstep(0.35, 0.65, COLOR.r + (n - 0.5) * 0.55);

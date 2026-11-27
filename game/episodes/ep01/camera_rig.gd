@@ -44,6 +44,20 @@ const SOFT_RADIUS := 0.9
 const ARM_IN_TIME := 0.25
 const ARM_OUT_TIME := 1.2
 const ARM_HYST := 0.04
+## G24a2 (transparencia): com `occlusion_fade`, o braco so encurta para a camera nao ficar DENTRO de algo (mola de
+## deslizamento `_arm_clear`, sem salto); o que fica ENTRE a camera e o heroi vira pontilhado (WV2Materials.set_occlusion,
+## cone de OCCL_RADIUS m no heroi), entrando/saindo em OCCL_TIME s. `occluded` = vista tapada no ultimo quadro.
+var occlusion_fade: bool = false
+var occluded: bool = false
+var _rel_s: Vector3 = Vector3.ZERO
+var _rel_fresh: bool = true
+var occlusion_amount: float = 0.0
+const OCCL_RADIUS := 0.7
+const OCCL_CENTER_Y := 0.6
+const OCCL_TIME := 0.15
+## Deslocamento maximo da camera por quadro de fisica com `occlusion_fade` (m).
+const STEP_MAX := 0.2
+const CLOSE_LOOK_Y := 0.55
 ## Encurtamento do ultimo quadro (m; 0 = livre), para testes e depuracao.
 var last_pull: float = 0.0
 var _probe: SphereShape3D
@@ -125,6 +139,7 @@ func follow(node: Node3D, snap: bool = false) -> void:
 	target = node
 	if snap:
 		_arm = -1.0
+		_rel_fresh = true
 		_update(1.0, 0.0)
 
 
@@ -166,17 +181,35 @@ func _update(weight: float, delta: float) -> void:
 	# Alguem moveu a camera por fora (captura, cena): parte de onde ela esta.
 	if camera.global_position.distance_to(_written) > 0.0001:
 		_follow_pos = camera.global_position
-	_follow_pos = _follow_pos.lerp(wanted, weight)
-	if not framing_world:
-		_follow_pos = _keep_arm(focus, _follow_pos, Vector2(rel.x, rel.z).length())
+	if occlusion_fade and not framing_world:
+		# G24a2: segue o heroi rigido e suaviza so o deslocamento relativo (giro, abertura da corrida): o tremido do
+		# passo do heroi nao vira vai-e-volta dele na tela (a camera anda junto).
+		if _rel_fresh or camera.global_position.distance_to(_written) > 0.0001:
+			_rel_s = _follow_pos - focus if camera.global_position.distance_to(_written) > 0.0001 else rel
+			_rel_fresh = false
+		_rel_s = _rel_s.lerp(rel, weight)
+		_follow_pos = focus + _rel_s
+	else:
+		_follow_pos = _follow_pos.lerp(wanted, weight)
+		if not framing_world:
+			_follow_pos = _keep_arm(focus, _follow_pos, Vector2(rel.x, rel.z).length())
 	var pivot := focus + look_offset
 	var look := pivot + (lead if not framing_world else Vector3.ZERO)
 	var pos := _follow_pos
-	if collision_mask != 0:
+	if collision_mask != 0 and occlusion_fade:
+		pos = _arm_clear(pivot, _follow_pos, delta)
+		# Camera mais perto que o braco livre: a antecipacao diminui e a mira desce para o meio do corpo (heroi inteiro).
+		var full := maxf(_follow_pos.distance_to(pivot), 0.01)
+		var k := clampf((pos.distance_to(pivot) - MIN_ARM) / maxf(full - MIN_ARM, 0.01), 0.0, 1.0)
+		look = pivot + (Vector3.ZERO if framing_world else lead) * k
+		look.y -= (1.0 - k) * maxf(look_offset.y - CLOSE_LOOK_Y, 0.0)
+	elif collision_mask != 0:
 		var soft := avoid(pivot, _follow_pos, SOFT_RADIUS, SOFT_RADIUS - PROBE_RADIUS)
 		pos = _smooth_arm(pivot, _follow_pos, avoid(pivot, _follow_pos), soft, delta)
 	camera.global_position = pos
 	_written = pos
+	if collision_mask != 0 and occlusion_fade and not framing_world:
+		_update_occlusion(pos, delta)
 	if _shake_time > 0.0 and not reduced_motion:
 		_shake_time = maxf(0.0, _shake_time - delta)
 		var a := _shake_amp * (_shake_time / maxf(_shake_time + delta, 0.001))
@@ -243,6 +276,164 @@ func _smooth_arm(look: Vector3, free_pos: Vector3, hard_pos: Vector3, soft_pos: 
 	_arm = clampf(_arm, minf(MIN_ARM, free_len), free_len)
 	last_pull = free_len - _arm
 	return look + (free_pos - look) / free_len * _arm
+
+
+## G24a2: a camera e uma esfera (PROBE_RADIUS) que desliza: anda do lugar do quadro anterior rumo ao braco livre, no
+## maximo STEP_MAX por quadro, parando no contato e escorregando pela superficie (como move_and_slide); nunca entra em
+## nada e nunca salta. O que fica entre ela e o heroi vira pontilhado. Sem quadro anterior (inicio, corte de cena,
+## teleporte) assenta com o braco duro antigo.
+func _arm_clear(pivot: Vector3, free_pos: Vector3, delta: float) -> Vector3:
+	var free_len := free_pos.distance_to(pivot)
+	var fresh := _arm < 0.0 or delta <= 0.0 or _written.x == INF \
+			or camera.global_position.distance_to(_written) > 0.0001 or _written.distance_to(pivot) > free_len * 2.0 + 2.0
+	var p: Vector3
+	if fresh:
+		if _probe == null:
+			_inside(pivot)
+		p = _out_of_canopies(_depenetrate(avoid(pivot, free_pos)))
+		var l := p.distance_to(pivot)
+		while _inside(p) and l > MIN_ARM:
+			# Assentando dentro de algo que a varredura da mira nao viu: recua pelo braco ate sair.
+			l -= 0.1
+			p = pivot + (free_pos - pivot).normalized() * l
+	else:
+		p = _slide(_written, free_pos)
+	_arm = p.distance_to(pivot)
+	last_pull = maxf(0.0, free_len - _arm)
+	return p
+
+
+## Esfera da camera de `from` rumo a `to` (no maximo STEP_MAX), com ate 3 escorregoes e saida de penetracao.
+func _slide(from: Vector3, to: Vector3) -> Vector3:
+	if _probe == null:
+		_inside(from)
+	var space := get_world_3d().direct_space_state
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = _probe
+	q.collision_mask = collision_mask
+	q.exclude = exclude
+	var p := _depenetrate(from)
+	var motion := to - p
+	if motion.length() > STEP_MAX:
+		motion = motion.normalized() * STEP_MAX
+	for i in 3:
+		if motion.length() < 0.0005:
+			break
+		q.transform = Transform3D(Basis(), p)
+		q.motion = motion
+		var res := space.cast_motion(q)
+		if res.size() != 2 or res[0] >= 1.0:
+			p += motion
+			break
+		p += motion * res[0]
+		q.transform = Transform3D(Basis(), p + motion * (res[1] - res[0]))
+		q.motion = Vector3.ZERO
+		var info := space.get_rest_info(q)
+		if info.is_empty():
+			break
+		motion = (motion * (1.0 - res[0])).slide((info["normal"] as Vector3).normalized())
+	p = _out_of_canopies(_depenetrate(p))
+	if _inside(p):
+		# A varredura nao viu (forma concava/fina): fica onde estava, se la estava livre.
+		var back := _out_of_canopies(_depenetrate(from))
+		if not _inside(back):
+			return back
+	return p
+
+
+## Empurra a esfera para fora do que ela toca (ate 4 passos pela normal de contato).
+func _depenetrate(p: Vector3) -> Vector3:
+	var space := get_world_3d().direct_space_state
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = _probe
+	q.collision_mask = collision_mask
+	q.exclude = exclude
+	for i in 4:
+		q.transform = Transform3D(Basis(), p)
+		var info := space.get_rest_info(q)
+		if info.is_empty():
+			return p
+		var n := (info["normal"] as Vector3).normalized()
+		var depth := PROBE_RADIUS - (p - (info["point"] as Vector3)).dot(n)
+		if depth < 0.003:
+			if (p - (info["point"] as Vector3)).length() >= PROBE_RADIUS * 0.75:
+				return p  # so encostando (o cast_motion para rente): nao empurra milimetros a cada quadro
+			depth = PROBE_RADIUS  # ponto de contato fundo (normal sem sentido): empurra pela normal assim mesmo
+		p += n * depth
+	return p
+
+
+func _out_of_canopies(p: Vector3) -> Vector3:
+	for o in occluders:
+		var c := Vector3(o.x, o.y, o.z)
+		var d := p - c
+		if d.length() < o.w and d.length() > 0.001:
+			p = c + d.normalized() * (o.w + 0.01)
+	return p
+
+
+## Esfera de PROBE_RADIUS em `p` encosta na camada da camera ou esta numa copa.
+func _inside(p: Vector3) -> bool:
+	if _probe == null:
+		_probe = SphereShape3D.new()
+		_probe.radius = PROBE_RADIUS
+		_probe_soft = SphereShape3D.new()
+		_probe_soft.radius = SOFT_RADIUS
+	if not is_inside_tree():
+		return false
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = _probe
+	q.transform = Transform3D(Basis(), p)
+	q.collision_mask = collision_mask
+	q.exclude = exclude
+	if not get_world_3d().direct_space_state.intersect_shape(q, 1).is_empty():
+		return true
+	for o in occluders:
+		if p.distance_to(Vector3(o.x, o.y, o.z)) < o.w:
+			return true
+	return false
+
+
+## G24a2: vista tapada (raios da camera ao pe, ao centro e a cabeca do heroi, e copas) liga o pontilhado no cone.
+func _update_occlusion(cam: Vector3, delta: float) -> void:
+	var hero := target.global_position
+	var space := get_world_3d().direct_space_state
+	occluded = false
+	for h: float in [0.2, OCCL_CENTER_Y, 1.0]:
+		var p := hero + Vector3(0, h, 0)
+		var q := PhysicsRayQueryParameters3D.create(cam, p, collision_mask, exclude)
+		if not space.intersect_ray(q).is_empty():
+			occluded = true
+			break
+		if _segment_hits_canopy(cam, p):
+			occluded = true
+			break
+	var want := 1.0 if occluded else 0.0
+	occlusion_amount = want if delta <= 0.0 else move_toward(occlusion_amount, want, delta / OCCL_TIME)
+	WV2Materials.set_occlusion(cam, hero + Vector3(0, OCCL_CENTER_Y, 0), OCCL_RADIUS, occlusion_amount)
+
+
+func _segment_hits_canopy(a: Vector3, b: Vector3) -> bool:
+	for o in occluders:
+		var c := Vector3(o.x, o.y, o.z)
+		var ab := b - a
+		var t := clampf((c - a).dot(ab) / maxf(ab.length_squared(), 1e-6), 0.0, 1.0)
+		if (a + ab * t).distance_to(c) < o.w:
+			return true
+	return false
+
+
+## G24a2: `point` some no pontilhado agora? (mesma conta do wv2_occlusion.gdshaderinc, para testes.)
+func occlusion_covers(point: Vector3) -> bool:
+	if occlusion_amount < 0.5:
+		return false
+	var cam := camera.global_position
+	var hero := target.global_position + Vector3(0, OCCL_CENTER_Y, 0)
+	var seg := hero - cam
+	var t := (point - cam).dot(seg) / maxf(seg.length_squared(), 1e-4)
+	if t <= 0.0 or t >= 1.0:
+		return false
+	return (cam + seg * t).distance_to(point) < OCCL_RADIUS * lerpf(0.5, 1.0, t)
 
 
 ## Mola criticamente amortecida (sem salto de velocidade): `smooth_time` ~ tempo para chegar ao alvo.

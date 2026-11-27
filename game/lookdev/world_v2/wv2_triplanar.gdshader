@@ -1,5 +1,6 @@
 shader_type spatial;
 render_mode diffuse_lambert_wrap, specular_schlick_ggx;
+#include "res://lookdev/world_v2/wv2_occlusion.gdshaderinc"
 // Rota Brava · Mundo v2 (RB-R1 W1) · triplanar no mundo para massas organicas sem UV (copas, arbustos, rochas).
 // Folhas: textura de folhas com relevo por folha, cor de vertice (sombra interna da copa assada no Blender),
 // luz que atravessa (BACKLIGHT) e balanco de vento leve. PROVISORIO ate aprovacao de Thiago.
@@ -50,6 +51,7 @@ vec3 unpack(vec4 d) {
 }
 
 void fragment() {
+	occl_discard((INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz, FRAGCOORD.xy);
 	vec3 n = normalize(v_wnrm);
 	vec3 bw = pow(abs(n), vec3(4.0));
 	bw /= bw.x + bw.y + bw.z;

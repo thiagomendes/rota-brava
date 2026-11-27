@@ -3,7 +3,8 @@ extends RefCounted
 ## vila; gira a camera com `cam_left`/`cam_right` (Input Map) e corre rente a parede. Em todo passo de fisica:
 ##  - esfera de 0,1 m na posicao da camera nao toca a camada de obstaculo da camera (`collision_mask`, sem `exclude`);
 ##  - (fora os passos com o braco no minimo de 0,9 m, que o rig aceita de proposito e sao so contados)
-##  - raio da mira ate a camera sem obstaculo; camera fora das copas (`occluders`).
+##  - raio da mira ate a camera sem obstaculo; camera fora das copas (`occluders`);
+##  - G24a2: com `occlusion_fade`, obstaculo entre mira e camera so vale se estiver no pontilhado (`occlusion_covers`).
 ## Mede estado; nao comprova o que se ve na tela.
 
 const CAM_RADIUS := 0.1
@@ -13,6 +14,8 @@ var r
 var main: Ep01V3Main
 var _ticks := 0
 var _at_min := 0
+var _faded := 0
+var _blocked_for := 0.0
 var _bad: Array[String] = []
 var _sphere := SphereShape3D.new()
 
@@ -39,7 +42,7 @@ func run(runner) -> void:
 		walls += 1
 		await _at_wall(String(mk), spot[0] as Vector3, spot[1] as Vector3)
 	_release()
-	print("  medida parede: %d paredes, %d passos medidos, %d com camera dentro/atras de obstaculo %s; %d no braco minimo" % [walls, _ticks, _bad.size(), _bad.slice(0, 4), _at_min])
+	print("  medida parede: %d paredes, %d passos medidos, %d com camera dentro/atras de obstaculo %s; %d no braco minimo; %d atras com o oclusor em pontilhado" % [walls, _ticks, _bad.size(), _bad.slice(0, 4), _at_min, _faded])
 	r.check(walls >= 3, "parede: %d paredes da vila encontradas" % walls)
 	r.check(_bad.is_empty(), "parede: camera nunca dentro nem atras de obstaculo (%d de %d passos %s)" % [_bad.size(), _ticks, _bad.slice(0, 3)])
 	main.queue_free()
@@ -135,6 +138,14 @@ func _tick(label: String) -> void:
 	var hit := space.intersect_ray(ray)
 	# Mira ja dentro de algo (heroi colado) nao conta: o rig tambem ignora esse caso.
 	var behind := not hit.is_empty() and (hit["position"] as Vector3).distance_to(look) > 0.05
+	# G24a2: atras de algo so vale se o que tapa esta no pontilhado (ou entrando nele, ate OCCL_TIME depois de tapar).
+	if behind and rig.occlusion_fade:
+		_blocked_for += 1.0 / Engine.physics_ticks_per_second
+		if rig.occlusion_covers(hit["position"] as Vector3) or _blocked_for <= CameraRig.OCCL_TIME + 0.02:
+			behind = false
+			_faded += 1
+	elif hit.is_empty():
+		_blocked_for = 0.0
 	var canopy := false
 	for s in rig.occluders:
 		var c := Vector3(s.x, s.y, s.z)

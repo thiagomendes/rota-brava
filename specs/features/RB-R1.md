@@ -954,3 +954,29 @@ Critérios de aceite:
   - **Revisão da corrida.** O código é o `633a08a`, já coberto pela revisão do G24a. Ela aprovou a causa, `_keep_arm`, +10% de braço e +4° de FOV, FOV fixo com movimento reduzido, testes não vácuos e nenhuma regressão em cutscene ou cais. O bloqueio daquela revisão era só o `_crane`, que ficou de fora.
   - **Ajuste do lead.** O único código novo é a tolerância de `test_ep01_v3_late.gd:291`, de 0,01 para 0,05 m. A esfera macia roça o cais e o braço encurta 0,011 m. Conferi o diff: a altura continua exigida e não houve outro afrouxamento.
   - **Suíte do autor:** 5363 PASS.
+
+#### Evidência G24a2 (transparência, `gameplay`, branch `feature/rb-r1-g24a2-transparencia`, em andamento)
+- **Câmera:** com `occlusion_fade` (ligado no Ep01 v3), a câmera é uma esfera de 0,2 m que desliza. Ela anda do lugar do quadro anterior rumo ao braço livre, no máximo 0,2 m por quadro, e para no contato, escorregando pela superfície. Também sai de penetração e de copa. Nunca corta, nos dois modos.
+  - O braço não encurta mais por objeto no meio.
+  - A translação segue o herói rígida, e só o deslocamento relativo é suavizado.
+  - Com a câmera mais perto, a antecipação diminui e a mira desce.
+- **Pontilhado:** `lookdev/world_v2/wv2_occlusion.gdshaderinc`, incluído nos 5 shaders do mundo (`surface`, `triplanar`, `terrain`, `grass`, `paper`).
+  - Descarta, em Bayer 4×4, só os fragmentos dentro de um cone ao longo do segmento câmera → centro do herói (raio 0,7 m no herói e 0,35 m na câmera) e antes do herói. No máximo 75% dos pixels somem.
+  - Os parâmetros vêm de `WV2Materials.set_occlusion`: uma escrita por material da biblioteca, não por malha.
+  - O fade é ligado por 3 raios (pé, centro e cabeça) e pelas copas, com entrada e saída em 0,15 s.
+- **Teste novo `test_camera_occlusion`** (5 pontos rente a parede ou caixote, câmera girada contra a parede, normal e reduzido, 880 passos cada). Medido igual nos dois modos:
+  - salto máximo 0,20 m/quadro (limite 0,25);
+  - câmera dentro de obstáculo: 0 passos;
+  - vista tapada em 363 passos: 4 entrando no fade e 0 sem pontilhado (conta do shader em `CameraRig.occlusion_covers`);
+  - herói no quadro: mínimo 97%.
+  - No código da integração (`775223a`) o teste falha por não existir `occlusion_covers`. Com uma versão intermediária desta branch, que só encurtava o braço contra "dentro" e não deslizava, ele mediu: salto 2,91 m no normal e 6,90 m no reduzido, câmera dentro em 63 a 70 passos, herói com até 13% no quadro. Não medi o rig da integração nesse percurso com o teste completo.
+- **G6** (`test_camera_wall`, ajustado: "atrás" só vale com o oclusor em pontilhado): 0 de 2500 passos; 270 passos atrás com pontilhado.
+- **G3** (`test_camera_tremor`, critério de percurso agora "encurta o braço ou tapa a vista"):
+  - p99 de 63,3 m/s² e 0,50 inversões/s do braço: passam;
+  - **"vai-e-volta" em 3,3/s, acima do limite 3: falha.**
+  - Medido: com o desvio desligado, o seguir sozinho já dá 5,9/s nesse percurso, tanto no código da integração quanto no novo. O valor baixo antigo vinha do braço encurtado.
+- **Suíte completa** (532 s): `FALHOU (5371 PASS, 2 FALHA(S))`.
+  - Uma falha é o "vai-e-volta" do G3, descrito acima.
+  - A outra é `test_movement_f1.gd:312` ("0 vistas com lugar livre a 1,6 m"): com a câmera atrás do oclusor em vez de encurtada, o anel de 1,6 m em volta do herói fica todo à vista na praça. É uma suposição do teste sobre a geometria da câmera, e não mexi nele.
+- **Capturas** em `captures/g24a2/` (Vulkan em xvfb): `depois_M5_Crates.png` (câmera sobre o toldo, toldo e parede em pontilhado no cone, herói visível) e `depois_M4_Cart.png` (chafariz em pontilhado no canto, herói inteiro).
+- **Não medido:** custo do discard no celular. Como o discard fica em todos os materiais do mundo, ele pode desligar o early-Z mesmo com `occl_amount` 0. A sombra também passa pelo discard.

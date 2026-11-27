@@ -157,6 +157,18 @@ static func set_festival(on: bool) -> void:
 
 
 ## Troca os materiais de toda malha sob `root` pelo material da biblioteca com o mesmo nome. Devolve quantas superficies.
+## RB-R1 G24a2: pontilhado do que fica entre a camera e o heroi (wv2_occlusion.gdshaderinc). `hero` = centro do heroi,
+## `radius` no heroi (m), `amount` 0..1 (0 desliga). Uma escrita por material da biblioteca (dezenas, nao por malha).
+static func set_occlusion(cam: Vector3, hero: Vector3, radius: float, amount: float) -> void:
+	for k in _cache:
+		var m := _cache[k] as ShaderMaterial
+		if m == null:
+			continue
+		m.set_shader_parameter("occl_cam", cam)
+		m.set_shader_parameter("occl_hero", Vector4(hero.x, hero.y, hero.z, radius))
+		m.set_shader_parameter("occl_amount", amount)
+
+
 static func apply(root: Node) -> int:
 	var count := 0
 	for node in root.find_children("*", "MeshInstance3D", true, false):
