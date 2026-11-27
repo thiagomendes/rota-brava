@@ -140,7 +140,7 @@ func _menu_timeout() -> void:
 	# Palco ausente/falhou (nada pendente e nenhum palco): nao segura a tela; menu fica sobre a imagem parada.
 	var m2 := (load(MENU) as PackedScene).instantiate() as TitleScreen
 	r.tree.root.add_child(m2)
-	m2._key_pending.clear()
+	m2.abandon_key_art()
 	r.check(not m2.loading_hold() and m2.key_art == null, "palco ausente: menu nao segura a tela de carregamento")
 	await r.frames(3)
 	r.check(m2.key_art == null and m2.play_button.has_focus(), "palco ausente: menu abre sobre a imagem parada com foco")

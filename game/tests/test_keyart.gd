@@ -266,7 +266,7 @@ func _trio_case() -> void:
 	sv2.add_child(m2)
 	await r.frames(1)
 	if m2.key_art == null:
-		m2._key_pending.clear()
+		m2.abandon_key_art()
 		var st := m2.get_node_or_null("KeyArtStill")
 		if st != null:
 			st.free()

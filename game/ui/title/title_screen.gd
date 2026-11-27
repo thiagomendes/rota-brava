@@ -373,6 +373,20 @@ func _poll_key_art() -> void:
 	print("[RB] title key_art instanciar=%dms ready=%dms" % [t1 - t0, _key_frame_ms - t1])
 
 
+## G14: desiste da arte-chave (saida da tela, palco ausente/falho nos testes): entrega os pedidos em segundo plano ao
+## carregador, que os recolhe quando prontos (sem travar esperando). Zerar `_key_pending` direto deixaria vila e trio
+## presos no cache do ResourceLoader para sempre.
+func abandon_key_art() -> void:
+	if not _key_pending.is_empty():
+		SceneLoaderService.instance().adopt_requests(_key_pending)
+		_key_pending = []
+	_key_held.clear()
+
+
+func _exit_tree() -> void:
+	abandon_key_art()
+
+
 func _reveal_key_art() -> void:
 	_key_held.clear()
 	_key_ready = true

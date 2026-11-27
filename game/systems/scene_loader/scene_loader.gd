@@ -181,7 +181,33 @@ func change_scene(path: String) -> bool:
 	return true
 
 
+## G14: pedidos em segundo plano de quem saiu da arvore antes de recolher (ex.: menu fechado com a arte-chave ainda
+## carregando). Sem `load_threaded_get`, o ResourceLoader guarda o recurso pronto para sempre (vila e trio ficavam no
+## cache e o menu seguinte abria ja com o palco). O carregador, que nunca sai, recolhe e solta quando ficam prontos.
+var _orphans: Array[String] = []
+
+
+func adopt_requests(paths: Array[String]) -> void:
+	for p: String in paths:
+		if not _orphans.has(p):
+			_orphans.append(p)
+
+
+func _collect_orphans() -> void:
+	for p: String in _orphans.duplicate():
+		if p == target_path or _pending.has(p):
+			continue  # o carregador mesmo esta usando este pedido
+		var st := ResourceLoader.load_threaded_get_status(p)
+		if st == ResourceLoader.THREAD_LOAD_LOADED:
+			ResourceLoader.load_threaded_get(p)  # recolhe e descarta a referencia
+			_orphans.erase(p)
+		elif st != ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			_orphans.erase(p)
+
+
 func _process(delta: float) -> void:
+	if not _orphans.is_empty():
+		_collect_orphans()
 	if phase == Phase.IDLE:
 		return
 	var real := delta / maxf(Engine.time_scale, 0.0001)
