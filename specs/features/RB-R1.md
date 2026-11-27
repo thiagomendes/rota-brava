@@ -851,3 +851,23 @@ Print: `captures/g24/thiago_corda_m5.png` (fora do Git). No M5, a corda do Pico 
 - **Capturas** em `captures/g24a/` (fora do Git), `antes_*`/`depois_*` × `169`/`43` × `parado`/`reta`/`curva`/`re`, vila v3 com `--ep01-cutscenes=off`, Rastro correndo pela Input Map de `M3_BallStop` rumo a `M5_Crates`, **com o desvio de obstáculo da câmera desligado** (mede só seguimento/antecipação/corrida). Medido pelo AABB visual do herói: reta 16:9 antes 4,23 m / 50° / herói com 34% da altura da tela, depois 4,74 m / 53,8° / 28%; curva antes 3,95 m, depois 4,72 m; ré antes 4,41 m, depois 4,75 m; herói 100% no quadro em todas. Vistas: `antes_169_reta.png` (poste entre câmera e herói, que some) e `depois_169_reta.png` (herói inteiro de costas).
 - **Limite:** nas tentativas com o desvio de obstáculo ligado, o herói encostado em caixotes/carroça deixou o braço no mínimo (0,9 a 1,4 m, `last_pull` > 3 m, herói com 33% a 70% no quadro), parecido com o relato de "primeira pessoa". Isso é a mola de obstáculo (G6), fora da decisão "sem obstáculo"; não mudei. A curva e a ré do teste são sintéticas (alvo sem colisão), e o AABB do teste é uma caixa de 0,5 × 1,15 × 0,4 m, não a malha.
 - **Suíte completa** (`bash tools/test.sh`, 505 s): `FALHOU (5279 PASS, 1 FALHA(S))`. A falha é `test_ep01_v3_late.gd:291` ("no cais fica a câmera baixa ... sem encurtar", `last_pull` 0,011 m). Medido: no código antigo, nesse ponto o braço livre tinha só 3,53 m (a câmera estava mais perto que o pedido) e por isso a zona macia não tocava nada; com a mudança o braço livre tem os 4,20 m pedidos e a esfera de 0,9 m da zona macia toca algo do cais a 4,11 m. Esse arquivo está fora da área do G24a e não foi mexido: cabe ao lead decidir entre tolerância no teste ou ajuste da zona macia. `camera,movement,touch_controls`: `OK (189 PASS)`, com G3 (`test_camera_tremor`, p99 55,3 m/s², 0,24 inversões/s) e G6 (`test_camera_wall`, 0 de 2500 passos dentro de obstáculo) passando.
+- **G24a, parte 2: obstáculo** (pedido do lead depois da primeira entrega). O herói correndo colado em caixotes, carroça e bancos deixava o braço no mínimo (0,9 m) e a câmera virava primeira pessoa.
+  - **Mudança no rig:**
+    - Antes da mola, `_crane` testa desvios a partir do herói: subir até 0,8 rad, girar para o lado até ±1,6 rad, menor desvio primeiro, com a esfera dura. Ele fica com o primeiro desvio que dá braço ≥ `VIEW_MIN` 2,2 m.
+    - O desvio anda suave (`CRANE_TIME` 0,25 s). Se o caminho atual já está tapado, a câmera corta direto para o desvio livre.
+    - A zona macia de 0,9 m não puxa mais abaixo de 2,2 m quando o limite duro permite. Ela começava dentro da parede e prendia o braço em 0,9 m.
+    - Com o braço curto, a antecipação diminui e a mira desce do peito para 0,55 m.
+    - O limite duro continua igual.
+  - **Teste novo `test_camera_crowd`** (5 pontos a 0,45 m de parede ou caixote, corrida rente nos dois sentidos com a câmera girada contra a parede, 600 passos medidos depois de 0,5 s):
+    - código anterior (`633a08a`): herói no quadro no mínimo 8%, 600 passos abaixo de 90%; distância mínima 0,90 m, 591 passos abaixo de 1,9 m; `FALHOU (1 PASS, 2 FALHA(S))`;
+    - agora: mínimo 100% no quadro, distância mínima 2,20 m, `OK`.
+  - G6 (`test_camera_wall`): 0 de 2500 passos dentro ou atrás de obstáculo, 0 passos no braço mínimo (antes 308).
+  - G3 (`test_camera_tremor`) passa: p99 63,9 m/s² (limite 80; antes desta parte 55,3), 0,26 inversões/s. O RMS da aceleração subiu de 22 para 73 m/s² por causa dos cortes.
+  - `test_ep01_v3_late.gd:291` passa sem mudança no arquivo (a zona macia não puxa mais o braço livre): `1,99 m, sem encurtar`.
+  - **Capturas** com o desvio ligado, `captures/g24a/obst_{antes,depois}_{169,43}_{M5_Crates,M4_Cart}.png`:
+    - antes: 0,90 a 1,20 m, herói 7% a 31% no quadro;
+    - depois: 2,20 a 3,73 m, herói 100% no quadro;
+    - vistas: `obst_antes_169_M4_Cart.png` (só o topo da cabeça na borda) e `obst_depois_169_M4_Cart.png` (herói inteiro correndo, câmera de lado e acima).
+  - **Comandos:**
+    - `bash tools/test.sh camera,movement,touch_controls,ep01_v3_late`: `OK (254 PASS)`.
+    - Suíte completa: `OK (5283 PASS, 0 FALHA(S))` em 511 s.

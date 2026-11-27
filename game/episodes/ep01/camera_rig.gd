@@ -46,6 +46,15 @@ const ARM_OUT_TIME := 1.2
 const ARM_HYST := 0.04
 ## Encurtamento do ultimo quadro (m; 0 = livre), para testes e depuracao.
 var last_pull: float = 0.0
+## G24a: distancia minima de enquadramento (m) e desvios testados (x = subir em rad, y = girar para o lado em rad).
+const VIEW_MIN := 2.2
+const CLOSE_LOOK_Y := 0.55
+const CRANE_TIME := 0.25
+## Ordem de preferencia: menor desvio primeiro (subir conta 1,5x menos que girar); montada em `_crane_steps()`.
+static var CRANE_STEPS: Array[Vector2] = _crane_steps()
+var _crane_goal: Vector2 = Vector2.ZERO
+var _crane_now: Vector2 = Vector2.ZERO
+var _crane_cut: bool = false
 var _probe: SphereShape3D
 var _probe_soft: SphereShape3D
 var _arm: float = -1.0
@@ -173,8 +182,15 @@ func _update(weight: float, delta: float) -> void:
 	var look := pivot + (lead if not framing_world else Vector3.ZERO)
 	var pos := _follow_pos
 	if collision_mask != 0:
-		var soft := avoid(pivot, _follow_pos, SOFT_RADIUS, SOFT_RADIUS - PROBE_RADIUS)
-		pos = _smooth_arm(pivot, _follow_pos, avoid(pivot, _follow_pos), soft, delta)
+		var free := _crane(pivot, _follow_pos, delta)
+		var soft := avoid(pivot, free, SOFT_RADIUS, SOFT_RADIUS - PROBE_RADIUS)
+		pos = _smooth_arm(pivot, free, avoid(pivot, free), soft, delta)
+		# Perto do heroi a antecipacao inteira jogaria a mira para fora dele: reduz com o braco.
+		var full := maxf(_follow_pos.distance_to(pivot), 0.01)
+		var k := clampf((pos.distance_to(pivot) - MIN_ARM) / maxf(full - MIN_ARM, 0.01), 0.0, 1.0)
+		look = pivot + (Vector3.ZERO if framing_world else lead) * k
+		# Braco curto: a mira desce do peito para o meio do corpo (cabe o heroi inteiro, pes inclusive).
+		look.y -= (1.0 - k) * maxf(look_offset.y - CLOSE_LOOK_Y, 0.0)
 	camera.global_position = pos
 	_written = pos
 	if _shake_time > 0.0 and not reduced_motion:
@@ -224,14 +240,16 @@ func _smooth_arm(look: Vector3, free_pos: Vector3, hard_pos: Vector3, soft_pos: 
 	if free_len < 0.01:
 		return free_pos
 	var hard := hard_pos.distance_to(look)
-	var want := minf(soft_pos.distance_to(look), hard)
-	if _arm < 0.0 or reduced_motion or delta <= 0.0:
+	# G24a: a zona macia (esfera de 0,9 m) so antecipa; ela nunca puxa abaixo de VIEW_MIN se o limite duro deixa.
+	var want := minf(maxf(soft_pos.distance_to(look), minf(hard, VIEW_MIN)), hard)
+	if _arm < 0.0 or reduced_motion or delta <= 0.0 or _crane_cut:
 		_arm = want
 		_arm_vel = 0.0
 	elif want < _arm:
 		_arm = _damp(_arm, want, ARM_IN_TIME, delta)
 	elif want > _arm + ARM_HYST:
-		_arm = _damp(_arm, want, ARM_OUT_TIME, delta)
+		# G24a: com a camera desviada (crane/lado) o braco volta rapido ao comprimento livre achado.
+		_arm = _damp(_arm, want, ARM_OUT_TIME if _crane_goal == Vector2.ZERO else CRANE_TIME, delta)
 	else:
 		_arm = _damp(_arm, _arm, ARM_OUT_TIME, delta)
 	if _arm > hard:
@@ -243,6 +261,65 @@ func _smooth_arm(look: Vector3, free_pos: Vector3, hard_pos: Vector3, soft_pos: 
 	_arm = clampf(_arm, minf(MIN_ARM, free_len), free_len)
 	last_pull = free_len - _arm
 	return look + (free_pos - look) / free_len * _arm
+
+
+## G24a (obstaculo): quando a parede encurtaria o braco abaixo de VIEW_MIN, a camera sobe (crane, olhando para baixo)
+## ou desliza para o lado livre em vez de virar primeira pessoa. Escolhe o primeiro desvio de CRANE_STEPS com braco livre
+## (zona macia) >= VIEW_MIN, mantendo o atual enquanto ele servir; o desvio anda suave (CRANE_TIME). Devolve a posicao
+## livre girada em volta do `pivot`; a mola e o limite duro de `_smooth_arm` continuam valendo sobre ela.
+func _crane(pivot: Vector3, free_pos: Vector3, delta: float) -> Vector3:
+	var arm := free_pos - pivot
+	var need := minf(VIEW_MIN, arm.length())
+	var goal := Vector2.ZERO
+	if _reach(pivot, arm, _crane_goal) >= need:
+		goal = _crane_goal
+	else:
+		var best := -1.0
+		for c: Vector2 in CRANE_STEPS:
+			var r := _reach(pivot, arm, c)
+			if r >= need:
+				goal = c
+				break
+			if r > best:
+				best = r
+				goal = c
+	_crane_goal = goal
+	_crane_cut = false
+	if reduced_motion or delta <= 0.0:
+		_crane_now = goal
+	elif _crane_now != goal and _reach(pivot, arm, _crane_now) < need and _reach(pivot, arm, goal) >= need:
+		# O caminho atual ja esta tapado: corta direto para o desvio livre (girar atravessando a parede deixaria a
+		# camera colada no heroi ate o braco voltar).
+		_crane_now = goal
+		_crane_cut = true
+	else:
+		_crane_now = _crane_now.lerp(goal, 1.0 - exp(-3.0 / CRANE_TIME * delta))
+	return pivot + _crane_arm(arm, _crane_now)
+
+
+static func _crane_steps() -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	for up: float in [0.0, 0.2, 0.4, 0.6, 0.8]:
+		for k in range(-8, 9):
+			out.append(Vector2(up, k * 0.2))
+	out.sort_custom(func(a: Vector2, b: Vector2) -> bool: return a.x / 1.5 + absf(a.y) < b.x / 1.5 + absf(b.y))
+	return out
+
+
+func _crane_arm(arm: Vector3, c: Vector2) -> Vector3:
+	var flat := Vector3(arm.x, 0.0, arm.z)
+	if flat.length() < 0.01 or (c.x == 0.0 and c.y == 0.0):
+		return arm
+	var side := flat.normalized().cross(Vector3.UP)
+	return Basis(Vector3.UP, c.y) * (Basis(side, -c.x) * arm)
+
+
+func _reach(pivot: Vector3, arm: Vector3, c: Vector2) -> float:
+	var to := pivot + _crane_arm(arm, c)
+	# Esfera dura (a macia de 0,9 m ja comeca dentro da parede quando o heroi passa colado, e ai nao ve nada).
+	var r := avoid(pivot, to).distance_to(pivot)
+	last_pull = 0.0
+	return r
 
 
 ## Mola criticamente amortecida (sem salto de velocidade): `smooth_time` ~ tempo para chegar ao alvo.
