@@ -51,7 +51,7 @@
   - O build 2 do iPhone rodou sem o travamento.
 - **Em andamento:**
   - G18: varal do M2.
-  - G19: ações no jogo revisadas e integradas (`faea804`). Pendente: G19b (ressalvas A–D da revisão), com `gameplay`. Lente do M7 na parede da galeria (decisão de Thiago).
+  - G19 e G19b: ações no jogo revisadas e integradas (pausa congela, sem mágica na troca de herói). Lente do M7 na parede da galeria (decisão de Thiago).
   - G21: a arte do Lumi e da base já está integrada; falta o plano na abertura, que espera o aval visual de Thiago.
   - G22 (iPhone, build 3):
     - G22b (rádio no nível das vozes, −0,26 LU) e G22c (Vila Maré) estão revisados e integrados; falta Thiago ouvir.

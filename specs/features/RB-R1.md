@@ -787,3 +787,16 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - D: teste salva (pausado) no meio de pôr no cesto com a roupa na mão, sai, recarrega: retoma no M2 sem ação presa, a camiseta volta ao telhado e solta/leva normalmente. **Esse teste já passa no código antigo** (a missão recomeça do primeiro passo); fica como guarda.
   - Comandos: `bash tools/test.sh ep01_v3_g19` OK (98 PASS; com o código revertido: 14 falhas e 1 erro de script); `bash tools/test.sh ep01_v3_g19,prop_overlap,ep01_v3` OK (372 PASS); suíte completa `bash tools/test.sh` OK (5258 PASS, 0 falhas) em 481 s.
   - Fraco: posição de pouso não foi vista em render; se o herói antigo estiver encostado em parede em todas as 6 direções, usa a da frente sem garantia. O herói antigo fica onde parou no meio do banco se a peça sumir no meio do pendurar (caso só de teste).
+- **Revisão G19b** (`reviewer`, 2026-11-27): APROVADO, sem bloqueio. `ep01_v3_g19,prop_overlap,ep01_v3` deu 372 PASS. Com o código revertido, 14 falhas e 1 erro, então os testes não são vácuos. O D foi aceito como guarda, e o `ep01_v3_cutscene.gd` perdido não entrou.
+  - A pausa não acumula tempo.
+  - O `_act_end` fica protegido pelo serial e não aparece duplicado.
+  - A guarda de quem carrega está no cesto, no varal e na entrega.
+  - `pick_ground` exige `carried == null`.
+
+  Ficaram fracos, sem bloquear:
+  - Se as 6 direções do pouso estiverem cercadas, não há garantia.
+  - A garantia de troca sem ação depende de `blocked()`.
+  - Falta um teste explícito de outro herói no cesto.
+  - O gesto não foi visto em imagem e fica com Thiago.
+
+  Merge em `feature/rb-r1-reorientacao`.
