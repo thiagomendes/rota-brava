@@ -10,6 +10,8 @@ Uso: python3 tools/glyphs/make_glyphs.py   (depois: tools/godot.sh --headless --
 """
 from pathlib import Path
 
+from help_symbol import BALLOON  # G22a: a ajuda e um "?" num balao, nao a letra H
+
 OUT = Path(__file__).resolve().parents[2] / "game" / "ui" / "glyphs" / "svg"
 
 WHITE = "#FFFFFF"
@@ -189,7 +191,8 @@ def touches() -> dict[str, str]:
             'stroke-linejoin="round"/><path d="M24 84q26-11 52 0" fill="none" stroke="#0B2440" stroke-width="8" '
             'stroke-linecap="round"/>')
     t["touch_jump"] = touch_disc(PAPER, NAVY, scaled(jump, 50, 50, 0.62), INK)
-    t["touch_help"] = touch_disc(YELLOW, NAVY, scaled(stroke(LETTERS["H"], INK, 13), 50, 50, 0.72), INK)
+    # G22a: disco claro (como pular) com o balao amarelo da ajuda; antes era a letra H num disco amarelo.
+    t["touch_help"] = touch_disc(PAPER, NAVY, scaled(BALLOON, 50, 51, 0.74), INK)
     bars = (f'<rect x="38" y="34" width="9" height="32" rx="4.5" fill="{WHITE}"/>'
             f'<rect x="53" y="34" width="9" height="32" rx="4.5" fill="{WHITE}"/>')
     t["touch_pause"] = touch_disc("#1D5FC4", NAVY, bars, WHITE)

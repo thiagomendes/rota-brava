@@ -3220,6 +3220,31 @@
       "nota": "RB-R1 E7 (ux). carabiner.svg substitui o desenho de 038be7b (oval simetrica que lia como '0' cortado): forma de D inclinada 22 graus, trava prata e luva amarela. Prova: game/tests/test_ep01_v3_portraits.gd (48 px) e captures/e7_icones/prancha_icones_48_96.png (fora do Git)."
     },
     {
+      "id": "brand_icon_help_g22a",
+      "nome": "G22a · pictograma da ajuda: ponto de interrogacao desenhado num balao de fala (substitui a letra H de help.svg)",
+      "agente": "ux",
+      "processo": {
+        "script": "tools/glyphs/help_symbol.py",
+        "ferramenta": "SVG gerado por script do projeto (Python, texto), viewBox 100x100, 256 px; balao #FFD23F, contorno #123A5E 6 u, interrogacao #0B2440 em traco 9 u (path, sem fonte)",
+        "exportador": "importador de textura SVG da Godot (svg/scale 1.0)"
+      },
+      "origem": [
+        "tools/glyphs/help_symbol.py"
+      ],
+      "saida": "game/ui/brand/icons",
+      "arquivos_sha256": {
+        "help_balloon.svg": "c47a86cfc817c75c4b7a6fe7b799a592f1172e1a4c1ee6f3db7680a8a4fdbb00"
+      },
+      "arquivos_bytes": {
+        "help_balloon.svg": 531
+      },
+      "status": "provisorio",
+      "aprovacao": "pendente (Thiago, no iPhone)",
+      "originalidade": "formas desenhadas no projeto, sem referencia, fonte ou imagem de terceiros; sem modelo de imagem",
+      "data": "2026-11-27",
+      "nota": "RB-R1 G22a (ux). O mesmo desenho (BALLOON) vai no glifo de toque game/ui/glyphs/svg/touch_help.svg por tools/glyphs/make_glyphs.py. help.svg (letra H) saiu. Usado por game/ui/hud.gd (Hud.HELP_ICON) e game/ui/touch/touch_controls.gd. Prova: game/tests/test_ui_glyphs.gd, game/tests/test_touch_controls.gd e captures/g22a/ (fora do Git)."
+    },
+    {
       "id": "clues_v3_captain_boot",
       "nome": "Ep01 v3 F2 · bota do capitao caida de lado (M1.boot): junto a amarra vazia M1_EmptyMooring; le a 8 m na camera baixa",
       "agente": "art3d",
