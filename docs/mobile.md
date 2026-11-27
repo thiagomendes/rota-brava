@@ -6,7 +6,8 @@ Builds de **validação** (sem publicação em loja). Android: APK pelo cabo. iO
 
 ## 1. Custo antes de tudo
 - Os dois workflows só rodam quando você clica em **Run workflow**. Nada roda a cada push.
-- Em repositório **privado**, minutos de **macOS** custam mais que os de Linux (o GitHub aplica um multiplicador; confira o valor atual na documentação de cobrança do GitHub Actions e em Settings > Billing). Dispare o iOS só quando houver algo novo para testar.
+- Hoje o `rota-brava` é **público**: as máquinas padrão do GitHub Actions (inclusive macOS) não cobram minutos em repositório público. Os segredos continuam invisíveis para todos; só quem tem permissão de escrita no repositório consegue apertar "Run workflow"; os workflows não rodam em pull request de fork. O que fica público: os logs (com segredos mascarados) e o APK do Android enquanto o artefato existir (decisão de Thiago: tudo bem).
+- Se o repositório virar **privado**: minutos de **macOS** custam mais que os de Linux (o GitHub aplica um multiplicador; confira o valor atual na documentação de cobrança do GitHub Actions e em Settings > Billing). Dispare o iOS só quando houver algo novo para testar.
 - O Android roda em Linux, que custa menos.
 
 ## 2. Apple (uma vez só)
