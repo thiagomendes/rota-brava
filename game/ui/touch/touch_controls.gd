@@ -249,6 +249,14 @@ func release_all() -> void:
 		_canvas.queue_redraw()
 
 
+## App em segundo plano ou janela sem foco: o sistema pode nunca mandar o "soltou" dos dedos. Solta tudo agora para
+## o heroi nao voltar andando sozinho (revisao do RB-M1).
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED \
+			or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		release_all()
+
+
 func _exit_tree() -> void:
 	release_all()
 	if hud != null and is_instance_valid(hud):

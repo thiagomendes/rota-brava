@@ -43,6 +43,7 @@ func run(runner) -> void:
 	await _act()
 	await _camera()
 	await _two_fingers()
+	await _focus_lost()
 	await _panel_blocks()
 	await _hud_buttons()
 	await _hide_on_other_devices()
@@ -241,6 +242,33 @@ func _two_fingers() -> void:
 	r.check(not Input.is_action_pressed(&"move_up"), "dois dedos: soltar o joystick para o heroi")
 
 
+## App para segundo plano / janela perde o foco com o dedo no joystick e no pular: nada fica pressionado.
+func _focus_lost() -> void:
+	var o := Vector2(420, touch.view_size().y * 0.62)
+	for what: int in [Node.NOTIFICATION_APPLICATION_FOCUS_OUT, Node.NOTIFICATION_APPLICATION_PAUSED,
+			Node.NOTIFICATION_WM_WINDOW_FOCUS_OUT]:
+		_down(0, o)
+		await r.frames(1)
+		_drag(0, o, o + Vector2(TouchControls.STICK_RADIUS, 0))
+		_down(1, touch.jump_center())
+		await r.frames(2)
+		var held := Input.is_action_pressed(&"move_right") and Input.is_action_pressed(&"run") and Input.is_action_pressed(&"jump")
+		touch.notification(what)
+		await r.frames(2)
+		var free := not Input.is_action_pressed(&"move_right") and not Input.is_action_pressed(&"run") \
+			and not Input.is_action_pressed(&"jump") and touch.finger_kind(0) == &"" and touch.finger_kind(1) == &""
+		r.check(held and free, "foco: notificacao %d solta joystick, corrida e pular (segurava %s, solto %s)" % [what, held, free])
+		# O "soltou" que chega depois (se chegar) nao pertence mais a camada e nao quebra nada.
+		_down(0, o, false)
+		_down(1, touch.jump_center(), false)
+		await r.frames(2)
+	var p0 := lead.global_position
+	await _physics(20)
+	var drift := lead.global_position - p0
+	drift.y = 0.0
+	r.check(drift.length() < 0.3, "foco: depois de perder o foco o heroi para (%.2f m)" % drift.length())
+
+
 func _panel_blocks() -> void:
 	var probe := Probe.new()
 	r.tree.root.add_child(probe)
@@ -273,9 +301,15 @@ func _hud_buttons() -> void:
 	main.hud.help_requested.connect(func() -> void: helps[0] += 1)
 	var hb := main.hud._help_button
 	r.check(hb in main.hud.touch_passthrough(), "ajuda: o botao de ajuda do HUD fica com a GUI (a camada nao cobre)")
+	r.check(hb.size.x >= 110.0 and hb.size.y >= 110.0, "ajuda: alvo de toque do H >= 110 px (%s)" % str(hb.size))
 	await _tap(_center(hb))
 	r.check(helps[0] == 1 and int(probe.counts.get(&"help", 0)) == 1,
 		"ajuda: tocar no botao de ajuda envia a intencao help uma vez (sinal %d, intencao %d)" % [helps[0], int(probe.counts.get(&"help", 0))])
+	# Toque na borda do alvo (fora do disco desenhado) tambem conta.
+	var edge := hb.get_global_rect().position + Vector2(8, 8)
+	var h0: int = helps[0]
+	await _tap(edge)
+	r.check(helps[0] == h0 + 1, "ajuda: tocar no canto do alvo, fora do desenho, tambem pede ajuda (%d)" % (helps[0] - h0))
 	# Pausa pela camada; Continuar e Opcoes da pausa pelo toque.
 	await _tap(touch.pause_center())
 	r.check(main.hud.pause_open and main.get_tree().paused and not touch.visible, "pausa: o botao de pausa da camada pausa (e a camada some)")
