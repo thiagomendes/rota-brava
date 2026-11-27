@@ -1009,3 +1009,27 @@ Critérios de aceite:
   - O deslizamento é um empurrão geométrico, sem animação nem som de batida.
   - Depois de se soltar, o barco segue o leme e encosta a proa no cais (empurrão antigo do `boat.gd`).
   - O M6 do bot voltou a cerca de 33 s.
+
+### G24c · segunda correção da revisão (a correção do contato teleportava o barco), `gameplay`, 2026-11-27
+- **Teto do empurrão:** em `_guard_boat_turn`, a correção desloca no máximo `PUSH_MAX` = 5 cm por quadro de 1/60 s, somando cais e boia. Com o tempo acelerado, o teto escala pelo delta. O que faltar fica para o quadro seguinte.
+- **Para segurar a interpenetração com esse teto:**
+  - perto do que boia (folga < 0,6 m), de frente ou já encostado, a velocidade cai para 1,2 m/s;
+  - o cais é resolvido antes da boia;
+  - o empurrão da boia não entra na margem: espremido entre a boia e a margem, o passo do quadro (giro e avanço) não vale, e o barco sai pelo outro lado do leme;
+  - giro que enfia a quina na margem também não vale.
+- **`test_boat_unstick` (40 checagens):**
+  - Casos: boias A e B, `rowboat_b` e cais; de frente e de quina; leme para os dois lados. A chegada é pela primeira direção de água livre.
+  - Em todos os quadros, o salto da correção é de no máximo 5,5 cm, a folga mínima fica acima de -5 cm, e a caixa do casco fica dentro da camada 1 em no máximo 2 quadros.
+  - "Solto" passou a ser a proa virar mais de 0,75 rad ou a folga passar de 0,4 m, em até 3,5 s. Os dois lados do leme precisam soltar, exceto espremido contra a margem, onde basta um.
+  - Na boia A, quina, leme esquerdo, o barco fica espremido e não solta por esse lado (gira 0,18 rad); solta pelo outro.
+  - Em `6c61444`, a checagem do salto falha em 4 casos: 0,651 m e 0,284 m na boia B, e 0,060 m na boia A e no cais.
+- **Outras mudanças:**
+  - `KNOWN`: `M2 char: static` virou um item para o Pico (teto 25 cm) e outro para o Rastro (teto 10 cm); vasos viraram `kit:pot_a#` (apareceu o `pot_a#3` no M7, 9 cm). Não estreitei o `M7 char:Actor_climber x static`: o cenário fixo é uma malha só, sem nome de peça.
+  - `test_ep01_v3_late` voltou a conferir a atracação: proa para o bote (diferença < 0,15 rad) e casco livre (folga ≥ 0,3 m).
+- **Provas:**
+  - `bash tools/test.sh ep01_v3,prop_overlap,motion_audit,boat_unstick`: OK (420 PASS).
+  - Suíte completa, duas rodadas com o código final, ambas falhas por motivos sem ligação aparente com o G24:
+    - `4292 PASS`: uma Godot caiu com sinal 11 (`propagate_notification` chamado de outra thread) em `test_movement_f1`;
+    - `2496 PASS`: o mesmo crash, agora em `test_ep01_v3_late`, e uma falha de `radio nivel` (-1,54 LU).
+  - Esses três arquivos sozinhos (`ep01_v3_late,movement_f1,audio_radio_level`) dão OK (97 PASS). A terceira rodada da suíte completa deu OK (5388 PASS, 0 falhas) em 590 s.
+  - Captura aberta: `captures/g24/after/unstick_09.png` (barco solto da boia A, girando).

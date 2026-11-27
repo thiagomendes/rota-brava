@@ -185,6 +185,10 @@ func _m6_boat() -> void:
 	var want_d := Vector2(to.x - dn.x, to.z - dn.z).length()
 	r.check(absf(Vector2(boat.global_position.x - dn.x, boat.global_position.z - dn.z).length() - want_d) < 0.1,
 		"v3 M6: barco encostou no bote")
+	var to_d := dn - boat.global_position
+	r.check(absf(wrapf(atan2(-to_d.x, -to_d.z) - boat.heading, -PI, PI)) < 0.15
+		and land.boat_gap(boat.global_position, boat.heading, ["wv3_dinghy"]) >= 0.3,
+		"v3 M6: atracado com a proa para o bote e o casco livre (rumo %.2f)" % boat.heading)
 	r.check(_step(main) == &"rope" and main.active_member == &"climber", "v3 M6: o Pico joga a corda (troca no barco)")
 	r.check(main.best_interactable() == land.spots[&"rope"], "v3 M6: corda ao alcance do Pico embarcado")
 	land._on_spot(&"rope", main.actors[&"climber"])

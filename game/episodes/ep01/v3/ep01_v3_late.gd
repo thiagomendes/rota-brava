@@ -1144,22 +1144,26 @@ func _physics_process(delta: float) -> void:
 ## folga ficou abaixo de TOUCH_GAP, ele e empurrado para fora, na direcao que separa os dois, ate a folga voltar. Assim
 ## acelerar contra a boia so encosta, e girar sempre solta (a proa escorrega pela boia), para qualquer lado.
 const TOUCH_GAP := 0.03
+## Teto do empurrao de saida por quadro (m), somando boia e cais: o barco escorrega, nao salta.
+const PUSH_MAX := 0.05
+## Perto do que boia (folga em m), de frente, a velocidade cai para CONTACT_SPEED (m/s: 2 cm por quadro a 60 Hz).
+const APPROACH_SLOW := 0.6
+const CONTACT_SPEED := 1.2
 
 
 func _guard_boat_turn() -> void:
 	if main == null or main.boat == null or not sailing or main.boat.input_locked:
+		_prev_heading = NAN
 		return
 	var boat := main.boat
-	for i in 40:
-		var gap := boat_gap(boat.global_position, boat.heading)
-		if gap >= TOUCH_GAP:
-			break
-		var n := _separation(boat.global_position, boat.heading)
-		if n == Vector3.ZERO:
-			break
-		boat.global_position += n * maxf(TOUCH_GAP - gap, 0.01)
-		if boat.forward().dot(n) < 0.0:
-			boat.speed = minf(boat.speed, 0.5)   # bateu de frente: perde o embalo
+	# deslocamento maximo da correcao neste quadro (o resto fica para o proximo); PUSH_MAX e por quadro de 1/60 s
+	var budget := PUSH_MAX * clampf(get_physics_process_delta_time() * 60.0, 1.0, 10.0)
+	# chegando perto de frente: o barco perde o embalo antes de encostar (a correcao de 4 cm/quadro da conta do resto)
+	var near := boat_gap(boat.global_position, boat.heading)
+	if near < APPROACH_SLOW:
+		var nn := _separation(boat.global_position, boat.heading)
+		if nn != Vector3.ZERO and (boat.forward().dot(nn) < -0.2 or near < 0.0):
+			boat.speed = minf(boat.speed, CONTACT_SPEED)
 	# cais e margem (camada 1): o giro encostado podia enfiar a quina; sai pela normal do contato
 	var col := boat.find_child("Collision", true, false) as CollisionShape3D
 	if col != null:
@@ -1169,6 +1173,8 @@ func _guard_boat_turn() -> void:
 		var lx := boat.global_transform.affine_inverse() * col.global_transform
 		var space := world.get_world_3d().direct_space_state
 		for i in 20:
+			if budget <= 0.0001:
+				break
 			q.transform = Transform3D(Basis(Vector3.UP, boat.heading), boat.global_position) * lx
 			q.transform.origin.y += 0.25
 			var ex: Array[RID] = []
@@ -1183,9 +1189,47 @@ func _guard_boat_turn() -> void:
 			n.y = 0.0
 			if n.length() < 0.1:
 				break
-			boat.global_position += n.normalized() * 0.03
+			var st := minf(0.02, budget)
+			boat.global_position += n.normalized() * st
+			budget -= st
 			if boat.forward().dot(n) < 0.0:
 				boat.speed = minf(boat.speed, 0.5)
+	for i in 40:
+		if budget <= 0.0001:
+			break
+		var gap := boat_gap(boat.global_position, boat.heading)
+		if gap >= TOUCH_GAP:
+			break
+		var n := _separation(boat.global_position, boat.heading)
+		if n == Vector3.ZERO:
+			break
+		var step := minf(maxf(TOUCH_GAP - gap, 0.01), budget)
+		boat.global_position += n * step
+		if not _hull_free(boat.global_position, boat.heading):
+			# espremido entre a boia e a margem: nao empurra para dentro da margem; o passo deste quadro (giro e
+			# avanco) nao vale, se o quadro anterior estava livre
+			boat.global_position -= n * step
+			if not is_nan(_prev_heading) and _prev_pos.distance_to(boat.global_position) < 0.2:
+				boat.global_position = _prev_pos
+				boat.heading = _prev_heading
+				boat.rotation.y = boat.heading
+				boat.speed = 0.0
+			break
+		budget -= step
+		if boat.forward().dot(n) < 0.0:
+			boat.speed = minf(boat.speed, 0.5)   # bateu de frente: perde o embalo
+	# giro que enfia a quina na margem alem do que a correcao do quadro tira: o giro deste quadro nao vale (o outro
+	# lado e o motor continuam livres)
+	if not is_nan(_prev_heading) and not _hull_free(boat.global_position, boat.heading) \
+			and _hull_free(boat.global_position, _prev_heading):
+		boat.heading = _prev_heading
+		boat.rotation.y = boat.heading
+	_prev_heading = boat.heading
+	_prev_pos = boat.global_position
+
+
+var _prev_heading := NAN
+var _prev_pos := Vector3.ZERO
 
 
 ## Direcao (plano) que afasta o casco do que boia mais perto: do ponto mais perto do obstaculo ao eixo do casco.

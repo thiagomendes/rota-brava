@@ -10,10 +10,11 @@ const MAX_FRAMES := 40000
 ## Teto = a maior profundidade medida nas rodadas do G24 + 5 cm: passar dele falha. Cada uma esta no ticket (G24d, "o que
 ## sobrou") com a causa. Par fora da lista falha; entrada que nao casou com nada e avisada (para a lista nao apodrecer).
 const KNOWN := [
-	["*", "char:", "kit:pot_a#0", 23, "art3d"],          # vaso sem colisao na camada 1 (praca)
+	["*", "char:", "kit:pot_a#", 23, "art3d"],           # vasos sem colisao na camada 1 (praca, farol)
 	["*", "char:", "kit:bucket#", 21, "art3d"],          # balde sem colisao na camada 1 (cais)
 	["M1", "piece:CaptainBoot", "static", 19, "gameplay"],  # pick_up da bota afunda no cais
-	["M2", "char:", "static", 25, "gameplay"],           # escalada do galpao/arvore encosta na parede
+	["M2", "char:Actor_climber", "static", 25, "gameplay"],   # escalada do galpao/arvore encosta na parede
+	["M2", "char:Actor_tracker", "static", 10, "gameplay"],   # Rastro rente ao galpao (5 cm medidos)
 	["M2", "char:", "mission:Cloth", 22, "gameplay"],    # heroi passa pela roupa pendurada/no chao
 	["M2", "char:", "mission:ClothesBench", 20, "gameplay"],   # pulinho no banco
 	["M2", "char:", "mission:Basket", 18, "gameplay"],   # abaixar no cesto
