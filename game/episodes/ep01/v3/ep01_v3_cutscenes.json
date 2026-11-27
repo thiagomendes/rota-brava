@@ -578,7 +578,13 @@
        "who": "radio",
        "marker": "Base_LumiStand",
        "anim": "wave",
-       "then": "talk"
+       "then": "idle",
+       "hold": [
+        0.45,
+        1.25
+       ],
+       "hold_until": 0.8,
+       "_note": "G21i: o aceno fica em laco (0,45-1,25 s do wave, 2 periodos) ate 80% do plano e passa para idle com blend"
       }
      ],
      "line": {
@@ -621,8 +627,13 @@
        "who": "radio",
        "marker": "Base_LumiStand",
        "anim": "point",
-       "then": "talk",
-       "_note": "thumbs_up nao existe no lumi_v2: talk no lugar (G21i)"
+       "then": "idle",
+       "_note": "G21i: thumbs_up nao existe no lumi_v2; o point congela estendido (0,7 s) ate 90% do plano e passa para idle com blend",
+       "hold": [
+        0.7,
+        0.7
+       ],
+       "hold_until": 0.9
       }
      ],
      "line": {

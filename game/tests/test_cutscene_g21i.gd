@@ -2,7 +2,7 @@ extends RefCounted
 ## G21i (RB-R1): o plano 9 da abertura vira 9_out, 9a, 9b e 9c na base Farol 7 com o Lumi (lumi_v2). Roda a
 ## GameIntroScene de verdade (tempo acelerado) e confere, a cada plano da base: palco visivel e vila escondida, o Lumi
 ## filho do palco (sentado na cadeira no 9a), clipe pedido, cabeca dentro do quadro, fala no corte e plano do tamanho
-## G17; no 9c a legenda desenha {help} com glifo e o disco da ajuda aparece e pulsa. Tambem: carga do palco fora da
+## G17; no 9c o Lumi aponta no trecho "aperte o botao de ajuda" e o disco da ajuda aparece e pulsa. Tambem: carga do palco fora da
 ## tela de carregamento, cortes com movimento reduzido e textos/vozes do Lumi. Nao comprova o visual (capturas).
 
 const TIME_SCALE := 4.0
@@ -54,7 +54,7 @@ func _texts_and_voice() -> void:
 	var want := {
 		"ep01.narrator.intro.base": "E aqui é o Farol 7, a base da equipe!",
 		"ep01.radio.intro.hello": "Na escuta! Sou o Lumi, do rádio.",
-		"ep01.radio.intro.help": "Precisou? Aperte {help} que eu ajudo!",
+		"ep01.radio.intro.help": "Precisou? Aperte o botão de ajuda que eu ajudo!",
 		"ep01.radio.help.invite_1": "Na escuta! É o Lumi. Quer ajuda?",
 		"ep01.radio.help.invite_4": "Uma dica? Aqui é o Lumi!",
 		"member.radio.name": "Lumi"}
@@ -63,6 +63,18 @@ func _texts_and_voice() -> void:
 		if Loc.t(k) != want[k]:
 			bad.append("%s=%s" % [k, Loc.t(k)])
 	r.check(bad.is_empty(), "G21i: textos do Lumi no catalogo %s" % str(bad))
+	# retrato do radio: rosto do Lumi em toda fala `radio` do Ep01 v3 (abertura, dicas, convites)
+	var hud := Hud.new()
+	r.tree.root.add_child(hud)
+	var d0: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://episodes/ep01/v3/ep01_v3_dialogue.json"))
+	var radio_keys: Array[String] = []
+	for k: String in d0.get("lines", {}):
+		if hud.speaker_for(k) == &"radio":
+			radio_keys.append(k)
+	var tex := hud.speaker_texture(&"radio")
+	r.check(radio_keys.size() >= 20 and tex != null and tex.resource_path == "res://ui/portraits/lumi_neutra.png",
+		"G21i: %d falas radio do Ep01 v3 mostram o retrato do Lumi (%s)" % [radio_keys.size(), tex.resource_path if tex != null else "icone do farol"])
+	hud.queue_free()
 	r.check(Loc.member_name(&"radio") == "Lumi", "G21i: a legenda do radio diz Lumi (%s)" % Loc.member_name(&"radio"))
 	VoiceCatalog.reload()
 	var v3 := VoiceCatalog.v3_lines()
@@ -75,20 +87,20 @@ func _texts_and_voice() -> void:
 	r.check(not_pending.is_empty(), "G21i: falas novas/trocadas sem take antigo e pendentes para o lote %s" % str(not_pending))
 	r.check(not FileAccess.file_exists("res://audio/voice/v3/ep01_radio_intro_hello.visemes.json"),
 		"G21i: visemas do take antigo da intro.hello removidos")
+	# Decisao de Thiago: o jogo e multiplataforma, nenhuma fala do Ep01 cita tecla/botao por marcador ({...}); a
+	# legenda e igual ao que a voz diz (sem texto falado separado).
 	var d: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://episodes/ep01/v3/ep01_v3_dialogue.json"))
-	var spoken: Dictionary = d.get("spoken", {})
-	r.check(str(spoken.get("ep01.radio.intro.help", "")) == "Precisou? Aperte o botão de ajuda que eu ajudo!",
-		"G21i: texto falado da intro.help sem o glifo (%s)" % str(spoken.get("ep01.radio.intro.help", "")))
-	# toda fala com marcador de glifo tem texto falado (a voz nao le "{help}")
-	var no_spoken: Array[String] = []
-	for k: String in d.get("lines", {}):
-		if Loc.t(k).contains("{") and not spoken.has(k):
-			no_spoken.append(k)
-	for sh: Variant in _intro_shots():
-		var k := Ep01V3Cutscene.line_key(sh as Dictionary)
-		if k != "" and Loc.t(k).contains("{") and not spoken.has(k):
-			no_spoken.append(k)
-	r.check(no_spoken.is_empty(), "G21i: fala com marcador tem texto falado %s" % str(no_spoken))
+	var marked: Array[String] = []
+	var keys: Array = d.get("lines", {}).keys()
+	for gid: String in d.get("groups", {}):
+		keys.append_array(d["groups"][gid])
+	for id in Ep01V3Cutscene.scene_ids():
+		for sh: Variant in Ep01V3Cutscene.scene_data(id).get("shots", []):
+			keys.append(Ep01V3Cutscene.line_key(sh as Dictionary))
+	for k: Variant in keys:
+		if str(k) != "" and Loc.t(str(k)).contains("{"):
+			marked.append(str(k))
+	r.check(marked.is_empty() and not d.has("spoken"), "G21i: nenhuma fala do Ep01 v3 usa marcador {...} nem texto falado separado %s" % str(marked))
 
 
 func _play() -> void:
@@ -125,6 +137,7 @@ func _play() -> void:
 			"G21i %s: palco da base visivel, vila escondida" % id)
 		var lumi := cs.actors.get(&"radio") as Node3D
 		if id == "9_out":
+			_sea_checks(intro, cs, sh)
 			r.check(lumi == null or not lumi.is_visible_in_tree() or not _in_frame(cs.camera, lumi.global_position + Vector3(0, 1.0, 0)),
 				"G21i 9_out: casa-torre por fora, sem o Lumi no quadro")
 			continue
@@ -145,14 +158,14 @@ func _play() -> void:
 		var need := Hud.line_seconds(key, Ep01V3Cutscene.voice_seconds(key))
 		r.check(Ep01V3Cutscene.shot_length(sh) >= maxf(float(sh["duration"]), need) - 0.0001,
 			"G21i %s: plano dura >= max(ficha, voz/leitura + folga) (%.2f >= %.2f)" % [id, Ep01V3Cutscene.shot_length(sh), need])
+		var por := hud.find_child("SpeakerPortrait", true, false) as IconView
+		if key.begins_with("ep01.radio."):
+			r.check(por != null and por.texture_override != null and por.texture_override.resource_path.contains("lumi"),
+				"G21i %s: retrato da legenda e o rosto do Lumi (%s)" % [id, por.texture_override.resource_path if por != null and por.texture_override != null else "icone"])
+		if id == "9b" or id == "9c":
+			await _arm_samples(cs, lumi, i, id)
 		if id == "9c":
-			var g := hud.subtitle_glyphs()
-			var acts: Array[StringName] = []
-			if g != null:
-				for gv in g.glyphs():
-					acts.append(gv.action)
-			r.check(g != null and acts == [&"help"] and not g.plain_text().contains("{"),
-				"G21i 9c: legenda desenha {help} com o glifo do aparelho (%s / %s)" % [str(acts), g.plain_text() if g != null else "?"])
+			r.check(hud.subtitle_glyphs() == null, "G21i 9c: legenda em texto puro, igual a fala (sem glifo de tecla)")
 			r.check(hud.help_spotlit() and hud.help_pulsing(), "G21i 9c: disco da ajuda visivel e pulsando")
 			var s0 := (hud.find_child("HelpButton", true, false) as Control).scale
 			await r.frames(8)
@@ -188,6 +201,78 @@ func _play() -> void:
 	Ep01V3Cutscene.enabled = was
 	Ep01V3Cutscene.seen_path = was_seen
 	Ep01V3Cutscene.reset_seen()
+
+
+## 9_out: o mar (agua da vila, opaca) esta visivel e cobre toda a parte de baixo do quadro do plano inteiro: os raios
+## dos cantos de baixo da camera batem no mar dentro do tamanho dele, com a camera acima da agua. Assim a laje do fundo
+## do palco (abaixo do nivel do mar) nunca aparece.
+func _sea_checks(intro: GameIntroScene, cs: Ep01V3Cutscene, sh: Dictionary) -> void:
+	var sea := intro.sea_node
+	var mat := sea.material_override as ShaderMaterial if sea != null else null
+	r.check(sea != null and sea.is_visible_in_tree() and mat != null and float(mat.get_shader_parameter("alpha_shallow")) >= 1.0
+		and float(mat.get_shader_parameter("alpha_deep")) >= 1.0, "G21i 9_out: mar opaco com o material da agua da vila")
+	if sea == null:
+		return
+	var y := sea.global_position.y
+	var half := (sea.mesh as PlaneMesh).size.x * 0.5
+	var probe := Camera3D.new()
+	probe.fov = cs.camera.fov
+	cs.add_child(probe)
+	var bad: Array[String] = []
+	var vp := cs.camera.get_viewport().get_visible_rect().size
+	for k in 11:
+		var u := k / 10.0
+		var pose := cs.shot_pose(sh, u)
+		probe.global_position = pose[0]
+		probe.look_at(pose[1], Vector3.UP)
+		for px: Vector2 in [Vector2(0, vp.y), Vector2(vp.x, vp.y), Vector2(vp.x * 0.5, vp.y)]:
+			var o := probe.project_ray_origin(px)
+			var d := probe.project_ray_normal(px)
+			if o.y <= y + 0.2 or d.y >= -0.0001:
+				bad.append("u=%.1f %s sem mar" % [u, str(px)])
+				continue
+			var hit := o + d * ((y - o.y) / d.y)
+			if absf(hit.x - sea.global_position.x) > half or absf(hit.z - sea.global_position.z) > half:
+				bad.append("u=%.1f %s fora do mar" % [u, str(px)])
+	probe.queue_free()
+	r.check(bad.is_empty(), "G21i 9_out: o mar cobre a parte de baixo do quadro do plano inteiro (laje nunca aparece) %s" % str(bad))
+
+
+## Braco direito do Lumi em varios pontos do plano: no 9c estendido (mao longe do quadril, na altura do ombro) enquanto
+## a fala diz "aperte o botao de ajuda"; no 9b o aceno segue ate 80% do plano. Ao soltar, blend para idle.
+func _arm_samples(cs: Ep01V3Cutscene, lumi: Node3D, i: int, id: String) -> void:
+	var cv := StoryFigure.visual(lumi)
+	var dur := Ep01V3Cutscene.shot_length(_intro_shots()[i])
+	var bad: Array[String] = []
+	var log: Array[String] = []
+	# 9c: o trecho "aperte o botao de ajuda" ocupa ~21%-71% da fala (posicao dos caracteres na frase); amostras
+	# nesse trecho, em fracao do tempo da fala no HUD (que comeca no corte).
+	var key := Ep01V3Cutscene.line_key(_intro_shots()[i])
+	var line_s := Hud.line_seconds(key, Ep01V3Cutscene.voice_seconds(key))
+	var fracs: Array = [0.21, 0.35, 0.5, 0.62, 0.71] if id == "9c" else [0.25, 0.4, 0.55, 0.7]
+	for frac: float in fracs:
+		var at := frac * (line_s if id == "9c" else dur)
+		while cs.playing and cs.shot_index == i and cs.shot_time < at:
+			await r.tree.process_frame
+		if cs.shot_index != i:
+			bad.append("plano acabou antes de %.2f" % frac)
+			break
+		var hand := lumi.global_transform.affine_inverse() * cv.bone_position(&"hand.R")
+		log.append("%.2f:%s y=%.2f fwd=%.2f" % [frac, cs.holding(&"radio"), hand.y, -hand.z])
+		if id == "9c":
+			var saying := cs.hud.is_speaking()
+			# estendido: mao na altura do ombro (> 1,2 m; em repouso fica a ~0,79 m) e a frente do corpo (> 0,15 m; em
+			# repouso ~0,08 m), com a fala no ar
+			if not saying or cs.holding(&"radio") != &"point" or hand.y < 1.2 or -hand.z < 0.15:
+				bad.append(log[-1])
+		elif cs.holding(&"radio") != &"wave" or hand.y < 1.2:
+			bad.append(log[-1])
+	r.check(bad.is_empty(), "G21i %s: braco %s nas amostras do plano %s (ruins: %s)" % [id,
+		"estendido apontando no trecho 'aperte o botao de ajuda'" if id == "9c" else "acenando no alto", str(log), str(bad)])
+	while cs.playing and cs.shot_index == i and cs.holding(&"radio") != &"":
+		await r.tree.process_frame
+	r.check(cs.shot_index != i or StoryFigure.visual(lumi).current_animation() == &"idle",
+		"G21i %s: depois do trecho, passa para idle com blend (%s)" % [id, StoryFigure.visual(lumi).current_animation()])
 
 
 func _reduced_motion() -> void:

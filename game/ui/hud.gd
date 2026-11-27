@@ -34,7 +34,9 @@ const MEMBER_COLORS := {&"tracker": Color("FF8A1F"), &"climber": Color("3DBE5A")
 const SKILL_ICONS := {&"tracker": &"notebook", &"climber": &"rope", &"pilot": &"helm"}
 ## Retrato da legenda de quem nao e heroi (RB-R1 E7, PROVISORIO): render do modelo 3D (capitao, filhote; mesmo
 ## enquadramento dos retratos v2) ou retrato-icone da marca (Dona Amora sem modelo; Farol 7 = farol com ondas de radio).
-const SPEAKER_PORTRAITS := {&"captain": "res://ui/portraits/captain_neutra.png", &"pup": "res://ui/portraits/pup_neutra.png"}
+## G21i: o radio e o Lumi (rosto dele na legenda, nao mais o farol).
+const SPEAKER_PORTRAITS := {&"captain": "res://ui/portraits/captain_neutra.png", &"pup": "res://ui/portraits/pup_neutra.png",
+	&"radio": "res://ui/portraits/lumi_neutra.png"}
 const SPEAKER_ICONS := {&"captain": &"helm", &"pup": &"paw", &"vendor": &"vendor", &"radio": &"radio",
 	&"narrator": &"storybook"}
 ## Anel e nome do falante; cores escolhidas para o nome (escurecido 20%) ler sobre o papel do balao.

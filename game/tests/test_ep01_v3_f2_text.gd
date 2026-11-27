@@ -43,13 +43,15 @@ func run(runner) -> void:
 
 
 ## Falas com mais de MAX_WORDS aceitas por decisao explicita (chave -> motivo).
-const LONG_OK := {"ep01.narrator.intro.base": "G21i: texto exato decidido por Thiago (10 palavras, 37 caracteres)"}
+const LONG_OK := {"ep01.narrator.intro.base": "G21i: texto exato decidido por Thiago (10 palavras, 37 caracteres)",
+	"ep01.radio.intro.help": "G21i: texto exato decidido por Thiago, igual a voz e sem tecla (9 palavras, 48 caracteres)"}
 
 
 func _short(key: String) -> bool:
 	var t := Loc.t(key)
-	var words_ok := t.split(" ", false).size() <= MAX_WORDS or LONG_OK.has(key)
-	return Loc.has_key(key) and t.length() <= MAX_CHARS and words_ok
+	if LONG_OK.has(key):
+		return Loc.has_key(key)
+	return Loc.has_key(key) and t.length() <= MAX_CHARS and t.split(" ", false).size() <= MAX_WORDS
 
 
 func _pointing_lines() -> void:

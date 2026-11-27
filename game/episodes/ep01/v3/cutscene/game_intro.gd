@@ -20,6 +20,9 @@ const STAGE_OFFSET := Vector3(0, 200, 0)
 ## Cadeira de costas (para a mesa) ate o `turn_chair`, que a gira para a camera em TURN_S.
 const CHAIR_BACK_DEG := 180.0
 const TURN_S := 1.0
+## Mar do plano de fora: lado (m) e altura em relacao ao chao da torre (build: mar em y = -3).
+const SEA_SIZE := 1600.0
+const SEA_Y := -2.9
 
 ## Para onde ir ao terminar ("" = ficar; testes).
 static var next_scene: String = EP01_SCENE
@@ -35,6 +38,7 @@ var stage_from_queue: bool = false
 ## No da vila -> visivel antes do plano da base.
 var _village_hidden: Dictionary = {}
 var _chair_tween: Tween
+var sea_node: MeshInstance3D
 
 
 ## O que o menu chama em Jogar: abertura do jogo na primeira vez, senao direto o Ep01.
@@ -145,8 +149,34 @@ func _build_stage(ps: PackedScene) -> Farol7Base:
 	add_child(stage)
 	stage.global_position = STAGE_OFFSET
 	stage.set_chair_yaw(CHAIR_BACK_DEG)
+	_build_sea()
 	cutscene.stage = stage
 	return stage
+
+
+## G21i: mar ate o horizonte em volta da casa-torre (plano 9_out), com o material da agua da vila. O fundo do palco
+## acaba numa laje sob as pedras; o mar (y = -3 do palco, como no build) a cobre. So aparece no plano de fora: dentro,
+## o fundo da escotilha ja tem o proprio mar na mesma altura.
+func _build_sea() -> void:
+	var sea := WaterSurface.new()
+	sea.name = "ExteriorSea"
+	var pm := PlaneMesh.new()
+	pm.size = Vector2(SEA_SIZE, SEA_SIZE)
+	pm.subdivide_width = 160
+	pm.subdivide_depth = 160
+	sea.mesh = pm
+	var village_water := world.get_node_or_null(^"Water") as MeshInstance3D
+	if village_water != null and village_water.material_override != null:
+		# mesmo material da vila, mas opaco: a agua da vila e translucida e deixaria a laje aparecer por baixo
+		var m := village_water.material_override.duplicate() as ShaderMaterial
+		m.set_shader_parameter("alpha_shallow", 1.0)
+		m.set_shader_parameter("alpha_deep", 1.0)
+		sea.material_override = m
+	sea.visible = false
+	stage.add_child(sea)
+	var ext := stage.marker(&"Base_Exterior")
+	sea.global_position = (ext.global_position if ext != null else stage.global_position) + Vector3(0, SEA_Y, 0)
+	sea_node = sea
 
 
 func _on_shot(_i: int, sh: Dictionary) -> void:
@@ -160,6 +190,8 @@ func _on_shot(_i: int, sh: Dictionary) -> void:
 		return
 	var line: Dictionary = sh.get("line", {}) if sh.get("line") is Dictionary else {}
 	stage.set_on_air(str(line.get("speaker", "")) == "radio")
+	if sea_node != null:
+		sea_node.visible = str(sh.get("id", "")) == "9_out"
 	if str(sh.get("stage_event", "")) == "chair_turn":
 		if _chair_tween != null:
 			_chair_tween.kill()
