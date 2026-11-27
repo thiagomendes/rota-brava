@@ -988,3 +988,24 @@ Critérios de aceite:
 - **G24a, parte 2 (obstáculo):** a revisão reprovou os cortes do `_crane`, que saltavam até 2,41 m por quadro, e até 6,27 m com movimento reduzido. A rodada 3 (`3ff0dfd`, WIP) mostrou que os critérios conflitam: salto ≤ 0,25 m, G3, G6 e distância ≥ 1,9 m não fecham juntos. **Decisões de Thiago (2026-11-27):**
   1. Hoje entra só a parte 1, a corrida (`633a08a`): a distância não cai e a vista abre ao correr. A dependência é o ajuste de `test_ep01_v3_late.gd:291`.
   2. O caso de obstáculo vira o **G24a2**: a câmera desliza suave e nunca pula. Quando algo fica entre a câmera e o herói, o objeto fica semitransparente (dither ou fade). O `test_camera_jump` (salto ≤ 0,25 m nos dois modos) e o G3 continuam valendo, e o G6 passa a aceitar "vista tapada" desde que o objeto que tapa esteja transparente e a câmera nunca entre na geometria. Entra num build seguinte.
+
+### G24c/G24d · correção da revisão (barco preso na boia), `gameplay`, 2026-11-27
+- **Bloqueio resolvido:** sai a trava de giro (`TURN_GAP`), que desfazia o giro, e sai o empurrão de volta pelo que boia na `boat_clearance_all`, que hoje só olha a camada 1. Entra a resolução de contato em `_guard_boat_turn`, sem mexer no `boat.gd`:
+  - depois de cada passo do barco, se a folga para o que boia ficou abaixo de 3 cm, o casco é empurrado para fora na direção que separa os dois e desliza (bate de frente: o embalo cai para 0,5 m/s);
+  - contra a camada 1 (cais e margem), o casco sai pela normal do contato (`get_rest_info`, sem as paredes invisíveis).
+  - Resultado: acelerar contra a boia só encosta, e girar sempre solta.
+- **Atracação e reboque:** com o barco chegando já encostado em algo, o caminho só precisa não piorar a folga. Sem pose perfeita, `dock_pose` e `tow_plan` escolhem a de maior folga, em vez de ir para o marcador ou recuar reto.
+- **Teste novo `test_boat_unstick` (24 checagens):** barco encostado de frente e de quina na `wv3_buoy_a`, no `rowboat_b` e no cais, com motor cheio por 3 s e depois leme para cada lado. Em cada caso ele se solta em até 3,5 s (a proa vira mais de 1 rad, ou a folga passa de 0,4 m), sem nenhum quadro com folga abaixo de -3 cm nem a caixa dentro da camada 1.
+  - Em `ef11d1f` o teste falha em 6 checagens: na boia e no cais, de frente, o barco gira 0,14 a 0,45 rad e anda 1 a 19 cm.
+  - O pior caso agora (boia A, quina, leme esquerdo, espremido contra a margem norte) leva 3,5 s, acima dos ~3 s pedidos.
+- **`test_ep01_v3_late`:** a pose de atracação agora é conferida pela distância ao bote, não pelo marcador.
+- **`KNOWN`:** cada entrada tem teto (a maior medida das rodadas + 5 cm) e falha acima dele. Entrada que não apareceu na rodada gera um aviso `G24d AVISO` no log. Os curingas viraram objetos específicos. O par herói x carrinho do M4 chegou a 41 cm numa rodada, então o teto ficou em 46 cm.
+- **Corda do M5:** durante a descida, a corda já vai da mão ao piso sob o herói, deita no telhado até a borda (`_lip`, rente ao piso) e cai a prumo, sem ficar esticada no ar. Na auditoria, a tolerância de folhagem (25 cm) deixou de valer para corda: corda contra a copa conta com 2 cm. Nenhuma corda acusou.
+- **Provas:**
+  - `bash tools/test.sh ep01_v3,prop_overlap,motion_audit,boat_unstick`: OK (403 PASS).
+  - Suíte completa `bash tools/test.sh`: OK (5371 PASS, 0 falhas) em 593 s, já com o merge de `origin/feature/rb-r1-reorientacao`.
+  - Capturas em `captures/g24/after`, abertas: `unstick_05.png` (encostado na boia), `unstick_11.png` (solto) e `m5_fish_10.png` (corda deitada no telhado e caindo pela borda).
+- **Fraco:**
+  - O deslizamento é um empurrão geométrico, sem animação nem som de batida.
+  - Depois de se soltar, o barco segue o leme e encosta a proa no cais (empurrão antigo do `boat.gd`).
+  - O M6 do bot voltou a cerca de 33 s.

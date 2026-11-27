@@ -400,7 +400,7 @@ func _sample_rope(mission: String, r: Node3D) -> void:
 func _note(mission: String, mover: String, other: String, kind: String, depth: float, at: Vector3) -> void:
 	var tol := float(TOL[kind])
 	for k: String in SOFT:
-		if other.begins_with("kit:" + k + "#"):
+		if other.begins_with("kit:" + k + "#") and kind != "rope":   # corda na copa conta (ve-se a corda atravessando)
 			tol = maxf(tol, SOFT_TOL)
 	if depth <= tol:
 		return

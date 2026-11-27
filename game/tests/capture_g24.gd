@@ -26,7 +26,7 @@ func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(out)
 	Ep01V3Main.save_path = ""
 	Ep01V3Cutscene.enabled = false
-	Ep01V3Main.start_mission = &"M5" if act == "m5" else &"M6"
+	Ep01V3Main.start_mission = &"M5" if act == "m5" else &"M6"   # m6, unstick: M6
 	main = (load(MAIN) as PackedScene).instantiate() as Ep01V3Main
 	add_child(main)
 	await _wait(1.5)
@@ -156,6 +156,35 @@ func _place_cam(at: Vector3, dist: float, up: float) -> void:
 			return
 	cam.global_position = at + Vector3(0, dist, 0.1)
 	cam.look_at(at, Vector3.UP)
+
+
+## Barco encostado de frente na boia A (vindo do oeste), motor cheio 3 s; depois leme a esquerda com motor: se solta.
+func _act_unstick() -> void:
+	await _wait(0.5)
+	var land := main.land
+	var boat := main.boat
+	land.sailing = true
+	boat.input_locked = false
+	boat.set_physics_process(false)
+	var at := main.world.marker(&"M6_BuoyA").global_position
+	boat.place(at + Vector3(-5.0, 0, 0), -PI / 2.0)
+	cam.global_position = at + Vector3(-3.0, 9.0, 7.0)
+	cam.look_at(at + Vector3(-2.0, 0, 0), Vector3.UP)
+	var n := 0
+	for phase: Array in [[1.0, 0.0, 3.0], [1.0, 1.0, 3.0]]:
+		var t := 0.0
+		var next := 0.0
+		while t < float(phase[2]):
+			boat.throttle = phase[0]
+			boat.steer = phase[1]
+			boat.step(1.0 / 60.0)
+			land.call(&"_guard_boat_turn")
+			t += 1.0 / 60.0
+			if t >= next:
+				await _save("unstick_%02d.png" % n)
+				n += 1
+				next += 0.5
+	_done()
 
 
 func _done() -> void:

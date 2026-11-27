@@ -40,8 +40,6 @@ const DOCK_TIME := 1.4
 const TOW_TIME := 2.4
 ## G24c: recuo do reboque (m); o bote vem 1 m a menos (encurta a corda).
 const TOW_BACK := 4.0
-## G24c: folga somada a capsula na folga do barco (o BoatActor empurra de volta abaixo de 0,6 m).
-const GAP_PUSH := 0.45
 const FADE_TIME := 0.35
 ## Visao de barco: mais alta e mais longe (o casco tem 5 m).
 const BOAT_VIEW := Vector3(0, 3.4, 8.0)
@@ -620,7 +618,12 @@ func _lower_on_rope(a: MemberActor, thing: Node3D, down: Vector3, serial: int) -
 				_aim_rope_path(path))
 		if not ok1:
 			return false
-	# 2) a prumo ate o chao, a corda apoiada na beira
+	# 2) a prumo ate o chao. A corda nao fica esticada no ar: da mao desce ao piso sob o heroi, deita ate a borda e cai
+	# pela beira (lip, rente ao piso); sem esse apoio, a dobra no alto como antes.
+	var anchor := _floor_at(top) + Vector3(0, 0.05, 0)
+	var lip := _lip(anchor, way[way.size() - 1], land_at)
+	if absf(anchor.y - top.y) < 2.0 and lip != Vector3.INF and seg_clear(top, anchor) and seg_clear(anchor, lip):
+		way = PackedVector3Array([top, anchor, lip])
 	var start := thing.global_position
 	var ok := await _over(start.distance_to(end_xf.origin) / (LOWER_MPS * LOWER_SPEED), serial, func(k: float) -> void:
 		if is_instance_valid(thing):
@@ -631,21 +634,26 @@ func _lower_on_rope(a: MemberActor, thing: Node3D, down: Vector3, serial: int) -
 	thing.global_transform = end_xf
 	_aim_rope_path(_via(way, thing.global_position + hang))
 	_rest(a)
-	# G24b: a corda fica amarrada no alto (no piso sob a mao) em vez de ficar com a ponta no ar quando o heroi desce
-	var anchor := _floor_at(top) + Vector3(0, 0.05, 0)
-	if absf(anchor.y - top.y) < 2.0 and way.size() >= 2:
-		# a dobra desce ate rente a beira (a corda deita no piso e cai pela borda)
-		var bend := way[way.size() - 1]
-		for k in 30:
-			var b := Vector3(bend.x, anchor.y + 0.04 * k, bend.z)
-			if b.y > bend.y:
-				break
-			if seg_clear(anchor, b) and _column_clear(b, thing.global_position + hang, 0.02):
-				bend = b
-				break
-		if seg_clear(anchor, bend):
-			_aim_rope_path(PackedVector3Array([anchor, bend, thing.global_position + hang]))
+	# G24b: quando o heroi solta, a corda fica amarrada no piso sob a mao e cai pela borda (sem ponta no ar)
+	if way.size() >= 3 and way[1].distance_to(anchor) < 0.01:
+		_aim_rope_path(PackedVector3Array([anchor, way[2], thing.global_position + hang]))
+	else:
+		var lip2 := _lip(anchor, way[way.size() - 1], land_at)
+		if absf(anchor.y - top.y) < 2.0 and lip2 != Vector3.INF and seg_clear(anchor, lip2):
+			_aim_rope_path(PackedVector3Array([anchor, lip2, thing.global_position + hang]))
 	return true
+
+
+## G24b: ponto da beira rente ao piso: na vertical de `edge`, o mais baixo (a partir do piso `anchor`) em que o trecho
+## anchor -> beira e o prumo ate `ground` ficam livres. INF se nao houver.
+func _lip(anchor: Vector3, edge: Vector3, ground: Vector3) -> Vector3:
+	for k in 30:
+		var b := Vector3(edge.x, anchor.y + 0.04 * k, edge.z)
+		if b.y > edge.y + 0.01:
+			break
+		if seg_clear(anchor, b) and _column_clear(b, ground + Vector3(0, 0.15, 0), 0.02):
+			return b
+	return Vector3.INF
 
 
 ## Corda pendurada: o caminho ate a beira (`way`, da mao a beira) e dai a prumo ate `b`.
@@ -848,14 +856,10 @@ func boat_clearance(pos: Vector3) -> float:
 
 
 ## G24c: folga que o BoatActor usa (clearance_func): a da camada 1 (boat_clearance) e a do que boia. Barcos parados,
-## boias e bote nao estao na camada 1; o casco para encostado neles (so perto: nao freia a baia). +GAP_PUSH: o empurrao
-## de volta do BoatActor vem a 0,6 m; aqui ele vem a 0,15 m do casco.
+## boias e bote nao estao na camada 1: o contato com eles e resolvido em _guard_boat_turn.
 func boat_clearance_all(pos: Vector3) -> float:
-	var best := boat_clearance(pos)
-	if main.boat.input_locked:
-		return best
-	var gap := boat_gap(pos, main.boat.heading) + GAP_PUSH
-	return minf(best, gap) if gap < 1.0 else best
+	# so freia perto do que boia (o contato e resolvido por _guard_boat_turn, sem empurrao de volta que prende)
+	return boat_clearance(pos)
 
 
 # ---------------------------------------------------------------- G24c: o que boia na baia
@@ -1022,23 +1026,35 @@ func dock_pose(from: Vector3, from_heading: float) -> Array:
 	var dn := _mk(&"M6_Dinghy")
 	var rel := mk - dn
 	rel.y = 0.0
+	var start_gap := boat_gap(from, from_heading, ["wv3_dinghy"])
+	var d0 := dn - mk
+	var best: Array = [mk, atan2(-d0.x, -d0.z)]
+	var best_score := -INF
 	for deg: float in [0.0, 10.0, -10.0, 20.0, -20.0, 30.0, -30.0, 40.0, -40.0, 50.0, -50.0, 60.0, -60.0, 70.0, -70.0, 80.0, -80.0]:
 		var p := dn + rel.rotated(Vector3.UP, deg_to_rad(deg))
 		p.y = mk.y
 		var d := dn - p
 		var h := atan2(-d.x, -d.z)
 		var ok := true
-		for i in range(0, 11):
+		var low := 1000.0
+		for i in range(1, 11):
 			var k := i / 10.0
 			var q := from.lerp(p, k)
 			var hh := lerp_angle(from_heading, h, k)
-			if boat_gap(q, hh, ["wv3_dinghy"]) < (0.3 if i == 10 else 0.05) or not _hull_free(q, hh):
+			var g := boat_gap(q, hh, ["wv3_dinghy"])
+			low = minf(low, g)
+			# (o barco pode chegar ja encostado em algo: no comeco basta nao piorar)
+			if g < (0.3 if i == 10 else minf(0.05, start_gap - 0.005)) or not _hull_free(q, hh):
 				ok = false
-				break
-		if ok and bool(tow_plan(p, h, _dinghy(), TOW_BACK, TOW_BACK - 1.0, Vector3(dn.x, _dinghy().global_position.y, dn.z) if _dinghy() != null else Vector3.INF)[3]):
+		var tow_ok := bool(tow_plan(p, h, _dinghy(), TOW_BACK, TOW_BACK - 1.0, Vector3(dn.x, _dinghy().global_position.y, dn.z) if _dinghy() != null else Vector3.INF)[3])
+		if ok and tow_ok:
 			return [p, h]
-	var d0 := dn - mk
-	return [mk, atan2(-d0.x, -d0.z)]
+		# sem pose perfeita: a de maior folga no caminho (com recuo livre de preferencia)
+		var score := low + (1.0 if tow_ok else 0.0)
+		if score > best_score:
+			best_score = score
+			best = [p, h]
+	return best
 
 
 ## G24c: o reboque recua o barco (e o bote atras da proa) RECUO m. Em vez de ir reto para tras (passava pelo meio dos
@@ -1048,6 +1064,8 @@ func tow_plan(boat_pos: Vector3, heading: float, d: Node3D, dist: float = TOW_BA
 		d_from: Vector3 = Vector3.INF) -> Array:
 	var fwd := Vector3(-sin(heading), 0, -cos(heading))
 	var dpos := d_from if d_from != Vector3.INF else (d.global_position if d != null else boat_pos)
+	var best: Array = [boat_pos - fwd * dist, heading, dpos - fwd * d_dist if d != null else boat_pos, false]
+	var best_low := -INF
 	for deg: float in [0.0, 15.0, -15.0, 30.0, -30.0, 45.0, -45.0, 60.0, -60.0, 75.0, -75.0, 90.0, -90.0]:
 		var dir := (-fwd).rotated(Vector3.UP, deg_to_rad(deg))
 		var back := boat_pos + dir * dist
@@ -1073,8 +1091,14 @@ func tow_plan(boat_pos: Vector3, heading: float, d: Node3D, dist: float = TOW_BA
 				break
 		if ok:
 			return [back, h_end, d_end, true]
-	var d0 := dpos - fwd * d_dist if d != null else boat_pos
-	return [boat_pos - fwd * dist, heading, d0, false]
+		var low := 1000.0
+		for i in range(1, 11):
+			var k := i / 10.0
+			low = minf(low, boat_gap(boat_pos.lerp(back, k), lerp_angle(heading, h_end, k), ["wv3_dinghy"]))
+		if low > best_low:
+			best_low = low
+			best = [back, h_end, d_end, false]
+	return best
 
 
 func _board() -> void:
@@ -1115,28 +1139,85 @@ func _physics_process(delta: float) -> void:
 	_guard_boat_turn()
 
 
-## G24c: o BoatActor empurra de volta quem anda contra o obstaculo, mas o giro no lugar (devagar, o casco de 5 m) varria
-## a proa e a popa para dentro de boias e barcos parados. Se o giro deste quadro fechou a folga abaixo de TURN_GAP, volta
-## o rumo (e a posicao) do quadro anterior: o casco encosta e para, como contra o cais.
-var _boat_prev := Transform3D()
-var _boat_prev_heading := NAN
-const TURN_GAP := 0.12
+## G24c: contato do casco com o que boia (boias, barcos parados, bote). Em vez de travar (o BoatActor nao da re, e
+## uma trava de giro deixava o barco preso de vez com a proa na boia), o casco DESLIZA: depois do passo do barco, se a
+## folga ficou abaixo de TOUCH_GAP, ele e empurrado para fora, na direcao que separa os dois, ate a folga voltar. Assim
+## acelerar contra a boia so encosta, e girar sempre solta (a proa escorrega pela boia), para qualquer lado.
+const TOUCH_GAP := 0.03
 
 
 func _guard_boat_turn() -> void:
 	if main == null or main.boat == null or not sailing or main.boat.input_locked:
-		_boat_prev_heading = NAN
 		return
 	var boat := main.boat
-	if not is_nan(_boat_prev_heading):
-		var now := boat_gap(boat.global_position, boat.heading)
-		if now < TURN_GAP and now < boat_gap(_boat_prev.origin, _boat_prev_heading) - 0.0001:
-			boat.heading = _boat_prev_heading
-			boat.global_position = _boat_prev.origin
-			boat.rotation.y = boat.heading
-			boat.speed = 0.0
-	_boat_prev = boat.global_transform
-	_boat_prev_heading = boat.heading
+	for i in 40:
+		var gap := boat_gap(boat.global_position, boat.heading)
+		if gap >= TOUCH_GAP:
+			break
+		var n := _separation(boat.global_position, boat.heading)
+		if n == Vector3.ZERO:
+			break
+		boat.global_position += n * maxf(TOUCH_GAP - gap, 0.01)
+		if boat.forward().dot(n) < 0.0:
+			boat.speed = minf(boat.speed, 0.5)   # bateu de frente: perde o embalo
+	# cais e margem (camada 1): o giro encostado podia enfiar a quina; sai pela normal do contato
+	var col := boat.find_child("Collision", true, false) as CollisionShape3D
+	if col != null:
+		var q := PhysicsShapeQueryParameters3D.new()
+		q.shape = col.shape
+		q.collision_mask = 1
+		var lx := boat.global_transform.affine_inverse() * col.global_transform
+		var space := world.get_world_3d().direct_space_state
+		for i in 20:
+			q.transform = Transform3D(Basis(Vector3.UP, boat.heading), boat.global_position) * lx
+			q.transform.origin.y += 0.25
+			var ex: Array[RID] = []
+			for h: Dictionary in space.intersect_shape(q, 8):
+				if _invisible_wall(h):
+					ex.append(h["rid"])
+			q.exclude = ex
+			var info := space.get_rest_info(q)
+			if info.is_empty():
+				break
+			var n := info["normal"] as Vector3
+			n.y = 0.0
+			if n.length() < 0.1:
+				break
+			boat.global_position += n.normalized() * 0.03
+			if boat.forward().dot(n) < 0.0:
+				boat.speed = minf(boat.speed, 0.5)
+
+
+## Direcao (plano) que afasta o casco do que boia mais perto: do ponto mais perto do obstaculo ao eixo do casco.
+func _separation(pos: Vector3, heading: float) -> Vector3:
+	var h := hull_capsule(pos, heading)
+	var best := INF
+	var out := Vector3.ZERO
+	for f in floaters():
+		var g := seg_seg(h["a"], h["b"], f["a"], f["b"])
+		if g < best:
+			best = g
+			var pf := _closest_on(f["a"], f["b"], h["a"], h["b"])
+			var ph := _closest_on(h["a"], h["b"], pf, pf)
+			var d := ph - pf
+			if d.length() < 0.001:
+				d = Vector2(pos.x, pos.z) - pf
+			d = d.normalized()
+			out = Vector3(d.x, 0, d.y)
+	return out
+
+
+## Ponto do segmento a-b mais perto do segmento p-q (amostrado).
+static func _closest_on(a: Vector2, b: Vector2, p: Vector2, q: Vector2) -> Vector2:
+	var best := a
+	var bd := INF
+	for i in 21:
+		var c := a.lerp(b, i / 20.0)
+		var d := _pt_seg(c, p, q)
+		if d < bd:
+			bd = d
+			best = c
+	return best
 
 
 func _process(delta: float) -> void:
