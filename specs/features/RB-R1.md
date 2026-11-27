@@ -706,3 +706,4 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
     - fallback de `stall_drop_xf` (`ep01_v3_land.gd:373`) que desloca só em y;
     - grama atravessando o cesto;
     - a captura `basket_perto` saiu mal enquadrada.
+- **Clipes do G19 integrados.** Revisão (`reviewer`): APROVADO. Malha, materiais e clipes antigos estão idênticos, conferido canal a canal. Os ossos foram de 28 para 30, sem índice fixo no jogo. Duas mutações (`HoldPoint` em outro osso, `carry_walk` com passo de corrida) produzem 8 e 2 falhas. `characters` 1189, `ep01_v3` 232, `cutscene` 152, `keyart` 30.
