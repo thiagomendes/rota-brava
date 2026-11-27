@@ -120,6 +120,10 @@ var choice_open: bool = false
 var handoff_open: bool = false
 var pause_open: bool = false
 var complete_open: bool = false
+## RB-M1: com o toque ativo, o botao de acao do HUD sai de cena (a camada de toque mostra o seu, no mesmo lugar);
+## o estado logico do prompt (`prompt_visible`) continua o mesmo.
+var touch_mode: bool = false
+var _prompt_on: bool = false
 
 
 func _ready() -> void:
@@ -282,7 +286,9 @@ func _build_top_left(safe: Control) -> void:
 	_help_button.tooltip_text = Loc.t("ui.help.repeat_button", {"control": "H"})
 	_help_button.pressed.connect(func() -> void:
 		ui_sound.emit(&"confirm")
-		help_requested.emit())
+		help_requested.emit()
+		# RB-M1: o botao (mouse/toque) vira a mesma intencao `help` da tecla H (antes so emitia o sinal, sem ouvinte).
+		_send_action(&"help"))
 	row.add_child(_help_button)
 	var hi := _icon(_help_button, &"help", 72, ThemeV2.NAVY, false)
 	hi.set_anchors_preset(Control.PRESET_CENTER)
@@ -704,10 +710,11 @@ func set_member(member: StringName) -> void:
 
 
 func show_prompt(label: String, icon: StringName) -> void:
-	var was := _prompt_panel.visible
+	var was := _prompt_on
 	_prompt_label.text = label
 	_prompt_icon.kind = icon
-	_prompt_panel.visible = true
+	_prompt_on = true
+	_prompt_panel.visible = not touch_mode
 	if not was:
 		ThemeV2.pop_in(_action_button, 0.5)
 		ui_sound.emit(&"pop")
@@ -715,13 +722,37 @@ func show_prompt(label: String, icon: StringName) -> void:
 
 
 func hide_prompt() -> void:
+	_prompt_on = false
 	_prompt_panel.visible = false
 	if _pulse:
 		_pulse.kill()
 
 
 func prompt_visible() -> bool:
-	return _prompt_panel.visible
+	return _prompt_on
+
+
+## Pictograma da acao do momento (o mesmo do botao de acao).
+func prompt_icon() -> StringName:
+	return _prompt_icon.kind
+
+
+## RB-M1: liga/desliga o modo toque (a camada de toque chama). So esconde/mostra o botao de acao do HUD.
+func set_touch_mode(on: bool) -> void:
+	if on == touch_mode:
+		return
+	touch_mode = on
+	_prompt_panel.visible = _prompt_on and not touch_mode
+
+
+## Controles do HUD que continuam sendo da GUI quando o toque esta ativo (a camada de toque nao os cobre).
+func touch_passthrough() -> Array[Control]:
+	return [_help_button]
+
+
+## Mesmo efeito de tocar/clicar no botao de acao (a camada de toque usa).
+func trigger_action() -> void:
+	_on_action_pressed()
 
 
 func prompt_text() -> String:
@@ -744,9 +775,13 @@ func _on_action_pressed() -> void:
 	ui_sound.emit(&"confirm")
 	action_pressed.emit()
 	# O toque/clique vira a mesma intencao do teclado/controle: o jogo nao precisa saber de onde veio.
+	_send_action(&"interact")
+
+
+func _send_action(action: StringName) -> void:
 	for p in [true, false]:
 		var ev := InputEventAction.new()
-		ev.action = &"interact"
+		ev.action = action
 		ev.pressed = p
 		Input.parse_input_event(ev)
 
@@ -762,13 +797,16 @@ func set_skip_hint(on: bool) -> void:
 # ---------- dispositivo ----------
 
 func _input(event: InputEvent) -> void:
-	var dev := last_device
-	if event is InputEventKey or event is InputEventMouseButton:
-		dev = &"keyboard"
-	elif event is InputEventJoypadButton or (event is InputEventJoypadMotion and absf((event as InputEventJoypadMotion).axis_value) > 0.5):
-		dev = &"pad"
-	elif event is InputEventScreenTouch:
-		dev = &"touch"
+	# RB-M1: deteccao unica em InputDevice (mouse emulado pelo toque nao conta como mouse; mouse = glifo do teclado).
+	InputDevice.note(event)
+	var dev := InputDevice.family()
+	if InputDevice.classify(event) != &"" and dev != last_device:
+		set_device(dev)
+
+
+## RB-M1: alinha o glifo com InputDevice quando outro no consumiu o evento antes do HUD (camada de toque).
+func sync_device() -> void:
+	var dev := InputDevice.family()
 	if dev != last_device:
 		set_device(dev)
 
@@ -1098,7 +1136,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	# C2: a fala avanca por `interact` e consome o aperto (um E so avanca, nao interage). Nunca por `ui_accept`, que
 	# inclui Espaco (o pulo). Logo depois da fala acabar, `interact` fica ignorado por SPEECH_GRACE_MS.
 	# G7: com o botao de acao visivel, o E e da acao (a legenda nao rouba); sem acao no alcance, o E avanca a fala.
-	elif event.is_action_pressed(&"interact") and _prompt_panel.visible:
+	elif event.is_action_pressed(&"interact") and _prompt_on:
 		pass
 	elif event.is_action_pressed(&"interact") and not choice_open and not handoff_open \
 			and not pause_open and not complete_open and _speaking:

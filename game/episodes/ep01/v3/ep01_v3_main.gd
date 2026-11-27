@@ -63,6 +63,7 @@ var world: VillageWorld
 var camera_rig: CameraRig
 var boat: BoatActor
 var hud: Hud
+var touch: TouchControls
 var audio: AudioDirector
 var actors: Dictionary = {}
 var controlled_node: Node3D
@@ -121,6 +122,10 @@ func _ready() -> void:
 	hud.resume_requested.connect(_resume)
 	hud.menu_requested.connect(_on_menu)
 	hud.replay_requested.connect(_on_replay)
+	# RB-M1: controle por toque (so aparece depois do primeiro toque; some com teclado/controle ou painel aberto).
+	touch = TouchControls.new()
+	touch.setup(self)
+	add_child(touch)
 	audio = AudioDirector.new()
 	audio.name = "AudioDirector"
 	add_child(audio)
