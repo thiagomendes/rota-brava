@@ -938,3 +938,6 @@ Critérios de aceite:
     - (4) No 9c, a mão do Lumi fica aberta em vez de apontar.
   - Para Thiago: leitura no aparelho.
   - Merge em `feature/rb-r1-reorientacao`.
+- **G24a, parte 2 (obstáculo):** a revisão reprovou os cortes do `_crane`, que saltavam até 2,41 m por quadro, e até 6,27 m com movimento reduzido. A rodada 3 (`3ff0dfd`, WIP) mostrou que os critérios conflitam: salto ≤ 0,25 m, G3, G6 e distância ≥ 1,9 m não fecham juntos. **Decisões de Thiago (2026-11-27):**
+  1. Hoje entra só a parte 1, a corrida (`633a08a`): a distância não cai e a vista abre ao correr. A dependência é o ajuste de `test_ep01_v3_late.gd:291`.
+  2. O caso de obstáculo vira o **G24a2**: a câmera desliza suave e nunca pula. Quando algo fica entre a câmera e o herói, o objeto fica semitransparente (dither ou fade). O `test_camera_jump` (salto ≤ 0,25 m nos dois modos) e o G3 continuam valendo, e o G6 passa a aceitar "vista tapada" desde que o objeto que tapa esteja transparente e a câmera nunca entre na geometria. Entra num build seguinte.
