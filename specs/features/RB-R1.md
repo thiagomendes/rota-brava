@@ -806,3 +806,27 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 |---|---|---|---|
 | G23 | No capitão, na Dona Amora e no Lumi o sapato fica separado da perna: aparece um vão com o fundo passando entre a barra da calça e o sapato (conferido pelo lead em `captures/g21/g21_fila_frente.png`). Nos três heróis o sapato está encaixado. É a mesma família do G4, das mãos soltas | Perna e sapato contínuos em idle, walk e nos clipes próprios: a barra da calça ou da saia entra no cano do sapato, ou um tornozelo ou meia fecha o vão, sem vão visível de frente, de lado e de 3/4. Medição por script do vão perna-sapato em todos os quadros dos clipes (máximo ≤ 0 mm, isto é, sobreposição), com mutação que falha no modelo atual. O brilho de plástico do sapato fica igual ao dos heróis. Os mesmos 3 adultos e também os outros NPCs que tiverem o mesmo esquema de perna. Geometria por script, sem mexer no rig nem nos clipes. Capturas antes e depois: fila de frente, de lado e close dos pés | `art3d` |
 - **Decisão de Thiago (2026-11-27):** o Lumi da rodada 2 está aprovado ("ficou legal"). O único ajuste é o pé solto, sem tornozelo, que vira o G23. A integração do plano do Lumi na abertura (G21) pode seguir em paralelo com o G23.
+
+### G21i · plano do Lumi na abertura (dono `gameplay`; texto e voz seguem o padrão do G22c)
+Fonte: `docs/proposals/g21_farol7.md` §3 e §4, **trocando a personagem por um homem, o Lumi**.
+- **Cena `game_intro`:** o plano 9 sai e entram 9a, 9b e 9c no palco `game/worlds/farol7_base/`, com o Lumi (`lumi_v2`). Os clipes de cada plano:
+  - 9a: `turn_chair`;
+  - 9b: `wave` e depois `talk`;
+  - 9c: `point`. Ainda não existe `thumbs_up`: usar `talk` e registrar isso.
+
+  Antes de 9a vem um plano de fora (a casa-torre com a luz amarela), se o palco tiver isso; se não tiver, registrar. O plano 10 e o `exit_look` não mudam. Com movimento reduzido, os planos viram cortes. A duração de cada plano obedece ao G17 (voz mais folga, com os cliques do rádio). A carga do palco não pode atrasar a cena além do que já faz o `SceneLoader` (G10/G16).
+- **Textos** (catálogo i18n e diálogo v3):
+  - `ep01.narrator.intro.base` = "E aqui é o Farol 7, a base da equipe!"
+  - `ep01.radio.intro.hello` = "Na escuta! Sou o Lumi, do rádio."
+  - `ep01.radio.intro.help` = "Precisou? Aperte {help} que eu ajudo!". O texto falado da voz é "Precisou? Aperte o botão de ajuda que eu ajudo!".
+  - `ep01.radio.help.invite_1` = "Na escuta! É o Lumi. Quer ajuda?"
+  - `ep01.radio.help.invite_4` = "Uma dica? Aqui é o Lumi!"
+  - `member.radio.name` = "Lumi"
+  - O `cast.json` da entrada `farol7` passa a descrever o Lumi, operador da base, homem, calmo e animado, com voz limpa.
+- **Legenda:** a legenda do HUD desenha `{help}` com o glifo do aparelho em uso (`GlyphText`, G15). Durante o 9c, o disco da ajuda do HUD (G22a) aparece e pulsa.
+- **Voz:** os takes antigos cujo texto mudou saem do catálogo e entram em `pending.keys`, como no G22c. O `test_voice_v3` continua exigindo `text_at_generation` igual ao texto atual. As falas novas entram como pendentes para o lote de 2026-11-28 08:20 UTC. O `gen_v3.py` precisa aceitar o texto falado separado do texto da legenda.
+- **Provas:**
+  - testes de cena: o plano usa o Lumi e o palco, as durações seguem o G17, o glifo é resolvido e o disco pulsa no 9c;
+  - teste de catálogo;
+  - capturas dos 3 planos (headless; o render final fica com Thiago no iPhone);
+  - suíte completa.
