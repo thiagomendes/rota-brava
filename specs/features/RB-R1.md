@@ -771,3 +771,12 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - (D) salvar e sair com peça na mão não tem teste.
   Gesto e leitura visual ficam com Thiago. Merge em `feature/rb-r1-reorientacao`.
 - **Correção no merge do G19** (lead): a suíte completa integrada falhou em 2 testes, `test_ep01_v3_dialogue` (E6) e `test_ep01_v3_portraits` (E7). O G22a renomeou o pictograma `help` para `help_balloon`, mas 6 legendas (`ep01.radio.help.invite_1..5` e `ep01.plaza.vendor.help_call`) ainda citavam `help`. Isso escapou porque, no merge do G22a, rodei só `ui,touch,hud,audio,cutscene`. A correção trocou o emote no diálogo e no catálogo v3. Resultado: `ep01_v3,voice_v3` OK (335 PASS).
+- Suíte completa integrada depois da correção: `OK (5232 PASS, 0 FALHA(S))`.
+
+### G19b · ressalvas da revisão do G19 (dono `gameplay`, antes do build único)
+| Id | Problema | Critério de aceite |
+|---|---|---|
+| A | Na pausa (`get_tree().paused`), `_wait`/`_over` podem continuar andando, e o corpo e a peça se movem com a animação parada | Reproduzir em teste. Pausar no meio de uma escalada e de um pendurar: durante a pausa a posição do herói e a da peça não mudam. Ao despausar, a ação termina normalmente |
+| B | Retornos antecipados de uma ação (`_put` falso, `_step_walk` falho) saem sem `_act_end`, e `busy`/`scripted` ficam presos | Todo caminho de saída de uma ação passa por `_act_end`, ou existe uma guarda equivalente. Um teste força a falha (peça inválida no meio) e confere `busy` e `scripted` livres |
+| C | M2: se outro herói age com a roupa na mão de quem a carrega, a roupa voa para o cesto ou a corda, como mágica | Só quem carrega pode pôr no cesto ou pendurar. Ao trocar de herói com objeto na mão, o objeto é pousado no chão junto do herói antigo, com `place_low`, apoiado e sem interpenetração; quem chegar depois pode pegá-lo. Vale para M2 e M4, e o M7 continua usando `_give`. Os testes cobrem os dois casos |
+| D | Salvar e sair com peça na mão não tem teste | Teste: salvar no meio de uma ação com peça na mão, recarregar e retomar a missão sem travar. A peça fica num estado coerente (no lugar de origem ou pousada) |
