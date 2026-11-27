@@ -940,6 +940,28 @@ func is_speaking() -> bool:
 	return _speaking or not _queue.is_empty()
 
 
+## Tempo (s) que uma legenda fica na tela: leitura (>= 2,4 s) ou a voz + 0,35 s, o que for maior.
+## voice_len e o que voice_hook/play_line devolve; numa fala de radio ja inclui os cliques (G20).
+static func line_seconds_for_text(text: String, voice_len: float = 0.0) -> float:
+	var seconds := maxf(2.4, 1.3 + 0.055 * text.length())
+	if voice_len > 0.0:
+		seconds = maxf(seconds, voice_len + 0.35)  # a legenda nunca some antes do tempo de leitura
+	return seconds
+
+
+## G20: tempo extra dos cliques de radio (abrir + fechar) para a chave; 0.0 se nao for fala de radio.
+static func radio_extra_seconds(key: String) -> float:
+	return AudioDirector.RADIO_EXTRA_S if AudioDirector.is_radio_line(key) else 0.0
+
+
+## G20: tempo da fala `key` para planejar planos de cutscene sem tocar audio. voice_s = duracao do take (so a voz,
+## ex.: campo duration do catalogo; 0.0 sem take). Numa fala de radio com voz soma os cliques (RADIO_EXTRA_S);
+## sem voz os cliques cabem no tempo minimo de leitura (2,4 s).
+static func line_seconds(key: String, voice_s: float = 0.0, params: Dictionary = {}) -> float:
+	var extra := radio_extra_seconds(key) if voice_s > 0.0 else 0.0
+	return line_seconds_for_text(Loc.t(key, params), voice_s + extra)
+
+
 func skip_line() -> void:
 	_skip_current = true
 	if voice_stop_hook.is_valid():
@@ -1011,11 +1033,10 @@ func _pump() -> void:
 		_hint_active = bool(entry["hint"])
 		_skip_current = false
 		line_started.emit(String(entry["key"]))
-		var seconds := maxf(2.4, 1.3 + 0.055 * text.length())
+		var voice_len := 0.0
 		if voice_hook.is_valid():
-			var voice_len := float(voice_hook.call(String(entry["key"])))
-			if voice_len > 0.0:
-				seconds = maxf(seconds, voice_len + 0.35)  # a legenda nunca some antes do tempo de leitura
+			voice_len = float(voice_hook.call(String(entry["key"])))
+		var seconds := line_seconds_for_text(text, voice_len)
 		var t := 0.0
 		while t < seconds and not _skip_current:
 			await get_tree().process_frame

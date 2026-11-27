@@ -623,3 +623,21 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - **Câmera:** a ação acontece no jogo, com a câmera livre e sem corte. O gesto é curto e o controle volta logo.
 - **G20, aceite de escuta:** Thiago ouviu as amostras de antes e depois (2026-11-27): "Ficou bom o áudio, hein? Muito bom. Gostei." Os parâmetros do efeito ficam como estão.
 | G21 | Thiago: o Farol 7 aparece de repente no rádio, sem apresentação, e fica um personagem vago | **Decisão de Thiago:** o Farol 7 é a **base da equipe** Rota Brava, e quem fala é a pessoa que opera a base, com nome e rosto. Ela não mora no farol da vila. Na abertura, um **plano próprio** mostra a base e essa pessoa no rádio. Ela se apresenta e explica como ajuda ("se precisarem, apertem a ajuda que eu falo com vocês"), o que ensina à criança o botão de ajuda. Entregas: ficha do personagem (nome, personalidade, visual) com 3 opções de nome para Thiago escolher; roteiro do plano; modelo 3D **no mesmo padrão de qualidade do trio e dos secundários v2** (pedido de Thiago: SKIN + SUBSURF, atlas assada PBR, mãos encaixadas na manga, olhos abertos, captura lado a lado com o trio e revisão antes de entrar); cenário pequeno da base; retrato do HUD; falas novas com voz (Schedar, já escolhida). Cerca de 6 s a mais na abertura | `adventure` → `art3d` → `gameplay` |
+
+### Evidência G20 (`audio`, 2026-11-27; nada foi ouvido, aceite perceptual com Thiago)
+- Bus `Radio` criado por código (`game/audio/radio_bus.gd`, `RadioBus.ensure()` no `_ready` do `AudioDirector`), não no `default_bus_layout.tres` (a Godot reescreve esse arquivo e o `test.sh` o restaura). Envia para `Voz`: o volume de voz das Opções controla o rádio. Cadeia: passa-altas 300 Hz e passa-baixas 3400 Hz (12 dB/oit.), `AudioEffectDistortion` ATAN (a Godot não tem modo "softclip"; ATAN é o suave) drive 0,2 e −1 dB, compressor −18 dB 3:1 5 ms/150 ms +2 dB.
+- Sons gerados por `tools/audio/radio_fx.py` (semente 7007): `res://audio/radio/sfx_radio_open.ogg` 160 ms, `sfx_radio_close.ogg` 190 ms, `amb_radio_hiss.ogg` laço 2 s a −42 dBFS RMS. Parâmetros e sha256 em `source_audio/radio/g20_generated.json`; linhas em `source_audio/PROVENANCE.md`.
+- Ordem no jogo (`AudioDirector.play_line`): clique de abrir → voz no bus `Radio` após 0,16 s com chiado em laço (−4 dB) → clique de fechar ao fim ou ao corte. Sem voz: só os cliques. `duration` de uma fala de rádio já inclui os cliques (`voice_s` = só a voz, `radio_extra_s` = 0,35 s). Para planejar planos: `Hud.line_seconds(chave, voice_s)` / `Hud.radio_extra_seconds(chave)`.
+- Teste `game/tests/test_voice_v3_radio.gd`. Amostras antes/depois em `captures/g20/` (`tools/audio/radio_samples.py`, cadeia aproximada em Python).
+- **G20 integrado** (`feature/rb-r1-g20-radio`, autor `audio`).
+  - Bus "Radio" criado por código: passa-banda de 300 a 3400 Hz, saturação ATAN e compressor, ligado ao bus "Voz".
+  - Cliques de abrir e fechar e chiado de fundo sintetizados por `tools/audio/radio_fx.py`.
+  - `play_line` devolve a duração já com os cliques.
+  - Revisão (`reviewer`): APROVADO.
+    - O sha256 dos sons confere com o registro.
+    - Mutação com `is_radio_line` sempre falso: 9 falhas.
+    - `voice_v3` 28, `cutscene` 152, `ui_` 307.
+  - Aceite de escuta: Thiago.
+  - Ressalvas:
+    - Takes legados do catálogo v1 com `type: radio` passam pelo filtro duas vezes; isso afeta só o fluxo antigo.
+    - Ao juntar com o G17, `hud.gd` entra em conflito: as duas branches mudam `Hud.line_seconds`. O G17 tem de usar a chave da fala, ou somar `radio_extra_seconds`, para o plano de rádio contar os cliques.

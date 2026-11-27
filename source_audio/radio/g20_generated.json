@@ -1,0 +1,79 @@
+{
+  "generator": "tools/audio/radio_fx.py",
+  "license": "original (gerado pelo projeto)",
+  "seed": 7007,
+  "click_offset_ms": 3.0,
+  "sample_rate": 44100,
+  "params": {
+    "open": {
+      "dur_s": 0.16,
+      "noise_band_hz": [
+        900,
+        4200
+      ],
+      "noise_peak_dbfs": -14.0,
+      "attack_ms": 4,
+      "decay_tau_ms": 45,
+      "click_ms": 3.0,
+      "click_hz": 2400,
+      "click_peak_dbfs": -8.0
+    },
+    "close": {
+      "dur_s": 0.19,
+      "click_ms": 2.5,
+      "click_hz": 1900,
+      "click_peak_dbfs": -9.0,
+      "tail_band_hz": [
+        700,
+        3800
+      ],
+      "tail_peak_dbfs": -18.0,
+      "tail_delay_ms": 6,
+      "tail_tau_ms": 55
+    },
+    "hiss": {
+      "dur_s": 2.0,
+      "band_hz": [
+        300,
+        3400
+      ],
+      "rms_dbfs": -42.0,
+      "crossfade_ms": 200,
+      "crackle_per_s": 3,
+      "crackle_gain": 4.0
+    }
+  },
+  "bus_chain": {
+    "hp_hz": 300.0,
+    "lp_hz": 3400.0,
+    "order": 2,
+    "drive": 0.2,
+    "pre_gain_db": 0.0,
+    "post_gain_db": -1.0,
+    "comp_threshold_db": -18.0,
+    "comp_ratio": 3.0,
+    "comp_attack_ms": 5.0,
+    "comp_release_ms": 150.0,
+    "comp_gain_db": 2.0
+  },
+  "files": {
+    "res://audio/radio/sfx_radio_open.ogg": {
+      "duration_s": 0.16,
+      "peak_dbfs": -9.44,
+      "rms_dbfs": -28.61,
+      "sha256": "98c8dd3753eb83d6468845b419066cd0e7959ae4c61c7d574d3961a1ee7544fb"
+    },
+    "res://audio/radio/sfx_radio_close.ogg": {
+      "duration_s": 0.19,
+      "peak_dbfs": -9.15,
+      "rms_dbfs": -33.61,
+      "sha256": "da172b4bf7fd03463babb5a437c6961b317768f2600e7db0133e7a50f8cd8570"
+    },
+    "res://audio/radio/amb_radio_hiss.ogg": {
+      "duration_s": 2.0,
+      "peak_dbfs": -20.48,
+      "rms_dbfs": -42.25,
+      "sha256": "b78fc7a358e48a3126d5b8342077b60c91abeb560f7668c028e2ebc2cf7e38f2"
+    }
+  }
+}

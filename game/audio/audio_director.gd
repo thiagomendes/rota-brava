@@ -14,6 +14,18 @@ const BUS_VOICE := &"Voz"
 const BUS_MUSIC := &"Musica"
 const BUS_SFX := &"Efeitos"
 const BUS_AMBIENCE := &"Ambiente"
+## G20: falas de radio (Farol 7) passam pelo bus Radio (filho de Voz; criado por RadioBus.ensure()).
+const BUS_RADIO := RadioBus.NAME
+const RADIO_OPEN := "res://audio/radio/sfx_radio_open.ogg"
+const RADIO_CLOSE := "res://audio/radio/sfx_radio_close.ogg"
+const RADIO_HISS := "res://audio/radio/amb_radio_hiss.ogg"
+## Duracoes dos cliques (s; medidas em source_audio/radio/g20_generated.json). A voz entra ao fim do clique de abrir.
+const RADIO_OPEN_S := 0.16
+const RADIO_CLOSE_S := 0.19
+## Tempo extra que uma fala de radio ocupa alem da voz (abrir + fechar).
+const RADIO_EXTRA_S := RADIO_OPEN_S + RADIO_CLOSE_S
+## Chiado de fundo: o arquivo ja esta em -42 dBFS RMS; ganho extra no player.
+const RADIO_HISS_DB := -4.0
 const AMBIENCE_NAMES: Array[String] = ["amb_dock_water", "amb_wind_light", "amb_dock_creaks", "amb_gulls_far"]
 const STEP_NAMES: Array[String] = ["sfx_step_wood_01", "sfx_step_wood_02", "sfx_step_wood_03", "sfx_step_wood_04", "sfx_step_wood_05", "sfx_step_wood_06"]
 const SURFACES: Array[StringName] = [&"wood", &"stone", &"sand", &"grass"]
@@ -89,9 +101,16 @@ var _sting_player: AudioStreamPlayer
 var _visemes_cache: Dictionary = {}
 var _line_started_ms: int = 0
 var _line_duck: bool = false
+var _radio_player: AudioStreamPlayer
+var _radio_close_player: AudioStreamPlayer
+var _hiss_player: AudioStreamPlayer
+var _radio_voice_id: String = ""
+## Ultimo clique de radio tocado (&"open" / &"close") e historico, para testes (nada e ouvido).
+var radio_clicks: Array[StringName] = []
 
 
 func _ready() -> void:
+	RadioBus.ensure()
 	Options.music_duck_db = func() -> float: return DUCK_DB if ducked else 0.0
 	_ensure_catalog()
 	rng.randomize()
@@ -272,7 +291,8 @@ func play_footstep(speed: float, surface: StringName = &"wood", position: Vector
 
 ## Fala: uma por vez. Nova fala cancela a anterior com fade curto (voice_cancelled). Devolve a duracao em
 ## segundos; 0.0 se a fala ou o arquivo nao existe (sem erro; o chamador mantem a legenda e libera a sequencia).
-func play_voice(id: String) -> float:
+## bus: Voz (padrao) ou Radio; delay_s: espera antes de tocar (radio: o clique de abrir vem antes).
+func play_voice(id: String, bus: StringName = BUS_VOICE, delay_s: float = 0.0) -> float:
 	var s := VoiceCatalog.stream_for(id, Loc.language)
 	if s == null:
 		return 0.0
@@ -284,11 +304,90 @@ func play_voice(id: String) -> float:
 	p.stop()  # se ainda estava no fade de uma fala anterior
 	p.stream = s
 	p.volume_db = 0.0
+	p.bus = bus
 	_voice_token += 1
 	current_voice_id = id
-	p.play()
-	_wait_voice_end(p, id, _voice_token, s.get_length())
+	if delay_s > 0.0 and is_inside_tree():
+		_play_voice_later(p, id, _voice_token, delay_s)
+	else:
+		p.play()
+		_wait_voice_end(p, id, _voice_token, s.get_length())
 	return s.get_length()
+
+
+func _play_voice_later(p: AudioStreamPlayer, id: String, token: int, delay_s: float) -> void:
+	await get_tree().create_timer(delay_s).timeout
+	if token != _voice_token or current_voice_id != id:
+		return
+	p.play()
+	_wait_voice_end(p, id, token, p.stream.get_length())
+
+
+## Fala de radio do Farol 7? speaker/personagem "radio" no catalogo ou chave ep01.radio.* / *.radio.* (inclui v3:).
+static func is_radio_line(id: String, entry: Dictionary = {}) -> bool:
+	if str(entry.get("speaker", entry.get("character", ""))) == "radio" or str(entry.get("type", "")) == "radio":
+		return true
+	var key := id.trim_prefix(VoiceCatalog.V3_PREFIX)
+	return key.begins_with("ep01.radio.") or key.contains(".radio.")
+
+
+func _ensure_radio_players() -> void:
+	if _radio_player == null:
+		RadioBus.ensure()
+		_radio_player = _make_player(BUS_RADIO)
+		_radio_close_player = _make_player(BUS_RADIO)
+		_hiss_player = _make_player(BUS_RADIO)
+		_hiss_player.volume_db = RADIO_HISS_DB
+
+
+func _radio_stream(path: String, loop: bool = false) -> AudioStream:
+	if not ResourceLoader.exists(path):
+		return null
+	var s := load(path) as AudioStream
+	return _looped(s) if loop and s != null else s
+
+
+## Toca o clique de abrir (&"open") ou fechar (&"close") no bus Radio. Sem arquivo: so registra, sem erro.
+func play_radio_click(which: StringName) -> void:
+	_ensure_radio_players()
+	radio_clicks.append(which)
+	var s := _radio_stream(RADIO_OPEN if which == &"open" else RADIO_CLOSE)
+	if s == null:
+		return
+	var p := _radio_close_player if which == &"close" else _radio_player
+	p.stream = s
+	p.play()
+
+
+func _radio_hiss(on: bool) -> void:
+	_ensure_radio_players()
+	if on:
+		var s := _radio_stream(RADIO_HISS, true)
+		if s != null:
+			_hiss_player.stream = s
+			_hiss_player.play()
+	else:
+		_hiss_player.stop()
+
+
+func is_radio_hiss_playing() -> bool:
+	return _hiss_player != null and _hiss_player.playing
+
+
+## Fala de radio sem voz (so legenda): so os cliques, abrir e (apos o abrir) fechar.
+func _radio_clicks_only() -> void:
+	play_radio_click(&"open")
+	if is_inside_tree():
+		await get_tree().create_timer(RADIO_OPEN_S).timeout
+	play_radio_click(&"close")
+
+
+func _on_radio_voice_end(id: String) -> void:
+	if id != _radio_voice_id or id == "":
+		return
+	_radio_voice_id = ""
+	_radio_hiss(false)
+	play_radio_click(&"close")
 
 
 func _ensure_voice_players() -> void:
@@ -372,16 +471,30 @@ func play_line(id: String) -> Dictionary:
 	var info := {"id": id, "duration": 0.0, "type": str(e.get("type", "")), "character": str(e.get("character", "")),
 		"intent": str(e.get("intent", "")), "emotes": e.get("emotes", []), "subtitle": str(e.get("subtitle", id)),
 		"frame_s": 0.03, "visemes": []}
-	var dur := play_voice(id) if not e.is_empty() else 0.0
+	var radio := is_radio_line(id, e)
+	info["radio"] = radio
+	info["radio_extra_s"] = RADIO_EXTRA_S if radio else 0.0
+	if _radio_voice_id != "":
+		_on_radio_voice_end(_radio_voice_id)  # fala de radio anterior cortada: fecha o radio dela
+	var dur := play_voice(id, BUS_RADIO if radio else BUS_VOICE, RADIO_OPEN_S if radio else 0.0) if not e.is_empty() else 0.0
 	if dur <= 0.0:
 		current_line = {}
+		if radio:
+			_radio_clicks_only()
 		return info
+	info["voice_s"] = dur
+	if radio:
+		# G20: abrir -> voz pelo bus Radio com chiado -> fechar. duration inclui os cliques (a legenda espera por eles).
+		play_radio_click(&"open")
+		_radio_hiss(true)
+		_radio_voice_id = id
+		dur += RADIO_EXTRA_S
 	var vis := _load_visemes(str(e.get("visemes", "")))
 	info["duration"] = dur
 	info["frame_s"] = float(vis.get("frame_s", 0.03))
 	info["visemes"] = vis.get("open", [])
 	current_line = info
-	_line_started_ms = Time.get_ticks_msec()
+	_line_started_ms = Time.get_ticks_msec() + (int(RADIO_OPEN_S * 1000.0) if radio else 0)
 	if not ducked:
 		duck_music(true)
 		_line_duck = true
@@ -423,6 +536,7 @@ func current_viseme() -> float:
 
 
 func _on_line_end(_id: String) -> void:
+	_on_radio_voice_end(_id)
 	current_line = {}
 	if _line_duck:
 		_line_duck = false
