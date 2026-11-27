@@ -102,7 +102,7 @@ O lugar é bom porque vem depois de o trio se apresentar (a criança já conhece
 ### 4.1 Regra
 - As **dicas de missão** (`ep01.radio.v3_m*`) **ficam como estão**. Já começam pelo nome do herói e são concretas; pôr o nome dela em cada dica alongaria as frases sem ajudar. Quem fala aparece no **retrato da legenda**.
 - O **nome dela** entra só onde ela **chega ao rádio**: a apresentação e os convites da ajuda.
-- `member.radio.name`: "Farol 7" → "**[NOME]**". O retrato do HUD passa a ser o rosto dela, com a antena acesa. O `speaker_for` não muda, porque a chave continua `radio`.
+- `member.radio.name`: "Farol 7" → "**[NOME]**". O retrato do HUD passa a ser o rosto dela. O `speaker_for` não muda, porque a chave continua `radio`.
 
 ### 4.2 Trocas propostas (não aplicadas)
 | Chave | Hoje | Proposta | Voz? |
