@@ -54,7 +54,7 @@
   - G19 e G19b: ações no jogo revisadas e integradas (pausa congela, sem mágica na troca de herói). Lente do M7 na parede da galeria (decisão de Thiago).
   - G21: Lumi aprovado por Thiago. G21i (plano na abertura) revisado e integrado; falas novas pendentes para o lote de 28/11; G23 (pés) revisado e integrado (dívida: build do cabelo do Lumi não determinístico).
   - G24 (iPhone, jogado até o resgate do capitão):
-    - G24a, câmera ao correr: com `gameplay`.
+    - G24a parte 1 (corrida) integrada; G24a2 (obstáculo com objeto transparente) com `gameplay`, build seguinte.
     - G24b/c/d, corda que atravessa, barco de ré no meio dos outros e auditoria dinâmica de interpenetração: com `gameplay`.
     - G24e: proposta pronta (`docs/proposals/g24_roteiro.md`). Thiago escolheu pacote mínimo hoje (G25, depois do G21i), fio do filhote fujão, varal de bandeirinhas (no médio) e vozes novas primeiro.
   - G22 (iPhone, build 3):
