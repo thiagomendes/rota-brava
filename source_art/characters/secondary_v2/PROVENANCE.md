@@ -93,3 +93,29 @@ python3 -I source_art/farol7_base/manifest_g21.py
 - Clipes sentados para o plano 9a: `idle_seated` (3,6 s, laço) e `turn_chair` (1,0 s), assento a 0,40 m; o Lumi sentado é
   filho de `Chair/Seat` em `farol7_base.tscn` e gira com a cadeira (`Farol7Base.set_chair_yaw`). `idle_seated` entrou em
   `CharacterVisual.LOOPING`.
+
+## G23 · pés encaixados (capitão, Dona Amora, Lumi)
+Retorno de Thiago (2026-11-27): o sapato ficava solto da perna, sem tornozelo, com o fundo aparecendo entre a barra e o
+sapato. Só geometria por script; rig, pesos por distância e clipes iguais.
+- `sv2_human.py`: `shoes(shaft=(z_topo, raio))` sobe um cano por dentro da barra da calça (o cano é a ponta da corrente
+  SKIN, sem ramificação no tornozelo); `trousers(ankle_r=...)` continua a perna por um tornozelo mais fino que desce para
+  dentro do sapato.
+- Capitão: bota de cano (`shaft=(0.125, 0.045)`); Lumi: tênis de cano (`shaft=(0.125, 0.047)`); Dona Amora: meia com
+  tornozelo dentro do sapato (`ankle_r=0.040`). Brilho e pintura do sapato iguais (mesma parte `shoe`).
+- Medida: `measure_feet_g23.py` (no .blend) e `game/tests/test_feet_gap.gd` (no GLB), mesma conta, todos os quadros de
+  todos os clipes: vão perna-sapato antes +35,5 a +39,0 mm no .blend (+37,4 a +41,5 mm no GLB), depois −15,7 a −26,3 mm
+  (sobreposição; os dois dão o mesmo número).
+- Provas: `render_feet_g23.py` (fila de frente, de lado e de 3/4 e close dos pés) em `captures/g23/` (fora do Git).
+- GLB: `captain_v2.glb` `81b3d26d2385e5d56a44cc4fa233a2a6a21267095832202c1b4c2d02d52c22d3` (24 242 tris),
+  `amora_v2.glb` `2952973579600daa77a11513d88007b99baba3a75f6bc03cf27d50a8e4a31de8` (22 876 tris),
+  `lumi_v2.glb` `f6af8508e3751522477b8b7e0976a50e9c36454b79269a61f1d0de81d9cb3756` (23 027 tris).
+```bash
+for id in captain amora lumi; do
+  bash tools/blender.sh --background --factory-startup --python source_art/characters/secondary_v2/build_${id}_v2.py -- \
+    --glb $PWD/game/assets/models/characters/${id}_v2.glb --blend $PWD/source_art/characters/secondary_v2/${id}_v2.blend
+  bash tools/blender.sh --background source_art/characters/secondary_v2/${id}_v2.blend \
+    --python source_art/characters/secondary_v2/measure_feet_g23.py
+done
+bash tools/blender.sh --background --factory-startup --python source_art/characters/secondary_v2/render_feet_g23.py -- \
+  $PWD/captures/g23 depois_idle
+```

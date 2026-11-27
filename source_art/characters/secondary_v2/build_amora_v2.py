@@ -172,7 +172,7 @@ class Amora(Adult):
         F = self.F
         HEM = F.knee_z * 0.62
         self.dress = self.torso_shell("dress", HEM, hem_flare=1.62, belly_k=1.08, chest_k=1.10, cuff_k=1.05, decim=0.15)
-        self.trousers(part="tights", top_r=self.v["belly"] * 0.80, hem_up=0.035)
+        self.trousers(part="tights", top_r=self.v["belly"] * 0.80, hem_up=0.035, ankle_r=0.040)   # G23: meia entra no sapato
         self.shoes(high=0.030)
 
     def uniform_details(self):
