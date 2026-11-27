@@ -123,14 +123,25 @@ func _menu_timeout() -> void:
 	Options.motion_override = 0
 	loader.hold_max_ms = 1
 	loader.change_scene(MENU)
-	await _wait_idle()
+	# G14: amostra no quadro em que o teto estoura (a tela comeca a sair). Depois disso o palco segue carregando e pode
+	# entrar durante o fade da tela; conferir so no fim dependia da velocidade da maquina/disco (falhava so na suite).
+	var still_at_timeout := false
+	var focus_at_timeout := false
+	var n0 := 0
+	while loader.is_busy() and n0 < WAIT_FRAMES:
+		if loader.phase == SceneLoaderService.Phase.FADING_OUT and not still_at_timeout:
+			var mt := r.tree.current_scene as TitleScreen
+			if mt != null:
+				still_at_timeout = mt.get_node_or_null("KeyArtStill") != null and not mt.loading_hold()
+				focus_at_timeout = mt.play_button.has_focus()
+		await r.tree.process_frame
+		n0 += 1
 	loader.hold_max_ms = SceneLoaderService.HOLD_MAX_MS
 	var m := r.tree.current_scene as TitleScreen
 	r.check(m != null and not loader.is_showing(), "teto: menu abre mesmo sem o palco pronto")
 	if m == null:
 		return
-	r.check(m.get_node_or_null("KeyArtStill") != null and m.play_button.has_focus(),
-		"teto: menu sobre a imagem parada com foco em Jogar")
+	r.check(still_at_timeout and focus_at_timeout, "teto: menu sobre a imagem parada com foco em Jogar")
 	var n := 0
 	while m.get_node_or_null("KeyArtStill") != null and n < 20000:
 		await r.tree.process_frame
