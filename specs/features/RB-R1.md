@@ -556,3 +556,8 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 |---|---|---|---|
 | G14 | Controle nos menus + teto 20 s + Godot abortando ao fechar (código 134 em `ui_` e `keyart`) | A/B funcionam no menu, nos espaços, na pausa e nos painéis, sem pulo junto (teste). Teto `HOLD_MAX_MS` = 20000. Causa do 134 achada e corrigida, sem abort ao sair | `gameplay` |
 | G15 | Dicas com tecla ou botão fixos ("E / X"). Thiago lembrou que há controle de Xbox, de PlayStation e outros, além do teclado | **Decisão de Thiago:** mostrar o desenho do aparelho em uso. O jogo detecta o último dispositivo usado (teclado/mouse ou controle). No controle, identifica a família pelo nome do joypad: Xbox (A/B/X/Y coloridos), PlayStation (✕ ○ □ △), Nintendo e genérico. Toda dica, rótulo de botão e legenda que cite um comando troca na hora. Os ícones são SVG originais do projeto, sem marca registrada nem logo de fabricante. Sem texto fixo de tecla no i18n. Inclui teste. Entra **logo depois do G14** | `ux` |
+- **Trio duplicado no menu** (Thiago, print no Windows; `feature/rb-r1-g-trio-duplicado`, autor `ux`).
+  - Causa: desde o G10, o `_ready` montava o `HeroStage` antigo antes de a arte-chave existir, e os dois trios ficavam na tela, 6 heróis no total. Correção em `title_screen.gd`.
+  - Revisão (`reviewer`): APROVADO. `test_keyart` dá 30 PASS e falha no código antigo (6 heróis).
+  - Ressalva menor: arte-chave carregada com `stage` nulo deixaria o palco antigo sem tamanho.
+  - O revisor do G13 contou "4 heróis" na captura do menu. Nem o autor nem o lead investigaram, e o defeito só voltou pelo Thiago.
