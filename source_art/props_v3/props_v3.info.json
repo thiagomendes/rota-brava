@@ -17,7 +17,7 @@
   },
   "basket": {
    "glb": "game/assets/models/props_v3/basket.glb",
-   "glb_bytes": 168676,
+   "glb_bytes": 177644,
    "materiais": [
     "pv3_cloth",
     "wv2_burlap",
@@ -25,11 +25,11 @@
     "wv2_wood"
    ],
    "objetos": {
-    "pv3_basket": 3260
+    "pv3_basket": 3476
    },
    "orcamento_tris": 4000,
    "pivo": "centro do fundo, no chao",
-   "triangulos": 3260
+   "triangulos": 3476
   },
   "cloth_scarf": {
    "glb": "game/assets/models/props_v3/cloth_scarf.glb",

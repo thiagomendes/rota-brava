@@ -1885,9 +1885,9 @@
         "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice (COLOR_0 linear), UV em metros, normais ponderadas por area (WeightedNormal), sem texturas embutidas"
       },
       "saida_glb": "game/assets/models/environment_v2/wv2_static.glb",
-      "glb_sha256": "c15635730629467a7fb11cdeaa0374307778b18987bb3736d069d64f0884d3a4",
-      "glb_bytes": 10579376,
-      "triangulos": 206126,
+      "glb_sha256": "1e418e284409da0eb7f165f8852ed0668aa2b2108b1fd4bb6cd4e7652f967d4c",
+      "glb_bytes": 10581244,
+      "triangulos": 206150,
       "materiais": [
         "wv2_bark",
         "wv2_burlap",
@@ -2280,11 +2280,11 @@
       "saida": "game/worlds/village_v3",
       "arquivos_sha256": {
         "village_collision.tscn": "3ed988a54b5496d86fb0b0e7acd54d3eaafbb28f47955f1545f17f1a711f9985",
-        "village_world.tscn": "c86dc7e1a6bf826dd3165f999a9cc8794ba72311142b08c2e3812fabd36967c1"
+        "village_world.tscn": "e3b9b85a13029069ec340062ffedcad6016ab2f87c5b215ff2de936cdeedd0ef"
       },
       "arquivos_bytes": {
         "village_collision.tscn": 185544,
-        "village_world.tscn": 9770
+        "village_world.tscn": 10173
       },
       "colisao": {
         "formas_por_corpo": {
@@ -2371,12 +2371,12 @@
       ],
       "missao": "M2",
       "saida_glb": "game/assets/models/props_v3/basket.glb",
-      "glb_sha256": "2a1bc4d2aa7260beab21926394d86216fcb3347f32da2922531fc91b3aea6129",
-      "glb_bytes": 168676,
+      "glb_sha256": "27a081233ee917d633e716891c65a44d3df10c8e4a9ecae0a14cc1146e11f7dc",
+      "glb_bytes": 177644,
       "cena": "game/assets/models/props_v3/basket.tscn",
-      "cena_sha256": "1b6981a3f8e6c614be43787d7dc2cf7c341fe71fd60918bcfd5c25d842bf386c",
+      "cena_sha256": "f4c5397c75205b1df54d91dace9cb6784850e5dcb58b761810603b8232717aee",
       "cena_bytes": 750,
-      "triangulos": 3260,
+      "triangulos": 3476,
       "orcamento_tris": 4000,
       "materiais": [
         "pv3_cloth",

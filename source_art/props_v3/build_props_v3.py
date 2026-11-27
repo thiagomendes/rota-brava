@@ -278,8 +278,10 @@ def basket():
         arc = [(s * (0.335 + 0.05 * math.sin(math.pi * t)), 0.24 + 0.07 * math.sin(math.pi * t), -0.09 + 0.18 * t)
                for t in [k / 10 for k in range(11)]]
         m.tube(arc, 0.013, "wv2_rope", hexc("#B98450"), seg=6)
-    # toalha dobrada dentro (cor da casa do varal), so para o cesto nao parecer vazio de longe
-    m.box((0.05, 0.2, 0.0), (0.3, 0.05, 0.24), "pv3_cloth", hexc("#BDEBD3"), 0.02, 2, rot=R(ry=8, rz=-6))
+    # G18: pilha de 3 toalhas dobradas apoiada no fundo (antes uma toalha solta a 17,5 cm do fundo); topo a 0,195 m, onde
+    # as roupas soltas do M2 deitam (Ep01V3Land.BASKET_FLOOR)
+    for k, (sx, sz, ry, col) in enumerate(((0.34, 0.26, 8, "#BDEBD3"), (0.32, 0.25, -5, "#FFF0D6"), (0.33, 0.24, 13, "#BDEBD3"))):
+        m.box((0.03 - 0.02 * k, 0.0325 + 0.065 * k, 0.0), (sx, 0.065, sz), "pv3_cloth", hexc(col), 0.02, 2, rot=R(ry=ry))
     return m
 
 

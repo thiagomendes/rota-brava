@@ -48,7 +48,7 @@ Metros, +Y para cima. Raiz de cada cena na origem com escala 1. Tris = LOD 0 (a 
 | `cloth_tshirt.tscn` camiseta rosa com estrela | M2 | meio da gola, na linha do varal | `sway` (loop), `shake` | 1840 / 2500 |
 | `cloth_scarf.tscn` lenço azul de bolinhas | M2 | meio da dobra, na linha | `sway` (loop), `shake` | 1956 / 2500 |
 | `cloth_sock.tscn` meia amarela com pelo do filhote | M2 | meio do punho, na linha | `sway` (loop), `shake` | 1300 / 2500 |
-| `basket.tscn` cesto de vime | M2 | centro do fundo | — | 3260 / 4000 |
+| `basket.tscn` cesto de vime | M2 | centro do fundo | — | 3476 / 4000 |
 | `fountain_leaves.tscn` tufo que entope a bacia | M3 | centro da base | `rustle` (loop), `pull_out`, `reset` | 1172 / 3000 |
 | `ball.tscn` bola do filhote (raio 0,16) | M3 | contato no chão; malha no filho `Spin` | `roll` (loop, rola para +Z), `bounce` | 920 / 1500 |
 | `crate_apple/lemon/grapes.tscn` caixotes | M4 | centro do fundo | — | 1404 / 1708 / 1948 de 4500 |
@@ -75,6 +75,12 @@ meio tapada pelos arbustos do promontório (posição do mundo, não da peça).
 ## G6 (RB-R1, 2026-11-26)
 - Caixotes do M4 (`crate_*`): fundo falso de palha a 5 cm da borda; as frutas pousam nele (antes ficavam 21 cm acima do
   fundo, soltas). Mesma medida externa. Achado por `bash tools/prop-overlap.sh`.
+
+## G18 (RB-R1, 2026-11-27)
+- Cesto (`basket`): a toalha solta a 17,5 cm do fundo virou uma pilha de 3 toalhas dobradas apoiada no fundo (topo a
+  0,195 m, onde as roupas soltas do M2 deitam no jogo). 3260 -> 3476 tris. Achado por `test_prop_overlap` (parte solta
+  de 13,1 cm) quando o cesto entrou no M2 pela primeira vez. Roupas (`cloth_*`) sem mudanca: o pivo ja era a boca do
+  prendedor; o erro estava no jogo (vagas fora da corda).
 
 ## Limites conhecidos
 - Tecidos são chapas rígidas (balançam inteiros no `sway`, sem simulação de pano).

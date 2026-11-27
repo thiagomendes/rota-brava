@@ -126,3 +126,15 @@ Mesmas regras de originalidade (tudo por script). Mudancas, todas no mesmo build
   duas arvores do promontorio fora das pedras, vaso sem chao para o chao, guarda-sois afastados, moitas 5 cm mais baixas.
 - **Pesos:** `wv2_kit.glb` regravado; `wv2_static.glb`, `wv3_props.glb` sem mudanca; `wv2_boat.glb` e `village_world.tscn`
   restaurados do Git (o build nao os refaz bit a bit). `village_collision.tscn` regravada (caixas dos kits movidos).
+
+## G18 · varal do M2 (RB-R1, art3d, 2026-11-27) — PROVISORIO
+- **Varal (`build_bank`):** a corda (mesma polilinha de 13 pontos, flecha 0,25 m) fica com 4 panos fixos so nas pontas
+  (t 0,12 / 0,235 / 0,765 / 0,885); o pano azul do meio saiu para abrir as 3 vagas do M2 (t 0,385 / 0,5 / 0,615,
+  `CLOTHESLINE_SLOTS`). Cada pano pendura com a borda de cima na corda e inclinado como ela, com 2 prendedores sobre a corda
+  (antes: borda reta numa corda curva e 1 prendedor deslocado 0,15 m em x, ate 6 cm fora da corda).
+- **Contrato com o jogo:** o marcador `M2_Clothesline` leva `metadata/rope` (a polilinha, metros) e `metadata/rope_slots`
+  (as 3 vagas); `Ep01V3Land.line_slot()` pendura as roupas ali. Escrito por `wv3_collision.write_scenes`.
+- **Pesos:** `wv2_static.glb` regravado (+24 tris); o `random` global volta ao estado que os panos antigos deixavam (refeitos
+  numa malha descartada), entao kit, props e o resto do mundo saem iguais. `wv2_boat.glb` restaurado do Git (o build muda
+  so a ordem de 72 bytes de indices de uma primitiva). `village_world.tscn`: so as 2 linhas de metadado entraram na versao
+  do Git (o gerador reescreve 3 transformacoes com -0 / 6e-17 em vez de -4e-08).
