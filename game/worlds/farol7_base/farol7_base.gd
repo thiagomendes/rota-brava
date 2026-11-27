@@ -6,7 +6,8 @@ extends Node3D
 ##
 ## Contrato para o jogo:
 ##   marker(&"Base_Chair")       pivo da cadeira (no chao); o no `Chair` gira em Y (`set_chair_yaw`)
-##   marker(&"Base_Seat")        onde fica o Lumi sentado (reserva: os clipes sentados nao existem ainda)
+##   no `Chair/Seat`             pai do Lumi sentado (clipes `idle_seated`, `turn_chair`): gira junto com a cadeira
+##   marker(&"Base_Seat")        o mesmo lugar no mundo, com a cadeira virada para a mesa (yaw 180)
 ##   marker(&"Base_LumiStand")   Lumi de pe no console do radio, de frente para a camera
 ##   marker(&"Base_CamWide"), marker(&"Base_CamFront"), marker(&"Base_CamMic")   cameras dos planos 9a/9b/9c (olham para -Z local)
 ##   marker(&"Base_Exterior"), marker(&"Base_CamExterior")                        casa-torre por fora (plano 9a)

@@ -22,6 +22,9 @@ metadata/stage = "base_farol7"
 [node name="Chair" parent="." instance=ExtResource("3_chair")]
 transform = Transform3D(-1, 0, 1.2246e-16, 0, 1, 0, -1.2246e-16, 0, -1, 0.6, 0, -1)
 
+[node name="Seat" type="Marker3D" parent="Chair"]
+transform = Transform3D(-1, 0, 1.2246e-16, 0, 1, 0, -1.2246e-16, 0, -1, 0, 0, 0.06)
+
 [node name="SkylightBeacon" parent="." instance=ExtResource("4_beacon")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3, -0.55)
 
@@ -87,7 +90,7 @@ omni_range = 5.0
 transform = Transform3D(-1, 0, 1.2246e-16, 0, 1, 0, -1.2246e-16, 0, -1, 0.6, 0, -1)
 
 [node name="Base_Seat" type="Marker3D" parent="Markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0.6, 0.47, -0.98)
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 0.6, 0, -1.06)
 
 [node name="Base_LumiStand" type="Marker3D" parent="Markers"]
 transform = Transform3D(-1, 0, 1.2246e-16, 0, 1, 0, -1.2246e-16, 0, -1, -0.3, 0, -0.95)

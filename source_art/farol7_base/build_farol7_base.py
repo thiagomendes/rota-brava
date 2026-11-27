@@ -401,14 +401,15 @@ def chair():
         m.tube([(0, 0.11, 0), p], 0.025, "wv2_metal", c("#2B3440"), seg=8)
         m.sphere((p[0], 0.035, p[2]), 0.035, "wv2_glossy", c(NAVY), subd=2)
     m.cyl((0, 0.08, 0), 0.05, 0.06, "wv2_metal", c("#2B3440"), seg=16)
-    m.cyl((0, 0.12, 0), 0.028, 0.30, "wv2_metal", c("#AEB7C2"), seg=12)
-    m.box((0, 0.46, 0.02), (0.50, 0.10, 0.48), "pv3_vinyl", c(CORAL), 0.045, 3)
-    m.box((0, 0.40, 0.02), (0.44, 0.04, 0.42), "wv2_metal", c("#2B3440"), 0.01, 1)
+    # G21 r2: assento a 0,40 m (o Lumi sentado alcanca o chao com os pes)
+    m.cyl((0, 0.12, 0), 0.028, 0.17, "wv2_metal", c("#AEB7C2"), seg=12)
+    m.box((0, 0.35, 0.02), (0.50, 0.10, 0.48), "pv3_vinyl", c(CORAL), 0.045, 3)
+    m.box((0, 0.29, 0.02), (0.44, 0.04, 0.42), "wv2_metal", c("#2B3440"), 0.01, 1)
     # encosto (o assento fica de frente para +Z; costas em -Z)
-    m.tube([(0, 0.44, -0.18), (0, 0.55, -0.25), (0, 0.66, -0.25)], 0.02, "wv2_metal", c("#2B3440"), seg=8)
-    m.box((0, 0.84, -0.25), (0.46, 0.40, 0.09), "pv3_vinyl", c(CORAL), 0.045, 3, rot=T(0, 0, 0) @ R(rx=-6))
-    m.box((0, 0.84, -0.30), (0.30, 0.16, 0.02), "wv2_paint", c(YELLOW), 0.008, 1)
-    m.prism((0, 0, 0), star(5, 0.06, 0.025), 0.01, "wv2_paint", c(NAVY), rot=T(0, 0.84, -0.31) @ R(ry=180))
+    m.tube([(0, 0.33, -0.18), (0, 0.44, -0.25), (0, 0.55, -0.25)], 0.02, "wv2_metal", c("#2B3440"), seg=8)
+    m.box((0, 0.73, -0.25), (0.46, 0.40, 0.09), "pv3_vinyl", c(CORAL), 0.045, 3, rot=T(0, 0, 0) @ R(rx=-6))
+    m.box((0, 0.73, -0.30), (0.30, 0.16, 0.02), "wv2_paint", c(YELLOW), 0.008, 1)
+    m.prism((0, 0, 0), star(5, 0.06, 0.025), 0.01, "wv2_paint", c(NAVY), rot=T(0, 0.73, -0.31) @ R(ry=180))
     return m
 
 

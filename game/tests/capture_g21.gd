@@ -4,6 +4,7 @@ extends Node
 ##   --g21-anim=talk  --g21-seek=1.6       clipe do Lumi e instante congelado (seek < 0 = toca em laco)
 ##   --g21-at=Base_LumiStand               marcador onde o Lumi fica (de frente para a camera da tomada front)
 ##   --g21-chair=0                         giro da cadeira (0 = assento para a camera)
+##   --g21-seat=1                          Lumi sentado (filho de Chair/Seat; use --g21-anim=idle_seated ou turn_chair)
 ##   --g21-out=/ABS/dir  --g21-name=g21    PNG por tomada (<name>_<shot>.png)
 ## Uso: xvfb-run -a -s "-screen 0 1600x900x24" bash tools/godot.sh --path game --rendering-driver vulkan \
 ##   --resolution 1600x900 res://tests/capture_g21.tscn -- --g21-out=$PWD/captures/g21 --g21-shots=front,wide,mic,exterior
@@ -13,6 +14,8 @@ var base: Farol7Base
 var cam: Camera3D
 var lumi: Node3D
 var shots: PackedStringArray = []
+var hold_anim: StringName = &""
+var hold_t := -1.0
 var frame := 0
 var ready_done := false
 
@@ -30,14 +33,20 @@ func _ready() -> void:
 	await get_tree().process_frame
 	base.set_chair_yaw(float(_arg("--g21-chair", "0")))
 	base.set_on_air(true)
-	var at := base.marker(StringName(_arg("--g21-at", "Base_LumiStand")))
-	lumi = StoryFigure.spawn(base.get_node("Actors"), "lumi_model", "Lumi")
-	lumi.global_transform = at.global_transform
+	if _arg("--g21-seat", "0") == "1":
+		# sentado: filho do assento da cadeira (gira junto com ela)
+		lumi = StoryFigure.spawn(base.get_node("Chair/Seat"), "lumi_model", "Lumi")
+	else:
+		var at := base.marker(StringName(_arg("--g21-at", "Base_LumiStand")))
+		lumi = StoryFigure.spawn(base.get_node("Actors"), "lumi_model", "Lumi")
+		lumi.global_transform = at.global_transform
 	var anim := StringName(_arg("--g21-anim", "talk"))
 	var seek := float(_arg("--g21-seek", "1.6"))
 	var cv := StoryFigure.visual(lumi)
 	if seek >= 0.0:
-		cv.play(anim, 0.0, 0.0)
+		# congelado: o quadro e refeito a cada frame (o pause do seek_clip sozinho voltava ao quadro de repouso)
+		hold_anim = anim
+		hold_t = seek
 		cv.seek_clip(anim, seek)
 	else:
 		StoryFigure.loop(lumi, anim)
@@ -61,6 +70,8 @@ func _set_shot(i: int) -> void:
 func _process(_delta: float) -> void:
 	if not ready_done:
 		return
+	if hold_t >= 0.0:
+		StoryFigure.visual(lumi).seek_clip(hold_anim, hold_t)
 	frame += 1
 	if frame % HOLD == 0:
 		var i := frame / HOLD - 1
@@ -70,5 +81,5 @@ func _process(_delta: float) -> void:
 		var out := _arg("--g21-out", "")
 		if out != "":
 			get_viewport().get_texture().get_image().save_png("%s/%s_%s.png" % [out, _arg("--g21-name", "g21_base"), shots[i]])
-		print("G21 SHOT %d %s %d" % [i, shots[i], frame])
+		print("G21 SHOT %d %s %d mao.R=%s (%s @ %.2f s)" % [i, shots[i], frame, StoryFigure.visual(lumi).bone_position(&"hand.R"), hold_anim, hold_t])
 		_set_shot(i + 1)

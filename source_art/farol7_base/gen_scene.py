@@ -69,6 +69,8 @@ def main():
              '[node name="Backdrop" parent="." instance=ExtResource("6_backdrop")]', '',
              # cadeira: de costas para a camera (assento virado para a mesa) no comeco do plano 9a
              '[node name="Chair" parent="." instance=ExtResource("3_chair")]', 'transform = %s' % yaw(180.0, chair), '',
+             # assento: o Lumi sentado fica filho deste no e gira junto com a cadeira (Farol7Base.set_chair_yaw)
+             '[node name="Seat" type="Marker3D" parent="Chair"]', 'transform = %s' % yaw(180.0, (0.0, 0.0, 0.06)), '',
              '[node name="SkylightBeacon" parent="." instance=ExtResource("4_beacon")]',
              'transform = %s' % xf(((1, 0, 0), (0, 1, 0), (0, 0, 1)), (sky[0], 3.30, sky[2])), '']
     lights = [
@@ -102,7 +104,7 @@ def main():
               'light_color = Color(1, 0.85, 0.35, 1)', 'light_energy = 2.0', 'omni_range = 5.0', '']
     markers = [
         ("Base_Chair", yaw(180.0, chair)),
-        ("Base_Seat", yaw(0.0, (chair[0], 0.47, chair[2] + 0.02))),
+        ("Base_Seat", yaw(0.0, (chair[0], 0.0, chair[2] - 0.06))),
         ("Base_LumiStand", yaw(180.0, (-0.30, 0.0, -0.95))),
         ("Base_Porthole", xf(((1, 0, 0), (0, 1, 0), (0, 0, 1)), port)),
         ("Base_Mic", xf(((1, 0, 0), (0, 1, 0), (0, 0, 1)), mic)),
