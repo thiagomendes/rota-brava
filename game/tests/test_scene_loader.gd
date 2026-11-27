@@ -122,18 +122,20 @@ func _menu_fast() -> void:
 func _menu_timeout() -> void:
 	Options.motion_override = 0
 	loader.hold_max_ms = 1
+	var before: Node = r.tree.current_scene
 	loader.change_scene(MENU)
-	# G14: amostra no quadro em que o teto estoura (a tela comeca a sair). Depois disso o palco segue carregando e pode
-	# entrar durante o fade da tela; conferir so no fim dependia da velocidade da maquina/disco (falhava so na suite).
+	# G14: amostra no primeiro quadro com o menu na arvore (teto de 1 ms: estoura ja ai). O palco carrega em paralelo e,
+	# conforme a velocidade da maquina/disco, entra antes do fim do fade da tela; conferir so no fim falhava na suite.
 	var still_at_timeout := false
 	var focus_at_timeout := false
+	var sampled := false
 	var n0 := 0
 	while loader.is_busy() and n0 < WAIT_FRAMES:
-		if loader.phase == SceneLoaderService.Phase.FADING_OUT and not still_at_timeout:
-			var mt := r.tree.current_scene as TitleScreen
-			if mt != null:
-				still_at_timeout = mt.get_node_or_null("KeyArtStill") != null and not mt.loading_hold()
-				focus_at_timeout = mt.play_button.has_focus()
+		var mt := r.tree.current_scene as TitleScreen
+		if mt != null and mt != before and not sampled:
+			sampled = true
+			still_at_timeout = mt.get_node_or_null("KeyArtStill") != null
+			focus_at_timeout = mt.play_button.has_focus()
 		await r.tree.process_frame
 		n0 += 1
 	loader.hold_max_ms = SceneLoaderService.HOLD_MAX_MS
