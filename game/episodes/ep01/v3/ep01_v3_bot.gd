@@ -99,7 +99,7 @@ func _physics_process(delta: float) -> void:
 		_stuck_from = main.controlled_node.global_position
 		_detour_t = 0.0
 	if main.controlled_node is BoatActor:
-		_drive(goal.global_position)
+		_drive(goal.global_position, (goal as Ep01Interactable).radius if goal is Ep01Interactable else 2.0)
 		return
 	var here := main.controlled_node.global_position
 	if _detour_t > 0.0:
@@ -199,8 +199,33 @@ func _plan(target: Vector3, reach: float) -> bool:
 
 
 ## Pilotagem (M6) com as mesmas intencoes do jogador: move_up acelera, move_left/right viram. Menos motor em curva fechada.
-func _drive(target: Vector3) -> void:
+## G24c: folga (m) da linha do casco ate o que boia ao desviar (meia boca do casco + margem).
+const BOAT_PASS := 1.9
+
+
+func _drive(target: Vector3, reach: float = 2.0) -> void:
 	var boat := main.boat
+	# preso encostado (o barco nao da re e o casco para no que boia): gira para o lado que abre folga e replaneja
+	_boat_still += get_physics_process_delta_time()
+	if boat.global_position.distance_to(_still_pos) > 0.4 or absf(wrapf(boat.heading - _still_h, -PI, PI)) > 0.35:
+		_still_pos = boat.global_position
+		_still_h = boat.heading
+		_boat_still = 0.0
+	if _boat_still > 2.0 and _escape <= 0.0:
+		_escape = 1.6
+		_boat_still = 0.0
+		_boat_path.clear()
+		var g := func(dh: float) -> float:
+			return float(main.land.call(&"boat_gap", boat.global_position, boat.heading + dh))
+		_escape_dir = 1.0 if g.call(0.3) >= g.call(-0.3) else -1.0
+	if _escape > 0.0:
+		_escape -= get_physics_process_delta_time()
+		_hold(&"move_up", 0.3)
+		_hold(&"move_down", 0.0)
+		_hold(&"move_left", maxf(_escape_dir, 0.0))
+		_hold(&"move_right", maxf(-_escape_dir, 0.0))
+		return
+	target = _boat_waypoint(boat.global_position, target, reach)
 	var d := target - boat.global_position
 	d.y = 0.0
 	var err := wrapf(atan2(-d.x, -d.z) - boat.heading, -PI, PI)
@@ -209,6 +234,169 @@ func _drive(target: Vector3) -> void:
 	_hold(&"move_right", maxf(-steer, 0.0))
 	_hold(&"move_up", clampf(1.0 - absf(err) / 1.6, 0.25, 1.0))
 	_hold(&"move_down", 0.0)
+
+
+## G24c: o bot pilota como gente: nao mira o centro de uma boia (passa ao lado, dentro do raio do ponto) e contorna
+## barcos parados, boias e a margem. Rota por grafo de visibilidade: nos ao redor de cada obstaculo (a BOAT_NODE m da
+## borda), arestas que passam a BOAT_PASS m de tudo e sem tocar a camada 1 nas duas bordas do casco; Dijkstra. Replaneja
+## quando o alvo muda ou a cada BOAT_REPLAN s.
+const BOAT_NODE := 2.5
+## Distancia da borda da boia em que o barco passa por ela (o ponto da boia tem raio BUOY_RADIUS do centro).
+const BOAT_GOAL := 2.1
+const BOAT_REPLAN := 1.5
+## Folga lateral da linha do barco ate a margem e o cais (meia boca + a distancia em que o barco freia).
+const BOAT_SHORE := 1.9
+var _boat_path: Array[Vector2] = []
+var _boat_goal := Vector2.INF
+var _boat_plan_at := -INF
+var _slack := 1.0
+var _boat_still := 0.0
+var _still_pos := Vector3.INF
+var _still_h := 0.0
+var _escape := 0.0
+var _escape_dir := 1.0
+
+
+func _boat_waypoint(from: Vector3, target: Vector3, reach: float = 2.0) -> Vector3:
+	if not main.land.has_method(&"floaters"):
+		return target
+	var p := Vector2(from.x, from.z)
+	var t := Vector2(target.x, target.z)
+	if t.distance_to(_boat_goal) > 0.1 or elapsed - _boat_plan_at > BOAT_REPLAN or _boat_path.is_empty():
+		_boat_goal = t
+		_boat_plan_at = elapsed
+		_boat_path = _boat_plan(p, t, from.y, reach, 1.0)
+		if _boat_path.is_empty():
+			_boat_path = _boat_plan(p, t, from.y, reach, 0.6)   # apertado: folgas menores
+		if _boat_path.is_empty():
+			_boat_path = [t]
+	while _boat_path.size() > 1 and p.distance_to(_boat_path[0]) < 1.6:
+		_boat_path.pop_front()
+	var w: Vector2 = _boat_path[0] if not _boat_path.is_empty() else t
+	return Vector3(w.x, target.y, w.y)
+
+
+func _boat_plan(p: Vector2, t: Vector2, y: float, reach: float = 2.0, slack: float = 1.0) -> Array[Vector2]:
+	_slack = slack
+	var all: Array[Dictionary] = main.land.call(&"floaters")
+	var box := Rect2(p, Vector2.ZERO).expand(t).grow(10.0)
+	var obs: Array[Dictionary] = []
+	for f in all:
+		if box.has_point(f["a"]) or box.has_point(f["b"]):
+			obs.append(f)
+	# alvo em cima de um obstaculo (boia do percurso) ou rente a um (emblema): os alvos sao um anel dentro do raio do ponto,
+	# longe do que boia; na boia, chega de lado (tangente)
+	var goals: Array[Vector2] = []
+	var target_ob := -1
+	for i in obs.size():
+		var c: Vector2 = ((obs[i]["a"] as Vector2) + (obs[i]["b"] as Vector2)) * 0.5
+		if c.distance_to(t) < float(obs[i]["r"]) + 0.3:
+			target_ob = i
+	var ring := minf(reach * 0.85, (float(obs[target_ob]["r"]) + BOAT_GOAL) if target_ob >= 0 else reach * 0.85)
+	var cands: Array[Vector2] = []
+	if target_ob < 0:
+		cands.append(t)
+	for k in 12:
+		cands.append(t + Vector2.from_angle(TAU * k / 12.0) * ring)
+	for g in cands:
+		var free := true
+		for i in obs.size():
+			if i != target_ob and Ep01V3Late._pt_seg(g, obs[i]["a"], obs[i]["b"]) < float(obs[i]["r"]) + BOAT_PASS:
+				free = false
+		if free:
+			goals.append(g)
+	if goals.is_empty():
+		goals.append(t)
+	var nodes: Array[Vector2] = [p]
+	nodes.append_array(goals)
+	var n_goal := goals.size()
+	for i in obs.size():
+		if i == target_ob:
+			continue
+		var f := obs[i]
+		var a: Vector2 = f["a"]
+		var b: Vector2 = f["b"]
+		var c := (a + b) * 0.5
+		var R := float(f["r"]) + BOAT_NODE + a.distance_to(b) * 0.5
+		for k in 10:
+			nodes.append(c + Vector2.from_angle(TAU * k / 10.0) * R)
+	var n := nodes.size()
+	var dist: Array[float] = []
+	var prev: Array[int] = []
+	var done: Array[bool] = []
+	for i in n:
+		dist.append(INF)
+		prev.append(-1)
+		done.append(false)
+	dist[0] = 0.0
+	var space := main.world.get_world_3d().direct_space_state
+	while true:
+		var u := -1
+		for i in n:
+			if not done[i] and dist[i] < INF and (u < 0 or dist[i] < dist[u]):
+				u = i
+		if u < 0:
+			break
+		done[u] = true
+		if u >= 1 and u <= n_goal:
+			var path: Array[Vector2] = []
+			var k := u
+			while k > 0:
+				path.push_front(nodes[k])
+				k = prev[k]
+			return path
+		for v in range(1, n):
+			if done[v]:
+				continue
+			var nd := dist[u] + nodes[u].distance_to(nodes[v])
+			if nd >= dist[v] or not _boat_edge(nodes[u], nodes[v], obs, target_ob, u == 0, space, y):
+				continue
+			if target_ob >= 0 and v >= 1 and v <= n_goal:
+				# chega a boia de lado (tangente): de frente a proa comprida bateria nela antes de entrar no raio
+				var tob := obs[target_ob]
+				var c: Vector2 = ((tob["a"] as Vector2) + (tob["b"] as Vector2)) * 0.5
+				var radial := (nodes[v] - c).normalized()
+				var dirv := (nodes[v] - nodes[u]).normalized()
+				if absf(dirv.dot(radial)) > 0.45 or Ep01V3Late.seg_seg(nodes[u], nodes[v], tob["a"], tob["b"]) < float(tob["r"]) + 1.5:
+					continue
+			dist[v] = nd
+			prev[v] = u
+	var none: Array[Vector2] = []
+	return none
+
+
+func _boat_edge(u: Vector2, v: Vector2, obs: Array[Dictionary], skip: int, from_start: bool,
+		space: PhysicsDirectSpaceState3D, y: float) -> bool:
+	var dn := (v - u).normalized() if u.distance_to(v) > 0.01 else Vector2.ZERO
+	if from_start:
+		# saindo do lugar: o casco inteiro (capsula) nas poses ao longo da aresta, com o rumo dela
+		var steps := maxi(2, int(u.distance_to(v)))
+		for k in steps + 1:
+			var q := u.lerp(v, float(k) / steps)
+			var h := atan2(-dn.x, -dn.y)
+			if float(main.land.call(&"boat_gap", Vector3(q.x, y, q.y), h)) < 0.62:
+				return false
+	else:
+		# a proa passa do no antes de virar: a linha conta um pouco alem das pontas
+		var u2 := u - dn * 1.0
+		var v2 := v + dn * 1.5
+		for i in obs.size():
+			if i == skip:
+				continue
+			if Ep01V3Late.seg_seg(u2, v2, obs[i]["a"], obs[i]["b"]) < float(obs[i]["r"]) + BOAT_PASS * _slack:
+				return false
+	var d := (v - u)
+	if d.length() < 0.01:
+		return true
+	# margem e cais: as duas bordas do casco com folga (o barco freia e para a 0,6 m da margem)
+	var side := d.normalized().orthogonal() * BOAT_SHORE * _slack
+	var ext := d.normalized() * 1.0 * _slack
+	for o: Vector2 in [Vector2.ZERO, side, -side]:
+		var a := Vector3(u.x + o.x - ext.x, y + 0.3, u.y + o.y - ext.y)
+		var b := Vector3(v.x + o.x + ext.x, y + 0.3, v.y + o.y + ext.y)
+		if not space.intersect_ray(PhysicsRayQueryParameters3D.create(a, b, 1)).is_empty():
+			return false
+	return true
 
 
 func _walk(dir_world: Vector3, run: bool = false) -> void:
