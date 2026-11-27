@@ -325,6 +325,28 @@ func _build_m7() -> void:
 	_emblem(&"emb_m7_gallery", g, &"climber")
 
 
+## G24d: ponto no chao perto de `p` em que uma capsula de raio r e altura h (acima de 5 cm do chao) nao toca a camada 1.
+func free_spot(p: Vector3, r: float, h: float) -> Vector3:
+	if not is_inside_tree():
+		return p
+	var space := get_world_3d().direct_space_state
+	var cap := CapsuleShape3D.new()
+	cap.radius = r
+	cap.height = maxf(h, r * 2.0 + 0.01)
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = cap
+	q.collision_mask = 1
+	for ring: float in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]:
+		var n := 1 if ring == 0.0 else 8
+		for i in n:
+			var c := p + Vector3(sin(TAU * i / n), 0, cos(TAU * i / n)) * ring
+			var g := _ground(c)
+			q.transform = Transform3D(Basis(), g + Vector3(0, 0.05 + cap.height * 0.5, 0))
+			if space.intersect_shape(q, 1).is_empty():
+				return g
+	return p
+
+
 func _build_m8() -> void:
 	_dinghy_docked()
 	world.set_festival(true)
@@ -334,8 +356,9 @@ func _build_m8() -> void:
 	var plaza := _mk(&"M8_FestaPlaza")
 	captain.visible = true
 	pup.visible = true
-	captain.global_position = plaza + Vector3(1.6, 0, -1.2)
-	pup.global_position = plaza + Vector3(0.6, 0, -1.5)
+	# G24d: o filhote ficava dentro dos caixotes da praca (15 cm); os dois vao para o lugar livre mais perto
+	captain.global_position = free_spot(plaza + Vector3(1.6, 0, -1.2), 0.3, 1.5)
+	pup.global_position = free_spot(plaza + Vector3(0.6, 0, -1.5), 0.25, 0.6)
 	StoryFigure.face(captain, plaza)
 	StoryFigure.face(pup, plaza)
 	_spot(&"captain", captain.global_position, &"heart", "ui.action.talk", &"", 1.9)

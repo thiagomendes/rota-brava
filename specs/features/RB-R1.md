@@ -842,3 +842,50 @@ Print: `captures/g24/thiago_corda_m5.png` (fora do Git). No M5, a corda do Pico 
 | G24d | "Falta uma estratégia de testes mais efetiva para objetos se atravessando" | Criar uma **auditoria dinâmica de interpenetração**. Durante a partida completa do bot (M0 a M8) e as cenas, ela amostra a cada quadro os corpos que se movem (heróis, seguidores, NPCs, objetos na mão, cordas, barcos, carrinho) contra o mundo e as peças, com tolerância por par e uma lista de exceções justificada. A saída é um relatório com quadro, par e profundidade. Ela entra na suíte; a lista de exceções fica no ticket. Não substitui o `PropOverlap` estático, que continua. | `gameplay` (com `build-qa` se precisar) |
 | G24e | As missões parecem soltas, sem conexão ("vamos ver um varal, mas tem uma bota no chão"). Faltam instigação e fio condutor | **Decisão de Thiago:** análise e proposta primeiro, aprovadas por ele antes de qualquer código. Diagnóstico do Ep01 v3 missão a missão: motivação, causa e consequência, gancho para a próxima e o papel de Lumi, capitão, Amora e filhote. Proposta de fio condutor, com o que muda em falas, ordem, objetos e cenas, o custo de cada mudança e o que precisa de voz nova. Documento em `docs/proposals/g24_roteiro.md` | `adventure` |
 - **Decisão de Thiago:** o que ficar pronto e revisado hoje entra no build de hoje; o resto vai no de amanhã, junto com as vozes.
+
+### G24b, G24c e G24d · cordas, barcos e auditoria dinâmica (`gameplay`, branch `feature/rb-r1-g24-interpenetracao`, 2026-11-27, sem merge)
+- **G24d, auditoria** (`game/tests/motion_audit.gd`, classe `MotionAudit`; teste `test_motion_audit`): presa à partida completa do bot (M0→M8, entrada real, tempo 8x), a cada quadro de física amostra os moventes contra os corpos de sondagem do `PropOverlap` (malha exata do kit, das peças soltas, das peças de missão e do cenário fixo; as sondagens das peças seguem o nó a cada quadro e são refeitas no início de cada missão).
+  - Moventes: cada `CharacterVisual` visível (heróis, seguidores, capitão, filhote; cápsula de 16 cm de raio, de 15 cm acima dos pés até 1 m), objeto na mão, carrinho, bote (casco convexo), casco do barco (caixa `Body/Collision`) e cada corda `Rope*` esticada (segmento sem 15 cm em cada ponta; profundidade = trecho dentro da geometria).
+  - Tolerância por tipo: personagem 5 cm, peça 3 cm, barco 5 cm, corda 2 cm; folhagem (moita, copa) 25 cm.
+  - Exceções (com justificativa no código): bote com o capitão sentado; defensa encostada no barco atracado; peça na mão encostada na mão; emblema girando no ar (é coleta); casco abaixo da linha d'água (y < -0,25) contra o fundo da baía (o bote encalhado do M6 é a história); paredes invisíveis da baía e rampas desligadas não contam.
+  - Relatório: `missão q<quadro> (1º quadro, nº de quadros) movente x outro <profundidade> cm em (x, y, z)`, impresso no log do teste. O teste falha em qualquer corda ou barco atravessando, e em qualquer par fora da lista `KNOWN` (pendências abaixo).
+  - Custo: ~66-70 s por rodada (bot ~370-390 s de jogo); entrou no `WEIGHTS` do `run_tests.gd`. Depuração: `RB_G24_FROM=M6` começa na missão dada, `RB_G24_TRACE=1` imprime a pose do barco nos quadros com batida.
+- **Inventário no código antigo** (`f59938f`, 55 pares): 3 cordas (M5 peixe atravessa o toldo/estruturas, 505 cm de trecho dentro; M6 corda do reboque atravessa a proa do barco, 223 cm; M7 corda do filhote atravessa a torre, 464 cm); 5 barcos no M6 (barco do jogador atravessa `rowboat_b`, `float_buoy#7`, `wv3_festa_boat_1`, boias A e B, ~45 cm; o recuo do reboque ia reto para dentro do `rowboat_b`); filhote dentro da galeria (27 cm) e dentro dos caixotes da praça no M8 (15 cm); e o resto listado abaixo.
+- **G24b, cordas** (`ep01_v3_late.gd`): a corda vira polilinha (`_aim_rope_path`, trechos `Rope`, `Rope_2`...).
+  - Baixar na corda (peixe M5, filhote M7): `drop_spot` escolhe o ponto de descida a prumo com o prumo livre para a peça (centro e 4 bordas), chão a até 1 m da altura pedida, caminho mão→beira livre (`route`, com no máximo uma dobra no alto) e nota que pesa a corda esticada no ar; a peça vai até a beira e desce a prumo; depois a corda fica amarrada no piso sob a mão e cai pela borda. No M7 o filhote desce rente à galeria e corre em arco ao redor da torre até o pé da escada (`_pup_run_to`).
+  - Reboque (M6): a corda sai do cunho para cima, passa ao lado do mastro da luz de proa (12 cm do eixo), dobra no bico e vai à ponta do bote mais perto do barco; no arremesso, sobre o convés, faz uma dobra no alto por cima da cabine.
+  - Sem M3: o M3 não tem corda (só o clipe `pull_rope` nas folhas). A corda do bote amarrado (`RopeDinghyLine`, M7/M8) não acusou nada.
+- **G24c, barcos** (`ep01_v3_late.gd`, `ep01_v3_bot.gd`):
+  - `floaters()`: cápsulas no plano dos barcos parados e boias do kit, das boias do percurso, dos barquinhos da festa e do bote. `boat_gap` mede o retângulo do casco (caixa de colisão) contra elas.
+  - O `BoatActor` passa a usar `boat_clearance_all` (camada 1 como antes + o que boia, empurrão a 0,15 m do casco). `boat_clearance` continua só com a camada 1 (o teste das paredes da baía segue valendo).
+  - Guarda de giro (`_guard_boat_turn`): o giro no lugar varria a proa para dentro das boias; se o giro do quadro fecha a folga abaixo de 12 cm, o rumo e a posição voltam ao quadro anterior.
+  - Atracação: `dock_pose` gira ao redor do bote, na mesma distância do marcador, até achar uma pose com o casco livre e com recuo livre (no marcador a popa encostava no `rowboat_b`). Reboque: `tow_plan` escolhe o recuo mais reto (até ±90°) em que o casco e o bote não tocam nada em nenhum quadro; a popa gira para a água livre.
+  - O emblema da baía saiu de cima do `rowboat_b` (só dava para pegar atravessando o barco) para água livre entre a boia B e o bote.
+  - Bot (ferramenta de teste): rota por grafo de visibilidade ao redor do que boia e da margem, passa de lado pelas boias (dentro do raio do ponto), e se ficar preso encostado gira para o lado que abre folga. O M6 do bot passou de ~23 s para ~45-58 s de jogo.
+- **Resto, corrigido**: filhote e capitão do M8 no lugar livre mais perto (`free_spot`; o filhote estava 15 cm dentro dos caixotes). O filhote dentro da galeria (M7) sumiu com a descida nova.
+- **O que sobrou** (lista `KNOWN` do teste; nada disso é corda ou barco):
+
+| Missão | Par | Profundidade | Causa provável | Dono sugerido |
+|---|---|---|---|---|
+| M1, M6, M7 | heróis x `pot_a#0`, `bucket#0/1` | 12-17 cm | vaso e balde do kit sem colisão na camada 1 (o herói passa por dentro) | `art3d` |
+| M1 | bota do capitão x cais | 14 cm | `pick_up` da bota afunda no cais | `gameplay` |
+| M2 | Pico/Rastro x parede do galpão, roupas, banco, cesto; roupa na mão x banco, barril | 3-20 cm | escalada encosta o corpo na parede; herói passa pela roupa pendurada | `gameplay` |
+| M3 | Pico x bolo de folhas | 15 cm | agarrar as folhas | `gameplay` |
+| M4 | carrinho x barracas e caixotes; heróis x carrinho parado | 5-59 cm | o carrinho não tem colisão própria (segue o herói) | `gameplay` (forma do carrinho no corpo de quem empurra) |
+| M5 | Pico x gaivota; Pico x caixotes/toldo | 15-17 cm | gaivota pousada colada no telhado; escalada | `gameplay` |
+| M6 | Leme x barco | 22-35 cm | pulinho de embarque atravessa a borda | `gameplay` |
+| M7 | lente na mão x torre; Pico x patamares; bússola x moita | 8-26 cm | escalada com a lente; mão rente à moita | `gameplay` |
+
+- **Provas** (rodadas nesta sessão, Linux, Godot 4.7.2):
+  - `bash tools/test.sh motion_audit` no código antigo (`ep01_v3_late.gd` e `ep01_v3_bot.gd` de `f59938f`, auditoria nova): FALHOU, 3 cordas, 5 barcos e 47 pares fora da lista (antes da lista existir). No código novo: OK.
+  - `bash tools/test.sh ep01_v3,prop_overlap,motion_audit`: OK (377 PASS).
+  - `bash tools/test.sh motion_audit,ep01_v3_g19,ep01_v3_late`: OK (165 PASS).
+  - Suíte completa `bash tools/test.sh`: 5262 PASS e 1 falha (filhote x emblema da galeria, 7 cm), em 581 s; a exceção do emblema entrou depois, e só os três filtros acima foram rodados de novo.
+  - Capturas headless (`tests/capture_g24.tscn`, xvfb + vulkan) em `captures/g24/before` e `captures/g24/after`: `m5_fish_10.png` (antes a corda corta o toldo; depois desce a prumo atrás do galpão), `m5_fish_15.png` (depois: corda amarrada no telhado e caindo pela borda), `m6_tow_08.png` (antes o barco recua por cima do `rowboat_b`; depois recua para a água livre). A cena antiga do M6 começa com o barco já encostado no `rowboat_b` (como no `test_ep01_v3_late`); a nova chega por água livre.
+- **Fraco**:
+  - O barco do jogador é medido pela caixa de colisão; o motor de popa e a cabine que passam dela não entram na folga nem na auditoria (uma tentativa com o casco convexo do modelo travou o bot e acusou o cais na atracação).
+  - A guarda de giro faz o barco parar seco encostado (sem animação de batida).
+  - No M5 o trecho da mão até a beira ainda fica esticado no ar uns 2 m enquanto o peixe desce; depois deita no telhado.
+  - A corrida do filhote em volta da torre não foi vista em render; o filhote é medido pela auditoria (sem batida).
+  - O bot no M6 ficou ~2x mais lento; a suíte completa subiu para ~580 s (3 processos).
+  - O teste depende do caminho do bot: pares de raspão podem aparecer ou sumir conforme a rota; a lista `KNOWN` é por missão e prefixo para não ficar frágil, o que também esconde pares novos do mesmo tipo.
