@@ -1008,3 +1008,43 @@ Critérios de aceite:
 - **Testes:**
   - `bash tools/test.sh camera,movement,touch_controls,ep01_v3_late`: `FALHOU (261 PASS, 7 FALHA(S))`, todas em `test_camera_occlusion`. Passam o G3 (p99 41,14 m/s²), o G6 (0 de 2500) e o `test_camera_run`. O `test_movement_f1:312` passou sem o ajuste do WIP.
   - Suíte completa: `FALHOU (5412 PASS, 7 FALHA(S))` em 531 s, com as mesmas 7 falhas.
+
+#### G24a2 v2, rodada 2 (decisões do lead: escopo = peças; estrutura vai para o G24a3)
+- **Critérios do `test_camera_occlusion` separados:**
+  - **Peças (rígido):** vista tapada por peça sem pontilhado = 0 nos dois modos.
+  - **Estrutura (sem regressão):** não pode piorar em relação ao rig da integração `5cef201`, medido com este teste e fixado nele como [normal, reduzido]: salto 3,32/3,73 m, dentro da estrutura 149/146, herói no quadro 8,1%/30,1%, vista tapada pela estrutura 0/1.
+  - No rig da integração o teste falha pelas peças (68/93 passos sem pontilhado).
+- **Mola suave também no movimento reduzido (aplicada):**
+  - salto reduzido: máx 3,32 → **1,47 m**, p99 1,478 → **0,195 m**;
+  - em troca, a vista tapada pela **estrutura** no reduzido vai de 1 para **16 passos** (mureta `Structures/31` no M4 enquanto o braço volta). É a única falha que sobra.
+  - Testei encolher na hora e só voltar suave: caem para 1 passo, mas o salto máximo volta a 3,32 m. Revertido. Fica para o G24a3.
+- **Peças de missão:** o carrinho do M4 (`land.cart`) e o banco do varal do G19 (grupo `g19_bench`) pontilham, e o banco sai do desvio da câmera. A ligação é refeita a cada `land.build`.
+  - O banco usa StandardMaterial3D, e a 4.7 não expõe o código gerado ao GDScript (`material_get_shader`/`get_shader_rid` não existem). A variante dele usa o pontilhado de distância da própria Godot (`DISTANCE_FADE_PIXEL_DITHER`, 0–8 m): sem cone e sem fade de 0,15 s. **PROVISÓRIO**, para o `art3d` revisar.
+- **Números finais (normal / reduzido):**
+
+  | Medida | Normal | Reduzido |
+  |---|---|---|
+  | Vista tapada por peça sem pontilhado | **0** | **0** |
+  | Salto máximo | 0,76 m | 1,47 m |
+  | Dentro da estrutura | 117 | 117 |
+  | Herói no quadro, mínimo | 8,1% | 31% |
+  | CPU média da troca | 63 µs | 63 µs |
+  | CPU p99 | 153 µs | 169 µs |
+  | CPU máxima | 5,4 ms | 4,8 ms |
+
+  No máximo 2 trocas por quadro e 5 peças pontilhadas ao mesmo tempo.
+- **Capturas** (`captures/g24a2v2/`, quadro 39, abertas):
+  - `m4_stall-antes`: a barraca encurta o braço e a câmera fica a 1,89 m, colada na nuca do herói.
+  - `m4_stall-depois`: câmera a 4,54 m atrás da barraca do limão. O toldo listrado e as frutas aparecem pontilhados (padrão de peneira) e o trio aparece inteiro.
+  - `m5_awning-depois`: o herói fica **em cima** do toldo e a câmera acima dele, então o pontilhado não aparece. Essa tomada ainda precisa de enquadramento; a de caixotes do M5 também (a câmera é encurtada pelo galpão).
+- **Aquecimento (m4_stall, xvfb + llvmpipe; contadores `surface` / `specialization` na carga):**
+
+  | Aquecimento | `surface` | `specialization` |
+  |---|---|---|
+  | dentro da vista | 106 | 93 |
+  | fora da vista | 106 | 63 |
+  | sem aquecimento | 60 | 63 |
+
+  Conclusão: a 4.7 **compila o pipeline base fora da vista**; dentro da vista ela compila também as especializações. `draw=0` em todos os casos e nenhuma compilação nova depois do pontilhado. Fica o aquecimento dentro da vista. O impacto no celular (GPU real) segue pendente.
+- **Testes:** `camera,movement,touch_controls,ep01_v3_late`: `FALHOU (269 PASS, 1 FALHA(S))`, e a falha é a vista tapada pela estrutura no reduzido (16 ≤ 1).
+  - Suíte completa: `FALHOU (5420 PASS, 1 FALHA(S))` em 526 s, com a mesma falha. O `motion_audit` não falhou nesta rodada.
