@@ -29,7 +29,9 @@ const REWRITTEN := {
 	"ep01.narrator.bridge.m1_m2": "O capitão foi pelo mar.",
 	"ep01.dock.climber.go_line": "A gente segue o filhote!",
 	"ep01.bank.tracker.next_clue": "O lenço do filhote! Ele foi à praça.",
-	"ep01.market.vendor.mess": "Ai, minhas lanternas da festa!",
+	"ep01.market.vendor.mess": "Ai, minhas frutas da festa!",  # rodada 2: os caixotes do M4 tem frutas
+	"ep01.bank.tracker.wet_paw": "Pegadinha molhada! O lenço está nos juncos.",
+	"ep01.radio.v3_m2.find_third_2": "Rastro, o lenço vermelho está no capim.",
 	"ep01.market.vendor.gull_hint": "Obrigada! Tome uma lanterna!",
 	"ep01.street.climber.fish_got": "Peguei! O peixe volta para a Dona Amora.",
 }

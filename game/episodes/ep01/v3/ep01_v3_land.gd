@@ -65,6 +65,10 @@ const BASKET_FLOOR := 0.197
 const BASKET_SPOTS: Array[Vector3] = [Vector3(0.0, 0.0, 0.0), Vector3(-0.10, 0.0, 0.0), Vector3(0.15, 0.0, 0.0)]
 const BASKET_TURN: Array[float] = [0.0, 90.0, -80.0]
 ## G19: o lenco deita um pouco mais dobrado (0,74): vindo da mao (pose parada) a 0,8 ele encostava 2,5 cm na borda do cesto.
+## G25: lenco do filhote nos juncos (rumo, inclinacao em graus a partir de deitado) e raio sem capim em volta dele.
+const REEDS_YAW := 35.0
+const REEDS_TILT := 78.0
+const REEDS_GRASS_R := 0.35
 ## Raio (m) em volta do cesto sem capim do kit (o cesto oval tem ~0,34 m de meia-largura).
 const BASKET_GRASS_R := 0.55
 const BASKET_FOLD: Array[float] = [0.7, 0.74, 0.95]
@@ -627,8 +631,10 @@ func _build_m2() -> void:
 	tree.global_transform = branch_xf()
 	var reeds := _cloth(_mk(&"M2_ReedsPiece"), Color("f2c81d"), "ClothReeds")
 	still(reeds)
-	# meia caida de pe entre os juncos, inclinada (deitada ela some no capim alto)
-	reeds.global_transform = lay_flat_xf(reeds, _floor_at(_mk(&"M2_ReedsPiece") + Vector3(-0.1, 0, 0.15)), 35.0, 1.0, 62.0)
+	# G25: lenco do filhote caido de pe entre os juncos, quase em pe e com o capim aberto em volta (deitado ou baixo ele
+	# some no capim alto; a meia era mais alta)
+	reeds.global_transform = lay_flat_xf(reeds, _floor_at(_mk(&"M2_ReedsPiece") + Vector3(-0.1, 0, 0.15)), REEDS_YAW, 1.0, REEDS_TILT)
+	_clear_grass(reeds.global_position, REEDS_GRASS_R)
 	_basket = Ep01V3Pieces.final(_root, "basket", "Basket")
 	if _basket != null:
 		_basket.global_position = _floor_at(points[&"Basket"])

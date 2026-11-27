@@ -261,7 +261,6 @@ Gemini API (TTS, vozes pre-prontas) com o elenco aprovado por Thiago (`tools/voi
 | `res://audio/voice/v3/ep01_bank_tracker_call_climber.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Leda, 2026-11-27T08:26:27+00:00 | `tools/voice/gen_v3.py` | `a0a8f115822b54cb…` |
 | `res://audio/voice/v3/ep01_bank_climber_sock_high.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Fenrir, 2026-11-26T13:33:01+00:00 | `tools/voice/gen_v3.py` | `46eafc948541a29d…` |
 | `res://audio/voice/v3/ep01_bank_climber_call_tracker.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Fenrir, 2026-11-26T13:33:01+00:00 | `tools/voice/gen_v3.py` | `878786740b553213…` |
-| `res://audio/voice/v3/ep01_bank_tracker_wet_paw.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Leda, 2026-11-26T13:33:02+00:00 | `tools/voice/gen_v3.py` | `377d7433cf6c1c8f…` |
 | `res://audio/voice/v3/ep01_bank_pilot_m2_done.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Erinome, 2026-11-26T13:33:02+00:00 | `tools/voice/gen_v3.py` | `23e35f49f6fff99d…` |
 | `res://audio/voice/v3/ep01_radio_v3_m2_free_pieces.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Schedar, 2026-11-26T13:33:02+00:00 | `tools/voice/gen_v3.py` | `b91a1a0f7ea5ea03…` |
 | `res://audio/voice/v3/ep01_radio_v3_m2_find_third.ogg` | gerado (Gemini TTS) | gemini-3.8-flash-tts, voz Schedar, 2026-11-26T13:33:02+00:00 | `tools/voice/gen_v3.py` | `4306535ba41837d7…` |
