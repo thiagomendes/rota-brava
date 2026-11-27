@@ -2672,5 +2672,9 @@
  },
  "_note_f2": "RB-R1 F2/D19c: step_start ('Mx.passo'), travel ('Ma>Mb') e step_done = falas que apontam; gesture.anim = clipe do heroi (Pico nao tem 'point': usa look_up/wave), fallback se faltar, target = marcador de village_world. groups = variantes sorteadas sem repetir a ultima (hint.radio.<passo>: a 1a e a dica atual). take null = sem audio ainda (vozes D19 depois).",
  "_note_switch": "F2/A1: switch.to_* so tem chamados genericos (sem lugar); a fala da missao (switch) sempre vence.",
- "_note_g9": "RB-R1 G9: pontes entre missoes (docs/proposals/ep01_v3_pontes.md). mission_done = conversa da equipe com controle (a cena seguinte espera a fala acabar, ate 12 s); mission_start = conversa andando; moment 'bridge'. 'vary' = a fala vira uma variante sorteada do grupo."
+ "_note_g9": "RB-R1 G9: pontes entre missoes (docs/proposals/ep01_v3_pontes.md). mission_done = conversa da equipe com controle (a cena seguinte espera a fala acabar, ate 12 s); mission_start = conversa andando; moment 'bridge'. 'vary' = a fala vira uma variante sorteada do grupo.",
+ "_note_g21i": "G21i: 'spoken' = texto que a voz diz quando a legenda tem marcador de glifo ({help}); tools/voice/gen_v3.py manda este texto a API e guarda spoken_at_generation no catalogo.",
+ "spoken": {
+  "ep01.radio.intro.help": "Precisou? Aperte o botão de ajuda que eu ajudo!"
+ }
 }

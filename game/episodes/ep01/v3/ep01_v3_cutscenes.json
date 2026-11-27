@@ -470,27 +470,163 @@
      }
     },
     {
-     "duration": 4.0,
-     "move": "orbit",
+     "id": "9_out",
+     "stage": "farol7_base",
+     "duration": 2.0,
+     "move": "dolly",
      "from": {
-      "marker": "M7_LanternPivot",
+      "marker": "Base_CamExterior",
       "offset": [
-       -10,
-       -10,
-       10
+       0.8,
+       0.3,
+       -1.0
       ]
      },
-     "look": {
-      "marker": "M7_LanternPivot",
+     "to": {
+      "marker": "Base_CamExterior",
       "offset": [
        0,
        0,
        0
       ]
      },
-     "actors": [],
+     "look": {
+      "marker": "Base_Exterior",
+      "offset": [
+       0,
+       5,
+       0
+      ]
+     },
+     "actors": []
+    },
+    {
+     "id": "9a",
+     "stage": "farol7_base",
+     "duration": 3.0,
+     "move": "dolly",
+     "stage_event": "chair_turn",
+     "from": {
+      "marker": "Base_CamWide",
+      "offset": [
+       0,
+       0.1,
+       0.4
+      ]
+     },
+     "to": {
+      "marker": "Base_CamWide",
+      "offset": [
+       0,
+       -0.1,
+       -0.6
+      ]
+     },
+     "look": {
+      "marker": "Base_Chair",
+      "offset": [
+       0,
+       0.95,
+       0
+      ]
+     },
+     "actors": [
+      {
+       "who": "radio",
+       "seat": "Chair/Seat",
+       "anim": "turn_chair",
+       "then": "idle_seated"
+      }
+     ],
+     "focus": "radio",
+     "line": {
+      "key": "ep01.narrator.intro.base",
+      "speaker": "narrator"
+     }
+    },
+    {
+     "id": "9b",
+     "stage": "farol7_base",
+     "duration": 3.5,
+     "move": "dolly",
+     "from": {
+      "marker": "Base_CamFront",
+      "offset": [
+       0,
+       0,
+       0
+      ]
+     },
+     "to": {
+      "marker": "Base_CamFront",
+      "offset": [
+       -0.1,
+       -0.05,
+       -0.3
+      ]
+     },
+     "look": {
+      "marker": "Base_LumiStand",
+      "offset": [
+       0,
+       1.3,
+       0
+      ]
+     },
+     "actors": [
+      {
+       "who": "radio",
+       "marker": "Base_LumiStand",
+       "anim": "wave",
+       "then": "talk"
+      }
+     ],
      "line": {
       "key": "ep01.radio.intro.hello",
+      "speaker": "radio"
+     }
+    },
+    {
+     "id": "9c",
+     "stage": "farol7_base",
+     "duration": 3.5,
+     "move": "dolly",
+     "hud": "help_pulse",
+     "from": {
+      "marker": "Base_CamFront",
+      "offset": [
+       -0.3,
+       0,
+       -0.6
+      ]
+     },
+     "to": {
+      "marker": "Base_CamFront",
+      "offset": [
+       -0.45,
+       -0.05,
+       -1.05
+      ]
+     },
+     "look": {
+      "marker": "Base_LumiStand",
+      "offset": [
+       0,
+       1.35,
+       0
+      ]
+     },
+     "actors": [
+      {
+       "who": "radio",
+       "marker": "Base_LumiStand",
+       "anim": "point",
+       "then": "talk",
+       "_note": "thumbs_up nao existe no lumi_v2: talk no lugar (G21i)"
+      }
+     ],
+     "line": {
+      "key": "ep01.radio.intro.help",
       "speaker": "radio"
      }
     },
@@ -567,7 +703,7 @@
      0
     ]
    },
-   "duration": 34.5,
+   "duration": 42.5,
    "skippable_after_first": true,
    "replay_from_menu": true
   },
@@ -1748,5 +1884,5 @@
    "skippable_after_first": true
   }
  ],
- "total_duration": 123.0
+ "total_duration": 131.0
 }
