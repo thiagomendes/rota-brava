@@ -34,8 +34,8 @@
     "ep01.radio.v3_m2.find_third_2",
     "ep01.bank.tracker.wet_paw",
     "ep01.bank.tracker.next_clue",
-    "ep01.lumi.lantern_1",
-    "ep01.lumi.lantern_2",
+    "ep01.lumi.cheer_1",
+    "ep01.lumi.cheer_2",
     "ep01.market.vendor.mess",
     "ep01.market.vendor.gull_hint",
     "ep01.market.vendor.gull_hint_b",
@@ -45,8 +45,8 @@
     "ep01.call.c3.lumi_alert",
     "ep01.call.c3.lumi_stakes",
     "ep01.call.c3.lumi_go",
-    "ep01.lumi.lanterns_lit",
-    "ep01.festival.captain.first_lantern"
+    "ep01.lumi.beacon_lit",
+    "ep01.festival.captain.thanks_m8"
    ]
   }
  ]

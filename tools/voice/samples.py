@@ -27,8 +27,8 @@ LINES = {
     "rastro": ["ep01.dock.tracker.two_trails", "ep01.dock.tracker.small_print"],
     "pico": ["ep01.street.climber.gull_fish", "ep01.plaza.climber.m3_done"],
     "leme": ["ep01.arrival.pilot.no_captain", "ep01.market.pilot.cart_go"],
-    "capitao": ["ep01.bay.captain.thanks_tow", "ep01.festival.captain.first_lantern"],
-    "farol7": ["ep01.call.c1.lumi_alert", "ep01.lumi.lantern_2"],
+    "capitao": ["ep01.bay.captain.thanks_tow", "ep01.festival.captain.thanks_m8"],
+    "farol7": ["ep01.call.c1.lumi_alert", "ep01.lumi.cheer_2"],
     "dona_amora": ["ep01.market.vendor.mess", "ep01.market.vendor.gull_hint"],
 }
 ORDINAL = ["voz um", "voz dois", "voz tres", "voz quatro"]

@@ -65,7 +65,7 @@
  "mission_done": {
   "M2": [
    "ep01.bank.pilot.m2_done",
-   "ep01.lumi.lantern_1",
+   "ep01.lumi.cheer_1",
    "ep01.team.tracker.follow_1"
   ],
   "M3": [
@@ -74,7 +74,7 @@
    "ep01.plaza.vendor.help_call"
   ],
   "M7": [
-   "ep01.lumi.lanterns_lit",
+   "ep01.lumi.beacon_lit",
    "ep01.lighthouse.climber.pup_hug",
    "ep01.lighthouse.pilot.to_party"
   ],
@@ -143,7 +143,7 @@
   "ep01.plaza.tracker.ball_stuck",
   "ep01.plaza.tracker.call_climber",
   "ep01.plaza.climber.top_basin",
-  "ep01.lumi.lantern_2",
+  "ep01.lumi.cheer_2",
   "ep01.plaza.climber.m3_done",
   "ep01.market.vendor.mess",
   "ep01.market.vendor.pup_crates",
@@ -174,9 +174,9 @@
   "ep01.lighthouse.climber.call_pilot",
   "ep01.lighthouse.pilot.aim",
   "ep01.lighthouse.pup.horn",
-  "ep01.lumi.lanterns_lit",
+  "ep01.lumi.beacon_lit",
   "ep01.festival.radio.night",
-  "ep01.festival.captain.first_lantern",
+  "ep01.festival.captain.thanks_m8",
   "ep01.festival.tracker.cheer"
  ],
  "lines": {
@@ -2393,7 +2393,7 @@
    "when": "done",
    "moment": "bridge"
   },
-  "ep01.lumi.lantern_1": {
+  "ep01.lumi.cheer_1": {
    "speaker": "radio",
    "emotes": [
     "star",
@@ -2404,7 +2404,7 @@
    "when": "done",
    "moment": "bridge"
   },
-  "ep01.lumi.lantern_2": {
+  "ep01.lumi.cheer_2": {
    "speaker": "radio",
    "emotes": [
     "wave",
@@ -2479,7 +2479,7 @@
    "when": "done",
    "moment": "bridge"
   },
-  "ep01.lumi.lanterns_lit": {
+  "ep01.lumi.beacon_lit": {
    "speaker": "radio",
    "emotes": [
     "boat",
@@ -2489,7 +2489,7 @@
    "mission": "M7",
    "when": "done"
   },
-  "ep01.festival.captain.first_lantern": {
+  "ep01.festival.captain.thanks_m8": {
    "speaker": "captain",
    "emotes": [
     "heart",

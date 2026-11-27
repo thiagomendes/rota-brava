@@ -1218,7 +1218,7 @@ func _act_pull_leaves(a: MemberActor) -> void:
 		return
 	main.say("ep01.plaza.climber.top_basin")
 	main.notify_mission(&"leaves_pulled")
-	main.say("ep01.lumi.lantern_2")
+	main.say("ep01.lumi.cheer_2")
 	_roll_ball()
 	if not await _climb_chain(a, [_mk(&"M3_FountainStep_2"), _mk(&"M3_FountainStep_1"), points[&"FountainBase"]], s):
 		_act_end(a, s)

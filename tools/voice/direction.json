@@ -810,17 +810,17 @@
    "pace": "normal",
    "note": "segunda metade da regra: o filhote foi pela vila"
   },
-  "ep01.lumi.lantern_1": {
+  "ep01.lumi.cheer_1": {
    "emotion": "alegria",
    "energy": 3,
    "pace": "normal",
-   "note": "comemora a primeira lanterna da festa"
+   "note": "comemora a pista do lenço"
   },
-  "ep01.lumi.lantern_2": {
+  "ep01.lumi.cheer_2": {
    "emotion": "alegria",
    "energy": 3,
    "pace": "normal",
-   "note": "comemora a segunda lanterna"
+   "note": "comemora a água de volta e a equipe"
   },
   "ep01.market.vendor.gull_hint_b": {
    "emotion": "dica",
@@ -858,17 +858,17 @@
    "pace": "normal",
    "note": "chama o Pico pelo nome"
   },
-  "ep01.lumi.lanterns_lit": {
+  "ep01.lumi.beacon_lit": {
    "emotion": "alegria",
    "energy": 3,
    "pace": "normal",
-   "note": "festa: todas as lanternas acesas"
+   "note": "o farol acendeu: alívio e festa"
   },
-  "ep01.festival.captain.first_lantern": {
+  "ep01.festival.captain.thanks_m8": {
    "emotion": "alegria",
    "energy": 2,
    "pace": "normal",
-   "note": "agradece e acende a primeira lanterna"
+   "note": "agradece a equipe na festa, caloroso"
   }
  },
  "demo": {

@@ -105,7 +105,7 @@ func _lines() -> void:
 	await _open(&"M8")
 	await _wait(1.0)
 	_yaw_to(main.controlled_node.global_position, main.land.captain.global_position)
-	await _say("ep01.festival.captain.first_lantern")
+	await _say("ep01.festival.captain.thanks_m8")
 	await _shot("legenda_capitao_m8")
 
 

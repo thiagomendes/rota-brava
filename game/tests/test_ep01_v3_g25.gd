@@ -13,16 +13,16 @@ const NEW := {
 	"ep01.call.c1.lumi_go": "Rastro, ache as pistas no cais!",
 	"ep01.call.team_go": "Rota Brava, partiu!",
 	"ep01.narrator.bridge.m1_m2b": "E o filhote, pela vila!",
-	"ep01.lumi.lantern_1": "Varal salvo! Mais uma lanterna para a festa!",
-	"ep01.lumi.lantern_2": "Água de volta! Mais uma lanterna!",
+	"ep01.lumi.cheer_1": "Boa! Uma pista do filhote!",
+	"ep01.lumi.cheer_2": "Água de volta! Muito bem, equipe!",
 	"ep01.market.vendor.gull_hint_b": "O filhote foi atrás da gaivota.",
 	"ep01.call.c2.lumi_alert": "Na escuta! O bote do capitão encalhou!",
 	"ep01.call.c2.lumi_go": "Leme, o barco é com você!",
 	"ep01.call.c3.lumi_alert": "O farol apagou!",
 	"ep01.call.c3.lumi_stakes": "Os barcos não acham a festa!",
 	"ep01.call.c3.lumi_go": "Pico, suba e salve o filhote!",
-	"ep01.lumi.lanterns_lit": "Todas as lanternas acesas! Que equipe!",
-	"ep01.festival.captain.first_lantern": "Obrigado! Agora eu acendo a primeira!",
+	"ep01.lumi.beacon_lit": "O farol acendeu! Os barcos acham a festa!",
+	"ep01.festival.captain.thanks_m8": "Obrigado! Meu filhote está em casa!",
 }
 const REWRITTEN := {
 	"ep01.dock.tracker.boot_captain": "A bota do capitão vai até o bote!",
@@ -32,7 +32,7 @@ const REWRITTEN := {
 	"ep01.market.vendor.mess": "Ai, minhas frutas da festa!",  # rodada 2: os caixotes do M4 tem frutas
 	"ep01.bank.tracker.wet_paw": "Pegadinha molhada! O lenço está nos juncos.",
 	"ep01.radio.v3_m2.find_third_2": "Rastro, o lenço vermelho está no capim.",
-	"ep01.market.vendor.gull_hint": "Obrigada! Tome uma lanterna!",
+	"ep01.market.vendor.gull_hint": "Obrigada! Vocês ajudaram muito!",
 	"ep01.street.climber.fish_got": "Peguei! O peixe volta para a Dona Amora.",
 }
 const GONE: Array[String] = ["ep01.bank.tracker.sock_fur", "ep01.arrival.climber.horn_alone", "ep01.arrival.pilot.boat_empty",
@@ -41,7 +41,7 @@ const GONE: Array[String] = ["ep01.bank.tracker.sock_fur", "ep01.arrival.climber
 	"ep01.lighthouse.radio.lights_on", "ep01.festival.captain.thanks"]
 const SPEAKERS := {"ep01.call.c1.captain_radio": &"captain", "ep01.call.team_go": &"tracker",
 	"ep01.narrator.bridge.m1_m2b": &"narrator", "ep01.market.vendor.gull_hint_b": &"vendor",
-	"ep01.festival.captain.first_lantern": &"captain"}
+	"ep01.festival.captain.thanks_m8": &"captain"}
 ## Excecoes LONG_OK do test_ep01_v3_f2_text: texto fixado aqui e teto proprio (revisao do G21i).
 const LONG_FIXED := {"ep01.narrator.intro.base": "E aqui é o Farol 7, a base da equipe!",
 	"ep01.radio.intro.help": "Precisou? Aperte o botão de ajuda que eu ajudo!"}
@@ -99,8 +99,8 @@ func _text() -> void:
 	var d5 := Ep01V3Dialogue.done_lines(&"M5")
 	var d6 := Ep01V3Dialogue.done_lines(&"M6")
 	r.check(d5.has("ep01.call.c2.lumi_alert") and d5.has("ep01.call.c2.lumi_go") and d6.has("ep01.call.c3.lumi_alert")
-		and d6.has("ep01.call.c3.lumi_go") and Ep01V3Dialogue.done_lines(&"M2").has("ep01.lumi.lantern_1")
-		and Ep01V3Dialogue.done_lines(&"M7").has("ep01.lumi.lanterns_lit"), "G25: C2 no fim do M5, C3 no fim do M6, lanternas no M2 e M7")
+		and d6.has("ep01.call.c3.lumi_go") and Ep01V3Dialogue.done_lines(&"M2").has("ep01.lumi.cheer_1")
+		and Ep01V3Dialogue.done_lines(&"M7").has("ep01.lumi.beacon_lit"), "G25: C2 no fim do M5, C3 no fim do M6, comemoracoes do Lumi no M2 e no farol no M7")
 	# excecoes longas: texto fixado e teto
 	var f2 := load("res://tests/test_ep01_v3_f2_text.gd") as GDScript
 	var long_ok: Dictionary = f2.get_script_constant_map().get("LONG_OK", {})
@@ -119,9 +119,9 @@ func _text() -> void:
 			sp_bad.append("%s %s" % [k, hud.speaker_for(k)])
 	hud.free()
 	r.check(sp_bad.is_empty(), "G25: falante da legenda pela chave nova (Lumi = radio) %s" % str(sp_bad))
-	r.check(AudioDirector.is_radio_line("ep01.call.c1.lumi_alert") and AudioDirector.is_radio_line("ep01.lumi.lantern_1")
+	r.check(AudioDirector.is_radio_line("ep01.call.c1.lumi_alert") and AudioDirector.is_radio_line("ep01.lumi.cheer_1")
 		and AudioDirector.is_radio_line("ep01.call.c1.captain_radio") and not AudioDirector.is_radio_line("ep01.call.team_go"),
-		"G25: chamados e lanternas tocam como radio; o bordao da equipe nao")
+		"G25: chamados e comemoracoes do Lumi tocam como radio; o bordao da equipe nao")
 
 
 func _voice() -> void:

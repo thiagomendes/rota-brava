@@ -467,7 +467,7 @@ func _on_spot(id: StringName, actor: Node3D) -> void:
 			var cv := StoryFigure.visual(captain)
 			if cv != null and cv.has_animation(&"thanks"):
 				cv.play(&"thanks")
-			main.say("ep01.festival.captain.first_lantern")
+			main.say("ep01.festival.captain.thanks_m8")
 			main.notify_mission(&"captain_thanked")
 	refresh()
 

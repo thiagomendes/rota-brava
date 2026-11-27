@@ -5,14 +5,14 @@
   "ep01.call.c1.lumi_go": "Rastro, ache as pistas no cais!",
   "ep01.call.team_go": "Rota Brava, partiu!",
   "ep01.narrator.bridge.m1_m2b": "E o filhote, pela vila!",
-  "ep01.lumi.lantern_1": "Varal salvo! Mais uma lanterna para a festa!",
-  "ep01.lumi.lantern_2": "Água de volta! Mais uma lanterna!",
+  "ep01.lumi.cheer_1": "Boa! Uma pista do filhote!",
+  "ep01.lumi.cheer_2": "Água de volta! Muito bem, equipe!",
   "ep01.market.vendor.gull_hint_b": "O filhote foi atrás da gaivota.",
   "ep01.call.c2.lumi_alert": "Na escuta! O bote do capitão encalhou!",
   "ep01.call.c2.lumi_go": "Leme, o barco é com você!",
   "ep01.call.c3.lumi_alert": "O farol apagou!",
   "ep01.call.c3.lumi_stakes": "Os barcos não acham a festa!",
   "ep01.call.c3.lumi_go": "Pico, suba e salve o filhote!",
-  "ep01.lumi.lanterns_lit": "Todas as lanternas acesas! Que equipe!",
-  "ep01.festival.captain.first_lantern": "Obrigado! Agora eu acendo a primeira!"
+  "ep01.lumi.beacon_lit": "O farol acendeu! Os barcos acham a festa!",
+  "ep01.festival.captain.thanks_m8": "Obrigado! Meu filhote está em casa!"
 }
