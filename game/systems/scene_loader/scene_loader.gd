@@ -402,6 +402,10 @@ func _fail(reason: String) -> void:
 	drop.append_array(_pending)
 	adopt_requests(drop)  # G16: o que ficou na fila sai; o que esta em andamento e recolhido quando terminar
 	_pending.clear()
+	# G16b: sem isto o orfao da cena que falhou ficava protegido (`p == target_path`) e a fila nunca esvaziava
+	target_path = ""
+	_loaded_ms = 0
+	_collect_orphans()
 	if _old_scene != null and is_instance_valid(_old_scene):
 		_old_scene.process_mode = _old_mode
 	_old_scene = null
