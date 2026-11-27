@@ -41,11 +41,19 @@ func _only_filter() -> String:
 	return ""
 
 
+## Filtro com varios trechos separados por virgula (ex.: --only=keyart,scene_loader), na ordem normal da suite.
+func _matches(only: String, f: String) -> bool:
+	for part in only.split(",", false):
+		if part in f:
+			return true
+	return false
+
+
 func _run() -> void:
 	var only := _only_filter()
 	var files: Array[String] = []
 	for f in DirAccess.get_files_at("res://tests"):
-		if f.begins_with("test_") and f.ends_with(".gd") and (only.is_empty() or only in f):
+		if f.begins_with("test_") and f.ends_with(".gd") and (only.is_empty() or _matches(only, f)):
 			files.append(f)
 	files.sort()
 	if files.is_empty():

@@ -20,7 +20,7 @@ const FADE_OUT := 0.3
 const SETTLE_FRAMES := 3
 ## Teto (ms, relogio real) que uma cena pode segurar a tela por `loading_hold()`; estourou, chama `loading_timeout()`
 ## e a tela sai (crianca nunca fica presa no carregamento).
-const HOLD_MAX_MS := 60000
+const HOLD_MAX_MS := 20000
 
 var hold_max_ms: int = HOLD_MAX_MS  # testes encurtam
 ## Recursos pesados que as cenas carregam no proprio `_ready` com `load()` (a .tscn em si e minuscula): vao junto em
@@ -171,16 +171,43 @@ func change_scene(path: String) -> bool:
 	_pending.clear()
 	_begin_block()
 	for dep: String in WARM.get(path, []):
-		if ResourceLoader.exists(dep) and ResourceLoader.load_threaded_request(dep, "", true) == OK:
+		if ResourceLoader.exists(dep) and ResourceLoader.load_threaded_request(dep, "", false) == OK:
 			_pending.append(dep)
 	print("[RB] loader request %s" % path)
-	var err := ResourceLoader.load_threaded_request(path, "PackedScene", true)
+	# G14: sem sub-threads (use_sub_threads=true faz a Godot 4.7.2 abortar ao fechar, codigo 134)
+	var err := ResourceLoader.load_threaded_request(path, "PackedScene", false)
 	if err != OK:
 		_fail("pedido recusado (%d)" % err)
 	return true
 
 
+## G14: pedidos em segundo plano de quem saiu da arvore antes de recolher (ex.: menu fechado com a arte-chave ainda
+## carregando). Sem `load_threaded_get`, o ResourceLoader guarda o recurso pronto para sempre (vila e trio ficavam no
+## cache e o menu seguinte abria ja com o palco). O carregador, que nunca sai, recolhe e solta quando ficam prontos.
+var _orphans: Array[String] = []
+
+
+func adopt_requests(paths: Array[String]) -> void:
+	for p: String in paths:
+		if not _orphans.has(p):
+			_orphans.append(p)
+
+
+func _collect_orphans() -> void:
+	for p: String in _orphans.duplicate():
+		if p == target_path or _pending.has(p):
+			continue  # o carregador mesmo esta usando este pedido
+		var st := ResourceLoader.load_threaded_get_status(p)
+		if st == ResourceLoader.THREAD_LOAD_LOADED:
+			ResourceLoader.load_threaded_get(p)  # recolhe e descarta a referencia
+			_orphans.erase(p)
+		elif st != ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			_orphans.erase(p)
+
+
 func _process(delta: float) -> void:
+	if not _orphans.is_empty():
+		_collect_orphans()
 	if phase == Phase.IDLE:
 		return
 	var real := delta / maxf(Engine.time_scale, 0.0001)
