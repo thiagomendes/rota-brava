@@ -26,7 +26,24 @@
 - **Terceiro retorno de Thiago (2026-11-26) integrado:** câmera sem tremor na corrida (segue no passo de física, braço com mola + zona macia de 0,9 m, encosta na hora na parede; `test_camera_tremor` e `test_camera_wall` falham no código antigo) e a mesma fala não entra duas vezes na fila em 5 s; suíte `OK (3917 PASS)` em 896 s, a 4 s do limite de 900 s, acelerar é prioridade da E7 (causa da fala dupla: `success.climber` contém `sock_high`, que o M2 também diz). Pendente de Thiago: ver o tremor na tela real, giro do mouse em monitor > 60 Hz, câmera mais perto em lugares apertados.
 - **G6 (art3d, branch `feature/rb-r1-g-interpenetracao`, sem merge):** `bash tools/prop-overlap.sh` audita a vila com as peças de M1–M8; antes 44 pares se atravessando, 14 flutuando, 10 modelos com partes soltas; depois 0/0/0 (carrinho do M4 com caixotes em fila no fundo, kit e disposição corrigidos). Guarda: `test_prop_overlap` (~40 s a mais na suíte, que já estava a 4 s do limite de 900 s). Detalhes e limites no ticket.
 - **Pacote G integrado (2026-11-26, quarto retorno de Thiago):** G1 olhos abertos; G3 sombra sem xadrez; G2 artigo "a Leme"; G9 pontes entre missões; G5 `MouseLock`; G7 primeiro E age; trava do M2 corrigida; G6 auditoria `prop_overlap` (0 sobreposições); G4 capitão, filhote e Amora no padrão do trio; G8 tela inicial (cena B + logo C noite); G10 `SceneLoader` com estrela e menu liberado só depois do palco 3D (teto 60 s); G11 abertura → menu. Suíte: 4150 PASS em 986 s (passa do limite de 900 s) depois da correção do manifesto.
-- **Próximo:** Thiago jogar `2307ffc`; G12 (menu Jogar/Opções/Sair) e G13 (3 espaços de jogo) em andamento; vozes (201 pendentes, ~95/dia, lote agendado para 2026-11-27 08:20 UTC); E7 começando por acelerar a suíte, depois bot humano ≥ 8 min, capturas, vídeo, build Windows, Portão 2, e PARAR.
+- **Depois do pacote G (2026-11-27):**
+  - Menu com Jogar/Opções/Sair e 3 espaços de jogo (G12/G13).
+  - Trio duplicado corrigido.
+  - Controle por A/B nos menus e pulo suprimido com painel aberto (G14).
+  - Tela de carregamento com teto de 20 s.
+  - Fila única de carregamento, e no celular o menu é a imagem parada (G16).
+  - G15 (dicas pelo aparelho em uso) foi decidido e não começou.
+- **Mobile (RB-M1):**
+  - Workflows Android/iOS sob demanda, na `main` só os dois arquivos.
+  - O APK foi instalado no Galaxy Tab FE.
+  - O build iOS 1 travou na estrela (impasse); o G16 é a correção.
+  - O build 2, com toque básico, está esperando Thiago disparar.
+- **Vozes:** 101 de 251 com voz. Lote diário agendado.
+- **Próximo:**
+  - Thiago dispara iOS/Android build 2 e confirma o iPhone.
+  - G15.
+  - Lote de vozes de 2026-11-28.
+  - E7: acelerar a suíte (cerca de 17 min, roda com `RB_TEST_TIMEOUT=2400`), bot humano, capturas, vídeo, build Windows, Portão 2. Depois, PARAR.
 - **Páginas para Thiago:** trio 3D https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (Leme antiga), mundo v2 https://claude.ai/artifact/6WpRQzYXY2hW74LxMiPVww, novidades https://claude.ai/artifact/2WyeZqg8DNSLWegCPcCXAt.
 - **Dívidas:** `wv2_static.glb` ainda 10,6 MB e `world_v2.blend` 5,2 MB; materiais do mundo em `game/lookdev/world_v2/`; tris dos heróis no teto; cabelos de trás facetados; luz de parede estoura à noite; GPU real não medida; retratos do HUD antigos; branches `wip/*` a apagar pelo GitHub.
 

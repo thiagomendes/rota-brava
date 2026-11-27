@@ -571,3 +571,16 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 - `gen_v3.py`: reaproveita o take quando `text_at_generation` == i18n e o OGG existe (o cache `.cache/` não existia na sessão: sem isso as 50 falas prontas seriam pedidas de novo). Novo `--force` e `--max-calls`. Take reprovado pelo detector não sobrescreve mais o OGG antigo.
 - Lote: ~81 pedidos (80 contados + o recusado por cota) até o 429 de cota diária; 54 takes entraram (3 do narrador G2 refeitos com o texto novo + 51 novos), 26 tentativas reprovadas pelo detector, 4 falas reprovadas 3 vezes (`narrator.bridge.m2_m3`, `radio.v3_m4.deliver`, `street.pilot.to_boat`, `bay.pilot.see_boat`). Catálogo 101 takes, 150 pendentes. `detect_double --catalog`: 101 ok, 0 reprovados.
 - Testes: `voice_v3` 8 PASS, `ep01_v3_dialogue` 19, `cutscene` 152, `test_assets` 282. Amostra de escuta em `captures/vozes3/` (13 OGG + `lista.txt`). Ninguém ouviu: aceite perceptual pendente.
+- **Vozes 3 integradas** (`feature/rb-r1-vozes-3`, autor `audio`, 2026-11-27).
+  - 54 takes: os 3 do narrador do G2 foram refeitos e 51 são novos. O catálogo agora tem 101 takes e 150 pendentes.
+  - A cota diária acabou depois de cerca de 81 pedidos.
+  - `gen_v3.py` reaproveita o take quando o texto não mudou, aceita `--force` e `--max-calls`, e um take reprovado não sobrescreve o arquivo existente.
+  - Revisão (`reviewer`): APROVADO.
+    - Nenhum take tem texto diferente do i18n.
+    - O sha256 confere nos 101 takes.
+    - O detector deu 0 reprovados.
+    - Os 4 pendentes reprovaram nas 3 tentativas.
+    - Nenhum segredo nos arquivos.
+    - O lote soma 145 s de áudio, cerca de 1,7 MB.
+  - Pendente de Thiago: ouvir a amostra em `captures/vozes3/`.
+  - Próximo lote agendado para 2026-11-28 08:20 UTC.
