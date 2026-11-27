@@ -258,17 +258,24 @@ func orbit_step(delta: float) -> void:
 	pitch = clampf(pitch - v * PITCH_SPEED * delta, PITCH_MIN, PITCH_MAX)
 
 
+## Giro por arrasto (mouse preso ou dedo, RB-M1): `rel` em px; x gira em volta do heroi, y inclina (limitado).
+func orbit_by(rel: Vector2, yaw_sens: float = MOUSE_SENS, pitch_sens: float = MOUSE_SENS) -> void:
+	yaw = wrapf(yaw - rel.x * yaw_sens, -PI, PI)
+	pitch = clampf(pitch + rel.y * pitch_sens, PITCH_MIN, PITCH_MAX)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not orbit_enabled:
+		return
+	# RB-M1: o mouse que a Godot emula do toque nao prende nem gira (o toque gira pela camada TouchControls).
+	if event is InputEventMouse and event.device == InputEvent.DEVICE_ID_EMULATION:
 		return
 	# G5: o modo do mouse e do MouseLock; com painel clicavel aberto o pedido de prender fica guardado.
 	if event is InputEventMouseButton and (event as InputEventMouseButton).pressed \
 			and not MouseLock.captured() and not MouseLock.blocked() and not get_tree().paused:
 		MouseLock.capture()
 	elif event is InputEventMouseMotion and MouseLock.captured():
-		var rel := (event as InputEventMouseMotion).relative
-		yaw = wrapf(yaw - rel.x * MOUSE_SENS, -PI, PI)
-		pitch = clampf(pitch + rel.y * MOUSE_SENS, PITCH_MIN, PITCH_MAX)
+		orbit_by((event as InputEventMouseMotion).relative)
 	elif event.is_action_pressed(&"ui_cancel") and not event.is_action_pressed(&"pause"):
 		# Esc fora da pausa solta o mouse de vez; a pausa so bloqueia (ao fechar, volta a prender).
 		release_mouse()
