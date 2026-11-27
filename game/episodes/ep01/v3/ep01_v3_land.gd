@@ -1126,6 +1126,7 @@ func _act_drop_box(a: MemberActor, stall: StringName) -> void:
 	_cargo += 1
 	if _cargo >= CARGO_ORDER.size():
 		main.say("ep01.market.vendor.gull_hint")
+		main.say("ep01.market.vendor.gull_hint_b")
 	main.notify_mission(&"cargo_delivered")
 	if not await _wait(L * 0.4, s):
 		_act_end(a, s)
@@ -1211,7 +1212,7 @@ func _act_pull_leaves(a: MemberActor) -> void:
 		return
 	main.say("ep01.plaza.climber.top_basin")
 	main.notify_mission(&"leaves_pulled")
-	main.say("ep01.plaza.radio.water_back")
+	main.say("ep01.lumi.lantern_2")
 	_roll_ball()
 	if not await _climb_chain(a, [_mk(&"M3_FountainStep_2"), _mk(&"M3_FountainStep_1"), points[&"FountainBase"]], s):
 		_act_end(a, s)

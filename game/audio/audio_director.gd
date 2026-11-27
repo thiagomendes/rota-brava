@@ -335,7 +335,10 @@ static func is_radio_line(id: String, entry: Dictionary = {}) -> bool:
 	if str(entry.get("speaker", entry.get("character", ""))) == "radio" or str(entry.get("type", "")) == "radio":
 		return true
 	var key := id.trim_prefix(VoiceCatalog.V3_PREFIX)
-	return key.begins_with("ep01.radio.") or key.contains(".radio.")
+	# G25: o Lumi nos chamados e lanternas (ep01.lumi.*, ep01.call.cN.*) e o capitao chamando a base sao falas de radio;
+	# o bordao da equipe (ep01.call.team_go) e dito ao vivo.
+	return key.begins_with("ep01.radio.") or key.contains(".radio.") or key.begins_with("ep01.lumi.") \
+		or key.begins_with("ep01.call.c")
 
 
 func _ensure_radio_players() -> void:

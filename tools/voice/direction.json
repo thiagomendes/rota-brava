@@ -12,23 +12,11 @@
   "rápido": "ritmo um pouco rápido"
  },
  "lines": {
-  "ep01.arrival.radio.festival": {
-   "emotion": "alegria",
-   "energy": 2,
-   "pace": "normal",
-   "note": "anúncio festivo de rádio, sorriso na voz, convite"
-  },
   "ep01.arrival.pilot.no_captain": {
    "emotion": "surpresa",
    "energy": 2,
    "pace": "normal",
    "note": "notou algo estranho; surpresa curiosa, pergunta no ar, sem susto"
-  },
-  "ep01.arrival.tracker.look_dock": {
-   "emotion": "decisão animada",
-   "energy": 2,
-   "pace": "normal",
-   "note": "toma a iniciativa, confiante e curiosa"
   },
   "ep01.dock.tracker.small_print": {
    "emotion": "sussurro de descoberta",
@@ -88,7 +76,7 @@
    "emotion": "descoberta",
    "energy": 2,
    "pace": "normal",
-   "note": "junta as pistas, satisfeita"
+   "note": "achou o lenço do filhote: descoberta animada, aponta a praça"
   },
   "ep01.bank.pilot.m2_done": {
    "emotion": "orgulho",
@@ -125,12 +113,6 @@
    "energy": 3,
    "pace": "rápido",
    "note": "feito, voz de quem está lá no alto"
-  },
-  "ep01.plaza.radio.water_back": {
-   "emotion": "alegria",
-   "energy": 2,
-   "pace": "normal",
-   "note": "narra a boa notícia, sorrindo"
   },
   "ep01.plaza.climber.m3_done": {
    "emotion": "alegria",
@@ -300,23 +282,11 @@
    "pace": "lento",
    "note": "foco e calma, girando a luz"
   },
-  "ep01.lighthouse.radio.lights_on": {
-   "emotion": "alegria",
-   "energy": 2,
-   "pace": "normal",
-   "note": "boa notícia no rádio, convite para a festa"
-  },
   "ep01.festival.radio.night": {
    "emotion": "alegria",
    "energy": 3,
    "pace": "normal",
    "note": "abre a festa, festivo"
-  },
-  "ep01.festival.captain.thanks": {
-   "emotion": "gratidão",
-   "energy": 2,
-   "pace": "lento",
-   "note": "agradecimento caloroso e orgulhoso"
   },
   "ep01.festival.tracker.cheer": {
    "emotion": "alegria",
@@ -672,18 +642,6 @@
    "pace": "lento",
    "note": "despedida de fim de episódio, sorriso"
   },
-  "ep01.arrival.pilot.boat_empty": {
-   "emotion": "estranhamento calmo",
-   "energy": 2,
-   "pace": "normal",
-   "note": "olha dentro do barco vazio, pergunta séria mas tranquila"
-  },
-  "ep01.arrival.climber.horn_alone": {
-   "emotion": "espanto brincalhão",
-   "energy": 3,
-   "pace": "rápido",
-   "note": "acha graça e estranha ao mesmo tempo, olhos arregalados"
-  },
   "ep01.arrival.tracker.clue_dock": {
    "emotion": "confiança curiosa",
    "energy": 2,
@@ -707,12 +665,6 @@
    "energy": 3,
    "pace": "rápido",
    "note": "já sai correndo, chama a turma"
-  },
-  "ep01.bank.tracker.sock_fur": {
-   "emotion": "descoberta",
-   "energy": 2,
-   "pace": "normal",
-   "note": "segura a meia e mostra o pelo, voz de achado"
   },
   "ep01.team.tracker.follow_1": {
    "emotion": "convite animado",
@@ -774,18 +726,6 @@
    "pace": "normal",
    "note": "segue a gaivota com a voz, leve suspense divertido"
   },
-  "ep01.narrator.bridge.m5_m6": {
-   "emotion": "narração animada",
-   "energy": 2,
-   "pace": "normal",
-   "note": "virada da história, animada sem susto"
-  },
-  "ep01.street.pilot.to_boat": {
-   "emotion": "coragem tranquila",
-   "energy": 2,
-   "pace": "normal",
-   "note": "assume a tarefa com orgulho calmo"
-  },
   "ep01.street.tracker.captain_knows": {
    "emotion": "ideia",
    "energy": 2,
@@ -797,12 +737,6 @@
    "energy": 3,
    "pace": "rápido",
    "note": "adora altura, comemora o desafio"
-  },
-  "ep01.bay.pilot.lamp_dark": {
-   "emotion": "preocupação leve",
-   "energy": 1,
-   "pace": "normal",
-   "note": "observa o farol, pensa no barco da festa, sem medo"
   },
   "ep01.lighthouse.climber.pup_hug": {
    "emotion": "ternura alegre",
@@ -839,6 +773,102 @@
    "energy": 2,
    "pace": "normal",
    "note": "apresenta a base da equipe, a casa-torre na ponta das pedras"
+  },
+  "ep01.call.c1.lumi_alert": {
+   "emotion": "alerta calmo",
+   "energy": 2,
+   "pace": "normal",
+   "note": "abre o chamado: atento e caloroso, sem susto"
+  },
+  "ep01.call.c1.captain_radio": {
+   "emotion": "aflição leve",
+   "energy": 2,
+   "pace": "rápido",
+   "note": "pede ajuda pelo rádio, apressado mas sem medo"
+  },
+  "ep01.call.c1.lumi_stakes": {
+   "emotion": "preocupação leve",
+   "energy": 2,
+   "pace": "normal",
+   "note": "explica o que está em jogo, tranquilo"
+  },
+  "ep01.call.c1.lumi_go": {
+   "emotion": "confiança",
+   "energy": 2,
+   "pace": "normal",
+   "note": "chama quem parte pelo nome, animado"
+  },
+  "ep01.call.team_go": {
+   "emotion": "alegria",
+   "energy": 3,
+   "pace": "rápido",
+   "note": "bordão da equipe, curto e vibrante"
+  },
+  "ep01.narrator.bridge.m1_m2b": {
+   "emotion": "narração animada",
+   "energy": 2,
+   "pace": "normal",
+   "note": "segunda metade da regra: o filhote foi pela vila"
+  },
+  "ep01.lumi.lantern_1": {
+   "emotion": "alegria",
+   "energy": 3,
+   "pace": "normal",
+   "note": "comemora a primeira lanterna da festa"
+  },
+  "ep01.lumi.lantern_2": {
+   "emotion": "alegria",
+   "energy": 3,
+   "pace": "normal",
+   "note": "comemora a segunda lanterna"
+  },
+  "ep01.market.vendor.gull_hint_b": {
+   "emotion": "dica",
+   "energy": 2,
+   "pace": "normal",
+   "note": "aponta para onde o filhote correu"
+  },
+  "ep01.call.c2.lumi_alert": {
+   "emotion": "alerta calmo",
+   "energy": 2,
+   "pace": "normal",
+   "note": "segundo chamado: atento, sem susto"
+  },
+  "ep01.call.c2.lumi_go": {
+   "emotion": "confiança",
+   "energy": 2,
+   "pace": "normal",
+   "note": "chama o Leme pelo nome"
+  },
+  "ep01.call.c3.lumi_alert": {
+   "emotion": "alerta calmo",
+   "energy": 2,
+   "pace": "normal",
+   "note": "terceiro chamado: o farol está apagado, calmo"
+  },
+  "ep01.call.c3.lumi_stakes": {
+   "emotion": "preocupação leve",
+   "energy": 2,
+   "pace": "normal",
+   "note": "o que está em jogo, sem medo"
+  },
+  "ep01.call.c3.lumi_go": {
+   "emotion": "confiança",
+   "energy": 2,
+   "pace": "normal",
+   "note": "chama o Pico pelo nome"
+  },
+  "ep01.lumi.lanterns_lit": {
+   "emotion": "alegria",
+   "energy": 3,
+   "pace": "normal",
+   "note": "festa: todas as lanternas acesas"
+  },
+  "ep01.festival.captain.first_lantern": {
+   "emotion": "alegria",
+   "energy": 2,
+   "pace": "normal",
+   "note": "agradece e acende a primeira lanterna"
   }
  },
  "demo": {
