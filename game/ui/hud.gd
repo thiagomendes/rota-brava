@@ -940,12 +940,16 @@ func is_speaking() -> bool:
 	return _speaking or not _queue.is_empty()
 
 
-## Tempo (s) que uma legenda fica na tela: leitura (>= 2,4 s) ou a voz + 0,35 s, o que for maior.
+## Folga depois da voz antes de a legenda sair (s). G17: as cutscenes usam a mesma conta para a duracao do plano.
+const VOICE_TAIL := 0.35
+
+
+## Tempo (s) que uma legenda fica na tela: leitura (>= 2,4 s) ou a voz + VOICE_TAIL, o que for maior.
 ## voice_len e o que voice_hook/play_line devolve; numa fala de radio ja inclui os cliques (G20).
 static func line_seconds_for_text(text: String, voice_len: float = 0.0) -> float:
 	var seconds := maxf(2.4, 1.3 + 0.055 * text.length())
 	if voice_len > 0.0:
-		seconds = maxf(seconds, voice_len + 0.35)  # a legenda nunca some antes do tempo de leitura
+		seconds = maxf(seconds, voice_len + VOICE_TAIL)  # a legenda nunca some antes do tempo de leitura
 	return seconds
 
 

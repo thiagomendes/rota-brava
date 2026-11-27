@@ -130,8 +130,9 @@ func _ready() -> void:
 	audio.name = "AudioDirector"
 	add_child(audio)
 	audio.bind_episode_music(self)
-	audio.start_ambience()
+	audio.ambience_hold = true
 	audio.set_ambience_zone(&"dock")
+	_start_ambience_when_released()
 	_setup_speech()
 	hud.handoff_confirmed.connect(_on_handoff_confirmed)
 	land = Ep01V3Late.new()
@@ -843,6 +844,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		# G7: com acao ao alcance o mesmo E age (try_interact ja encerra o olhar); sem acao, o E so encerra o olhar.
 		if try_interact() or guide.skip_look():
 			get_viewport().set_input_as_handled()
+
+
+## G17: o som da vila so entra quando a tela de carregamento sai.
+func _start_ambience_when_released() -> void:
+	await SceneLoaderService.wait_released(self)
+	if is_inside_tree():
+		audio.ambience_hold = false
+		audio.start_ambience()
 
 
 func _setup_speech() -> void:

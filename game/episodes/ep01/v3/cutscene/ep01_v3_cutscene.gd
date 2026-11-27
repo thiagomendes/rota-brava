@@ -55,6 +55,10 @@ var scene_id: StringName = &""
 var skippable: bool = false
 var shot_index: int = -1
 var time: float = 0.0
+## G17: tempo dentro do plano atual (s).
+var shot_time: float = 0.0
+## G17: a cena foi pedida com a tela de carregamento na frente; o relogio e as falas so comecam quando ela libera.
+var waiting_screen: bool = false
 ## Clipes que caíram no fallback nesta instancia: "who:anim->usado".
 var fallbacks: Array[String] = []
 var lines_said: Array[String] = []
@@ -67,6 +71,8 @@ var _scene: Dictionary = {}
 var _shots: Array = []
 var _total: float = 0.0
 var _starts: Array[float] = []
+## G17: duracao efetiva de cada plano (shot_length), calculada no play.
+var _durs: Array[float] = []
 var _held: Dictionary = {}
 var _moved: Dictionary = {}
 var _bars: CanvasLayer
@@ -124,8 +130,46 @@ static func scene_for(when: String) -> StringName:
 static func scene_length(id: StringName) -> float:
 	var total := 0.0
 	for sh: Variant in scene_data(id).get("shots", []):
-		total += float((sh as Dictionary).get("duration", 0.0))
+		total += shot_length(sh as Dictionary)
 	return total
+
+
+## G17: chave da fala do plano ("" sem fala ou fora do catalogo).
+static func line_key(sh: Dictionary) -> String:
+	var line: Dictionary = sh.get("line", {}) if sh.get("line") is Dictionary else {}
+	var key := str(line.get("key", ""))
+	return key if key != "" and Loc.has_key(key) else ""
+
+
+## G17: duracao do audio real da fala (o mesmo take que o HUD toca), sem tocar; 0 se nao ha voz.
+static func voice_seconds(key: String) -> float:
+	var id := Ep01V3Dialogue.take(key)
+	if id == "":
+		id = key
+	if VoiceCatalog.lookup(id, Loc.language).is_empty():
+		return 0.0
+	var s := VoiceCatalog.stream_for(id, Loc.language)
+	return s.get_length() if s != null else 0.0
+
+
+## G17: duracao efetiva do plano = max(duracao da ficha, tempo da fala no HUD). O tempo da fala no HUD e
+## max(leitura da legenda, voz real + folga), entao o corte nunca chega antes de a voz (e a legenda) acabar e a fala
+## do plano seguinte nunca espera na fila: comeca no corte.
+static func shot_length(sh: Dictionary) -> float:
+	var base := float(sh.get("duration", 0.0))
+	var key := line_key(sh)
+	if key == "":
+		return base
+	# Por chave (G20): numa fala de radio soma os cliques de abrir e fechar.
+	return maxf(base, Hud.line_seconds(key, voice_seconds(key)))
+
+
+## G17: quem esta em foco no plano (`focus` da ficha ou o primeiro ator); &"" se o plano nao tem ator.
+static func shot_focus(sh: Dictionary) -> StringName:
+	if sh.has("focus"):
+		return StringName(str(sh["focus"]))
+	var list: Array = sh.get("actors", [])
+	return StringName(str((list[0] as Dictionary).get("who", ""))) if not list.is_empty() else &""
 
 
 # ---------- vistas ----------
@@ -245,12 +289,15 @@ func play(id: StringName) -> bool:
 	scene_id = id
 	_shots = _scene.get("shots", [])
 	_starts.clear()
+	_durs.clear()
 	_total = 0.0
 	for sh: Variant in _shots:
 		_starts.append(_total)
-		_total += float((sh as Dictionary).get("duration", 0.0))
+		_durs.append(shot_length(sh as Dictionary))
+		_total += _durs[-1]
 	skippable = is_seen(id) and bool(_scene.get("skippable_after_first", true))
 	time = 0.0
+	shot_time = 0.0
 	shot_index = -1
 	shots_played = 0
 	lines_said.clear()
@@ -265,7 +312,9 @@ func play(id: StringName) -> bool:
 	_skip_label.visible = skippable
 	_layout_bars(1.0 if reduced_motion else 0.0)
 	print("[RB] cutscene start %s skippable=%s" % [id, skippable])
-	_step(0.0)
+	waiting_screen = not SceneLoaderService.instance().screen_released()
+	if not waiting_screen:
+		_step(0.0)
 	if auto_skip:
 		_finish.call_deferred(true)
 	return true
@@ -273,6 +322,17 @@ func play(id: StringName) -> bool:
 
 func _process(delta: float) -> void:
 	if not playing:
+		return
+	if waiting_screen:
+		# G17: o celular segura a tela de carregamento por muito tempo; a cena nao conta tempo nem fala por baixo dela.
+		if on_step.is_valid():
+			on_step.call()
+		_hide_game_hud()
+		if not SceneLoaderService.instance().screen_released():
+			return
+		waiting_screen = false
+		print("[RB] cutscene tela liberada %s" % scene_id)
+		_step(0.0)
 		return
 	_step(delta)
 
@@ -284,26 +344,29 @@ func _step(delta: float) -> void:
 	_hide_game_hud()
 	if not reduced_motion:
 		_layout_bars(minf(time, BAR_IN) / BAR_IN)
-	var idx := _shots.size() - 1
-	for i in _starts.size():
-		if time < _starts[i] + float((_shots[i] as Dictionary).get("duration", 0.0)):
-			idx = i
-			break
-	if idx != shot_index and idx >= 0:
-		shot_index = idx
-		_enter_shot(idx)
+	# G17: relogio por plano, zerado no corte (o HUD conta a fala do mesmo quadro em diante, com os mesmos deltas):
+	# o plano acaba no mesmo quadro em que a fala dele acaba, nunca antes.
+	shot_time += delta
+	if shot_index < 0 and not _shots.is_empty():
+		shot_index = 0
+		shot_time = 0.0
+		_enter_shot(0)
+	elif shot_index >= 0 and shot_index < _shots.size() - 1 and shot_time >= _durs[shot_index]:
+		shot_index += 1
+		shot_time = 0.0
+		_enter_shot(shot_index)
 	if shot_index >= 0:
 		var sh: Dictionary = _shots[shot_index]
-		var dur := maxf(float(sh.get("duration", 0.0)), 0.001)
-		var u := clampf((time - _starts[shot_index]) / dur, 0.0, 1.0)
+		var dur := maxf(_durs[shot_index], 0.001)
+		var u := clampf(shot_time / dur, 0.0, 1.0)
 		var pose := camera_pose(sh, u)
 		camera.global_position = pose[0]
 		if (pose[0] as Vector3).distance_to(pose[1]) > 0.01:
 			camera.look_at(pose[1], Vector3.UP)
 	_hold_clips()
-	if time >= _total:
+	if _shots.is_empty() or (shot_index == _shots.size() - 1 and shot_time >= _durs[shot_index]):
 		var speaking := hud != null and hud.is_speaking()
-		if not speaking or time >= _total + TAIL_MAX:
+		if not speaking or shot_time >= (_durs[shot_index] if shot_index >= 0 else 0.0) + TAIL_MAX:
 			_finish(false)
 
 
@@ -358,11 +421,12 @@ func _enter_shot(i: int) -> void:
 	_held.clear()
 	for a: Variant in sh.get("actors", []):
 		_place_actor(a as Dictionary, cam_from, sh)
-	var line: Dictionary = sh.get("line", {}) if sh.get("line") is Dictionary else {}
-	var key := str(line.get("key", ""))
-	if key != "" and Loc.has_key(key):
+	var key := line_key(sh)
+	if key != "":
 		lines_said.append(key)
 		if hud != null:
+			# G17: a fala do plano comeca no corte; o que restasse da anterior nao a empurra para a fila.
+			hud.clear_speech()
 			hud.say(key)
 
 
@@ -466,6 +530,7 @@ func _finish(skipped: bool) -> void:
 	if not playing:
 		return
 	playing = false
+	waiting_screen = false
 	var id := scene_id
 	mark_seen(id)
 	_restore_actors()
