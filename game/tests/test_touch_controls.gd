@@ -300,19 +300,49 @@ func _hud_buttons() -> void:
 	var helps := [0]
 	main.hud.help_requested.connect(func() -> void: helps[0] += 1)
 	var hb := main.hud._help_button
-	r.check(hb in main.hud.touch_passthrough(), "ajuda: o botao de ajuda do HUD fica com a GUI (a camada nao cobre)")
-	r.check(hb.size.x >= 110.0 and hb.size.y >= 110.0, "ajuda: alvo de toque do H >= 110 px (%s)" % str(hb.size))
-	await _tap(_center(hb))
+	# G22a: no toque a ajuda e um disco da camada, no lugar do botao do HUD (que fica vazio e sem receber o dedo).
+	r.check(not (hb in main.hud.touch_passthrough()), "G22a ajuda: no toque o botao do HUD nao e mais da GUI (a camada desenha)")
+	r.check(not main.hud._help_icon.visible and hb.mouse_filter == Control.MOUSE_FILTER_IGNORE and hb.self_modulate.a == 0.0,
+		"G22a ajuda: no toque o botao do HUD fica vazio (sem o disco de 72 px e sem pegar o dedo)")
+	r.check(TouchControls.HELP_RADIUS * 2.0 >= 110.0 and TouchControls.HELP_RADIUS * 2.0 >= TouchControls.PAUSE_RADIUS * 2.0,
+		"G22a ajuda: disco de %d px no toque (>= 110 e >= pausa)" % int(TouchControls.HELP_RADIUS * 2.0))
+	var hc := touch.help_center()
+	r.check(hc != Vector2.ZERO and hc.distance_to(_center(hb)) < 0.5, "G22a ajuda: disco no lugar do botao do HUD (%s)" % str(hc))
+	r.check(touch.button_at(hc) == &"help" and touch.button_at(hc + Vector2(TouchControls.HELP_RADIUS * 1.1, 0)) == &"help",
+		"G22a ajuda: alvo do toque cobre o disco e um pouco alem (dedo de crianca)")
+	r.check(TouchControls.HELP_ICON_FRACTION >= 0.65, "G22a ajuda: pictograma proporcional ao disco (%.2f do raio)" % TouchControls.HELP_ICON_FRACTION)
+	# Nao briga com o painel de objetivo nem com o contador de emblemas (contador aceso para medir).
+	main.hud.set_collectibles(1, 10, false)
+	await r.frames(2)
+	var disc := Rect2(touch.help_center() - Vector2.ONE * TouchControls.HELP_RADIUS, Vector2.ONE * TouchControls.HELP_RADIUS * 2.0)
+	var obj := main.hud.find_child("ObjectivePanel", true, false) as Control
+	var emb := main.hud._emblem_panel
+	r.check(not disc.intersects(obj.get_global_rect()) and not disc.intersects(emb.get_global_rect()),
+		"G22a ajuda: disco nao encosta no objetivo (%s) nem nos emblemas (%s)" % [str(obj.get_global_rect()), str(emb.get_global_rect())])
+	r.check(touch.button_at(_center(emb)) != &"help", "G22a ajuda: tocar nos emblemas nao pede ajuda")
+	r.check(_key_hints_on_screen().is_empty(), "G22a sem tecla no toque: HUD em jogo sem selo/texto de tecla %s" % str(_key_hints_on_screen()))
+	await _tap(touch.help_center())
 	r.check(helps[0] == 1 and int(probe.counts.get(&"help", 0)) == 1,
-		"ajuda: tocar no botao de ajuda envia a intencao help uma vez (sinal %d, intencao %d)" % [helps[0], int(probe.counts.get(&"help", 0))])
-	# Toque na borda do alvo (fora do disco desenhado) tambem conta.
+		"ajuda: tocar no disco da ajuda envia a intencao help uma vez (sinal %d, intencao %d)" % [helps[0], int(probe.counts.get(&"help", 0))])
+	# Toque na borda do lugar (fora do disco desenhado) tambem conta.
 	var edge := hb.get_global_rect().position + Vector2(8, 8)
 	var h0: int = helps[0]
 	await _tap(edge)
 	r.check(helps[0] == h0 + 1, "ajuda: tocar no canto do alvo, fora do desenho, tambem pede ajuda (%d)" % (helps[0] - h0))
+	# Segundo dedo: com o joystick seguro pelo dedo 0, o dedo 1 na ajuda pede ajuda (a GUI so via o dedo 0).
+	h0 = helps[0]
+	var so := touch.stick_home()
+	_down(0, so)
+	await r.frames(1)
+	await _tap(touch.help_center(), 1)
+	r.check(helps[0] == h0 + 1 and touch.finger_kind(0) == &"stick", "G22a ajuda: segundo dedo na ajuda pede ajuda com o joystick seguro (%d)" % (helps[0] - h0))
+	_down(0, so, false)
+	await r.frames(2)
+	main.hud.set_collectibles(0, 10, false)
 	# Pausa pela camada; Continuar e Opcoes da pausa pelo toque.
 	await _tap(touch.pause_center())
 	r.check(main.hud.pause_open and main.get_tree().paused and not touch.visible, "pausa: o botao de pausa da camada pausa (e a camada some)")
+	r.check(_key_hints_on_screen().is_empty(), "G22a sem tecla no toque: pausa aberta sem selo/texto de tecla %s" % str(_key_hints_on_screen()))
 	await _tap(_center(main.hud._pause_options))
 	r.check(main.hud.options_open, "pausa: Opcoes responde ao toque")
 	main.hud.close_options()
@@ -322,6 +352,23 @@ func _hud_buttons() -> void:
 	r.check(touch.pause_center().x + TouchControls.PAUSE_RADIUS <= main.hud._member_panel.get_global_rect().position.x
 		or not main.hud._member_panel.visible, "pausa: o botao fica a esquerda dos retratos (nao cobre)")
 	probe.queue_free()
+
+
+## G22a: selos de glifo visiveis que nao sao de toque e textos visiveis com nome de tecla (HUD inteiro).
+func _key_hints_on_screen() -> Array[String]:
+	var bad: Array[String] = []
+	var keys := RegEx.create_from_string("(^|[^\\p{L}])(Esc|Enter|Espa[cç]o|Shift|Tab|Tecla|tecla)([^\\p{L}]|$)|\\[[A-Z]\\]|^[A-Z]$")
+	for n: Node in main.hud.find_children("*", "", true, false):
+		var c := n as CanvasItem
+		if c == null or not c.is_visible_in_tree():
+			continue
+		if n is GlyphView and not String((n as GlyphView).glyph_id()).begins_with("touch_"):
+			bad.append("%s=%s" % [n.name, (n as GlyphView).glyph_id()])
+		elif n is Label and keys.search((n as Label).text) != null:
+			bad.append("%s='%s'" % [n.name, (n as Label).text])
+		elif n is Button and keys.search((n as Button).text) != null:
+			bad.append("%s='%s'" % [n.name, (n as Button).text])
+	return bad
 
 
 func _hide_on_other_devices() -> void:
@@ -338,6 +385,12 @@ func _hide_on_other_devices() -> void:
 	await r.frames(2)
 	r.check(not touch.visible and main.hud.last_device == &"keyboard", "outros: tecla esconde a camada")
 	r.check(not Input.is_action_pressed(&"move_up") and touch.finger_kind(0) == &"", "outros: esconder solta o joystick que estava segurado")
+	# G22a: no teclado o botao de ajuda do HUD volta (balao + selo H do G15) e a auditoria de tecla acusa o selo (mutacao).
+	var hb := main.hud._help_button
+	r.check(main.hud._help_icon.visible and hb.mouse_filter == Control.MOUSE_FILTER_STOP and hb.self_modulate.a == 1.0
+		and main.hud._help_glyph.is_visible_in_tree() and main.hud._help_glyph.glyph_id() == &"key_h",
+		"G22a teclado: botao de ajuda do HUD de volta, com o selo H so no canto")
+	r.check(not _key_hints_on_screen().is_empty(), "G22a mutacao: no teclado a auditoria de tecla acusa os selos (%d)" % _key_hints_on_screen().size())
 	k = k.duplicate()
 	k.pressed = false
 	Input.parse_input_event(k)

@@ -6,7 +6,11 @@ extends CanvasLayer
 ## - Metade esquerda: joystick flutuante (nasce onde o dedo toca); aciona `move_*` com forca analogica e `run` acima de
 ##   RUN_AT do raio. Metade direita fora dos botoes: arrastar gira a camera (`CameraRig.orbit_by`, a mesma do mouse).
 ## - Botoes grandes a direita, com icone e sem texto: agir (`interact`, embaixo, no lugar do botao de acao do HUD) e
-##   pular (`jump`). Pausa (`pause`) pequena no alto, a esquerda dos retratos. A ajuda e o botao do proprio HUD.
+##   pular (`jump`). Pausa (`pause`) pequena no alto, a esquerda dos retratos.
+## - G22a: ajuda (`help`) desenhada pela camada no lugar do botao de ajuda do HUD (abaixo do painel de objetivo), no
+##   estilo dos outros discos (anel marinho, sombra, afunda ao tocar) com o "?" no balao; o HUD esvazia o seu botao no
+##   toque. Assim a ajuda aceita um segundo dedo (a GUI so recebe o dedo 0, pela emulacao de mouse) e tem a escala dos
+##   botoes da camada, em vez do disco de 72 px do teclado.
 ## - Multitoque: cada dedo (indice) tem um dono (joystick, camera ou botao); dois dedos andam e giram ao mesmo tempo.
 ## Nada de entrada direta: tudo vira intencao da Input Map (os botoes injetam InputEventAction, o joystick usa
 ## `Input.action_press(acao, forca)`). Layout em unidades logicas (viewport 1080 de altura, stretch canvas_items/expand).
@@ -25,6 +29,9 @@ const STICK_FOLLOW := 1.25
 const ACT_RADIUS := 112.0
 const JUMP_RADIUS := 90.0
 const PAUSE_RADIUS := 60.0
+## G22a: disco da ajuda (128 px, o tamanho do lugar do botao no HUD); o pictograma ocupa HELP_ICON_FRACTION do raio.
+const HELP_RADIUS := 64.0
+const HELP_ICON_FRACTION := 0.74
 ## Alvo de toque um pouco maior que o desenho (dedo de crianca).
 const HIT_GROW := 1.15
 const GAP := 30.0
@@ -53,7 +60,7 @@ var stick_origin: Vector2 = Vector2.ZERO
 var stick_tip: Vector2 = Vector2.ZERO
 var running: bool = false
 var reduced_motion: bool = false
-## Dedo -> {"kind": &"stick"|&"cam"|&"act"|&"jump"|&"pause", "pos": Vector2}
+## Dedo -> {"kind": &"stick"|&"cam"|&"act"|&"jump"|&"pause"|&"help", "pos": Vector2}
 var _fingers: Dictionary = {}
 var _pressed_moves: Dictionary = {}
 var _canvas: Control
@@ -80,6 +87,7 @@ func _ready() -> void:
 	for k in ["jump", "hand", "stick_base", "stick_knob", "cam_turn"]:
 		_tex[k] = load(ICON_DIR + k + ".svg") as Texture2D
 	_tex["pause"] = IconView.texture_for(&"pause")
+	_tex["help"] = IconView.texture_for(Hud.HELP_ICON)
 	_canvas = Control.new()
 	_canvas.name = "Canvas"
 	_canvas.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -149,6 +157,16 @@ func pause_center() -> Vector2:
 	return Vector2(right - PAUSE_RADIUS, m.y + PAUSE_RADIUS)
 
 
+## G22a: centro do disco da ajuda = centro do lugar do botao de ajuda no HUD (ZERO se o HUD nao o mostra).
+func help_center() -> Vector2:
+	var slot := help_slot()
+	return slot.get_center() if slot.has_area() else Vector2.ZERO
+
+
+func help_slot() -> Rect2:
+	return hud.help_slot_rect() if hud != null else Rect2()
+
+
 ## Onde o joystick descansa (fantasma) e volta ao soltar.
 func stick_home() -> Vector2:
 	var vp := view_size()
@@ -171,6 +189,9 @@ func button_at(p: Vector2) -> StringName:
 		return &"jump"
 	if p.distance_to(pause_center()) <= maxf(PAUSE_RADIUS * HIT_GROW, 64.0):
 		return &"pause"
+	var hs := help_slot()
+	if hs.has_area() and (hs.has_point(p) or p.distance_to(hs.get_center()) <= HELP_RADIUS * HIT_GROW):
+		return &"help"
 	return &""
 
 
@@ -314,6 +335,8 @@ func _begin(index: int, p: Vector2) -> bool:
 		&"pause":
 			_send(&"pause", true)
 			_send(&"pause", false)
+		&"help":
+			hud.trigger_help()
 		_:
 			if p.x < view_size().x * 0.5:
 				if _has_kind(&"stick"):
@@ -448,6 +471,12 @@ func _draw_controls() -> void:
 	_draw_icon(c, "jump", jc, JUMP_RADIUS * 0.7, 1.0)
 	# Pausa.
 	_draw_icon(c, "pause", pause_center(), PAUSE_RADIUS, 0.95)
+	# Ajuda (G22a): disco claro como o pular, com o "?" no balao amarelo.
+	if help_slot().has_area():
+		var help_down := _has_kind(&"help")
+		var hc0 := help_center() + (Vector2(0, 5) if help_down else Vector2.ZERO)
+		_disc(c, hc0, HELP_RADIUS, PAPER if not help_down else PAPER.darkened(0.12), NAVY, help_down)
+		_draw_icon(c, "help", hc0, HELP_RADIUS * HELP_ICON_FRACTION, 1.0)
 	# Dica de camera: setas curvas na direita, somem no primeiro arrasto.
 	if _cam_hint_left > 0.0:
 		var vp := view_size()
