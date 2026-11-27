@@ -668,3 +668,10 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - **Ajuste do lead:** o modo serial passa a ter limite padrão de 2700 s.
   - **Correção da meta:** o autor disse "~350 s", mas a revisão mediu de 420 s a 450 s nesta máquina. Fica abaixo de 600 s.
 - **Suíte completa na integração** (`d27aa75`): pacote G, G14 a G17, G20, toque, G16, G16b e E7 juntos. `bash tools/test.sh`: `OK (4542 PASS, 0 FALHA(S))`, código 0, em 455 s.
+- **Clipes do G19 prontos** (`feature/rb-r1-g19-clipes`, autor `art3d`).
+  - Clipes: `pick_up`, `carry_idle`, `carry_walk`, `place_high`, `place_low` e `inspect` para os 3. Para o Pico: `climb_up_low`, `climb_up`, `climb_up_high`, `climb_wall`, `climb_top`, `climb_down`, `throw_rope` e `lower_rope`. Para a Leme: `push_cart`.
+  - Pontos de encaixe `HoldPoint` e `HoldPoint_L`.
+  - Achado do autor: os heróis têm cerca de 1,10 m e não alcançam mais que uns 0,85 m com o objeto erguido. Por isso o varal (1,75 a 2 m) e o balcão (0,80 m) ficam fora do alcance, e a caixa do M4 (42 cm) não cabe na pega de duas mãos (cerca de 15 cm).
+- **Decisões de Thiago** (2026-11-27):
+  - **Varal:** o herói **sobe num banquinho** perto do varal para pendurar. Na integração, a altura do banquinho e a da corda precisam ficar ao alcance medido: se precisar, a corda desce, mantendo a regra do G18 de roupa encostada na corda.
+  - **M4:** cada entrega vira uma **caixinha ou cestinha de frutas** do tamanho de criança. A caixa grande fica no carrinho.
