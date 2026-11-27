@@ -5,8 +5,10 @@ extends SceneTree
 ##     --script res://episodes/ep01/v3/cutscene/cutscene_capture.gd -- --out=/abs/dir
 ## Nao e teste: so produz imagens para olhar.
 
-const INTRO_SHOTS := [[3.0, "game_intro_1_vila"], [10.0, "game_intro_2_rastro"], [19.0, "game_intro_3_pico"],
-	[25.0, "game_intro_4_leme"], [32.5, "game_intro_5_equipe"]]
+## G21i: plano da abertura (indice na ficha) + fracao do plano, em vez de tempo absoluto (o G17 e o G21i mudam os tempos).
+const INTRO_SHOTS := [[0, 0.6, "game_intro_1_vila"], [3, 0.5, "game_intro_2_rastro"], [5, 0.5, "game_intro_3_pico"],
+	[7, 0.5, "game_intro_4_leme"], [8, 0.6, "game_intro_9_out"], [9, 0.8, "game_intro_9a"], [10, 0.55, "game_intro_9b"],
+	[11, 0.6, "game_intro_9c"], [12, 0.6, "game_intro_5_equipe"]]
 ## cena, missao de partida, tempo na cena, nome
 const EP_SHOTS := [[&"opening", &"M0", 7.0, "ep01_opening"], [&"m1_intro", &"M1", 1.6, "ep01_m1_intro"],
 	[&"m4_intro", &"M4", 4.5, "ep01_m4_intro_amora"], [&"boat_departure", &"M6", 1.5, "ep01_boat_departure"], [&"nightfall", &"M7", 6.0, "ep01_nightfall"],
@@ -37,6 +39,11 @@ func _shot(n: String) -> void:
 	print("[RB] shot ", n, " ", img.get_size())
 
 
+func _until_shot(cs: Ep01V3Cutscene, i: int, frac: float) -> void:
+	while cs.playing and (cs.shot_index < i or (cs.shot_index == i and cs.shot_time < frac * cs._durs[i])):
+		await process_frame
+
+
 func _until(cs: Ep01V3Cutscene, t: float) -> void:
 	while cs.playing and cs.time < t:
 		await process_frame
@@ -52,10 +59,10 @@ func _run() -> void:
 	current_scene = intro
 	await process_frame
 	for s: Array in INTRO_SHOTS:
-		if not only.is_empty() and not only.has(str(s[1])) and not only.has("game_intro"):
+		if not only.is_empty() and not only.has(str(s[2])) and not only.has("game_intro"):
 			continue
-		await _until(intro.cutscene, float(s[0]))
-		await _shot(str(s[1]))
+		await _until_shot(intro.cutscene, int(s[0]), float(s[1]))
+		await _shot(str(s[2]))
 	intro.queue_free()
 	await create_timer(0.3).timeout
 	for s: Array in EP_SHOTS:

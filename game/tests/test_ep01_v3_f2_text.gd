@@ -11,7 +11,9 @@ const ICON_DIR := "res://ui/brand/icons/"
 const MODELS := {"tracker": "res://assets/models/characters/rastro_v2.glb",
 	"climber": "res://assets/models/characters/pico_v2.glb", "pilot": "res://assets/models/characters/leme_v2.glb",
 	"captain": "res://assets/models/characters/captain_v2.glb", "pup": "res://assets/models/characters/pup_v2.glb",
-	"vendor": "res://assets/models/characters/amora_v2.glb"}
+	"vendor": "res://assets/models/characters/amora_v2.glb", "radio": "res://assets/models/characters/lumi_v2.glb"}
+## G21i: planos com `stage` usam os marcadores do palco da base Farol 7.
+const STAGE_PATH := "res://worlds/farol7_base/farol7_base.tscn"
 const STEPS: Array[String] = ["M1.bench", "M1.boot", "M1.trail", "M2.free_pieces", "M2.find_third", "M2.hang",
 	"M3.stream", "M3.leaves", "M4.read", "M4.deliver", "M5.feathers", "M5.compass", "M5.fish", "M6.board", "M6.buoys",
 	"M6.approach", "M6.rope", "M7.lens", "M7.climb", "M7.aim", "M8.thanks"]
@@ -19,6 +21,8 @@ const CARDINAL: Array[String] = ["oeste", "leste", "norte", " sul"]
 
 var r
 var _markers: Dictionary = {}
+var _stage_markers: Dictionary = {}
+var _stage_src := ""
 
 
 func run(runner) -> void:
@@ -28,15 +32,24 @@ func run(runner) -> void:
 	for m in re.search_all(src):
 		_markers[m.get_string(1)] = true
 	r.check(_markers.size() >= 50, "F2 texto: %d marcadores lidos do mundo" % _markers.size())
+	_stage_src = FileAccess.get_file_as_string(STAGE_PATH)
+	for m in re.search_all(_stage_src):
+		_stage_markers[m.get_string(1)] = true
+	r.check(_stage_markers.has("Base_CamFront") and _stage_markers.has("Base_LumiStand"), "G21i: marcadores Base_* lidos do palco (%d)" % _stage_markers.size())
 	_pointing_lines()
 	_groups()
 	_cardinal()
 	_cutscenes()
 
 
+## Falas com mais de MAX_WORDS aceitas por decisao explicita (chave -> motivo).
+const LONG_OK := {"ep01.narrator.intro.base": "G21i: texto exato decidido por Thiago (10 palavras, 37 caracteres)"}
+
+
 func _short(key: String) -> bool:
 	var t := Loc.t(key)
-	return Loc.has_key(key) and t.length() <= MAX_CHARS and t.split(" ", false).size() <= MAX_WORDS
+	var words_ok := t.split(" ", false).size() <= MAX_WORDS or LONG_OK.has(key)
+	return Loc.has_key(key) and t.length() <= MAX_CHARS and words_ok
 
 
 func _pointing_lines() -> void:
@@ -134,12 +147,18 @@ func _cutscenes() -> void:
 		for sh: Variant in s["shots"]:
 			var shot := sh as Dictionary
 			sum += float(shot["duration"])
+			var mk: Dictionary = _stage_markers if str(shot.get("stage", "")) == "farol7_base" else _markers
 			for f in ["from", "to", "look", "look_to"]:
-				if shot.has(f) and not _markers.has(str((shot[f] as Dictionary)["marker"])):
+				if shot.has(f) and not mk.has(str((shot[f] as Dictionary)["marker"])):
 					bad.append("%s: %s" % [s["id"], f])
 			for a: Variant in shot["actors"]:
 				var ad := a as Dictionary
-				if not _markers.has(str(ad["marker"])) or not str(ad["anim"]) in (anims.get(str(ad["who"]), []) as PackedStringArray):
+				var where_ok := mk.has(str(ad.get("marker", "")))
+				if ad.has("seat"):
+					# G21i: sentado = filho de um no do palco (Chair/Seat)
+					where_ok = str(ad["seat"]) == "Chair/Seat" and _stage_src.contains("[node name=\"Seat\" type=\"Marker3D\" parent=\"Chair\"]")
+				var have := anims.get(str(ad["who"]), []) as PackedStringArray
+				if not where_ok or not str(ad["anim"]) in have or (ad.has("then") and not str(ad["then"]) in have):
 					bad.append("%s: %s/%s" % [s["id"], ad["who"], ad["anim"]])
 			if shot.has("line"):
 				var key := str((shot["line"] as Dictionary)["key"])

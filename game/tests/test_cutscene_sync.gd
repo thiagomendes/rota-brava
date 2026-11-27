@@ -53,9 +53,16 @@ func run(runner) -> void:
 func _radio_shot_length() -> void:
 	var checked := 0
 	var bad: Array[String] = []
+	var keys: Array[String] = []
 	for id in Ep01V3Cutscene.scene_ids():
 		for sh: Variant in Ep01V3Cutscene.scene_data(id).get("shots", []):
-			var k := Ep01V3Cutscene.line_key(sh as Dictionary)
+			keys.append(Ep01V3Cutscene.line_key(sh as Dictionary))
+	# G21i: as falas de radio das cenas podem estar todas pendentes de voz (lote novo); a conta vale para qualquer
+	# take de radio do catalogo v3, entao confere tambem esses.
+	for k: String in VoiceCatalog.v3_lines():
+		keys.append(k)
+	for k: String in keys:
+		if true:
 			var v := _voice(k) if k != "" else 0.0
 			if v <= 0.0 or not AudioDirector.is_radio_line(k):
 				continue
