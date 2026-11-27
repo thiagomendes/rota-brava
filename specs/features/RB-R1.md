@@ -621,3 +621,4 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
 - **Decisões de Thiago sobre o G19** (2026-11-27). A auditoria em `docs/proposals/ep01_v3_acoes.md` encontrou 41 interações: 24 "por mágica" e 7 fracas.
   - **Escopo:** fazer **todas**, na ordem sugerida pela auditoria, antes do Portão 2.
   - **Câmera:** a ação acontece no jogo, com a câmera livre e sem corte. O gesto é curto e o controle volta logo.
+- **G20, aceite de escuta:** Thiago ouviu as amostras de antes e depois (2026-11-27): "Ficou bom o áudio, hein? Muito bom. Gostei." Os parâmetros do efeito ficam como estão.
