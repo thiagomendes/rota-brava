@@ -66,6 +66,7 @@ const CAM_RISE_MAX := 0.5
 var last_pull: float = 0.0
 var _probe: SphereShape3D
 var _probe_soft: SphereShape3D
+var _probe_in: SphereShape3D
 var _arm: float = -1.0
 var _arm_vel: float = 0.0
 var _follow_pos: Vector3 = Vector3.ZERO
@@ -87,6 +88,10 @@ const RUN_ARM := 0.10
 const RUN_FOV := 4.0
 const RUN_TIME := 0.6
 var run_open: float = 0.0
+var _run_on: bool = false
+var _run_hold: float = 0.0
+const RUN_STICK := 0.7
+const RUN_HOLD := 0.4
 var _vel: Vector3 = Vector3.ZERO
 var _fov_base: float = -1.0
 var _fov_written: float = -1.0
@@ -239,6 +244,19 @@ func _keep_arm(focus: Vector3, pos: Vector3, arm: float) -> Vector3:
 ## G24a: abertura suave na corrida pela velocidade planar suavizada.
 func _update_run(delta: float) -> void:
 	var want := 0.0 if framing_world else smoothstep(RUN_FROM, RUN_TO, Vector2(_vel.x, _vel.z).length())
+	if occlusion_fade:
+		# G24a2: no jogo a abertura segue a INTENCAO de correr (segurar `run` com o direcional >= RUN_STICK por
+		# RUN_HOLD s; solta por RUN_HOLD s fecha), nao a velocidade: desvio que freia por um instante nao mexe no braco.
+		var intent := Input.is_action_pressed(&"run") \
+				and Input.get_vector(&"move_left", &"move_right", &"move_up", &"move_down").length() >= RUN_STICK
+		if intent != _run_on:
+			_run_hold += delta
+			if _run_hold >= RUN_HOLD:
+				_run_on = intent
+				_run_hold = 0.0
+		else:
+			_run_hold = 0.0
+		want = 1.0 if _run_on and not framing_world else 0.0
 	if delta <= 0.0:
 		run_open = want
 		return
@@ -301,14 +319,14 @@ func _arm_clear(pivot: Vector3, free_pos: Vector3, delta: float) -> Vector3:
 			l -= 0.1
 			p = pivot + (free_pos - pivot).normalized() * l
 	else:
-		p = _slide(_written, free_pos)
+		p = _slide(_written, free_pos, pivot)
 	_arm = p.distance_to(pivot)
 	last_pull = maxf(0.0, free_len - _arm)
 	return p
 
 
 ## Esfera da camera de `from` rumo a `to` (no maximo STEP_MAX), com ate 3 escorregoes e saida de penetracao.
-func _slide(from: Vector3, to: Vector3) -> Vector3:
+func _slide(from: Vector3, to: Vector3, pivot: Vector3) -> Vector3:
 	if _probe == null:
 		_inside(from)
 	var space := get_world_3d().direct_space_state
@@ -346,6 +364,13 @@ func _slide(from: Vector3, to: Vector3) -> Vector3:
 		q.motion = down
 		var rd := space.cast_motion(q)
 		p += down * (rd[0] if rd.size() == 2 else 1.0)
+	if p.y > to.y + CAM_RISE_MAX and p.y > pivot.y + 0.01:
+		# Empurrada para cima (saida de penetracao em cima de toldo/telhado): desce pela reta ate a mira, chegando
+		# mais perto do heroi, em vez de ficar em cima.
+		var k := (to.y + CAM_RISE_MAX - pivot.y) / (p.y - pivot.y)
+		var near := pivot + (p - pivot) * clampf(k, 0.0, 1.0)
+		if not _inside(near):
+			p = near
 	if _inside(p):
 		# A varredura nao viu (forma concava/fina): fica onde estava, se la estava livre.
 		var back := _out_of_canopies(_depenetrate(from))
@@ -394,8 +419,12 @@ func _inside(p: Vector3) -> bool:
 		_probe_soft.radius = SOFT_RADIUS
 	if not is_inside_tree():
 		return false
+	if _probe_in == null:
+		# Esfera menor que a da varredura: encostar (o cast_motion para rente) nao conta como dentro.
+		_probe_in = SphereShape3D.new()
+		_probe_in.radius = PROBE_RADIUS * 0.75
 	var q := PhysicsShapeQueryParameters3D.new()
-	q.shape = _probe
+	q.shape = _probe_in
 	q.transform = Transform3D(Basis(), p)
 	q.collision_mask = collision_mask
 	q.exclude = exclude

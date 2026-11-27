@@ -185,6 +185,10 @@ static func occl_variant(m: Material) -> Material:
 	return v
 
 
+static func occl_variants() -> Array:
+	return _occl_mats.values()
+
+
 ## Parametros do pontilhado nas variantes ja criadas (dezenas no maximo; nao por malha).
 static func set_occlusion(cam: Vector3, hero: Vector3, radius: float, amount: float) -> void:
 	for k in _occl_mats:

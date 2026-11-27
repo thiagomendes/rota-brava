@@ -1000,3 +1000,15 @@ Critérios de aceite:
     - Não provei que o teste falharia sem o limite.
   - **Prova contra o rig da integração (`775223a`)**, mesmo teste adaptado: salto máximo de 3,32 m (normal) e 3,73 m (reduzido); câmera dentro em 149 e 146 passos; vista tapada sem pontilhado em 68 e 69 passos; herói no quadro com mínimo de 8% e 30%. **Agora:** salto máximo de 0,20 m, 0 passos dentro, 0 sem pontilhado, mínimo de 97% no quadro.
   - **Suíte completa:** `FALHOU (5380 PASS, 1 FALHA(S))` em 555 s. A única falha é o "vai-e-volta" do G3.
+- **G24a2, rodada 3** (em andamento; ainda falha):
+  - **Abertura da corrida pela intenção:** segurar `run` com o direcional ≥ 0,7 por 0,4 s abre; soltar por 0,4 s fecha. No percurso do G3 a abertura mudou só 1 vez e ficou em 1,00. **Mesmo assim o G3 piorou para 9,1/s.**
+    - Medido: 1230 quadros caíam na volta de segurança "câmera dentro de algo → fica onde estava". A esfera da checagem (0,2 m) contava o simples encosto deixado pelo `cast_motion` como estar dentro, e a câmera alternava entre duas posições.
+    - Correção: a checagem de "dentro" passou a usar esfera de 0,15 m. Isso zerou essas voltas e trouxe o G3 para **4,2/s (limite 3)**, com p99 de 59,3 m/s² e 0,22 inversões/s do braço.
+    - Opção (b), congelar a abertura durante o desvio: não muda nada aqui, porque a abertura já fica constante no percurso.
+  - **Efeito colateral no toldo:** com a esfera de 0,15 m, sair de penetração empurra a câmera para cima do toldo do M5, até 3,12 m acima do herói (limite do teste 2,70).
+    - Descer pela reta até a mira não resolve: o ponto de baixo fica dentro do toldo.
+    - O teste do toldo falha agora com `CAM_RISE_MAX` em vigor, então a prova "falha sem o limite" não se aplica.
+  - **Aquecimento das variantes:** `CameraOcclusion.warm_up` põe um quadrado de 1 cm por variante, mais uma cópia reduzida de cada malha de MultiMesh trocada, em y = −1000 por 0,5 s na carga.
+    - Não verifiquei se a Godot 4.7 monta o pipeline de instâncias fora do frustum. Se ela só compila no desenho, isso não basta e as instâncias precisam entrar na vista da câmera.
+    - CPU da troca na suíte (3 processos ao mesmo tempo): média de 95 µs, p99 de 906 µs, máximo de 5,4 ms.
+  - **Suíte completa:** `FALHOU (5378 PASS, 3 FALHA(S))` em 525 s. As falhas são o "vai-e-volta" do G3 (4,2/s) e o teste do toldo nos 2 modos (3,12 m).

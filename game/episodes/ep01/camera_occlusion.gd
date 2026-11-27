@@ -41,6 +41,34 @@ func _init(world: Node) -> void:
 				_mm_cache[src] = WV2Materials.occl_mesh(src)
 
 
+## Aquecimento: um quadrado minusculo por variante pontilhada (e por malha de MultiMesh trocada), longe da vista
+## (y -1000), por `seconds`, para a Godot montar o pipeline de cada variante na carga e nao no primeiro tapar.
+func warm_up(parent: Node3D, seconds: float = 0.5) -> int:
+	var root := Node3D.new()
+	root.name = "OcclusionWarmUp"
+	parent.add_child(root)
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.01, 0.01)
+	var n := 0
+	for m: Material in WV2Materials.occl_variants():
+		var mi := MeshInstance3D.new()
+		mi.mesh = quad
+		mi.material_override = m
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		root.add_child(mi)
+		mi.global_position = Vector3(0, -1000.0, 0)
+		n += 1
+	for src: Mesh in _mm_cache:
+		var mi2 := MeshInstance3D.new()
+		mi2.mesh = _mm_cache[src]
+		root.add_child(mi2)
+		mi2.global_position = Vector3(0, -1000.0, 0)
+		mi2.scale = Vector3.ONE * 0.001
+		n += 1
+	parent.get_tree().create_timer(seconds).timeout.connect(root.queue_free)
+	return n
+
+
 ## Um quadro: `amount` > 0 troca as malhas no cone; 0 devolve todas. Parametros do shader nas variantes.
 func update(cam: Vector3, hero: Vector3, radius: float, amount: float) -> void:
 	var t0 := Time.get_ticks_usec()
