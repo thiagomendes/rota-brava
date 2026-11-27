@@ -32,6 +32,13 @@ META = {
     "tow_rope": ("M6", True, "throw", "climber", "corda de reboque (rolo ou trecho esticado de comprimento variavel)"),
     "help_arrow": ("", False, "", "", "seta de ajuda (degrau 3), ponta na origem"),
     "target_ring": ("", False, "", "", "pulso de destaque do alvo (anel no chao)"),
+    # G19 (acoes no jogo): pecas novas
+    "clothes_bench": ("M2", True, "step_up_hang", "", "banco de 2 degraus ao pe do varal (o heroi sobe para alcancar a corda)"),
+    "fruit_box_apple": ("M4", True, "carry_deliver", "pilot", "caixinha de macas: sai do carrinho para a barraca vermelha"),
+    "fruit_box_lemon": ("M4", True, "carry_deliver", "pilot", "caixinha de limoes: sai do carrinho para a barraca amarela"),
+    "fruit_box_grapes": ("M4", True, "carry_deliver", "pilot", "caixinha de uvas: sai do carrinho para a barraca azul"),
+    "lens_mount": ("M7", True, "place", "climber", "encaixe da lente na parede do farol, junto a galeria"),
+    "hand_compass": ("M7", True, "hold", "pilot", "bussola de mao da Leme (mira a lanterna)"),
 }
 EMBLEM_META = {"paw": "tracker", "carabiner": "climber", "helm": "pilot", "compass": "", "star": ""}
 for k, hero in EMBLEM_META.items():
@@ -40,6 +47,9 @@ EXTRA_META = {
     "crate_apple": {"stall": "M4_Stall_Apple", "fruit": "apple", "color": "e0412b"},
     "crate_lemon": {"stall": "M4_Stall_Lemon", "fruit": "lemon", "color": "f2c81d"},
     "crate_grapes": {"stall": "M4_Stall_Grapes", "fruit": "grapes", "color": "4a6fd8"},
+    "fruit_box_apple": {"stall": "M4_Stall_Apple", "fruit": "apple", "color": "e0412b"},
+    "fruit_box_lemon": {"stall": "M4_Stall_Lemon", "fruit": "lemon", "color": "f2c81d"},
+    "fruit_box_grapes": {"stall": "M4_Stall_Grapes", "fruit": "grapes", "color": "4a6fd8"},
 }
 for k in EMBLEM_META:
     EXTRA_META["emblem_" + k] = {"icon": k}

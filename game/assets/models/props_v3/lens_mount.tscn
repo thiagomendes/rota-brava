@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://assets/models/props_v3/props_v3_piece.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/lens_mount.glb" id="2_glb"]
+
+[node name="Pv3LensMount" type="Node3D"]
+script = ExtResource("1_script")
+metadata/piece_id = "lens_mount"
+metadata/mission = "M7"
+metadata/interactive = true
+metadata/interaction = "place"
+metadata/member = "climber"
+metadata/note = "encaixe da lente na parede do farol, junto a galeria"
+metadata/tris = 176
+metadata/tris_budget = 1000
+metadata/pivot = "meio da placa na parede; lente em (0, 0, 0,12)"
+metadata/provisional = false
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/props_v3/build_props_v3.py"
+
+[node name="Model" parent="." instance=ExtResource("2_glb")]

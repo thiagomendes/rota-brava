@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://assets/models/props_v3/props_v3_piece.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/fruit_box_grapes.glb" id="2_glb"]
+
+[node name="Pv3FruitBoxGrapes" type="Node3D"]
+script = ExtResource("1_script")
+metadata/piece_id = "fruit_box_grapes"
+metadata/mission = "M4"
+metadata/interactive = true
+metadata/interaction = "carry_deliver"
+metadata/member = "pilot"
+metadata/note = "caixinha de uvas: sai do carrinho para a barraca azul"
+metadata/tris = 904
+metadata/tris_budget = 2500
+metadata/pivot = "centro do fundo"
+metadata/provisional = false
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/props_v3/build_props_v3.py"
+metadata/stall = "M4_Stall_Grapes"
+metadata/fruit = "grapes"
+metadata/color = "4a6fd8"
+
+[node name="Model" parent="." instance=ExtResource("2_glb")]

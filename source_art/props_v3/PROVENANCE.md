@@ -86,3 +86,13 @@ meio tapada pelos arbustos do promontório (posição do mundo, não da peça).
 - Tecidos são chapas rígidas (balançam inteiros no `sway`, sem simulação de pano).
 - Asa recolhida da gaivota é rotação rígida: a face de baixo (cinza-claro) fica para fora.
 - Emblema com o mosquetão lê como um "0" com barra a distância.
+
+## G19 (2026-11-27, `gameplay`): peças das ações no jogo
+Mesmo processo e mesma originalidade das peças acima (geometria por script em `build_props_v3.py`, materiais `wv2_*`,
+nada de terceiros). Exportadas com `-- --only=<ids>` (as outras GLB não foram reescritas); cenas por `gen_scenes.py`.
+| Peça | Para quê | Medidas |
+|---|---|---|
+| `clothes_bench` | M2: banco de 2 degraus ao pé do varal; o herói sobe para alcançar a corda | tampo 0,90 m, degrau 0,45 m, 2,0 m de comprimento |
+| `fruit_box_apple/lemon/grapes` | M4: caixinha de cada barraca, pega com as duas mãos (a caixa grande fica no carrinho) | 0,16 x 0,13 x 0,09 m |
+| `lens_mount` | M7: encaixe da lente na parede do farol, junto à galeria | berço para o aro de raio 0,2 m |
+| `hand_compass` | M7: bússola de mão da Leme | raio 0,07 m |

@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://assets/models/props_v3/props_v3_piece.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/clothes_bench.glb" id="2_glb"]
+
+[node name="Pv3ClothesBench" type="Node3D"]
+script = ExtResource("1_script")
+metadata/piece_id = "clothes_bench"
+metadata/mission = "M2"
+metadata/interactive = true
+metadata/interaction = "step_up_hang"
+metadata/member = ""
+metadata/note = "banco de 2 degraus ao pe do varal (o heroi sobe para alcancar a corda)"
+metadata/tris = 180
+metadata/tris_budget = 2500
+metadata/pivot = "centro do chao sob o tampo (tampo 0,90 m, degrau 0,45 m)"
+metadata/provisional = false
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/props_v3/build_props_v3.py"
+
+[node name="Model" parent="." instance=ExtResource("2_glb")]

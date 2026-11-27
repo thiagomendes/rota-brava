@@ -3180,6 +3180,229 @@
       }
     },
     {
+      "id": "props_v3_clothes_bench",
+      "nome": "Ep01 v3 · banco de 2 degraus ao pe do varal (o heroi sobe para alcancar a corda)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M2",
+      "saida_glb": "game/assets/models/props_v3/clothes_bench.glb",
+      "glb_sha256": "d0d8e5af196d1c6263584302bebc82db8548e18d6f8d04886460c234f6e2778c",
+      "glb_bytes": 16852,
+      "cena": "game/assets/models/props_v3/clothes_bench.tscn",
+      "cena_sha256": "f58e02a71791cbfa3271d898a3f756d0280c6b70ce88c052e16dd0fd939aed6b",
+      "cena_bytes": 844,
+      "triangulos": 180,
+      "orcamento_tris": 2500,
+      "materiais": [
+        "wv2_wood"
+      ],
+      "pivo": "centro do chao sob o tampo (tampo 0,90 m, degrau 0,45 m)",
+      "animacoes": []
+    },
+    {
+      "id": "props_v3_fruit_box_apple",
+      "nome": "Ep01 v3 · caixinha de macas: sai do carrinho para a barraca vermelha",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M4",
+      "saida_glb": "game/assets/models/props_v3/fruit_box_apple.glb",
+      "glb_sha256": "32e74e7e89e7904ded84bb4ac4b0f44ec3cb068d83a1325ca378373e919f426d",
+      "glb_bytes": 25200,
+      "cena": "game/assets/models/props_v3/fruit_box_apple.tscn",
+      "cena_sha256": "cdba28c95613756e3d79eb3e4bf084bc9cca57ba8ccf92a4e5161e84d8d67fd4",
+      "cena_bytes": 887,
+      "triangulos": 388,
+      "orcamento_tris": 2500,
+      "materiais": [
+        "wv2_glossy",
+        "wv2_paint",
+        "wv2_wood"
+      ],
+      "pivo": "centro do fundo",
+      "animacoes": []
+    },
+    {
+      "id": "props_v3_fruit_box_grapes",
+      "nome": "Ep01 v3 · caixinha de uvas: sai do carrinho para a barraca azul",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M4",
+      "saida_glb": "game/assets/models/props_v3/fruit_box_grapes.glb",
+      "glb_sha256": "69b512e7a1519df8a922596f157f7bb6a342f0574d7be5b23d8d3b390716d31d",
+      "glb_bytes": 41092,
+      "cena": "game/assets/models/props_v3/fruit_box_grapes.tscn",
+      "cena_sha256": "f1c4693125cdbd086c0e1c9515ec7762976d1a640b10d8134f1bf7fee6a892e3",
+      "cena_bytes": 887,
+      "triangulos": 904,
+      "orcamento_tris": 2500,
+      "materiais": [
+        "wv2_glossy",
+        "wv2_paint",
+        "wv2_wood"
+      ],
+      "pivo": "centro do fundo",
+      "animacoes": []
+    },
+    {
+      "id": "props_v3_fruit_box_lemon",
+      "nome": "Ep01 v3 · caixinha de limoes: sai do carrinho para a barraca amarela",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M4",
+      "saida_glb": "game/assets/models/props_v3/fruit_box_lemon.glb",
+      "glb_sha256": "7ee4cb559c7211469897a134b5debe75a8436710df9b984d606b767f100191c9",
+      "glb_bytes": 19960,
+      "cena": "game/assets/models/props_v3/fruit_box_lemon.tscn",
+      "cena_sha256": "321a2585dfc3c5702e3a182d02035afd49531899f54f298d80f72159d0e06afc",
+      "cena_bytes": 887,
+      "triangulos": 344,
+      "orcamento_tris": 2500,
+      "materiais": [
+        "wv2_glossy",
+        "wv2_paint",
+        "wv2_wood"
+      ],
+      "pivo": "centro do fundo",
+      "animacoes": []
+    },
+    {
+      "id": "props_v3_hand_compass",
+      "nome": "Ep01 v3 · bussola de mao da Leme (mira a lanterna)",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M7",
+      "saida_glb": "game/assets/models/props_v3/hand_compass.glb",
+      "glb_sha256": "d5b14cc7af20c47d86548853eef5278bbecb25d92d644ce92822009b8fb1e7f5",
+      "glb_bytes": 15100,
+      "cena": "game/assets/models/props_v3/hand_compass.tscn",
+      "cena_sha256": "362f8cdb2bbef46796969f9363ea4685e671f277b76cd79be0b8892f99e0446f",
+      "cena_bytes": 766,
+      "triangulos": 324,
+      "orcamento_tris": 800,
+      "materiais": [
+        "wv2_metal",
+        "wv2_paint"
+      ],
+      "pivo": "centro do fundo",
+      "animacoes": []
+    },
+    {
+      "id": "props_v3_lens_mount",
+      "nome": "Ep01 v3 · encaixe da lente na parede do farol, junto a galeria",
+      "agente": "art3d",
+      "status": "provisorio",
+      "aprovacao": "modelo final para o jogo (nao e bloco); aprovacao estetica pendente (Thiago)",
+      "data": "2026-11-25",
+      "originalidade": "geometria 100% por script (bmesh e formulas proprias); nenhum modelo, malha, textura ou kit de terceiros; materiais = texturas procedurais do mundo v2 + 5 materiais pv3_* da Godot",
+      "processo": {
+        "script": "source_art/props_v3/build_props_v3.py",
+        "ferramenta": "Blender 4.5.16 LTS (tools/blender.sh, headless)",
+        "exportador": "glTF 2.0 binario (GLB), +Y up, metros, cor de vertice, UV em metros"
+      },
+      "origem": [
+        "source_art/props_v3/build_props_v3.py",
+        "source_art/props_v3/render_props_v3.py",
+        "source_art/props_v3/gen_scenes.py",
+        "source_art/props_v3/props_v3.blend",
+        "source_art/props_v3/PROVENANCE.md",
+        "source_art/environment_v2/wv2lib.py"
+      ],
+      "missao": "M7",
+      "saida_glb": "game/assets/models/props_v3/lens_mount.glb",
+      "glb_sha256": "13adb949fac0cee609e04d022fb12d4a40a2da7633219c7549d811cab194be2c",
+      "glb_bytes": 11412,
+      "cena": "game/assets/models/props_v3/lens_mount.tscn",
+      "cena_sha256": "2383a541a58000c3fc568b870fb5b23f3e9ca868dc7d5e45cfc65ab2577c0c3e",
+      "cena_bytes": 807,
+      "triangulos": 176,
+      "orcamento_tris": 1000,
+      "materiais": [
+        "wv2_metal"
+      ],
+      "pivo": "meio da placa na parede; lente em (0, 0, 0,12)",
+      "animacoes": []
+    },
+    {
       "id": "brand_icons_e7",
       "nome": "Pictogramas da marca da E7: lua, peixe, flor (barquinhos da festa), Dona Amora e Farol 7 (retratos-icone da legenda), mosquetao redesenhado",
       "agente": "ux",

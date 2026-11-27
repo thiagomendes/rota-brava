@@ -925,6 +925,82 @@ def target_ring():
     return a, b
 
 
+# ================================================================== G19: pecas das acoes (banco, caixinhas, amarra, encaixe, bussola)
+BENCH_TOP, BENCH_STEP, BENCH_L = 0.90, 0.45, 2.0
+
+
+def clothes_bench():
+    """G19 (M2): banco de dois degraus ao pe do varal, ao longo da corda (eixo X). O heroi (1,10 m, mao a ~0,85 m com o
+    objeto erguido) sobe no degrau (0,45 m) e no tampo (0,90 m) para alcancar a corda (~1,75 m). Tampo de z -0,20 a 0,16
+    (a corda passa sobre a borda de tras, z -0,20); degrau de z 0,16 a 0,44. Pivo: centro do chao sob o tampo."""
+    m = MB("pv3_clothes_bench")
+    rng = random.Random(71)
+    wood, dark = hexc("#C99A68"), hexc("#9C7048")
+    L = BENCH_L
+    for z0, z1 in ((-0.20, -0.02), (-0.02, 0.16)):
+        m.box((0, BENCH_TOP - 0.02, (z0 + z1) / 2), (L, 0.04, z1 - z0 - 0.006), "wv2_wood",
+              tuple(c * rng.uniform(0.95, 1.04) for c in wood), 0.006, 1, rng=rng)
+    m.box((0, BENCH_STEP - 0.02, 0.30), (L, 0.04, 0.274), "wv2_wood", wood, 0.006, 1, rng=rng)
+    for sx in (-1, 1):
+        x = sx * (L / 2 - 0.06)
+        for z in (-0.17, 0.13):
+            m.box((x, (BENCH_TOP - 0.04) / 2, z), (0.06, BENCH_TOP - 0.04, 0.05), "wv2_wood", dark, 0.006, 1, grain="y", rng=rng)
+        m.box((x, (BENCH_STEP - 0.04) / 2, 0.41), (0.06, BENCH_STEP - 0.04, 0.05), "wv2_wood", dark, 0.006, 1, grain="y", rng=rng)
+        m.box((x, 0.2, -0.02), (0.035, 0.06, 0.25), "wv2_wood", dark, 0.004, 1, grain="z", rng=rng)
+        m.box((x, 0.2, 0.27), (0.035, 0.06, 0.24), "wv2_wood", dark, 0.004, 1, grain="z", rng=rng)
+    m.box((0, 0.2, -0.17), (L - 0.16, 0.06, 0.03), "wv2_wood", dark, 0.004, 1, rng=rng)
+    m.box((0, 0.2, 0.41), (L - 0.16, 0.06, 0.03), "wv2_wood", dark, 0.004, 1, rng=rng)
+    return m
+
+
+def fruit_box(fruit):
+    """G19 (M4): caixinha de feira do tamanho de crianca, pega com as duas maos (palmas a ~0,20 m: 0,16 m em X entre as
+    palmas, 0,13 m em Z, 0,09 m de altura), na cor da barraca, com frutas. Pivo: centro do fundo."""
+    m = MB("pv3_fruit_box_" + fruit)
+    rng = random.Random({"apple": 81, "lemon": 82, "grapes": 83}[fruit])
+    col = hexc(STALL_COLORS[fruit])
+    dark = tuple(c * 0.78 for c in col)
+    W, D, H, b = 0.16, 0.13, 0.09, 0.012
+    m.box((0, 0.006, 0), (W - 0.004, 0.012, D - 0.004), "wv2_wood", hexc("#B48A60"), 0.002, 1, rng=rng)
+    for sz in (-1, 1):
+        m.box((0, H / 2, sz * (D / 2 - b / 2)), (W, H, b), "wv2_paint", col, 0.003, 1, rng=rng)
+    for sx in (-1, 1):
+        m.box((sx * (W / 2 - b / 2), H / 2, 0), (b, H, D - 2 * b), "wv2_paint", dark, 0.003, 1, grain="z", rng=rng)
+    f = T(0, H * 0.5, D / 2 + 0.001)
+    m.cyl((0, 0, 0), 0.03, 0.006, "wv2_paint", hexc("#FFF4E0"), seg=16, rot=f @ R(rx=90))
+    fruit_icon(m, f @ T(0, 0, 0.005) @ S(0.11), fruit)
+    FT = H - 0.03
+    m.box((0, FT - 0.005, 0), (W - 2 * b, 0.01, D - 2 * b), "wv2_wood", hexc("#C9A86A"), 0.0, 1, rng=rng)
+    rest = {"apple": 0.042 * 0.9, "lemon": 0.036 * 0.95, "grapes": 0.042}[fruit] * 0.8
+    for x, z in ((-0.035, -0.025), (0.035, -0.025), (-0.035, 0.025), (0.035, 0.025)):
+        fruit_ball(m, (x, FT + rest, z), fruit, rng, s=0.8)
+    return m
+
+
+def lens_mount():
+    """G19 (M7): encaixe da lente na parede do farol, junto a porta da galeria: placa de latao, braco e berco em arco que
+    segura o aro da lente (raio 0,2 m). Pivo: meio da placa, na parede; frente = +Z; a lente fica com o centro em
+    (0, 0, 0,12), de pe, virada para +Z."""
+    m = MB("pv3_lens_mount")
+    gold = hexc("#C9A13A")
+    m.box((0, 0, 0.01), (0.12, 0.34, 0.02), "wv2_metal", gold, 0.004, 1)
+    m.box((0, -0.2, 0.07), (0.04, 0.03, 0.12), "wv2_metal", gold, 0.004, 1)
+    arc = [(math.cos(a) * 0.25, math.sin(a) * 0.25, 0.12) for a in [math.pi * (1.15 + 0.7 * i / 12) for i in range(13)]]
+    m.tube(arc, 0.014, "wv2_metal", gold, seg=6)
+    return m
+
+
+def hand_compass():
+    """G19 (M7): bussola de mao da Leme (raio 0,07 m): caixa de latao, mostrador creme e agulha vermelha. Pivo: centro do
+    fundo."""
+    m = MB("pv3_hand_compass")
+    m.cyl((0, 0, 0), 0.07, 0.025, "wv2_metal", hexc("#C9A13A"), seg=20, bevel=0.004)
+    m.cyl((0, 0.025, 0), 0.06, 0.004, "wv2_paint", hexc("#FFF4E0"), seg=20)
+    m.prism((0, 0.032, 0), [(-0.008, 0.0), (0.0, -0.05), (0.008, 0.0), (0.0, 0.05)], 0.006, "wv2_paint", hexc("#D23C2C"),
+            rot=R(rx=90))
+    return m
+
+
 # ================================================================== exportacao
 def export_glb(objs, path, anim=False):
     bpy.ops.object.select_all(action="DESELECT")
@@ -964,11 +1040,22 @@ PIECES = [
     ("fish", fish, "meio do corpo (pega do bico)", 1500),
     ("help_arrow", help_arrow, "ponta da seta", 600),
 ] + [("emblem_" + k, (lambda kk: (lambda: emblem(kk)))(k), "centro da moeda", 3000) for k in EMBLEMS]
+# G19 (2026-11-27): no fim da lista, para as sementes (1000 + i) das pecas anteriores nao mudarem.
+PIECES += [
+    ("clothes_bench", clothes_bench, "centro do chao sob o tampo (tampo 0,90 m, degrau 0,45 m)", 2500),
+    ("fruit_box_apple", lambda: fruit_box("apple"), "centro do fundo", 2500),
+    ("fruit_box_lemon", lambda: fruit_box("lemon"), "centro do fundo", 2500),
+    ("fruit_box_grapes", lambda: fruit_box("grapes"), "centro do fundo", 2500),
+    ("lens_mount", lens_mount, "meio da placa na parede; lente em (0, 0, 0,12)", 1000),
+    ("hand_compass", hand_compass, "centro do fundo", 800),
+]
 
 
 def main():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     renders = "--renders" in argv
+    # G19: --only=id,id exporta so essas pecas (as outras entram no .blend e no info sem reescrever o GLB)
+    only = next((x.split("=", 1)[1].split(",") for x in argv if x.startswith("--only=")), None)
     reset()
     mats = materials()
     info = {"pecas": {}, "data": "2026-11-25", "blender": bpy.app.version_string}
@@ -1009,7 +1096,8 @@ def main():
                              "animacoes": anims}
     for pid, objs, anim in export_sets:
         path = os.path.join(GLB_DIR, pid + ".glb")
-        export_glb(objs, path, anim)
+        if only is None or pid in only:
+            export_glb(objs, path, anim)
         info["pecas"][pid]["glb"] = "game/assets/models/props_v3/%s.glb" % pid
         info["pecas"][pid]["glb_bytes"] = os.path.getsize(path)
         print("PV3 %-18s tris=%5d orc=%5d bytes=%d" % (pid, info["pecas"][pid]["triangulos"], info["pecas"][pid]["orcamento_tris"],

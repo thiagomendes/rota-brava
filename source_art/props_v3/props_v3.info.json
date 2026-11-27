@@ -78,6 +78,19 @@
    "pivo": "meio da gola, na linha do varal",
    "triangulos": 1840
   },
+  "clothes_bench": {
+   "glb": "game/assets/models/props_v3/clothes_bench.glb",
+   "glb_bytes": 16852,
+   "materiais": [
+    "wv2_wood"
+   ],
+   "objetos": {
+    "pv3_clothes_bench": 180
+   },
+   "orcamento_tris": 2500,
+   "pivo": "centro do chao sob o tampo (tampo 0,90 m, degrau 0,45 m)",
+   "triangulos": 180
+  },
   "crate_apple": {
    "glb": "game/assets/models/props_v3/crate_apple.glb",
    "glb_bytes": 75212,
@@ -220,6 +233,51 @@
    "pivo": "centro da base (assenta na agua da bacia de cima)",
    "triangulos": 1172
   },
+  "fruit_box_apple": {
+   "glb": "game/assets/models/props_v3/fruit_box_apple.glb",
+   "glb_bytes": 25200,
+   "materiais": [
+    "wv2_glossy",
+    "wv2_paint",
+    "wv2_wood"
+   ],
+   "objetos": {
+    "pv3_fruit_box_apple": 388
+   },
+   "orcamento_tris": 2500,
+   "pivo": "centro do fundo",
+   "triangulos": 388
+  },
+  "fruit_box_grapes": {
+   "glb": "game/assets/models/props_v3/fruit_box_grapes.glb",
+   "glb_bytes": 41092,
+   "materiais": [
+    "wv2_glossy",
+    "wv2_paint",
+    "wv2_wood"
+   ],
+   "objetos": {
+    "pv3_fruit_box_grapes": 904
+   },
+   "orcamento_tris": 2500,
+   "pivo": "centro do fundo",
+   "triangulos": 904
+  },
+  "fruit_box_lemon": {
+   "glb": "game/assets/models/props_v3/fruit_box_lemon.glb",
+   "glb_bytes": 19960,
+   "materiais": [
+    "wv2_glossy",
+    "wv2_paint",
+    "wv2_wood"
+   ],
+   "objetos": {
+    "pv3_fruit_box_lemon": 344
+   },
+   "orcamento_tris": 2500,
+   "pivo": "centro do fundo",
+   "triangulos": 344
+  },
   "gull": {
    "animacoes": {
     "flee": {
@@ -288,6 +346,20 @@
    "pivo": "entre os pes, no chao; frente = +Z",
    "triangulos": 3564
   },
+  "hand_compass": {
+   "glb": "game/assets/models/props_v3/hand_compass.glb",
+   "glb_bytes": 15100,
+   "materiais": [
+    "wv2_metal",
+    "wv2_paint"
+   ],
+   "objetos": {
+    "pv3_hand_compass": 324
+   },
+   "orcamento_tris": 800,
+   "pivo": "centro do fundo",
+   "triangulos": 324
+  },
   "help_arrow": {
    "glb": "game/assets/models/props_v3/help_arrow.glb",
    "glb_bytes": 12904,
@@ -301,6 +373,19 @@
    "orcamento_tris": 600,
    "pivo": "ponta da seta",
    "triangulos": 232
+  },
+  "lens_mount": {
+   "glb": "game/assets/models/props_v3/lens_mount.glb",
+   "glb_bytes": 11412,
+   "materiais": [
+    "wv2_metal"
+   ],
+   "objetos": {
+    "pv3_lens_mount": 176
+   },
+   "orcamento_tris": 1000,
+   "pivo": "meio da placa na parede; lente em (0, 0, 0,12)",
+   "triangulos": 176
   },
   "target_ring": {
    "glb": "game/assets/models/props_v3/target_ring.glb",
