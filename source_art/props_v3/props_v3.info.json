@@ -33,7 +33,7 @@
   },
   "cloth_pup_scarf": {
    "glb": "game/assets/models/props_v3/cloth_pup_scarf.glb",
-   "glb_bytes": 80876,
+   "glb_bytes": 76236,
    "materiais": [
     "pv3_cloth",
     "pv3_vinyl",
@@ -41,11 +41,11 @@
     "wv2_wood"
    ],
    "objetos": {
-    "pv3_cloth_pup_scarf": 1436
+    "pv3_cloth_pup_scarf": 1316
    },
    "orcamento_tris": 2500,
    "pivo": "meio da dobra, na linha do varal",
-   "triangulos": 1436
+   "triangulos": 1316
   },
   "cloth_scarf": {
    "glb": "game/assets/models/props_v3/cloth_scarf.glb",

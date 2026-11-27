@@ -253,19 +253,19 @@ def sock():
 
 
 def pup_scarf():
-    """G25: lenco vermelho do filhote (bandana em triangulo, pata creme e tufos de pelo castanho), a pista do M2 nos
+    """G25: lenco vermelho do filhote (bandana em triangulo 0,22 x 0,22 m, pata creme e tufos de pelo castanho), a pista do M2 nos
     juncos no lugar da meia. Menor que o lenco do varal e de outra cor. Pivo: meio da dobra, na linha do varal."""
     m = MB("pv3_cloth_pup_scarf")
-    poly = [(-0.15, 0.0), (0.15, 0.0), (0.02, -0.205), (0.0, -0.215), (-0.02, -0.205)]
+    poly = [(-0.11, 0.0), (0.11, 0.0), (0.02, -0.205), (0.0, -0.215), (-0.02, -0.205)]
 
     def disp(x, y):
         return 0.009 * math.sin(x * 24.0 + 0.4) * min(1.0, -y * 6.0) + 0.006 * math.sin(y * 34.0 + x * 6.0)
     red = hexc("#E0412B")
     m.add_bm(sheet_bm(poly, 2, 0.01, disp), T(0, 0, 0), "pv3_cloth", red, uv="box")
     # dobra (rolinho) com as duas pontas de amarrar soltas
-    m.tube([(-0.15, 0.004, 0.0), (0.0, 0.006, 0.0), (0.15, 0.004, 0.0)], 0.01, "pv3_cloth", hexc("#C9362A"), seg=8)
+    m.tube([(-0.11, 0.004, 0.0), (0.0, 0.006, 0.0), (0.11, 0.004, 0.0)], 0.01, "pv3_cloth", hexc("#C9362A"), seg=8)
     for s_ in (-1, 1):
-        m.tube([(s_ * 0.15, 0.004, 0.0), (s_ * 0.185, -0.03, 0.004), (s_ * 0.2, -0.07, 0.0)], 0.008, "pv3_cloth",
+        m.tube([(s_ * 0.11, 0.004, 0.0), (s_ * 0.12, -0.02, 0.004), (s_ * 0.122, -0.045, 0.0)], 0.008, "pv3_cloth",
                hexc("#C9362A"), seg=6)
     # pata creme na frente e atras: almofada + 4 dedos
     pad = [(math.cos(a_) * 0.032, -0.105 + math.sin(a_) * 0.024) for a_ in [k * math.pi / 8 for k in range(16)]]
@@ -278,8 +278,8 @@ def pup_scarf():
     # tufos de pelo do filhote presos no tecido (a pista)
     rng = random.Random(25)
     for k in range(7):
-        x, y = rng.uniform(-0.1, 0.1), rng.uniform(-0.17, -0.02)
-        if abs(x) > 0.15 + y * 0.7:   # fica dentro do triangulo
+        x, y = rng.uniform(-0.07, 0.07), rng.uniform(-0.17, -0.02)
+        if abs(x) > 0.11 + y * 0.5:   # fica dentro do triangulo
             x *= 0.4
         sd = 1 if k % 2 else -1
         for j in range(3):
