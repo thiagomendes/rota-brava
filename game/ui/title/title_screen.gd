@@ -24,6 +24,10 @@ const LOGO_MAX_H := 0.34
 const SAFE_FRACTION := 0.05
 const SAFE_MIN := 48.0
 const BUTTON_HEIGHT := 128.0
+## G16 (RB-M1, travamento no iOS) INTERRUPTOR: nas plataformas moveis (`OS.has_feature("mobile")`) o menu usa so a
+## imagem parada da arte-chave, sem o palco 3D (a vila inteira so para o menu e o caminho mais pesado no celular).
+## Vale nos builds de validacao; `true` religa o palco 3D no celular. No desktop nada muda.
+const MOBILE_KEY_ART_3D := false
 
 var background: ColorRect
 ## Fundo 3D animado (null se a cena da arte-chave nao existir).
@@ -37,6 +41,10 @@ var _key_frame_ms := 0
 ## Teto da tela de carregamento estourou: o menu abre sobre a imagem parada e o palco entra depois com fade.
 var _key_late := false
 var _key_ready := false
+## Recursos da arte-chave ja recolhidos da fila, por caminho (o palco sai do cache, sem load sincrono).
+var _key_res: Dictionary = {}
+## Testes: -1 segue a plataforma, 0 forca desktop, 1 forca mobile (definir antes de entrar na arvore).
+var mobile_override: int = -1
 var hero_stage: SubViewportContainer
 ## Onde o lead instancia os 3 herois 3D (os placeholders sao filhos chamados Placeholder*).
 var hero_root: Node3D
@@ -64,8 +72,18 @@ func _ready() -> void:
 		ThemeV2.pop_in(b, 0.6, 0.4, 0.25 + i * 0.07)
 		i += 1
 	play_button.grab_focus()
+	# G16: os pedidos so comecam depois de tudo que o menu carrega na thread principal (imagem, logo, icones, opcoes):
+	# nenhum load sincrono com pedido pendente. A fila do SceneLoader faz um pedido por vez, na ordem da lista.
+	for path: String in _key_pending:
+		SceneLoaderService.bg_request(path)
 	if not _key_pending.is_empty():
 		_cover_on_boot.call_deferred()
+
+
+## Menu com o palco 3D da arte-chave: desktop sempre; mobile so com MOBILE_KEY_ART_3D (ou forcado nos testes).
+func uses_key_art_stage() -> bool:
+	var mobile := OS.has_feature("mobile") if mobile_override < 0 else mobile_override == 1
+	return MOBILE_KEY_ART_3D or not mobile
 
 
 func _build() -> void:
@@ -77,7 +95,7 @@ func _build() -> void:
 	background.color = Color("1a1440")
 	if not ResourceLoader.exists(KEY_ART):
 		var mat := ShaderMaterial.new()
-		mat.shader = load("res://ui/title/sky_sea.gdshader") as Shader
+		mat.shader = SceneLoaderService.sync_load("res://ui/title/sky_sea.gdshader") as Shader
 		mat.set_shader_parameter("motion", 0.0 if Options.reduced_motion() else 1.0)
 		background.material = mat
 	add_child(background)
@@ -91,14 +109,17 @@ func _build() -> void:
 			_still.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			_still.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			_still.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-			_still.texture = load(KEY_STILL) as Texture2D
+			_still.texture = SceneLoaderService.sync_load(KEY_STILL) as Texture2D
 			add_child(_still)
-		_key_pending = [KEY_ART]
-		_key_pending.append_array(Array(KeyArtStage.resource_paths()))
-		_key_pending.append_array(KEY_ART_GLBS)
-		for path: String in _key_pending:
-			# G14: sem sub-threads (use_sub_threads=true faz a Godot 4.7.2 abortar ao fechar, codigo 134)
-			ResourceLoader.load_threaded_request(path, "", false)
+		if uses_key_art_stage() or _still == null:
+			# G16: lista em sequencia (cena do palco, vila, barco, trio, GLBs da vila), sem repetir caminho; os pedidos
+			# saem no fim do _ready, um por vez pela fila do SceneLoader.
+			var paths: Array[String] = [KEY_ART]
+			paths.append_array(Array(KeyArtStage.resource_paths()))
+			paths.append_array(KEY_ART_GLBS)
+			for p: String in paths:
+				if not _key_pending.has(p):
+					_key_pending.append(p)
 	_safe = Control.new()
 	_safe.name = "Safe"
 	_safe.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -110,7 +131,7 @@ func _build() -> void:
 		_build_heroes()
 	logo = TextureRect.new()
 	logo.name = "Logo"
-	logo.texture = load(LOGO) as Texture2D
+	logo.texture = SceneLoaderService.sync_load(LOGO) as Texture2D
 	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 	logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -343,15 +364,15 @@ func _poll_key_art() -> void:
 	if _key_pending.is_empty():
 		return
 	for path: String in _key_pending.duplicate():
-		var st := ResourceLoader.load_threaded_get_status(path)
-		if st == ResourceLoader.THREAD_LOAD_LOADED:
-			_key_held.append(ResourceLoader.load_threaded_get(path))
-			_key_pending.erase(path)
-		elif st != ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+		if SceneLoaderService.bg_status(path) != ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			var res := SceneLoaderService.bg_get(path)
+			if res != null:
+				_key_held.append(res)
+				_key_res[path] = res
 			_key_pending.erase(path)
 	if not _key_pending.is_empty():
 		return
-	var packed := ResourceLoader.load(KEY_ART) as PackedScene
+	var packed := _key_res.get(KEY_ART) as PackedScene
 	if packed == null:
 		_fallback_heroes()
 		return
@@ -364,7 +385,7 @@ func _poll_key_art() -> void:
 	key_art.name = "KeyArt"
 	key_art.framing = &"menu"
 	key_art.show_logo = false   # o logo e o TextureRect `logo` abaixo (com mola e escondido nas opcoes)
-	key_art.village_scene = ResourceLoader.load(KeyArtStage.VILLAGE) as PackedScene  # ja no cache (segundo plano)
+	key_art.village_scene = _key_res.get(KeyArtStage.VILLAGE) as PackedScene  # recolhida da fila (null: o palco carrega)
 	add_child(key_art)
 	move_child(key_art, background.get_index() + 1)
 	_build_heroes()  # religa hero_stage/hero_root/hero_models ao trio da arte-chave
@@ -381,6 +402,7 @@ func abandon_key_art() -> void:
 		SceneLoaderService.instance().adopt_requests(_key_pending)
 		_key_pending = []
 	_key_held.clear()
+	_key_res.clear()
 
 
 func _exit_tree() -> void:
@@ -389,6 +411,7 @@ func _exit_tree() -> void:
 
 func _reveal_key_art() -> void:
 	_key_held.clear()
+	_key_res.clear()
 	_key_ready = true
 	print("[RB] title key_art pronto ms=%d" % Time.get_ticks_msec())
 	if _still == null:
