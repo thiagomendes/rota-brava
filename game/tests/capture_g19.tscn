@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tests/capture_g19.gd" id="1_cap"]
+
+[node name="CaptureG19" type="Node"]
+script = ExtResource("1_cap")
+metadata/capture_only = true

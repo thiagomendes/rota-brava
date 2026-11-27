@@ -26,6 +26,13 @@ const PIECES := {
 	"emblem_helm": [["spin", "collect"], 0.5, 1.1],
 	"emblem_compass": [["spin", "collect"], 0.5, 1.1],
 	"emblem_star": [["spin", "collect"], 0.5, 1.1],
+	# G19 (acoes no jogo)
+	"clothes_bench": [[], 1.9, 2.1],
+	"fruit_box_apple": [[], 0.14, 0.2],
+	"fruit_box_lemon": [[], 0.14, 0.2],
+	"fruit_box_grapes": [[], 0.14, 0.2],
+	"lens_mount": [[], 0.3, 0.6],
+	"hand_compass": [[], 0.12, 0.17],
 }
 const LOOPS := ["sway", "rustle", "roll", "flop", "perch_idle", "fly", "glide", "point", "pulse", "spin"]
 const META_KEYS := ["piece_id", "mission", "interactive", "interaction", "member", "tris", "tris_budget", "pivot"]

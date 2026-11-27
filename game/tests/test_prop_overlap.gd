@@ -94,11 +94,18 @@ func _mission(m: StringName) -> void:
 ## O teste tem dente: uma pilha como a antiga do carrinho (caixotes de 0,32 m a 0,22 m um do outro) e achada.
 func _detects_old_stack(main: Ep01V3Main) -> void:
 	var cargo := main.land.cart.get_node("Cargo") as Node3D
+	var saved := {}
+	var y0 := cargo.position.y
 	cargo.position.y = 0.85
-	for i in cargo.get_child_count():
-		var c := cargo.get_child(i) as Node3D
-		c.position = Vector3(0, 0.01 + i * 0.22, 0)
-		c.scale = Vector3.ONE
+	var n := 0
+	for c: Node3D in cargo.get_children():
+		saved[c] = c.transform
+		if String(c.name).begins_with("Crate"):   # G19: so as caixas grandes (as caixinhas ficam de fora da pilha)
+			c.position = Vector3(0, 0.01 + n * 0.22, 0)
+			c.scale = Vector3.ONE
+			n += 1
+		else:
+			c.visible = false
 	await r.frames(1)
 	var po := await _scan(main)
 	var ov := po.overlaps(po.ids_with_prefix("mission:"))
@@ -108,6 +115,11 @@ func _detects_old_stack(main: Ep01V3Main) -> void:
 			crate_pair = true
 	r.check(crate_pair, "G6: a pilha antiga de caixotes do M4 (um dentro do outro) e detectada (%s)" % _fmt(ov, "a", "depth"))
 	po.free_probes()
+	cargo.position.y = y0
+	for c: Node3D in saved:
+		c.transform = saved[c]
+		c.visible = true
+	await r.frames(1)
 
 
 ## M3: a bola que rola ate as barracas para no chao (nem enterrada nem no ar).
@@ -129,9 +141,13 @@ func _ball_after_roll(main: Ep01V3Main) -> void:
 ## em outra, nos panos fixos ou nos props. Depois, ja na missao seguinte, as 3 continuam no varal.
 func _m2_after_hang(main: Ep01V3Main) -> void:
 	var land := main.land
-	await _m2_act(main, &"climber", &"shed_free")
-	await _m2_act(main, &"climber", &"tree_free")
-	await _m2_act(main, &"tracker", &"reeds")
+	# G19: soltar/achar poe a roupa na mao; o "agir" no cesto deixa ela la
+	await _m2_act(main, &"climber", &"shed_free", 6.0)
+	await _m2_act(main, &"climber", &"basket", 1.5)
+	await _m2_act(main, &"climber", &"tree_free", 6.0)
+	await _m2_act(main, &"climber", &"basket", 1.5)
+	await _m2_act(main, &"tracker", &"reeds", 3.0)
+	await _m2_act(main, &"tracker", &"basket", 1.5)
 	var po := await _scan(main)
 	var ids := po.ids_with_prefix("mission:")
 	var ov := po.overlaps(ids)
@@ -139,7 +155,8 @@ func _m2_after_hang(main: Ep01V3Main) -> void:
 	po.free_probes()
 	land.call("_set_busy", true)   # segura a montagem do M3 (espera a Land livre) para medir com o M2 concluido
 	for i in 3:
-		await _m2_act(main, &"tracker", &"hang", 0.8)
+		await _m2_act(main, &"tracker", &"basket", 1.2)
+		await _m2_act(main, &"tracker", &"hang", 3.0)
 	var pieces: Array = land.get("_pieces")
 	r.check(main.current != null and main.current.id == &"M2" and main.current.is_completed() and pieces.size() == 3,
 		"G18 M2: missao concluida com 3 roupas penduradas")
@@ -162,7 +179,7 @@ func _m2_after_hang(main: Ep01V3Main) -> void:
 	var kept: Array = []
 	if after != null:
 		for c in after.get_children():
-			if String(c.name).begins_with("Cloth"):
+			if String(c.name).begins_with("Cloth") and not String(c.name).begins_with("ClothesBench"):
 				kept.append(c)
 	po = await _scan(main)
 	cl = po.clothesline(main.world, kept)
@@ -179,12 +196,21 @@ func _m4_delivered(main: Ep01V3Main) -> void:
 	main.active_member = &"pilot"
 	main.current.set_active_hero(&"pilot")
 	land.call("_set_busy", true)
+	var leme := main.actors[&"pilot"] as MemberActor
+	main.set_controlled(leme)
 	for st: StringName in Ep01V3Land.CARGO_ORDER:
-		land.call("_deliver", st)
-		var t := 0.0
-		while t < 0.7:
-			await r.tree.process_frame
-			t += r.tree.root.get_process_delta_time()
+		# G19: erguer a caixinha do carrinho e pousar na barraca (dois "agir")
+		land.call("_attach_cart", leme)
+		var m := land._mk(st)
+		leme.teleport(main.floor_at(m + (land.cart.global_position - m).normalized() * 1.5) + Vector3(0, 0.05, 0))
+		for k in 40:
+			await r.tree.physics_frame
+		for k in 2:
+			land.call("_deliver", st, leme)
+			var t := 0.0
+			while t < 8.0 and int(land.get("_acts")) > 0 or t < 0.1:
+				await r.tree.process_frame
+				t += r.tree.root.get_process_delta_time()
 	var po := await _scan(main)
 	var ids := []
 	var root: Node = land.get("_root")
@@ -195,7 +221,7 @@ func _m4_delivered(main: Ep01V3Main) -> void:
 	var ov := po.overlaps(ids)
 	ov.append_array(po.structure_hits(ids))
 	r.check(ids.size() == 3 and fl.is_empty() and ov.is_empty(),
-		"G18 M4: 3 caixotes entregues apoiados na frente das barracas, sem atravessar nada (%d; %s %s)" % [ids.size(),
+		"G18/G19 M4: 3 caixinhas entregues apoiadas na frente das barracas, sem atravessar nada (%d; %s %s)" % [ids.size(),
 		_fmt(fl, "id", "gap"), _fmt(ov, "a", "depth")])
 	po.free_probes()
 	land.call("_set_busy", false)
@@ -210,7 +236,7 @@ func _m4_delivered(main: Ep01V3Main) -> void:
 		for c in after.get_children():
 			if c.get_meta(&"after_of", &"") == &"M4":
 				kept += 1
-	r.check(land.mission_id == &"M5" and kept == 3, "G18 M4: na missao seguinte os 3 caixotes continuam nas barracas (%s, %d)"
+	r.check(land.mission_id == &"M5" and kept == 3, "G18/G19 M4: na missao seguinte as 3 caixinhas continuam nas barracas (%s, %d)"
 		% [land.mission_id, kept])
 
 

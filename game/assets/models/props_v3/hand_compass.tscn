@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://assets/models/props_v3/props_v3_piece.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/models/props_v3/hand_compass.glb" id="2_glb"]
+
+[node name="Pv3HandCompass" type="Node3D"]
+script = ExtResource("1_script")
+metadata/piece_id = "hand_compass"
+metadata/mission = "M7"
+metadata/interactive = true
+metadata/interaction = "hold"
+metadata/member = "pilot"
+metadata/note = "bussola de mao da Leme (mira a lanterna)"
+metadata/tris = 324
+metadata/tris_budget = 800
+metadata/pivot = "centro do fundo"
+metadata/provisional = false
+metadata/approval = "pendente (Thiago)"
+metadata/source = "source_art/props_v3/build_props_v3.py"
+
+[node name="Model" parent="." instance=ExtResource("2_glb")]

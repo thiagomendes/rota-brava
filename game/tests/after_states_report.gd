@@ -73,7 +73,9 @@ func _m4() -> void:
 	main.current.set_active_hero(&"pilot")
 	land.call("_set_busy", true)
 	for st: StringName in Ep01V3Land.CARGO_ORDER:
-		land.call("_deliver", st)
+		land.call("_attach_cart", main.actors[&"pilot"])
+		await land._deliver(st, main.actors[&"pilot"])
+		await land._deliver(st, main.actors[&"pilot"])
 		await _wait(0.8)
 	await _report("M4 entregue", ["Crate", "@Node3D", "Cart", "stall"])
 	land.call("_set_busy", false)

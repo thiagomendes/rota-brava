@@ -26,15 +26,20 @@ func _ready() -> void:
 	add_child(main)
 	await _wait(1.0)
 	if state != "initial":
-		await _act(&"climber", &"shed_free")
-		await _act(&"climber", &"tree_free")
-		await _act(&"tracker", &"reeds")
+		# G19: soltar/achar poe a roupa na mao; o "agir" no cesto deixa ela la
+		await _act(&"climber", &"shed_free", 6.0)
+		await _act(&"climber", &"basket", 1.5)
+		await _act(&"climber", &"tree_free", 6.0)
+		await _act(&"climber", &"basket", 1.5)
+		await _act(&"tracker", &"reeds", 3.0)
+		await _act(&"tracker", &"basket", 1.5)
 	if state in ["hung", "after"]:
 		if state == "hung":
 			# segura a montagem da proxima missao (ela espera a Land livre) para fotografar o varal com o M2 concluido
 			main.land.call("_set_busy", true)
 		for i in 3:
-			await _act(&"tracker", &"hang", 2.2 if i < 2 else 1.0)
+			await _act(&"tracker", &"basket", 1.2)
+			await _act(&"tracker", &"hang", 3.0)
 	if state == "after":
 		var t := 0.0
 		while main.land.mission_id == &"M2" and t < 20.0:
