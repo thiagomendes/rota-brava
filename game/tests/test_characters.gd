@@ -63,6 +63,9 @@ const CHARS := {
 		"anims": ["idle", "walk", "wave", "chat"], "shapes": FULL_SHAPES, "height": [0.8, 1.1],
 		"materials": ["mat_villager_c_pele", "mat_villager_c_uniforme", "mat_villager_c_cabelo"]},
 }
+## Personagem cuja entrada no manifesto tem outro id (RB-R1 G21: o Lumi ja nasceu v2 e so existe como `lumi_v2`).
+## Para estes, a entrada do manifesto tem de registrar ossos, shape keys e TODAS as animacoes de CHARS[id]["anims"].
+const MANIFEST_IDS := {"lumi": "lumi_v2"}
 const PORTRAIT_IDS := ["rastro", "pico", "leme", "captain", "pup", "lumi"]
 const PORTRAIT_EXPRS := ["neutra", "alegre", "surpresa"]
 
@@ -703,7 +706,7 @@ func _test_lumi() -> void:
 	var t0 := vis.bone_position(&"hand.R")
 	vis.seek_clip(&"talk", 3.0 - 0.001)
 	r.check(vis.bone_position(&"hand.R").distance_to(t0) < 0.02, "chars: talk do Lumi termina na pose do inicio")
-	# sentado (plano 9a): assento a 0,45 m, pes no chao, turn_chair de 1,0 s termina na pose do idle_seated
+	# sentado (plano 9a): assento a 0,40 m, pes no chao, turn_chair de 1,0 s termina na pose do idle_seated
 	r.check(vis.is_looping(&"idle_seated") and not vis.is_looping(&"turn_chair") and absf(vis.animation_length(&"turn_chair") - 1.0) < 0.02,
 		"chars: Lumi idle_seated em laco e turn_chair de 1,0 s")
 	vis.seek_clip(&"idle_seated", 0.0)
@@ -925,16 +928,27 @@ func _test_no_foreign_models() -> void:
 	r.check(foreign.is_empty(), "chars: pasta de personagens so tem GLB do manifesto %s" % [foreign])
 	var man: Variant = JSON.parse_string(FileAccess.get_file_as_string(ProjectSettings.globalize_path("res://").path_join("../source_art/manifest.json")))
 	var ids: Array = []
+	var checked: Array = []
+	for id in CHARS:
+		checked.append(String(MANIFEST_IDS.get(id, id)))
 	if man is Dictionary:
 		for a in (man as Dictionary)["ativos"]:
 			ids.append((a as Dictionary)["id"])
 			var d := a as Dictionary
-			if String(d["id"]) in CHARS:
-				r.check(int(d.get("quantidade_ossos", 0)) >= 22 and (d.get("animacoes_duracao_s", {}) as Dictionary).size() >= 2 and (d.get("shape_keys", []) as Array).has("blink"),
+			if String(d["id"]) in checked:
+				var anims := d.get("animacoes_duracao_s", {}) as Dictionary
+				r.check(int(d.get("quantidade_ossos", 0)) >= 22 and anims.size() >= 2 and (d.get("shape_keys", []) as Array).has("blink"),
 					"chars: manifesto de %s registra ossos, animacoes e shape keys" % d["id"])
+				if String(d["id"]) in MANIFEST_IDS.values():
+					var cid: String = MANIFEST_IDS.find_key(String(d["id"]))
+					var miss: Array = []
+					for an in CHARS[cid]["anims"]:
+						if not anims.has(an):
+							miss.append(an)
+					r.check(miss.is_empty(), "chars: manifesto de %s registra todas as animacoes do modelo (faltam %s)" % [d["id"], miss])
 	for id in CHARS:
-		# RB-R1 G21: personagem que ja nasceu v2 (Lumi) entra no manifesto so como <id>_v2
-		r.check(ids.has(id) or ids.has(id + "_v2"), "chars: manifesto lista %s" % id)
+		var mid := String(MANIFEST_IDS.get(id, id))
+		r.check(ids.has(mid), "chars: manifesto lista %s (id %s)" % [id, mid])
 
 
 

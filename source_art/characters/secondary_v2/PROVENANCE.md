@@ -73,7 +73,7 @@ Decisão de Thiago (2026-11-27): homem de uns 30 anos, nome Lumi. Mesmo pipeline
   ao punho pintada, emblema grande nas costas pintado (escudo por distância com sinal ao contorno), zíper, ribanas e bolsos
   pintados; calça clara; tênis branco com sola amarela.
 - Clipes: `idle` (3,6 s, laço, `pose_idle_adult`), `talk` (3,0 s, visemas A/O/E), `wave` (1,6 s, sorriso com olho aberto),
-  `point` (1,2 s). Sem clipes sentados.
+  `point` (1,2 s); sentado (rodada 2, abaixo): `idle_seated` e `turn_chair`.
 - Retratos: `bash tools/blender.sh --background source_art/characters/secondary_v2/lumi_v2.blend --python
   source_art/scripts/hero_portraits_v2.py -- lumi` → `game/ui/portraits/lumi_{neutra,alegre,surpresa}.png`.
 ```bash

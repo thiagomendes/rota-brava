@@ -69,8 +69,8 @@ def main():
         "velocidade_walk_mps": 0.0, "velocidade_run_mps": 0.0, "aprovacao": "pendente (reviewer, depois Thiago)",
         "originalidade": ORIG_CHAR, "data": DATA,
         "nota": "RB-R1 G21: operador do Farol 7 (decisao de Thiago: homem, ~30 anos, nome Lumi). Clipes idle (loop, braços "
-                "relaxados), talk (3,0 s, visemas), wave (1,6 s) e point (1,2 s). Sem clipes sentados (idle_seated, turn_chair) "
-                "nesta entrega."})
+                "relaxados), talk (3,0 s, visemas), wave (1,6 s), point (1,2 s) e, sentado na cadeira da base "
+                "(plano 9a, filho de Chair/Seat), idle_seated (3,6 s, loop) e turn_chair (1,0 s)."})
     # ------------------------------------------------------------ retratos do HUD do Lumi
     names = ["lumi_%s.png" % x for x in ("neutra", "alegre", "surpresa")]
     e = upsert(man, "portraits_v2_lumi")

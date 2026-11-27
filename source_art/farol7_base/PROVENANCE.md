@@ -35,7 +35,7 @@ xvfb-run -a -s "-screen 0 1600x900x24" bash tools/godot.sh --path game --renderi
 
 ## Limites conhecidos
 - Sem vidro na escotilha e na claraboia: o vidro transparente lia como chapa leitosa na captura.
-- Sem clipes sentados do Lumi (`idle_seated`, `turn_chair`): a cadeira tem pivô e `set_chair_yaw`, mas o Lumi sentado
-  ainda não existe; a captura mostra o Lumi de pé no console.
+- Lumi sentado (rodada 2): `idle_seated` e `turn_chair`, com o Lumi filho de `Chair/Seat` (assento a 0,40 m); a sincronia do
+  giro da cadeira com o clipe no plano 9a é do `gameplay`.
 - A ligação com a ficha da cutscene (`stage` ou instância longe da vila) é do `gameplay`. O nó `StageEnvironment`
   (céu e sol) sai com `use_own_environment = false` se o palco for instanciado dentro de uma cena que já tem ambiente.

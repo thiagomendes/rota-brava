@@ -4472,7 +4472,7 @@
       "aprovacao": "pendente (reviewer, depois Thiago)",
       "originalidade": "geometria procedural propria (SKIN + SUBSURF, metaballs, torno, bmesh, deslocamento em numpy); texturas pintadas por formula; rig e animacoes autorais por script; nenhum modelo, malha, rig, mocap, textura, HDRI ou personagem-base de terceiros",
       "data": "2026-11-27",
-      "nota": "RB-R1 G21: operador do Farol 7 (decisao de Thiago: homem, ~30 anos, nome Lumi). Clipes idle (loop, braços relaxados), talk (3,0 s, visemas), wave (1,6 s) e point (1,2 s). Sem clipes sentados (idle_seated, turn_chair) nesta entrega."
+      "nota": "RB-R1 G21: operador do Farol 7 (decisao de Thiago: homem, ~30 anos, nome Lumi). Clipes idle (loop, braços relaxados), talk (3,0 s, visemas), wave (1,6 s), point (1,2 s) e, sentado na cadeira da base (plano 9a, filho de Chair/Seat), idle_seated (3,6 s, loop) e turn_chair (1,0 s)."
     },
     {
       "id": "portraits_v2_lumi",
