@@ -658,3 +658,12 @@ Restrição: falas novas (G2, G9) precisam de voz Gemini; cota de 100 pedidos/di
   - Abertura: de 34,5 s para 38,7 s.
   - Ressalva: os casos de teto e de falha de carga do `cutscene_cover` são frouxos. Eles provam que a cena não trava, mas não que ela começa já no fade.
   - Pendente: Thiago ouvir no iPhone.
+- **E7: suíte acelerada** (`feature/rb-r1-e7-suite`, autor `build-qa`) e **G16b** (fila do SceneLoader presa depois de falha de carga, autor `gameplay`), ambos integrados.
+  - **Como ficou a suíte:** `tools/test.sh` roda 3 processos em paralelo (`RB_TEST_JOBS`), mais 1 processo para o tremor com `--fixed-fps 60`. Cada processo tem `XDG_DATA_HOME` e log próprios. Há tempo por arquivo, `--shard` e `--skip`.
+  - **Revisão** (`reviewer`), com merge local junto do G16b:
+    - Paralelo, 2 rodadas: `OK (4407 PASS)`, saída 0, em 457 s e 424 s. Serial: 1156 s.
+    - Os 54 arquivos rodam uma vez cada.
+    - Processo morto ou travado → `FALHOU` com o código certo.
+  - **G16b:** `_fail` limpa o `target_path`. O teste nega isso no código antigo. O contorno do `a7e19c5` saiu na integração.
+  - **Ajuste do lead:** o modo serial passa a ter limite padrão de 2700 s.
+  - **Correção da meta:** o autor disse "~350 s", mas a revisão mediu de 420 s a 450 s nesta máquina. Fica abaixo de 600 s.
