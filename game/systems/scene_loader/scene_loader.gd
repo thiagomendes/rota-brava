@@ -58,6 +58,119 @@ var _hold_start_ms: int = 0
 var _old_scene: Node
 var _old_mode: Node.ProcessMode = Node.PROCESS_MODE_INHERIT
 
+# ---------------------------------------------------------------- G16: fila unica de carga em segundo plano
+## RB-M1 (travamento no iOS: thread principal e WorkerThreads presas no mesmo mutex do ResourceLoader). Seguro por
+## construcao: no maximo UM `load_threaded_request` real em andamento no jogo inteiro; os demais esperam na fila e
+## so comecam depois que o anterior saiu de IN_PROGRESS. `sync_load` (load na thread principal) registra quando e
+## chamado com pedido pendente. Todo pedido em segundo plano do jogo passa por `bg_request` (teste de fonte garante).
+static var _bg_active: String = ""
+static var _bg_queue: Array[String] = []
+static var _bg_types: Dictionary = {}
+## Pedidos reais ja terminados (LOADED ou falha) esperando o `bg_get` de quem pediu.
+static var _bg_done: Array[String] = []
+static var _bg_failed: Array[String] = []
+static var _bg_max_active: int = 0
+static var _bg_sync_pending: Array[String] = []
+
+
+## Pede `path` em segundo plano (sem sub-threads). Entra na fila; repetido = o mesmo pedido.
+static func bg_request(path: String, type_hint: String = "") -> Error:
+	if path == _bg_active or _bg_queue.has(path) or _bg_done.has(path):
+		return OK
+	if not ResourceLoader.exists(path):
+		return ERR_FILE_NOT_FOUND
+	_bg_failed.erase(path)
+	_bg_queue.append(path)
+	_bg_types[path] = type_hint
+	_bg_pump()
+	return OK
+
+
+## Status no formato de `ResourceLoader.load_threaded_get_status` (na fila conta como IN_PROGRESS).
+static func bg_status(path: String) -> ResourceLoader.ThreadLoadStatus:
+	_bg_pump()
+	if path == _bg_active or _bg_queue.has(path):
+		return ResourceLoader.THREAD_LOAD_IN_PROGRESS
+	if _bg_failed.has(path):
+		return ResourceLoader.THREAD_LOAD_FAILED
+	if _bg_done.has(path):
+		return ResourceLoader.load_threaded_get_status(path)
+	return ResourceLoader.THREAD_LOAD_INVALID_RESOURCE
+
+
+## Recolhe um pedido terminado (null se ainda na fila/em andamento ou se falhou). Nunca bloqueia esperando.
+static func bg_get(path: String) -> Resource:
+	_bg_pump()
+	if _bg_failed.has(path):
+		_bg_failed.erase(path)
+		return null
+	if not _bg_done.has(path):
+		return null
+	_bg_done.erase(path)
+	# ja saiu de IN_PROGRESS: nao bloqueia; com falha devolve null e a Godot solta a tarefa
+	return ResourceLoader.load_threaded_get(path)
+
+
+## Desiste de um pedido: sai da fila se nao comecou; se ja comecou, o carregador recolhe e solta quando terminar.
+static func bg_cancel(path: String) -> void:
+	if _bg_queue.has(path):
+		_bg_queue.erase(path)
+		_bg_types.erase(path)
+	elif path == _bg_active or _bg_done.has(path):
+		instance().adopt_requests([path] as Array[String])
+	_bg_failed.erase(path)
+
+
+## Nenhum pedido em segundo plano na fila ou em andamento.
+static func bg_pending() -> bool:
+	_bg_pump()
+	return _bg_active != "" or not _bg_queue.is_empty()
+
+
+## `load()` na thread principal pelo carregador: registra se houver pedido em segundo plano pendente (G16, regra 2).
+static func sync_load(path: String, type_hint: String = "") -> Resource:
+	if bg_pending():
+		_bg_sync_pending.append(path)
+		push_warning("SceneLoader: load sincrono com pedido em segundo plano pendente: %s (ativo %s)" % [path, _bg_active])
+	return ResourceLoader.load(path, type_hint)
+
+
+static func _bg_pump() -> void:
+	if _bg_active != "":
+		if ResourceLoader.load_threaded_get_status(_bg_active) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			return
+		_bg_done.append(_bg_active)
+		_bg_active = ""
+	while _bg_active == "" and not _bg_queue.is_empty():
+		var p: String = _bg_queue.pop_front()
+		var hint: String = _bg_types.get(p, "")
+		_bg_types.erase(p)
+		# G14: sem sub-threads (use_sub_threads=true faz a Godot 4.7.2 abortar ao fechar, codigo 134)
+		if ResourceLoader.load_threaded_request(p, hint, false) != OK:
+			_bg_failed.append(p)
+			continue
+		if ResourceLoader.load_threaded_get_status(p) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			_bg_active = p
+			_bg_max_active = maxi(_bg_max_active, 1)
+		else:
+			_bg_done.append(p)
+
+
+## Medidas para os testes: maior numero de pedidos reais simultaneos e loads sincronos feitos com pendente.
+func bg_stats() -> Dictionary:
+	return {"max_active": _bg_max_active, "sync_during_pending": _bg_sync_pending.duplicate(),
+		"active": _bg_active, "queued": _bg_queue.duplicate()}
+
+
+func bg_reset_stats() -> void:
+	_bg_max_active = 1 if _bg_active != "" else 0
+	_bg_sync_pending.clear()
+
+
+## Fila vazia, nada em andamento e nenhum pedido orfao por recolher.
+func bg_idle() -> bool:
+	return not bg_pending() and _orphans.is_empty()
+
 
 func _ready() -> void:
 	layer = 128
@@ -170,12 +283,12 @@ func change_scene(path: String) -> bool:
 	_held.clear()
 	_pending.clear()
 	_begin_block()
+	# G16: aquecimento e cena pela fila unica, em sequencia (dependencias primeiro, a cena por ultimo)
 	for dep: String in WARM.get(path, []):
-		if ResourceLoader.exists(dep) and ResourceLoader.load_threaded_request(dep, "", false) == OK:
+		if bg_request(dep) == OK:
 			_pending.append(dep)
 	print("[RB] loader request %s" % path)
-	# G14: sem sub-threads (use_sub_threads=true faz a Godot 4.7.2 abortar ao fechar, codigo 134)
-	var err := ResourceLoader.load_threaded_request(path, "PackedScene", false)
+	var err := bg_request(path, "PackedScene")
 	if err != OK:
 		_fail("pedido recusado (%d)" % err)
 	return true
@@ -189,7 +302,9 @@ var _orphans: Array[String] = []
 
 func adopt_requests(paths: Array[String]) -> void:
 	for p: String in paths:
-		if not _orphans.has(p):
+		if _bg_queue.has(p):
+			bg_cancel(p)  # G16: ainda na fila, nem comecou
+		elif not _orphans.has(p):
 			_orphans.append(p)
 
 
@@ -197,15 +312,13 @@ func _collect_orphans() -> void:
 	for p: String in _orphans.duplicate():
 		if p == target_path or _pending.has(p):
 			continue  # o carregador mesmo esta usando este pedido
-		var st := ResourceLoader.load_threaded_get_status(p)
-		if st == ResourceLoader.THREAD_LOAD_LOADED:
-			ResourceLoader.load_threaded_get(p)  # recolhe e descarta a referencia
-			_orphans.erase(p)
-		elif st != ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+		if bg_status(p) != ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			bg_get(p)  # recolhe e descarta a referencia
 			_orphans.erase(p)
 
 
 func _process(delta: float) -> void:
+	_bg_pump()
 	if not _orphans.is_empty():
 		_collect_orphans()
 	if phase == Phase.IDLE:
@@ -217,7 +330,7 @@ func _process(delta: float) -> void:
 		Phase.LOADING:
 			_set_alpha(minf(1.0, _alpha + real / FADE_IN))
 			_collect_deps()
-			var status := ResourceLoader.load_threaded_get_status(target_path)
+			var status := bg_status(target_path)
 			if status == ResourceLoader.THREAD_LOAD_LOADED and _pending.is_empty() and _loaded_ms == 0:
 				_loaded_ms = Time.get_ticks_msec()
 			elif status == ResourceLoader.THREAD_LOAD_FAILED or status == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
@@ -246,16 +359,15 @@ func _process(delta: float) -> void:
 ## Recolhe as dependencias ja carregadas (falha numa delas nao trava: a cena carrega a sua no `_ready`).
 func _collect_deps() -> void:
 	for dep: String in _pending.duplicate():
-		var st := ResourceLoader.load_threaded_get_status(dep)
-		if st == ResourceLoader.THREAD_LOAD_LOADED:
-			_held.append(ResourceLoader.load_threaded_get(dep))
-			_pending.erase(dep)
-		elif st != ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+		if bg_status(dep) != ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			var res := bg_get(dep)
+			if res != null:
+				_held.append(res)
 			_pending.erase(dep)
 
 
 func _swap() -> void:
-	var packed := ResourceLoader.load_threaded_get(target_path) as PackedScene
+	var packed := bg_get(target_path) as PackedScene
 	var t0 := Time.get_ticks_msec()
 	var err := get_tree().change_scene_to_packed(packed) if packed != null else ERR_CANT_OPEN
 	if err != OK:
@@ -286,6 +398,9 @@ func _fail(reason: String) -> void:
 	print("[RB] loader falhou %s: %s" % [target_path, reason])
 	last_timings = {"failed": reason}
 	_held.clear()
+	var drop: Array[String] = [target_path]
+	drop.append_array(_pending)
+	adopt_requests(drop)  # G16: o que ficou na fila sai; o que esta em andamento e recolhido quando terminar
 	_pending.clear()
 	if _old_scene != null and is_instance_valid(_old_scene):
 		_old_scene.process_mode = _old_mode
@@ -303,6 +418,9 @@ func _begin_block() -> void:
 		_old_scene = cur
 		_old_mode = cur.process_mode
 		cur.process_mode = Node.PROCESS_MODE_DISABLED
+		# G16: a cena que sai desiste dos pedidos dela (os da fila nem comecam; a nova cena nao espera a vila do menu)
+		if cur.has_method(&"abandon_key_art"):
+			cur.call(&"abandon_key_art")
 	_stay_last()
 
 
