@@ -28,6 +28,10 @@ audio.play_sfx("sfx_boat_wake")             # loop da esteira (2D) enquanto o ba
 audio.play_ui(&"confirm")                   # move / confirm / back / open / swap / clue / star
 audio.play_sfx("sfx_horn_boat", pos)        # efeitos essenciais tem caption_key -> Loc.t(audio.caption_key(nome))
 ```
+Radio do Farol 7 (G20): fala com speaker `radio` (ou chave `*.radio.*`) toca clique de abrir, voz pelo bus `Radio`
+(criado por codigo em `radio_bus.gd`, filho de `Voz`; nao fica no `default_bus_layout.tres`, que a Godot reescreve) com
+chiado em laco e clique de fechar. `info.duration` inclui os cliques; `Hud.line_seconds(chave, voice_s)` para cutscenes.
+Sons: `tools/audio/radio_fx.py`; amostras: `tools/audio/radio_samples.py` -> `captures/g20/`.
 `play_line` abaixa a musica (-6 dB, 0,3 s / volta 0,8 s) e o bus Musica ainda tem sidechain na Voz.
 API antiga continua valida (`play_voice`, `start_ambience`, `play_music("theme_explore")`, `duck_music`).
 
