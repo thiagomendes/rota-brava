@@ -1,13 +1,13 @@
 {
   "tris": 24229,
   "tris_por_objeto": {
-    "Rastro_Skin": 2068,
-    "Rastro_Hair": 3428,
-    "Rastro_Suit": 6484,
+    "Rastro_Face": 2368,
     "Rastro_Gear": 9317,
-    "Rastro_Screen": 60,
     "Rastro_Glass": 504,
-    "Rastro_Face": 2368
+    "Rastro_Hair": 3428,
+    "Rastro_Screen": 60,
+    "Rastro_Skin": 2068,
+    "Rastro_Suit": 6484
   },
   "materials": [
     "mat_rastro_v2_face_dark",
@@ -48,11 +48,13 @@
     "forearm.R",
     "hand.R",
     "hand_tip.R",
+    "HoldPoint",
     "shoulder.L",
     "upper_arm.L",
     "forearm.L",
     "hand.L",
     "hand_tip.L",
+    "HoldPoint_L",
     "thigh.R",
     "shin.R",
     "foot.R",
@@ -66,8 +68,24 @@
     "toe_tip.L",
     "heel.L"
   ],
-  "bone_count": 28,
+  "bone_count": 30,
   "animations": {
+    "carry_idle": [
+      0,
+      72
+    ],
+    "carry_idle_gear": [
+      0,
+      72
+    ],
+    "carry_walk": [
+      0,
+      30
+    ],
+    "carry_walk_gear": [
+      0,
+      30
+    ],
     "celebrate": [
       0,
       36
@@ -92,6 +110,14 @@
       0,
       132
     ],
+    "inspect": [
+      0,
+      42
+    ],
+    "inspect_gear": [
+      0,
+      42
+    ],
     "inspect_touch": [
       0,
       90
@@ -107,6 +133,30 @@
     "look_to_leme_gear": [
       0,
       72
+    ],
+    "pick_up": [
+      0,
+      18
+    ],
+    "pick_up_gear": [
+      0,
+      18
+    ],
+    "place_high": [
+      0,
+      27
+    ],
+    "place_high_gear": [
+      0,
+      27
+    ],
+    "place_low": [
+      0,
+      24
+    ],
+    "place_low_gear": [
+      0,
+      24
     ],
     "point": [
       0,
@@ -261,5 +311,84 @@
       2048
     ]
   },
-  "inspect_tip_err_m": 0.0296
+  "inspect_tip_err_m": 0.0296,
+  "g19": {
+    "pick_up": {
+      "palmas_dist_m": [
+        0.2,
+        0.2201
+      ],
+      "instante_s": 0.27,
+      "meio_palmas_m": [
+        0.0,
+        0.2339,
+        0.0921
+      ],
+      "palma_R_m": [
+        0.11,
+        0.2339,
+        0.0921
+      ]
+    },
+    "carry_idle": {
+      "palmas_dist_m": [
+        0.2,
+        0.2
+      ],
+      "instante_s": 0.0,
+      "meio_palmas_m": [
+        0.0,
+        0.232,
+        0.542
+      ],
+      "palma_R_m": [
+        0.1,
+        0.232,
+        0.542
+      ]
+    },
+    "carry_walk": {
+      "palmas_dist_m": [
+        0.2,
+        0.2
+      ]
+    },
+    "place_high": {
+      "palmas_dist_m": [
+        0.1816,
+        0.2
+      ],
+      "instante_s": 0.45,
+      "meio_palmas_m": [
+        0.0,
+        0.1419,
+        0.8659
+      ],
+      "palma_R_m": [
+        0.0947,
+        0.1419,
+        0.8659
+      ]
+    },
+    "place_low": {
+      "palmas_dist_m": [
+        0.2,
+        0.2
+      ],
+      "instante_s": 0.38,
+      "meio_palmas_m": [
+        0.0,
+        0.282,
+        0.752
+      ],
+      "palma_R_m": [
+        0.1,
+        0.282,
+        0.752
+      ]
+    },
+    "inspect": {
+      "toque_no_chao_erro_m": 0.0183
+    }
+  }
 }

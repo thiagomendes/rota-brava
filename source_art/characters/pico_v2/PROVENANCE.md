@@ -118,3 +118,43 @@ Demais clipes, corpo, materiais e medidas (`pico_v2.info.json` e `pico_v2.check.
 .blend reexportados por `build_pico_v2.py` (`--glb` e `--blend`). Correcao da revisao: a reexportacao reempacotou as UVs
 de `Pico_Gear` e refez as texturas `pico_v2_gear_color/_orm/_normal` para elas (mesmo conteudo, reorganizado); as normais
 das shape keys do rosto tambem variaram. Close do Pico na abertura conferido sem costura visivel (captura, sem GPU real).
+
+## G19: pegar, levar, pousar e examinar (RB-R1, 2026-11-27, PROVISORIO)
+Pedido de Thiago: as acoes aconteciam "por magica". Clipes novos feitos por script (FK + IK, do zero) em
+`source_art/scripts/hero_anim.py` (bloco "RB-R1 G19", `g19_clips`), ligados pelo modulo de animacao deste heroi.
+Ossos novos, sem deformacao: `HoldPoint` (filho de `hand.R`) e `HoldPoint_L` (filho de `hand.L`), no centro da palma
+(45% do osso da mao, do pulso para os dedos), com os eixos do osso da mao. 28 -> 30 ossos.
+- `pick_up` 0,6 s: agacha e inclina, as palmas chegam ao objeto no chao em 0,27 s (o codigo prende aqui), sobe e termina
+  na pose do quadro 0 do `carry_idle`.
+- `carry_idle` 2,4 s em laco; `carry_walk` 1,0 s em laco, com os mesmos pes, curso, ciclo e quadril do `walk` (mesma
+  `walk_speed_mps`); as palmas ficam a 0,20 m uma da outra (caixa de ate ~0,15 m entre as luvas) a frente do peito.
+- `place_high` 0,9 s (solta em 0,45 s) e `place_low` 0,8 s (solta em 0,38 s): na ponta dos pes, depois voltam ao repouso
+  de maos vazias.
+- `inspect` 1,4 s: agacha e encosta a ponta dos dedos da mao direita no chao a frente; nome unico para os tres herois.
+- Objeto de duas maos: ponto medio de `HoldPoint` e `HoldPoint_L`. Objeto de uma mao: `HoldPoint` (ou `HoldPoint_L`).
+- Olhos: piscada curta, olho fechado no maximo 0,5 s seguidos; nenhum clipe sem laco termina de olho fechado.
+- Malha, UV, shape keys, grupos de vertices, materiais e texturas empacotadas: iguais aos do .blend anterior (hash
+  conferido objeto a objeto no Blender). Os clipes antigos sao regravados pelo mesmo codigo; o `info.json` ganhou os
+  ossos, os clipes e as medidas `g19`.
+- Regravado por `build_pico_v2.py --anim-only` (abre o .blend versionado, apaga as Actions e faixas NLA e grava tudo
+  de novo; nao reassa texturas). O build completo continua gerando os mesmos clipes.
+- Pranchas: `source_art/scripts/render_g19.py` (4 quadros por clipe) e `compose_g19.py`, em `captures/g19/` (fora do Git).
+- Medidas (Blender, referencial do ator: y a frente, z para cima): meio das palmas na pega a 0,10 m de altura e 0,21 m a frente; no carregar a 0,51 m de altura e 0,23 m a frente; ponto mais alto do `place_high` 0,81 m; `place_low` solta a 0,71 m de altura e 0,26 m a frente. O varal do M2 (1,58 m) e a bancada de 0,80 m ficam acima do alcance do heroi (1,0-1,1 m de altura, bracos curtos): a integracao precisa de encaixes nessas alturas.
+
+### G19 ampliado: escalada e corda do Pico (PROVISORIO)
+Funcoes reutilizaveis em `hero_anim.py` (`g19_clips(WALK, climber=True)` da os mesmos clipes a outro heroi, com
+as medidas do rig dele). Careta de esforco curta (`brava_leve` + `mouth_E`) de olho aberto.
+- `climb_up_low` 1,0 s / `climb_up` 1,2 s / `climb_up_high` 1,33 s: degraus de 0,6 / 0,9 / 1,2 m com a face 3 cm
+  alem da ponta do pe. Agarra a borda (palmas 2,6 cm acima do topo), faz forca com os pes na face, apoia os bracos,
+  sobe o joelho e fica de pe em cima. Sem root motion: no fim o corpo esta em (0; 0,30; H) m do ator
+  (Godot: subir H e avancar 0,30 m em -Z); o codigo move o ator por esse deslocamento ao trocar de clipe.
+- `climb_down` 1,0 s: o `climb_up` de 0,9 m ao contrario; comeca de pe com a borda atras e termina no chao em
+  (0; -0,30; -0,9) m (Godot: descer 0,9 m e recuar 0,30 m em +Z).
+- `climb_wall` 1,2 s em laco: parede a 0,20 m a frente; mao direita com pe esquerdo e vice-versa; o ator sobe 0,30 m
+  por ciclo (0,25 m/s). Ao contrario (velocidade -1) serve para descer uma escada.
+- `climb_top` 0,8 s: da pose do `climb_wall` (fase 0) por cima da borda, que fica 0,79 m acima do ator; termina de pe
+  em (0; 0,30; 0,79) m.
+- `throw_rope` 1,2 s: rolo na mao direita (`HoldPoint`), solta em 0,74 s. `lower_rope` 1,0 s em laco: mao sobre mao,
+  a corda desce 0,33 m por ciclo (0,33 m/s).
+- Folga minima (ossos ao volume do degrau ou parede, Blender): climb_up* e climb_down >= 0 mm; climb_wall -6,3 mm e
+  climb_top -8,5 mm (ponta do pe/dos dedos encostando).

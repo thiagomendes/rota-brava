@@ -1248,11 +1248,14 @@
         "source_art/scripts/char_lib.py",
         "source_art/scripts/char_anim.py",
         "source_art/scripts/rbart.py",
-        "source_art/scripts/hero_gait_v2.py"
+        "source_art/scripts/hero_gait_v2.py",
+        "source_art/scripts/g19_rebuild.py",
+        "source_art/scripts/render_g19.py",
+        "source_art/scripts/compose_g19.py"
       ],
       "saida_glb": "game/assets/models/characters/rastro_v2.glb",
-      "glb_sha256": "d52e85add8ba23e4aafea9eb0553e3d688273ba2bbc986d372cfc020addcf473",
-      "glb_bytes": 6407668,
+      "glb_sha256": "e68fdca97553ea9fe7282df136ffb5319f854e3a714d5f17a551beba8386264d",
+      "glb_bytes": 6804664,
       "triangulos": 24229,
       "materiais": [
         "mat_rastro_v2_face_dark",
@@ -1288,11 +1291,13 @@
         "forearm.R",
         "hand.R",
         "hand_tip.R",
+        "HoldPoint",
         "shoulder.L",
         "upper_arm.L",
         "forearm.L",
         "hand.L",
         "hand_tip.L",
+        "HoldPoint_L",
         "thigh.R",
         "shin.R",
         "foot.R",
@@ -1306,32 +1311,26 @@
         "toe_tip.L",
         "heel.L"
       ],
-      "quantidade_ossos": 28,
+      "quantidade_ossos": 30,
       "animacoes_duracao_s": {
+        "carry_idle": 2.4,
+        "carry_walk": 1.0,
         "celebrate": 1.2,
-        "celebrate_gear": 1.2,
         "crouch": 1.0,
-        "crouch_gear": 1.0,
         "idle": 4.4,
-        "idle_gear": 4.4,
+        "inspect": 1.4,
         "inspect_touch": 3.0,
-        "inspect_touch_gear": 3.0,
         "look_to_leme": 2.4,
-        "look_to_leme_gear": 2.4,
+        "pick_up": 0.6,
+        "place_high": 0.9,
+        "place_low": 0.8,
         "point": 1.2,
-        "point_gear": 1.2,
         "react_surprise": 0.9,
-        "react_surprise_gear": 0.9,
         "run": 0.6,
-        "run_gear": 0.6,
         "stop": 0.5,
-        "stop_gear": 0.5,
         "team_pose": 1.5,
-        "team_pose_gear": 1.5,
         "walk": 1.0,
-        "walk_gear": 1.0,
-        "wave": 1.6,
-        "wave_gear": 1.6
+        "wave": 1.6
       },
       "shape_keys": [
         "Basis",
@@ -1426,7 +1425,12 @@
           "mps_jogo": 3.2
         },
         "nota": "RB-R1 ciclos v2 (2026-11-25): walk/run refeitos por source_art/scripts/hero_gait_v2.py com passada longa; escala do clipe no jogo ~1,1-1,2 a 1,4 e 3,2 m/s. PROVISORIO."
-      }
+      },
+      "encaixes": {
+        "HoldPoint": "hand.R",
+        "HoldPoint_L": "hand.L"
+      },
+      "nota_g19": "RB-R1 G19 (2026-11-27): clipes novos pick_up, carry_idle, carry_walk (mesmo passo do walk), place_high, place_low, inspect; ossos sem deformacao HoldPoint (filho de hand.R) e HoldPoint_L (filho de hand.L) no centro da palma. Malha, materiais e texturas sem mudanca (regravados por build_rastro_v2.py --anim-only sobre o .blend)."
     },
     {
       "id": "pico_v2",
@@ -1459,11 +1463,14 @@
         "source_art/scripts/char_lib.py",
         "source_art/scripts/char_anim.py",
         "source_art/scripts/rbart.py",
-        "source_art/scripts/hero_gait_v2.py"
+        "source_art/scripts/hero_gait_v2.py",
+        "source_art/scripts/g19_rebuild.py",
+        "source_art/scripts/render_g19.py",
+        "source_art/scripts/compose_g19.py"
       ],
       "saida_glb": "game/assets/models/characters/pico_v2.glb",
-      "glb_sha256": "16b918e4da6469c8c126d192315403ecabeb84bb9f7ab4f3ad8b530f34a57311",
-      "glb_bytes": 6877128,
+      "glb_sha256": "14555cbe779ffbee8effd5611931a70147d9db92e7346510ef4bdab11fabbd2a",
+      "glb_bytes": 7739416,
       "triangulos": 24944,
       "materiais": [
         "mat_pico_v2_face_dark",
@@ -1497,11 +1504,13 @@
         "forearm.R",
         "hand.R",
         "hand_tip.R",
+        "HoldPoint",
         "shoulder.L",
         "upper_arm.L",
         "forearm.L",
         "hand.L",
         "hand_tip.L",
+        "HoldPoint_L",
         "thigh.R",
         "shin.R",
         "foot.R",
@@ -1515,18 +1524,32 @@
         "toe_tip.L",
         "heel.L"
       ],
-      "quantidade_ossos": 28,
+      "quantidade_ossos": 30,
       "animacoes_duracao_s": {
+        "carry_idle": 2.4,
+        "carry_walk": 1.0,
         "celebrate": 1.2,
+        "climb_down": 1.0,
+        "climb_top": 0.8,
+        "climb_up": 1.2,
+        "climb_up_high": 1.3333,
+        "climb_up_low": 1.0,
+        "climb_wall": 1.2,
         "idle": 4.0,
+        "inspect": 1.4,
         "jump": 1.0,
         "look_up": 2.0,
+        "lower_rope": 1.0,
+        "pick_up": 0.6,
+        "place_high": 0.9,
+        "place_low": 0.8,
         "point": 1.2,
         "pull_rope": 1.6,
         "react_surprise": 0.9,
         "run": 0.5667,
         "stop": 0.5,
         "team_pose": 1.5,
+        "throw_rope": 1.2,
         "walk": 1.0,
         "wave": 1.6
       },
@@ -1624,7 +1647,12 @@
         },
         "nota": "RB-R1 ciclos v2 (2026-11-25): walk/run refeitos por source_art/scripts/hero_gait_v2.py com passada longa; escala do clipe no jogo ~1,1-1,2 a 1,4 e 3,2 m/s. PROVISORIO."
       },
-      "nota_arte_cenas": "RB-R1 arte das cenas (2026-11-26): clipe point (1,2 s, sem loop) para as falas que apontam; demais clipes iguais."
+      "nota_arte_cenas": "RB-R1 arte das cenas (2026-11-26): clipe point (1,2 s, sem loop) para as falas que apontam; demais clipes iguais.",
+      "encaixes": {
+        "HoldPoint": "hand.R",
+        "HoldPoint_L": "hand.L"
+      },
+      "nota_g19": "RB-R1 G19 (2026-11-27): clipes novos pick_up, carry_idle, carry_walk (mesmo passo do walk), place_high, place_low, inspect, climb_up_low/climb_up/climb_up_high, climb_wall, climb_top, climb_down, throw_rope, lower_rope; ossos sem deformacao HoldPoint (filho de hand.R) e HoldPoint_L (filho de hand.L) no centro da palma. Malha, materiais e texturas sem mudanca (regravados por build_pico_v2.py --anim-only sobre o .blend)."
     },
     {
       "id": "leme_v2",
@@ -1654,11 +1682,14 @@
         "source_art/scripts/char_lib.py",
         "source_art/scripts/char_anim.py",
         "source_art/scripts/rbart.py",
-        "source_art/scripts/hero_gait_v2.py"
+        "source_art/scripts/hero_gait_v2.py",
+        "source_art/scripts/g19_rebuild.py",
+        "source_art/scripts/render_g19.py",
+        "source_art/scripts/compose_g19.py"
       ],
       "saida_glb": "game/assets/models/characters/leme_v2.glb",
-      "glb_sha256": "f417f96b3c94ccbc6bd72caa7708c162784f547d8413f855bab75d9432b83e39",
-      "glb_bytes": 7707944,
+      "glb_sha256": "e925d98e780771a686c8316201bde3027df8a482d3dd02ab88e91be03737eb5c",
+      "glb_bytes": 8153904,
       "triangulos": 24531,
       "materiais": [
         "mat_leme_v2_acc_lifevest",
@@ -1694,11 +1725,13 @@
         "forearm.R",
         "hand.R",
         "hand_tip.R",
+        "HoldPoint",
         "shoulder.L",
         "upper_arm.L",
         "forearm.L",
         "hand.L",
         "hand_tip.L",
+        "HoldPoint_L",
         "thigh.R",
         "shin.R",
         "foot.R",
@@ -1712,12 +1745,19 @@
         "toe_tip.L",
         "heel.L"
       ],
-      "quantidade_ossos": 28,
+      "quantidade_ossos": 30,
       "animacoes_duracao_s": {
+        "carry_idle": 2.4,
+        "carry_walk": 1.0,
         "celebrate": 1.2,
         "idle": 5.2,
         "idle_wheel": 2.4,
+        "inspect": 1.4,
+        "pick_up": 0.6,
+        "place_high": 0.9,
+        "place_low": 0.8,
         "point": 1.2,
+        "push_cart": 1.0,
         "react_horn": 0.9,
         "run": 0.6333,
         "steer_left": 1.0,
@@ -1854,7 +1894,12 @@
           "mps_jogo": 3.2
         },
         "nota": "RB-R1 ciclos v2 (2026-11-25): walk/run refeitos por source_art/scripts/hero_gait_v2.py com passada longa; escala do clipe no jogo ~1,1-1,2 a 1,4 e 3,2 m/s. PROVISORIO."
-      }
+      },
+      "encaixes": {
+        "HoldPoint": "hand.R",
+        "HoldPoint_L": "hand.L"
+      },
+      "nota_g19": "RB-R1 G19 (2026-11-27): clipes novos pick_up, carry_idle, carry_walk (mesmo passo do walk), place_high, place_low, inspect, push_cart; ossos sem deformacao HoldPoint (filho de hand.R) e HoldPoint_L (filho de hand.L) no centro da palma. Malha, materiais e texturas sem mudanca (regravados por build_leme_v2.py --anim-only sobre o .blend)."
     },
     {
       "id": "world_v2_static",
