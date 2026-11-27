@@ -111,7 +111,8 @@ func _run() -> void:
 		await _frames(2)
 		# so nesta captura: some o ceu chapado e o palco antigo do menu; o logo antigo da lugar ao da proposta
 		menu.background.visible = false
-		menu.hero_stage.visible = false
+		if menu.hero_stage != null and menu.key_art == null:
+			menu.hero_stage.visible = false
 		menu.logo.texture = KeyArtView.logo_texture(proposal, 1400)
 		await create_timer(1.6).timeout   # animacoes de entrada dos botoes
 		var fo := root.gui_get_focus_owner()

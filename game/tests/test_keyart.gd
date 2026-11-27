@@ -9,6 +9,9 @@ const MENU := "res://ui/main_menu.tscn"
 ## Tamanhos logicos com stretch canvas_items + expand (base 1920x1080).
 const RATIOS := {"16:9": Vector2i(1920, 1080), "20:9": Vector2i(2400, 1080), "4:3": Vector2i(1920, 1440)}
 
+## Quadros depois do palco pronto para ele revelar (KEY_SETTLE + folga).
+const KEY_FRAMES := 6
+
 var r
 
 
@@ -22,6 +25,7 @@ func run(runner) -> void:
 	await _focus_case()
 	await _reduced_motion_case()
 	await _release_case()
+	await _trio_case()
 	Options.motion_override = keep_motion
 
 
@@ -201,3 +205,75 @@ func _contrast() -> void:
 		r.check(worst >= 4.5, "contraste WCAG do texto em %s >= 4,5:1 (pior entre normal/hover/pressionado: %.2f)" % [t, worst])
 	r.check(ThemeV2.contrast_ratio(Color.WHITE, ThemeV2.GREEN) < 4.5, "mutacao: branco sobre o verde reprova (%.2f)"
 		% ThemeV2.contrast_ratio(Color.WHITE, ThemeV2.GREEN))
+
+
+## Herois 3D visiveis na arvore do menu (inclusive dentro dos SubViewports), com o nome do no-pai de cada um.
+func _visible_heroes(menu: Node) -> Array[String]:
+	var out: Array[String] = []
+	for n in menu.find_children("*", "CharacterVisual", true, false):
+		var v := n as CharacterVisual
+		var shown := v.is_visible_in_tree()
+		var p := v.get_parent()
+		while p != null and p != menu and shown:
+			if p is CanvasItem and not (p as CanvasItem).is_visible_in_tree():
+				shown = false
+			p = p.get_parent()
+		if shown:
+			out.append(String(v.get_parent().name))
+	return out
+
+
+## Bug do trio duplicado (Windows, Thiago): o palco antigo (HeroStage, trio em idle) era montado no _ready e ficava junto
+## com o trio da arte-chave. Agora: arte-chave dentro = exatamente 3 herois; plano B (imagem parada, que ja tem o trio)
+## = nenhum heroi 3D sobre ela; palco antigo so sem palco e sem imagem.
+func _trio_case() -> void:
+	var sv := SubViewport.new()
+	sv.size = RATIOS["16:9"]
+	sv.render_target_update_mode = SubViewport.UPDATE_DISABLED
+	r.tree.root.add_child(sv)
+	var menu := (load(MENU) as PackedScene).instantiate() as MainMenu
+	sv.add_child(menu)
+	await r.frames(2)
+	if menu.key_art == null:
+		var still := menu.get_node_or_null("KeyArtStill") as TextureRect
+		r.check(still != null and still.visible and _visible_heroes(menu).is_empty() and menu.hero_stage == null
+			and menu.find_child("HeroStage", true, false) == null,
+			"plano B: sobre a imagem parada (que ja tem o trio) nenhum heroi 3D (%s)" % str(_visible_heroes(menu)))
+		menu.loading_timeout()  # teto estourou: o menu abre sobre a imagem
+		await r.frames(2)
+		r.check(_visible_heroes(menu).is_empty(), "plano B com o teto estourado: continua sem heroi 3D sobre a imagem")
+	else:
+		r.check(false, "plano B: a arte-chave nao podia estar pronta em 2 quadros")
+	var waited := 0
+	while (menu.key_art == null or not menu.key_art.stage.ready_to_shoot) and waited < 600:
+		await r.frames(1)
+		waited += 1
+	await r.frames(KEY_FRAMES)
+	var heroes := _visible_heroes(menu)
+	r.check(heroes.size() == 3, "arte-chave dentro: exatamente 3 herois visiveis no menu (%s)" % str(heroes))
+	r.check(menu.find_child("HeroStage", true, false) == null, "arte-chave dentro: sem o palco antigo HeroStage")
+	r.check(menu.hero_root == menu.key_art.stage and menu.hero_models.size() == 3
+		and menu.hero_models.all(func(v: CharacterVisual) -> bool: return menu.key_art.stage.is_ancestor_of(v)),
+		"arte-chave dentro: hero_root/hero_models religados ao trio da arte-chave")
+	sv.queue_free()
+	await r.frames(3)
+	# sem palco e sem imagem (simulado antes do palco entrar): o palco antigo volta com o trio
+	var sv2 := SubViewport.new()
+	sv2.size = RATIOS["16:9"]
+	sv2.render_target_update_mode = SubViewport.UPDATE_DISABLED
+	r.tree.root.add_child(sv2)
+	var m2 := (load(MENU) as PackedScene).instantiate() as MainMenu
+	sv2.add_child(m2)
+	await r.frames(1)
+	if m2.key_art == null:
+		m2._key_pending.clear()
+		var st := m2.get_node_or_null("KeyArtStill")
+		if st != null:
+			st.free()
+		m2._still = null
+		m2._fallback_heroes()
+		await r.frames(2)
+		r.check(m2.find_child("HeroStage", true, false) != null and _visible_heroes(m2).size() == 3,
+			"sem palco e sem imagem: o palco antigo mostra o trio (%s)" % str(_visible_heroes(m2)))
+	sv2.queue_free()
+	await r.frames(3)

@@ -103,7 +103,10 @@ func _build() -> void:
 	_safe.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_safe.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_safe)
-	_build_heroes()
+	# Herois: com a arte-chave prevista (palco carregando) ou a imagem parada dela, o trio e o dela; o palco antigo
+	# (HeroStage) so existe sem nenhum dos dois. Antes ele era montado sempre e ficava junto com o trio da arte-chave.
+	if _key_pending.is_empty() and _still == null:
+		_build_heroes()
 	logo = TextureRect.new()
 	logo.name = "Logo"
 	logo.texture = load(LOGO) as Texture2D
@@ -130,11 +133,7 @@ func _build() -> void:
 
 func _build_heroes() -> void:
 	if key_art != null and key_art.stage != null:
-		# o trio da arte-chave e o palco dos herois (mesma API: hero_stage, hero_root, hero_models)
-		hero_stage = key_art.get_node("Stage") as SubViewportContainer
-		hero_root = key_art.stage
-		for id: StringName in key_art.stage.heroes:
-			hero_models.append(key_art.stage.heroes[id] as CharacterVisual)
+		_bind_key_art_heroes()
 		return
 	hero_stage = SubViewportContainer.new()
 	hero_stage.name = "HeroStage"
@@ -190,6 +189,22 @@ func _build_heroes() -> void:
 		mi.position = Vector3((i - 1) * 0.95, 0.55 + (0.12 if i == 1 else 0.0), 0)
 		hero_root.add_child(mi)
 		i += 1
+
+
+## O trio da arte-chave e o palco dos herois (mesma API: hero_stage, hero_root, hero_models).
+func _bind_key_art_heroes() -> void:
+	hero_stage = key_art.get_node("Stage") as SubViewportContainer
+	hero_root = key_art.stage
+	hero_models.clear()
+	for id: StringName in key_art.stage.heroes:
+		hero_models.append(key_art.stage.heroes[id] as CharacterVisual)
+
+
+## Sem palco e sem imagem parada (arquivos ausentes ou o palco falhou sem imagem): o palco antigo com o trio em idle.
+func _fallback_heroes() -> void:
+	if hero_stage == null and _still == null and key_art == null:
+		_build_heroes()
+		_layout()
 
 
 ## Herois 3D animados no palco da tela-titulo (RB-R1): pose de equipe uma vez, depois o idle de cada um.
@@ -281,7 +296,7 @@ func _layout() -> void:
 	logo.position = Vector2((left_w - logo_w) * 0.5, 0)
 	logo.pivot_offset = logo.size * 0.5
 	_raster_logo(logo_w)
-	if key_art == null:
+	if key_art == null and hero_stage != null:
 		var stage_top := logo.size.y + 20.0
 		hero_stage.position = Vector2(0, stage_top)
 		hero_stage.size = Vector2(left_w, area.y - stage_top)
@@ -337,9 +352,13 @@ func _poll_key_art() -> void:
 		return
 	var packed := ResourceLoader.load(KEY_ART) as PackedScene
 	if packed == null:
+		_fallback_heroes()
 		return
 	var t0 := Time.get_ticks_msec()
 	key_art = packed.instantiate() as KeyArtView
+	if key_art == null:
+		_fallback_heroes()
+		return
 	var t1 := Time.get_ticks_msec()
 	key_art.name = "KeyArt"
 	key_art.framing = &"menu"
@@ -347,6 +366,7 @@ func _poll_key_art() -> void:
 	key_art.village_scene = ResourceLoader.load(KeyArtStage.VILLAGE) as PackedScene  # ja no cache (segundo plano)
 	add_child(key_art)
 	move_child(key_art, background.get_index() + 1)
+	_build_heroes()  # religa hero_stage/hero_root/hero_models ao trio da arte-chave
 	_key_settle = KEY_SETTLE
 	_key_frame_ms = Time.get_ticks_msec()
 	print("[RB] title key_art instanciar=%dms ready=%dms" % [t1 - t0, _key_frame_ms - t1])
