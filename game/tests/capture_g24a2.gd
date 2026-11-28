@@ -10,6 +10,8 @@ const SHOTS := {
 	"m5_crates": [&"M5", &"M5_Crates", 1.3],
 	"m5_awning": [&"M5", &"M5_Awning", 1.4],
 	"m4_cart": [&"M4", &"M4_Cart", 1.4],
+	# Caixotes da rua do M5 (~-14,7, -16): heroi ao sul, camera ao norte, longe do galpao (x < -17,6).
+	"m5_street": [&"M5", &"M5_Crates", 1.3, Vector3(-14.6, 0.0, -17.9), 0.0],
 	"m4_stall": [&"M4", &"M4_Stall_Lemon", 1.5],
 }
 
@@ -63,6 +65,11 @@ func _ready() -> void:
 
 ## Heroi a `dist` m da peca, num chao livre; camera do jogo do outro lado da peca (a peca entre os dois).
 func _pick_spot() -> void:
+	if shot.size() > 4:
+		_at = shot[3]
+		_yaw = float(shot[4])
+		print("[G24a2] tomada %s %s: heroi fixo %s" % [_arg("--g24-shot"), "antes" if off else "depois", _at])
+		return
 	var c := main.world.marker(shot[1] as StringName).global_position
 	var space := main.world.get_world_3d().direct_space_state
 	var best := -1.0
@@ -97,10 +104,13 @@ func _process(_delta: float) -> void:
 		lead.face_now(_at + Basis(Vector3.UP, _yaw) * Vector3(0, 0, -3))
 		main.camera_rig.set_low_view(_yaw)
 		main.camera_rig.follow(lead, true)
+	if frame == 25 and shot.size() > 4:
+		# A missao gira a camera na entrada; a tomada fixa volta ao giro pedido.
+		main.camera_rig.set_low_view(_yaw)
 	if frame == 13:
 		print("[G24a2] pipelines antes do pontilhado: %s" % _pipelines())
 	if frame == 20 or frame == 39:
 		var occ := main.camera_rig.occlusion
-		print("[G24a2] quadro %d: pipelines %s; pecas pontilhadas %d; camera %s, heroi a %.2f m" % [frame, _pipelines(),
-			occ.swapped_now if occ != null else 0, main.camera_rig.camera.global_position,
+		print("[G24a2] quadro %d: pipelines %s; pecas pontilhadas %d; camera %s yaw %.2f, heroi %s a %.2f m" % [frame, _pipelines(),
+			occ.swapped_now if occ != null else 0, main.camera_rig.camera.global_position, main.camera_rig.yaw, main.controlled_node.global_position,
 			main.camera_rig.camera.global_position.distance_to(main.controlled_node.global_position)])

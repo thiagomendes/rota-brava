@@ -1048,3 +1048,8 @@ Critérios de aceite:
   Conclusão: a 4.7 **compila o pipeline base fora da vista**; dentro da vista ela compila também as especializações. `draw=0` em todos os casos e nenhuma compilação nova depois do pontilhado. Fica o aquecimento dentro da vista. O impacto no celular (GPU real) segue pendente.
 - **Testes:** `camera,movement,touch_controls,ep01_v3_late`: `FALHOU (269 PASS, 1 FALHA(S))`, e a falha é a vista tapada pela estrutura no reduzido (16 ≤ 1).
   - Suíte completa: `FALHOU (5420 PASS, 1 FALHA(S))` em 526 s, com a mesma falha. O `motion_audit` não falhou nesta rodada.
+- **Rodada 3 (decisão do lead):** mantida a mola suave no movimento reduzido. Critério "estrutura, vista tapada, reduzido" passa de 1 para 20 (16 medidos + folga 4), com a justificativa no `test_camera_occlusion.gd`: no reduzido, ficar sem salto vale mais que alguns quadros com a mureta tapando a vista; o caso segue para o G24a3. Os outros critérios de estrutura não mudaram.
+  - Captura `captures/g24a2v2/m5_street-{antes,depois}/f00000039.png` (aberta): herói ao sul dos caixotes da rua do M5, longe do galpão.
+    - Antes: câmera a 1,54 m, colada no herói.
+    - Depois: câmera a 3,26 m, atrás dos caixotes. O caixote ao lado das pernas do herói aparece pontilhado (padrão de peneira na borda), e o herói aparece inteiro.
+  - Suíte completa: `OK (5421 PASS, 0 FALHA(S))` em 521 s.

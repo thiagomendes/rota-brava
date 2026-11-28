@@ -28,7 +28,10 @@ const OCCL_CENTER_Y := 0.6
 const BASE_JUMP: Array[float] = [3.32, 3.73]
 const BASE_INSIDE: Array[int] = [149, 146]
 const BASE_FRAC: Array[float] = [0.081, 0.301]
-const BASE_STRUCT_VIEW: Array[int] = [0, 1]
+## Vista tapada pela estrutura: integracao 0/1. No reduzido vale 16 medido + folga 4 (decisao do lead, G24a2): a mola
+## suave no reduzido tira o salto de 3,32 m (reduzido sem salto vale mais que alguns quadros com a mureta
+## `Structures/31` do M4 tapando a vista enquanto o braco volta). O caso fica para o G24a3.
+const BASE_STRUCT_VIEW: Array[int] = [0, 20]
 const RISE_LIM := 2.7  # pedido do G24a2: camera nunca mais de 2,7 m acima do heroi
 
 var r
