@@ -1103,3 +1103,131 @@ Critérios de aceite:
     - tempo real do M6 não medido;
     - crash sinal 11 visto 2 vezes pelo autor e não reproduzido em 6 rodadas.
   - Conflito no merge: `ep01_v3_late.gd`, no fim do M5. Somei o `fish_street_gap` do G25 com o brilho na posição real do peixe do G24.
+- **Suíte integrada depois do merge do G24b/c/d (`a89b828`):** `FALHOU (5448 PASS, 1)`. A auditoria `motion_audit` acusou 5 pares novos no M5: na entrega do peixe à Amora (G25), o Pico e o peixe atravessam os caixotes `kit:crate#8/#9` da rua, até 17 cm. O defeito é real e não vai para a `KNOWN`. A correção é o **G25b** (`gameplay`). Até o G25b entrar, a integração fica com esse teste falhando.
+- **G24a2 v2:** a separação peça/estrutura resolveu o caso das peças: vista tapada sem pontilhado caiu de 68 para 0 no modo normal. Os casos de **estrutura** (paredes e galpão com a câmera girada contra eles: câmera dentro da parede, braço a 0,9 m, saltos nas quinas) já existiam antes e ficam com o **G24a3**, levado a Thiago com opções. O G24a2 fecha nas peças, com critério rígido. Para a estrutura vale não regredir em relação ao rig de integração. O movimento reduzido também ganha a mola suave.
+
+### G26 · suíte reprova SCRIPT ERROR (achado da revisão do G24a2, 2026-11-28)
+| Id | Problema | Critério de aceite | Dono |
+|---|---|---|---|
+| G26 | A suíte passou com 6790 SCRIPT ERROR no log, porque `tools/test.sh` só conta FAIL. Um erro de script aborta a função no meio e deixa estado errado sem nenhum teste acusar | `tools/test.sh` (e o equivalente `.ps1`, se ele tiver a mesma lógica) reprova a rodada quando algum log de processo tem `SCRIPT ERROR` ou `Parse Error` em script do jogo. Exceções só com lista explícita e justificada; o `Parse Error village_world.tscn:7` na saída, que já existia, entra na lista. O resumo mostra a contagem por mensagem. Prova: a integração atual passa (o último log da integração não tem nenhum SCRIPT ERROR), e um teste-sonda temporário que provoca um SCRIPT ERROR faz a rodada falhar | `build-qa` |
+
+**Evidência G26 (build-qa, 2026-11-28, Linux, Godot 4.7.2, base `2b69476`).** `tools/test.sh` junta as linhas `SCRIPT ERROR`/`Parse Error` de todos os logs de processo (shards, `fixed` e `serial`), tira as que casam com `tools/test_error_allow.txt` (regex ERE `|` motivo) e, se sobrar alguma, imprime `FAIL  N erro(s) de script nos logs` com a contagem por mensagem e reprova. Não existe `tools/test.ps1`: nada a espelhar no Windows.
+- `bash tools/test.sh` (sem sonda): `RESULTADO: FALHOU (5448 PASS, 2 FALHA(S))`, 638 s, 3 processos. Nenhum `SCRIPT ERROR`. Uma falha é o `Parse Error ... rastro_model.tscn:16` (shard-2, depois do `RESULTADO`, no encerramento; o `village_world.tscn:7` não apareceu), que já existia e foi posto na lista; a regex da lista casa com essa linha (conferido com `grep -cEf` sobre a saída). A outra é **anterior ao G26 e fora do escopo**: `FAIL G24d: nenhum par novo fora da lista de pendencias (5)` (M5, Actor_climber/Fish x crate#8/#9). Rodada completa com a lista ainda não refeita.
+- Sonda temporária `game/tests/test_zz_probe.gd` (acessa `name` de um `Node` liberado; removida, fora do commit): `bash tools/test.sh zz_probe,dialogue` → `FAIL 1 erro(s)`, `1 SCRIPT ERROR: Invalid access to property or key 'name' on a base object of type 'previously freed'.`, `RESULTADO: FALHOU (41 PASS, 1 FALHA(S))`, código 1. `RB_TEST_JOBS=1 bash tools/test.sh zz_probe` → mesma contagem, `FALHOU (1 PASS, 1 FALHA(S))`, código 1.
+- **Revisão G26** (`reviewer`): **APROVADO**. Sondas reprovam nos três modos: paralelo com filtro, serial e fps fixo. A regex da exceção é estreita: `:16` passa, `:17` reprova. Sem falso positivo. Bash robusto com espaço no caminho. Suíte completa: a única falha é a conhecida G24d M5 (G25b), com 0 SCRIPT ERROR. Merge em `feature/rb-r1-reorientacao`.
+  - **Dívidas abertas:**
+    1. O `Parse Error rastro_model.tscn:16` no encerramento provavelmente é um carregamento em segundo plano ainda pendente quando o processo sai. O teste de carga segura do menu não espera nem cancela o pedido. Prioridade baixa.
+    2. São 85 linhas `ERROR: Lambda capture at index 0 was freed` que o G26 não pega. Investigar.
+    3. A exceção vale para o log inteiro, não só depois do `RESULTADO`.
+#### Evidência G24a2 v2 (`gameplay`, branch `feature/rb-r1-g24a2-v2`): NÃO FECHA
+- **Separação (data-driven, sem .blend nem GLB):** peça é cada instância do `kit` do layout (fora `grass_*`/`flowers_*`), mais `NetShedAwning`, `NetShedFishTable`, `TreeBench` e `FlowerBedN/S` (`CameraOcclusion.PIECE_SHAPES`), que são movidas na carga para `Collision/CameraPieces`, na mesma camada. A câmera exclui `Collision/Props` e `CameraPieces` e não desvia mais das copas (`avoid_canopies = false`). As cenas continuam desviando de tudo (`_solid_exclude`). A mola G6 da estrutura não mudou.
+- **Pontilhado:** por instância. A instância do MultiMesh some e entra um `MeshInstance3D` com a malha pontilhada; o toldo do galpão troca os materiais da malha estática. Os parâmetros são `instance uniform`: fade por peça de 0,15 s, e no modo reduzido só liga e desliga. A sombra não pontilha. O aquecimento é feito na frente da câmera (`warm_mode`).
+- **`test_camera_occlusion`, 880 passos por modo (depois / rig da integração `5cef201`):**
+  - vista tapada sem pontilhado: normal **0** / 68; reduzido **1** (estrutura) / 94;
+  - câmera dentro da estrutura: 117 / 149;
+  - salto máximo: normal 0,76 / 3,32 m; reduzido 3,32 / 3,73 m;
+  - herói no quadro, mínimo: 8% / 8% no normal; 31% / 30% no reduzido;
+  - altura máxima: 2,08 m (limite 2,70).
+
+  Todas as falhas restantes são de **estrutura**: o galpão `Structures/23` no M5, com o braço no mínimo, e `Structures/31-32` no M4/M3. Nenhuma é de peça.
+- **Conflito:** com a mola G6 sem mudança, o cenário do teste (câmera girada 0,6 rad contra a parede) leva o braço ao mínimo de 0,9 m. A câmera entra no galpão e o herói fica com 8–34% no quadro.
+  - Tentei fazer a câmera escorregar na parede (esfera no pivô, projeção no plano, limite de taxa). Não fechou: saltos de até 3 m nas quinas do M4/M3. Revertido.
+  - Medido, mas não aplicado (muda a mola): com a mola suave também no modo reduzido, o salto reduzido cai de p99 1,48 m / máx 3,32 m para p99 0,195 m / máx 1,47 m.
+- **CPU da troca (headless):** média 56–67 µs/quadro, p99 145–188 µs, máximo 6,6 ms num quadro. No percurso foram 11–12 trocas, no máximo 1 por quadro e 5 peças pontilhadas ao mesmo tempo; 602 peças em grade de 4 m. GPU no celular: **pendente**.
+- **Pipeline (xvfb + llvmpipe):** `draw=0` em todos os quadros. Com o aquecimento na vista, `surface`/`specialization` vão de 91/85 para 96/89 entre a carga e o primeiro pontilhado no M5. Não comparei com `--g24-warm=out|none`: segue aberta a pergunta se a 4.7 compila o pipeline fora da vista.
+- **Capturas:** `captures/g24a2v2/{m5_crates,m5_awning,m4_cart}-{antes,depois}/f00000039.png`. Abri `m4_cart-depois` (herói atrás dos caixotes, inteiro, sem pontilhado visível) e `m5_crates-depois` (câmera a 1,54 m, encurtada pelo galpão). O enquadramento não mostra bem o pontilhado; as capturas precisam ser refeitas.
+- **Testes:**
+  - `bash tools/test.sh camera,movement,touch_controls,ep01_v3_late`: `FALHOU (261 PASS, 7 FALHA(S))`, todas em `test_camera_occlusion`. Passam o G3 (p99 41,14 m/s²), o G6 (0 de 2500) e o `test_camera_run`. O `test_movement_f1:312` passou sem o ajuste do WIP.
+  - Suíte completa: `FALHOU (5412 PASS, 7 FALHA(S))` em 531 s, com as mesmas 7 falhas.
+
+#### G24a2 v2, rodada 2 (decisões do lead: escopo = peças; estrutura vai para o G24a3)
+- **Critérios do `test_camera_occlusion` separados:**
+  - **Peças (rígido):** vista tapada por peça sem pontilhado = 0 nos dois modos.
+  - **Estrutura (sem regressão):** não pode piorar em relação ao rig da integração `5cef201`, medido com este teste e fixado nele como [normal, reduzido]: salto 3,32/3,73 m, dentro da estrutura 149/146, herói no quadro 8,1%/30,1%, vista tapada pela estrutura 0/1.
+  - No rig da integração o teste falha pelas peças (68/93 passos sem pontilhado).
+- **Mola suave também no movimento reduzido (aplicada):**
+  - salto reduzido: máx 3,32 → **1,47 m**, p99 1,478 → **0,195 m**;
+  - em troca, a vista tapada pela **estrutura** no reduzido vai de 1 para **16 passos** (mureta `Structures/31` no M4 enquanto o braço volta). É a única falha que sobra.
+  - Testei encolher na hora e só voltar suave: caem para 1 passo, mas o salto máximo volta a 3,32 m. Revertido. Fica para o G24a3.
+- **Peças de missão:** o carrinho do M4 (`land.cart`) e o banco do varal do G19 (grupo `g19_bench`) pontilham, e o banco sai do desvio da câmera. A ligação é refeita a cada `land.build`.
+  - O banco usa StandardMaterial3D, e a 4.7 não expõe o código gerado ao GDScript (`material_get_shader`/`get_shader_rid` não existem). A variante dele usa o pontilhado de distância da própria Godot (`DISTANCE_FADE_PIXEL_DITHER`, 0–8 m): sem cone e sem fade de 0,15 s. **PROVISÓRIO**, para o `art3d` revisar.
+- **Números finais (normal / reduzido):**
+
+  | Medida | Normal | Reduzido |
+  |---|---|---|
+  | Vista tapada por peça sem pontilhado | **0** | **0** |
+  | Salto máximo | 0,76 m | 1,47 m |
+  | Dentro da estrutura | 117 | 117 |
+  | Herói no quadro, mínimo | 8,1% | 31% |
+  | CPU média da troca | 63 µs | 63 µs |
+  | CPU p99 | 153 µs | 169 µs |
+  | CPU máxima | 5,4 ms | 4,8 ms |
+
+  No máximo 2 trocas por quadro e 5 peças pontilhadas ao mesmo tempo.
+- **Capturas** (`captures/g24a2v2/`, quadro 39, abertas):
+  - `m4_stall-antes`: a barraca encurta o braço e a câmera fica a 1,89 m, colada na nuca do herói.
+  - `m4_stall-depois`: câmera a 4,54 m atrás da barraca do limão. O toldo listrado e as frutas aparecem pontilhados (padrão de peneira) e o trio aparece inteiro.
+  - `m5_awning-depois`: o herói fica **em cima** do toldo e a câmera acima dele, então o pontilhado não aparece. Essa tomada ainda precisa de enquadramento; a de caixotes do M5 também (a câmera é encurtada pelo galpão).
+- **Aquecimento (m4_stall, xvfb + llvmpipe; contadores `surface` / `specialization` na carga):**
+
+  | Aquecimento | `surface` | `specialization` |
+  |---|---|---|
+  | dentro da vista | 106 | 93 |
+  | fora da vista | 106 | 63 |
+  | sem aquecimento | 60 | 63 |
+
+  Conclusão: a 4.7 **compila o pipeline base fora da vista**; dentro da vista ela compila também as especializações. `draw=0` em todos os casos e nenhuma compilação nova depois do pontilhado. Fica o aquecimento dentro da vista. O impacto no celular (GPU real) segue pendente.
+- **Testes:** `camera,movement,touch_controls,ep01_v3_late`: `FALHOU (269 PASS, 1 FALHA(S))`, e a falha é a vista tapada pela estrutura no reduzido (16 ≤ 1).
+  - Suíte completa: `FALHOU (5420 PASS, 1 FALHA(S))` em 526 s, com a mesma falha. O `motion_audit` não falhou nesta rodada.
+- **Rodada 3 (decisão do lead):** mantida a mola suave no movimento reduzido. Critério "estrutura, vista tapada, reduzido" passa de 1 para 20 (16 medidos + folga 4), com a justificativa no `test_camera_occlusion.gd`: no reduzido, ficar sem salto vale mais que alguns quadros com a mureta tapando a vista; o caso segue para o G24a3. Os outros critérios de estrutura não mudaram.
+  - Captura `captures/g24a2v2/m5_street-{antes,depois}/f00000039.png` (aberta): herói ao sul dos caixotes da rua do M5, longe do galpão.
+    - Antes: câmera a 1,54 m, colada no herói.
+    - Depois: câmera a 3,26 m, atrás dos caixotes. O caixote ao lado das pernas do herói aparece pontilhado (padrão de peneira na borda), e o herói aparece inteiro.
+  - Suíte completa: `OK (5421 PASS, 0 FALHA(S))` em 521 s.
+
+#### G24a2 v2, rodada 4 (revisões `reviewer` + `art3d` reprovaram; correções)
+- **SCRIPT ERROR do carrinho liberado:** os laços das peças de missão ficaram sem tipo, com `is_instance_valid` antes de qualquer uso. Nó liberado sai do `_dyn`/`_dyn_active`. O `land.cart` só entra se ainda estiver na árvore.
+  - Novo `test_camera_occlusion_life.gd`: M4→M5 sem peça liberada nas listas e `update` inteiro em 40 de 40 quadros.
+  - Contra o `7ee3f0d`, o teste falha já na carga (`occl_variant` sem `sync`), não chega a medir o M4→M5.
+  - `grep -c "SCRIPT ERROR"` nos logs da suíte completa: **0** em todos os processos (shard-1, shard-2, shard-3, fixed).
+- **Devolução ao normal:** `restore_all` roda antes de cada `land.build`, na troca de herói (`set_controlled`) e ao entrar em cena (`camera_rig.occlusion_paused`: o rig não pontilha durante a cena). Os três casos estão testados.
+- **Material:**
+  - Toldo e banca do galpão, banco da árvore e canteiros **voltaram a ser estrutura** (G24a3). Só troca malha de uma peça: o proxy por instância do kit ou o nó da peça de missão.
+  - A variante copia os parâmetros da base na troca (noite e festa testadas).
+  - StandardMaterial3D fica sem variante; o pontilhado por distância foi removido. O banco do varal usa `wv2_wood` e pontilha normal.
+  - Shader: a peça inteira pontilha com um fade só, Bayer calculado por conta (sem tabela indexada), e a sombra é excluída também por `length(CAMERA_POSITION_WORLD - occl_cam) > 0,5`. O `smoothstep` invertido saiu junto com o cone.
+- **Pico de CPU instrumentado** (`usec_max_stage`):
+  - normal: 1,7 ms na etapa "parâmetros" (`set_instance_shader_parameter`, sem troca no quadro);
+  - reduzido: 0,7 ms na etapa "troca" (3 trocas, criação dos `MeshInstance3D`);
+  - na suíte, o máximo chegou a 3,8–4,1 ms. A média fica em 45–62 µs.
+- **G3:** o teste agora exige também mais de 30 passos de braço encurtado pela **estrutura**, e passa.
+- **Capturas** (`captures/g24a2v2/{m4_stall,m5_street}-v3/f00000039.png`, abertas):
+  - M4: a barraca do limão inteira (toldo listrado, armação e frutas) e uma copa aparecem como um fantasma pontilhado uniforme, e o trio aparece inteiro. Ficou **bem transparente**; o `art3d` pode querer menos de 75%.
+  - M5: o caixote ao lado do herói aparece inteiro e uniformemente pontilhado; o caixote vizinho segue sólido.
+- **Testes:**
+  - `camera,movement,touch_controls,ep01_v3_late,cutscene`: o primeiro lote acusou só a troca de herói no teste novo (posição do caixote). Depois da correção, `camera_occlusion_life` passou com 10 PASS.
+  - Suíte completa: `OK (5432 PASS, 0 FALHA(S))` em 535 s.
+
+#### G24a2 v2, rodada 5 (ajustes do `art3d` antes do merge)
+- **Teto do pontilhado:** 50% (xadrez do Bayer 4×4). Com a câmera dentro da peça, 62,5% (`occl_cam.w = 1`).
+- **Guarda da injeção:** `occl_variant` chama `push_error` quando o shader não começa com `shader_type` ou não tem exatamente um `void fragment() {`. StandardMaterial3D continua sem variante, de propósito.
+  - Novo `test_occlusion_shaders.gd` cobre os 6 shaders `wv2`. Confere essas duas condições, confere que a variante tem `occl_discard` e que compila: o servidor de render do modo headless devolve a lista de uniformes vazia quando a compilação falha, e a variante tem os mesmos uniformes da base.
+- **`usec_max_stage`:** zerado no início do percurso medido (`reset_stats`). Pico normal: 1,2 ms na etapa "troca", com 3 trocas. Pico reduzido: 1,5 ms na etapa "grade".
+- **Capturas** `captures/g24a2v2/{m4_stall,m5_street}-v4/f00000039.png` (abertas; 0 SHADER/SCRIPT ERROR no Vulkan):
+  - M4: a barraca do limão inteira aparece em xadrez meio transparente, com cores legíveis (frutas vermelhas, verdes e roxas, toldo amarelo), e o trio aparece inteiro.
+  - M5: o caixote ao lado do herói aparece em xadrez meio transparente, com as tábuas legíveis, e o herói inteiro.
+- **Teste:** `bash tools/test.sh camera,camera_occlusion,camera_occlusion_life,cutscene,occlusion_shaders`: `OK (409 PASS, 0 FALHA(S))`, com 0 SCRIPT ERROR nos logs.
+- **Revisão G24a2** (aprovada nas duas frentes, merge em `feature/rb-r1-reorientacao`):
+  - **Código (`reviewer`):**
+    - R1 (`7ee3f0d`) reprovado: SCRIPT ERROR a cada quadro desde M4→M5 (carrinho liberado) e sem devolução ao normal.
+    - R2 (`649d39f`) **APROVADO**: 0 SCRIPT ERROR. `restore_all` roda antes de `land.build`, na troca de herói e na cena. A mutação do laço tipado falha no `camera_occlusion_life`. Suíte sobre o merge: 5478 PASS e 1 falha conhecida (G24d M5, que é o G25b).
+  - **Material (`art3d`):**
+    - R1 reprovado: malha errada nas 5 peças estáticas, parâmetros de noite e festa presos, `smoothstep` invertido.
+    - R2 **APROVADO**.
+    - Recomendações aplicadas em `a87c68d`, verificadas pelo lead no diff e na captura v4:
+      - teto de 50% (62,5% com a câmera dentro da peça);
+      - `push_error` e `test_occlusion_shaders` na injeção.
+  - **Pendentes:**
+    - G24a3: estrutura, toldo e banca do galpão, banco da árvore, canteiros e a câmera dentro de paredes;
+    - GPU no celular e grade com escala de render reduzida;
+    - troca de herói sem fade.

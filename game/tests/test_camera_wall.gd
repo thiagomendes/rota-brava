@@ -4,6 +4,9 @@ extends RefCounted
 ##  - esfera de 0,1 m na posicao da camera nao toca a camada de obstaculo da camera (`collision_mask`, sem `exclude`);
 ##  - (fora os passos com o braco no minimo de 0,9 m, que o rig aceita de proposito e sao so contados)
 ##  - raio da mira ate a camera sem obstaculo; camera fora das copas (`occluders`).
+## G24a2 v2: os testes olham a camada 1 INTEIRA (estrutura e pecas; so agua/limites/rampas fora). Camera dentro da
+## estrutura (mascara/`exclude` do rig) e sempre falha; dentro de peca, atras de peca ou dentro de copa so vale com a
+## peca pontilhada (`CameraOcclusion.piece_contains` / `CameraRig.occlusion_covers`), com FADE_S s de entrada do fade.
 ## Mede estado; nao comprova o que se ve na tela.
 
 const CAM_RADIUS := 0.1
@@ -14,6 +17,9 @@ var main: Ep01V3Main
 var _ticks := 0
 var _at_min := 0
 var _bad: Array[String] = []
+var _faded := 0
+var _blocked_for := 0.0
+const FADE_S := 0.17  # CameraOcclusion.FADE_TIME + 1 quadro
 var _sphere := SphereShape3D.new()
 
 
@@ -39,7 +45,7 @@ func run(runner) -> void:
 		walls += 1
 		await _at_wall(String(mk), spot[0] as Vector3, spot[1] as Vector3)
 	_release()
-	print("  medida parede: %d paredes, %d passos medidos, %d com camera dentro/atras de obstaculo %s; %d no braco minimo" % [walls, _ticks, _bad.size(), _bad.slice(0, 4), _at_min])
+	print("  medida parede: %d paredes, %d passos medidos, %d com camera dentro/atras de obstaculo %s; %d no braco minimo; %d com peca pontilhada no meio" % [walls, _ticks, _bad.size(), _bad.slice(0, 4), _at_min, _faded])
 	r.check(walls >= 3, "parede: %d paredes da vila encontradas" % walls)
 	r.check(_bad.is_empty(), "parede: camera nunca dentro nem atras de obstaculo (%d de %d passos %s)" % [_bad.size(), _ticks, _bad.slice(0, 3)])
 	main.queue_free()
@@ -66,7 +72,7 @@ func _wall_spot(c: Vector3) -> Variant:
 			for k in 8:
 				var dir := Vector3.FORWARD.rotated(Vector3.UP, TAU * k / 8.0)
 				var q := PhysicsRayQueryParameters3D.create(g + Vector3(0, 1.0, 0), g + Vector3(0, 1.0, 0) + dir * 1.5, 1)
-				q.exclude = main.camera_rig.exclude
+				q.exclude = _solid()
 				var h := space.intersect_ray(q)
 				if h.is_empty():
 					continue
@@ -107,6 +113,22 @@ func _at_wall(label: String, stand: Vector3, normal: Vector3) -> void:
 	_release()
 
 
+## Corpos invisiveis (agua, limites, rampas): nao tapam a vista.
+func _solid() -> Array[RID]:
+	var out: Array[RID] = []
+	for path: String in ["Collision/WaterLimits", "Collision/MapBounds", "Collision/AccessRamps"]:
+		var b := main.world.get_node_or_null(path) as CollisionObject3D
+		if b != null:
+			out.append(b.get_rid())
+	return out
+
+
+## O raio bateu numa peca pontilhada (o ponto pode estar fora do cone do shader, que mede ate o centro do heroi, e
+## nao ate a mira): vale se a peca do ponto esta pontilhada. Estrutura nunca vale.
+func _covers_struct_free(hit: Dictionary) -> bool:
+	return main.camera_rig.occlusion.piece_contains(hit["position"] as Vector3)
+
+
 func _push(dir: Vector3) -> void:
 	var local := Basis(Vector3.UP, -main.camera_rig.yaw) * dir.normalized()
 	for pair: Array in [[&"move_right", local.x], [&"move_left", -local.x], [&"move_down", local.z], [&"move_up", -local.z]]:
@@ -129,9 +151,12 @@ func _tick(label: String) -> void:
 	q.transform = Transform3D(Basis(), cam)
 	q.collision_mask = rig.collision_mask
 	q.exclude = rig.exclude
-	var inside := not space.intersect_shape(q, 1).is_empty()
-	var ray := PhysicsRayQueryParameters3D.create(look, cam, rig.collision_mask)
-	ray.exclude = rig.exclude
+	var inside := not space.intersect_shape(q, 1).is_empty()  # estrutura: nunca
+	q.collision_mask = 1
+	q.exclude = _solid()
+	var in_piece := not inside and not space.intersect_shape(q, 1).is_empty()
+	var ray := PhysicsRayQueryParameters3D.create(look, cam, 1)
+	ray.exclude = _solid()
 	var hit := space.intersect_ray(ray)
 	# Mira ja dentro de algo (heroi colado) nao conta: o rig tambem ignora esse caso.
 	var behind := not hit.is_empty() and (hit["position"] as Vector3).distance_to(look) > 0.05
@@ -140,8 +165,25 @@ func _tick(label: String) -> void:
 		var c := Vector3(s.x, s.y, s.z)
 		if cam.distance_to(c) < s.w - CAM_RADIUS and look.distance_to(c) > s.w:
 			canopy = true
+	if rig.occlusion != null:
+		var any := behind or in_piece or canopy
+		_blocked_for = _blocked_for + 1.0 / Engine.physics_ticks_per_second if any else 0.0
+		var ok_contain := rig.occlusion.piece_contains(cam)
+		var ok_behind := behind and (rig.occlusion_covers(hit["position"] as Vector3) or _covers_struct_free(hit))
+		var fading := _blocked_for <= FADE_S
+		if (in_piece or canopy) and (ok_contain or fading):
+			in_piece = false
+			canopy = false
+			_faded += 1
+		if behind and (ok_behind or (fading and rig.occlusion.is_piece_point(hit["position"] as Vector3))):
+			behind = false
+			_faded += 1
+	else:
+		in_piece = false  # rig sem pontilhado: peca conta como antes (mascara do rig)
+	inside = inside or in_piece
 	var d := cam.distance_to(look)
 	if (inside or behind or canopy) and d <= CameraRig.MIN_ARM + 0.02:
 		_at_min += 1  # braco minimo (0,9 m) de proposito: a camera nao cola no heroi; igual ao codigo antigo
 	elif inside or behind or canopy:
-		_bad.append("%s q%d d%.2f%s%s%s" % [label, _ticks, d, " dentro" if inside else "", " atras" if behind else "", " copa" if canopy else ""])
+		_bad.append("%s q%d d%.2f%s%s%s" % [label, _ticks, d, " dentro" if inside else "", " atras" if behind else "", " copa" if canopy else ""]
+			+ ("" if hit.is_empty() else " %s/%d" % [(hit["collider"] as Node).name if hit["collider"] is Node else "?", int(hit["shape"])]))

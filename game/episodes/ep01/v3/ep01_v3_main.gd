@@ -61,6 +61,9 @@ static var save_path: String = MissionSave.DEFAULT_PATH
 
 var world: VillageWorld
 var camera_rig: CameraRig
+## Corpos invisiveis fora do desvio (agua, limites, rampas), sem as pecas do G24a2: cenas desviam de tudo.
+var _solid_exclude: Array[RID] = []
+var _mission_rids: Array[RID] = []
 var boat: BoatActor
 var hud: Hud
 var touch: TouchControls
@@ -190,6 +193,41 @@ func _setup_camera_avoidance() -> void:
 		if b != null:
 			camera_rig.exclude.append(b.get_rid())
 	camera_rig.occluders = tree_canopies()
+	_solid_exclude = camera_rig.exclude.duplicate()
+	# G24a2 v2: pecas (kit e toldo/banca do galpao) saem do desvio da camera e ficam pontilhadas quando tapam o heroi;
+	# a estrutura continua na mola de braco (G6). Variantes aquecidas na frente da camera, na carga.
+	camera_rig.exclude.append_array(CameraOcclusion.piece_bodies(world))
+	camera_rig.avoid_canopies = false
+	camera_rig.occlusion = CameraOcclusion.new(world)
+	camera_rig.occlusion.warm_up(camera_rig.camera)
+
+
+## G24a2 v2: tudo volta ao normal antes de `land.build` (a instancia CART_KIT_INDEX do kit nao pode reaparecer ao lado
+## do carrinho dirigivel), ao entrar em cena e ao trocar de heroi.
+func _occlusion_reset() -> void:
+	if camera_rig != null and camera_rig.occlusion != null:
+		camera_rig.occlusion.restore_all()
+
+
+## G24a2 v2: pecas de missao (carrinho do M4, banco do varal do G19) pontilham como as do kit e saem do desvio
+## da camera. Refeito a cada `land.build` (as pecas sao recriadas por missao).
+func _link_mission_pieces() -> void:
+	if camera_rig == null or camera_rig.occlusion == null:
+		return
+	for rid in _mission_rids:
+		camera_rig.exclude.erase(rid)
+	_mission_rids.clear()
+	var nodes: Array = []
+	# Carrinho so enquanto a missao dele esta montada (land.build libera o velho; is_inside_tree descarta o liberado).
+	if is_instance_valid(land.cart) and land.cart.is_inside_tree():
+		nodes.append(land.cart)
+	for b in get_tree().get_nodes_in_group(&"g19_bench"):
+		var body := b as CollisionObject3D
+		if body != null and body.get_parent() is Node3D:
+			nodes.append(body.get_parent() as Node3D)
+			_mission_rids.append(body.get_rid())
+	camera_rig.exclude.append_array(_mission_rids)
+	camera_rig.occlusion.set_dynamic(nodes)
 
 
 ## Copas das arvores do kit como esferas (centro, raio), da caixa da malha de cada tipo e do layout do mundo.
@@ -367,7 +405,9 @@ func _start_mission(index: int) -> void:
 		_finish_episode()
 		return
 	current = missions[index]
+	_occlusion_reset()
 	land.build(current.id)
+	_link_mission_pieces()
 	var data: Dictionary = mission_data.get(current.id, {})
 	hud.set_objective(Loc.t(String(current.title_key)), StringName(str(data.get("icon", "notebook"))))
 	help.attach(current)
@@ -443,7 +483,9 @@ func _start_after_hops(index: int) -> void:
 
 
 func _finish_episode() -> void:
+	_occlusion_reset()
 	land.build(&"")
+	_link_mission_pieces()
 	current = null
 	complete = true
 	world.set_festival(true)
@@ -873,6 +915,8 @@ func _setup_speech() -> void:
 # ---------- controle ----------
 
 func set_controlled(node: Node3D) -> void:
+	if node != controlled_node:
+		_occlusion_reset()  # G24a2: troca de heroi nao herda pecas pontilhadas do outro
 	controlled_node = node
 	for m: StringName in actors:
 		(actors[m] as MemberActor).controlled = (actors[m] == node)
@@ -949,7 +993,7 @@ func _cutscene_setup() -> void:
 	cutscene.setup(world, hud, {&"tracker": actors[&"tracker"], &"climber": actors[&"climber"],
 		&"pilot": actors[&"pilot"], &"captain": land.captain, &"pup": land.pup})
 	cutscene.on_step = _cutscene_hold_input
-	cutscene.exclude = camera_rig.exclude.duplicate()
+	cutscene.exclude = _solid_exclude.duplicate()  # cenas: desvio de tudo, como antes do G24a2
 	cutscene.occluders = camera_rig.occluders
 	for m in missions:
 		m.step_done.connect(func(mid: StringName, _n: int, step: StringName) -> void:
@@ -1007,9 +1051,12 @@ func play_cutscene(sid: StringName, restore_members: bool = true) -> void:
 	set_followers_enabled(false)
 	camera_rig.orbit_enabled = false
 	MouseLock.block(&"cutscene")
+	camera_rig.occlusion_paused = true
+	_occlusion_reset()
 	if cutscene.play(sid):
 		_cutscene_hold_input()
 		await cutscene.finished
+	camera_rig.occlusion_paused = false
 	MouseLock.unblock(&"cutscene")
 	if not is_inside_tree():
 		return

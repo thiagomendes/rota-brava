@@ -156,6 +156,73 @@ static func set_festival(on: bool) -> void:
 	paper.set_shader_parameter("glow", PAPER_ON if on else PAPER_OFF)
 
 
+## RB-R1 G24a2: variante pontilhada de um material da biblioteca (mesmos parametros, shader com
+## wv2_occlusion.gdshaderinc). So a peca que tapa o heroi usa a variante, e so enquanto o fade dura (CameraOcclusion).
+## Material que nao e ShaderMaterial com `void fragment() {` (os StandardMaterial3D `wv2_lamp`, `wv2_glass*`, `pv3_*`)
+## volta sem variante: essa superficie nao pontilha. `sync`: copia os parametros atuais da base (noite, festa) na troca.
+const OCCL_INC := "res://lookdev/world_v2/wv2_occlusion.gdshaderinc"
+static var _occl_shaders: Dictionary = {}
+static var _occl_mats: Dictionary = {}
+static var _occl_meshes: Dictionary = {}
+
+
+static func occl_variant(m: Material, sync: bool = false) -> Material:
+	var sm := m as ShaderMaterial
+	if sm == null or sm.shader == null:
+		return m  # StandardMaterial3D (wv2_lamp, wv2_glass*, pv3_*): sem variante, de proposito
+	if not sm.shader.code.begins_with("shader_type") or sm.shader.code.count("void fragment() {") != 1:
+		push_error("WV2Materials.occl_variant: injecao do pontilhado nao casa com %s (shader_type na 1a linha e um so 'void fragment() {')" % sm.shader.resource_path)
+		return m
+	if _occl_mats.has(sm):
+		var old: ShaderMaterial = _occl_mats[sm]
+		if sync:
+			_occl_sync(sm, old)
+		return old
+	var sh: Shader = _occl_shaders.get(sm.shader)
+	if sh == null:
+		var code := sm.shader.code
+		var nl := code.find("\n")
+		code = code.substr(0, nl + 1) + "#include \"%s\"\n" % OCCL_INC + code.substr(nl + 1)
+		code = code.replace("void fragment() {", "void fragment() {\n\tocc" + "l_discard(CAMERA_POSITION_WORLD, FRAGCOORD.xy, PROJECTION_MATRIX);")
+		sh = Shader.new()
+		sh.code = code
+		_occl_shaders[sm.shader] = sh
+	var v := sm.duplicate() as ShaderMaterial
+	v.shader = sh
+	_occl_mats[sm] = v
+	return v
+
+
+## Parametros da base na variante (set_night/set_festival mudam a base depois que a variante nasceu).
+static func _occl_sync(base: ShaderMaterial, v: ShaderMaterial) -> void:
+	for u: Dictionary in base.shader.get_shader_uniform_list():
+		var n := StringName(u["name"])
+		v.set_shader_parameter(n, base.get_shader_parameter(n))
+
+
+## Variantes ja criadas (aquecimento na carga).
+static func occl_variants() -> Array:
+	return _occl_mats.values()
+
+
+## Malha com cada material trocado pela variante pontilhada (cache por malha; a peca do kit vira um MeshInstance3D).
+static func occl_mesh(src: Mesh, sync: bool = false) -> Mesh:
+	if _occl_meshes.has(src):
+		if sync:
+			for i in src.get_surface_count():
+				var b := src.surface_get_material(i)
+				if b != null:
+					occl_variant(b, true)
+		return _occl_meshes[src]
+	var mesh := src.duplicate() as Mesh
+	for i in mesh.get_surface_count():
+		var m := mesh.surface_get_material(i)
+		if m != null:
+			mesh.surface_set_material(i, occl_variant(m))
+	_occl_meshes[src] = mesh
+	return mesh
+
+
 ## Troca os materiais de toda malha sob `root` pelo material da biblioteca com o mesmo nome. Devolve quantas superficies.
 static func apply(root: Node) -> int:
 	var count := 0

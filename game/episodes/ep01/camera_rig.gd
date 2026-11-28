@@ -34,6 +34,15 @@ var framing_world: bool = false
 var collision_mask: int = 0
 var exclude: Array[RID] = []
 var occluders: Array[Vector4] = []
+## G24a2 v2: false = a camera nao desvia das copas (`occluders` viram peca, que fica pontilhada via `occlusion`).
+var avoid_canopies: bool = true
+## G24a2 v2: pecas (caixotes, toldos, barracas, arvores...) fora da mascara/`exclude` ficam pontilhadas quando tapam o
+## heroi ou contem a camera (null = desligado). A mola de braco (G6) continua so para a estrutura.
+var occlusion: CameraOcclusion
+## Alguma peca pontilhada no ultimo quadro (testes/depuracao).
+var occluded: bool = false
+## Cena (cutscene) em curso: nada pontilha (o rig continua andando por baixo do plano da cena).
+var occlusion_paused: bool = false
 const PROBE_RADIUS := 0.2
 const MIN_ARM := 0.9
 const ARM_MARGIN := 0.08
@@ -186,6 +195,19 @@ func _update(weight: float, delta: float) -> void:
 	if camera.global_position.distance_to(look) > 0.01:
 		camera.look_at(look, Vector3.UP)
 	_apply_fov()
+	if occlusion != null:
+		if occlusion_paused:
+			occlusion.restore_all()
+		else:
+			occlusion.update(pos, focus, delta, reduced_motion, not framing_world)
+		occluded = occlusion.swapped_now > 0
+
+
+## G24a2 v2: `point` esta numa peca pontilhada, na area que o shader faz sumir? (testes)
+func occlusion_covers(point: Vector3) -> bool:
+	if occlusion == null or target == null:
+		return false
+	return occlusion.covers_point(point, camera.global_position, target.global_position)
 
 
 ## G24a: o atraso nunca aproxima a camera do heroi (distancia horizontal >= `arm`); so a mola de obstaculo encurta.
@@ -225,7 +247,8 @@ func _smooth_arm(look: Vector3, free_pos: Vector3, hard_pos: Vector3, soft_pos: 
 		return free_pos
 	var hard := hard_pos.distance_to(look)
 	var want := minf(soft_pos.distance_to(look), hard)
-	if _arm < 0.0 or reduced_motion or delta <= 0.0:
+	# G24a2 v2: tambem com movimento reduzido a mola e suave (reduzido nunca pode saltar mais que o normal).
+	if _arm < 0.0 or delta <= 0.0:
 		_arm = want
 		_arm_vel = 0.0
 	elif want < _arm:
@@ -281,7 +304,8 @@ func avoid(from: Vector3, to: Vector3, radius: float = PROBE_RADIUS, grow: float
 	# [1, 1] = livre; [0, 0] = a mira ja comeca dentro de algo (ignora: nao colar a camera no heroi).
 	if res.size() == 2 and res[1] > 0.0 and res[0] < 1.0:
 		allowed = minf(allowed, dist * res[0] - ARM_MARGIN)
-	for s in occluders:
+	var canopy_list: Array[Vector4] = occluders if avoid_canopies else ([] as Array[Vector4])
+	for s in canopy_list:
 		var c := Vector3(s.x, s.y, s.z)
 		var w := s.w + grow
 		var oc := from - c
