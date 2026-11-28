@@ -61,7 +61,7 @@
     - G22b (rádio no nível das vozes, −0,26 LU) e G22c (Vila Maré) estão revisados e integrados; falta Thiago ouvir.
     - G22a ("?" no lugar do "H" e disco de 128 px no toque) revisado e integrado; falta Thiago ver no iPhone.
 - **Próximo:**
-  - Build de hoje (decisão de Thiago): assim que G23 e G21i estiverem revisados e integrados, avisar Thiago para disparar. Vozes de 28/11 vão num build seguinte.
+  - Integração limpa em `c6493e2` (suíte 5504 PASS, 0 SCRIPT ERROR): Thiago pode buildar. Lote de vozes 28/11 08:20 UTC (32 falas novas primeiro, `tools/voice/priority.json`), depois build com vozes. Abertos: G24a3 (câmera x paredes, levar opções a Thiago), G27 (clipe de mochila, `art3d`), pacote médio do roteiro (depois de Thiago jogar o mínimo).
   - Lote de vozes de 2026-11-28 08:20 UTC.
   - E7 restante: bot humano, capturas, vídeo, build Windows e Portão 2. Depois, PARAR.
 - **Páginas para Thiago:** trio 3D https://claude.ai/artifact/1ZKx8zKZ2HxQn85ZtL9EGR (Leme antiga), mundo v2 https://claude.ai/artifact/6WpRQzYXY2hW74LxMiPVww, novidades https://claude.ai/artifact/2WyeZqg8DNSLWegCPcCXAt.
