@@ -59,9 +59,14 @@ func _act_m5() -> void:
 	var next := 0.0
 	var n := 0
 	var caught := false
+	var was_belt := false
 	while int(land.get("_acts")) > 0 and t < 120.0:
 		var fish = land.get("_fish")
-		if not caught and fish != null and is_instance_valid(fish) and (fish as Node).has_meta(&"returned_to"):
+		var on_belt: bool = land.get("belt") != null
+		if on_belt != was_belt:
+			was_belt = on_belt
+			await _save("g25b_m5_%s.png" % ("prende_cinto" if on_belt else "tira_cinto"))
+		elif not caught and fish != null and is_instance_valid(fish) and (fish as Node).has_meta(&"returned_to"):
 			caught = true
 			await _save("g25b_m5_entrega.png")
 		elif t >= next:

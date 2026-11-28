@@ -227,6 +227,7 @@ func clear() -> void:
 	amora = null
 	fish_street_gap = INF
 	last_route = PackedVector3Array()
+	belt = null
 	_hand_compass = null
 	super.clear()
 
@@ -574,7 +575,9 @@ func _recover_fish(a: MemberActor) -> void:
 	if amora != null and is_instance_valid(amora):
 		# G25b: a corda do telhado so acha prumo no beco fechado atras do galpao; com a Amora esperando na rua, o Pico
 		# prende o peixe no cinto (quadril) e desce escalando com as maos livres.
-		_stow_on_belt(a, _fish)
+		if not await _stow_on_belt(a, _fish, s):
+			_act_end(a, s)
+			return
 	else:
 		# Baixa o peixe na corda ate o chao (lower_rope): a corda sai da mao e o peixe desce na ponta dela.
 		if not await _lower_on_rope(a, _fish, down, s):
@@ -587,7 +590,7 @@ func _recover_fish(a: MemberActor) -> void:
 	# Desce escalando antes de concluir (a missao seguinte desmonta esta).
 	var foot: Vector3 = points[&"CratesBase"]
 	if amora != null and is_instance_valid(amora):
-		foot = _floor_at(_mk(&"M5_Crates") + DESCENT_OUT + Vector3(0, 0.3, 0))
+		foot = free_near(_floor_at(_mk(&"M5_Crates") + DESCENT_OUT + Vector3(0, 0.3, 0)), START_CLEAR_R)
 	if not await _climb_chain(a, [_mk(&"M5_Awning"), _mk(&"M5_Crates"), foot], s):
 		_act_end(a, s)
 		return
@@ -615,16 +618,19 @@ func _return_fish(a: MemberActor, s: int) -> bool:
 	if not is_instance_valid(_fish) or amora == null or not is_instance_valid(amora):
 		return true
 	# G25b: com o peixe no cinto, o Pico contorna os caixotes por um caminho livre (capsula com folga) ate a Amora, na rua,
-	# tira o peixe do cinto (pick_up curto) e entrega.
+	# tira o peixe do cinto (mao ao quadril) e entrega.
 	if not await _walk_route(a, amora.global_position, AMORA_MEET_R, s):
 		return false
 	if _fish.has_meta(&"on_belt"):
-		var L := _clip(a, &"pick_up", 1.6)
-		if not await _wait(L * 0.5, s):
+		# mao ao quadril (trecho de ida do place_low, que baixa as maos ate a cintura) e o peixe volta para as maos no
+		# ponto mais baixo do gesto
+		var L := _clip(a, &"place_low", BELT_GESTURE_SPEED)
+		if not await _wait(L * BELT_SWAP_AT, s):
 			return false
 		_fish.remove_meta(&"on_belt")
+		belt = null
 		_take(a, _fish, true, Transform3D(Basis(Vector3.UP, PI / 2.0), Vector3.ZERO))
-		if not await _wait(L * 0.5, s):
+		if not await _wait(L * (1.0 - BELT_SWAP_AT), s):
 			return false
 	a.face_now(amora.global_position)
 	StoryFigure.face(amora, a.global_position)
@@ -764,36 +770,68 @@ func _walk_route(a: MemberActor, to: Vector3, stop: float, s: int) -> bool:
 	return true
 
 
-## G25b: prende o peixe no quadril do heroi (osso hips), pendurado de lado: as maos ficam livres para escalar.
-func _stow_on_belt(a: MemberActor, piece: Node3D) -> void:
+## G25b: prende o peixe no cinto do heroi (osso hips), pendurado nas costas: as maos ficam livres para escalar. Gesto:
+## trecho de ida do place_low (as maos descem a frente ate a cintura; nao ha clipe de levar a mao ao quadril) e a troca
+## de no no ponto mais baixo do gesto. A peca no cinto fica em `belt` (a auditoria G24d a mede como a da mao).
+func _stow_on_belt(a: MemberActor, piece: Node3D, s: int) -> bool:
 	if piece == null or not is_instance_valid(piece):
-		return
+		return true
 	var sk := a.model.skeleton() if a.model != null else null
 	var holder: Node3D = a
-	if sk != null and sk.find_bone("hips") >= 0:
+	if sk != null and sk.find_bone(BELT_BONE) >= 0:
 		var att := sk.get_node_or_null(^"G25_Belt") as Node3D
 		if att == null:
 			var b := BoneAttachment3D.new()
 			b.name = "G25_Belt"
-			b.bone_name = "hips"
+			b.bone_name = BELT_BONE
 			sk.add_child(b)
 			att = b
 		holder = att
-	var right := a.global_basis.x.normalized()
-	var at := a.global_position + right * BELT_SIDE + Vector3(0, BELT_Y, 0)
+	var L := _clip(a, &"place_low", BELT_GESTURE_SPEED)
+	if not await _wait(L * BELT_SWAP_AT, s):
+		return false
+	# nas costas, abaixo da mochila: na descida o Pico fica de frente para a parede e o peixe, do lado oposto (de lado ele
+	# raspava no toldo)
+	var at := a.global_position - a.facing() * BELT_SIDE + Vector3(0, BELT_Y, 0)
 	still(piece)
 	piece.reparent(holder, true)
 	piece.global_transform = Transform3D(Basis(a.global_basis.get_rotation_quaternion()) * Basis(Vector3.BACK, PI / 2.0), at)
 	piece.set_meta(&"on_belt", a.member)
+	belt = piece
 	if carried == piece:
 		carried = null
 		carrier = null
 		a.hands = &""
+	if not await _wait(L * (1.0 - BELT_SWAP_AT), s):
+		return false
+	_rest(a)
+	return true
 
 
-## Peixe no cinto: distancia (m) ao lado do corpo e altura do quadril do Pico.
-const BELT_SIDE := 0.2
-const BELT_Y := 0.5
+## Peixe no cinto: distancia (m) atras do corpo e altura do quadril do Pico.
+const BELT_SIDE := 0.12
+const BELT_Y := 0.85
+## Osso em que o peixe fica preso (costas, na altura do peito: na descida pelo toldo o quadril raspa na beira).
+const BELT_BONE := "chest"
+## Gesto de prender/tirar do cinto: velocidade do place_low e fracao do clipe em que a peca troca de no (maos mais baixas).
+const BELT_GESTURE_SPEED := 1.3
+const BELT_SWAP_AT := 0.45
+## G25b: peca presa no cinto do heroi agora (null se nenhuma); a auditoria G24d mede como a peca na mao.
+var belt: Node3D
+
+
+## G25b: `p` se o corpo de raio `r` cabe ali (camada 1); senao o vizinho livre mais perto (aneis de 0,1 m ate 0,8 m, no
+## mesmo nivel de chao); sem nenhum, o proprio `p`.
+func free_near(p: Vector3, r: float) -> Vector3:
+	if clear_for(p, r):
+		return p
+	for ring in range(1, 9):
+		var d := ring * 0.1
+		for k in 16:
+			var q := _floor_at(p + Vector3(sin(TAU * k / 16.0) * d, 0.3, cos(TAU * k / 16.0) * d))
+			if absf(q.y - p.y) < 0.15 and clear_for(q, r):
+				return q
+	return p
 
 
 ## Ponto de pega na mao direita de um figurante (BoneAttachment3D no osso hand.R; sem esqueleto, o proprio figurante).
