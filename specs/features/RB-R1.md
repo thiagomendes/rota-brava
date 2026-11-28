@@ -1053,3 +1053,26 @@ Critérios de aceite:
     - Antes: câmera a 1,54 m, colada no herói.
     - Depois: câmera a 3,26 m, atrás dos caixotes. O caixote ao lado das pernas do herói aparece pontilhado (padrão de peneira na borda), e o herói aparece inteiro.
   - Suíte completa: `OK (5421 PASS, 0 FALHA(S))` em 521 s.
+
+#### G24a2 v2, rodada 4 (revisões `reviewer` + `art3d` reprovaram; correções)
+- **SCRIPT ERROR do carrinho liberado:** os laços das peças de missão ficaram sem tipo, com `is_instance_valid` antes de qualquer uso. Nó liberado sai do `_dyn`/`_dyn_active`. O `land.cart` só entra se ainda estiver na árvore.
+  - Novo `test_camera_occlusion_life.gd`: M4→M5 sem peça liberada nas listas e `update` inteiro em 40 de 40 quadros.
+  - Contra o `7ee3f0d`, o teste falha já na carga (`occl_variant` sem `sync`), não chega a medir o M4→M5.
+  - `grep -c "SCRIPT ERROR"` nos logs da suíte completa: **0** em todos os processos (shard-1, shard-2, shard-3, fixed).
+- **Devolução ao normal:** `restore_all` roda antes de cada `land.build`, na troca de herói (`set_controlled`) e ao entrar em cena (`camera_rig.occlusion_paused`: o rig não pontilha durante a cena). Os três casos estão testados.
+- **Material:**
+  - Toldo e banca do galpão, banco da árvore e canteiros **voltaram a ser estrutura** (G24a3). Só troca malha de uma peça: o proxy por instância do kit ou o nó da peça de missão.
+  - A variante copia os parâmetros da base na troca (noite e festa testadas).
+  - StandardMaterial3D fica sem variante; o pontilhado por distância foi removido. O banco do varal usa `wv2_wood` e pontilha normal.
+  - Shader: a peça inteira pontilha com um fade só, Bayer calculado por conta (sem tabela indexada), e a sombra é excluída também por `length(CAMERA_POSITION_WORLD - occl_cam) > 0,5`. O `smoothstep` invertido saiu junto com o cone.
+- **Pico de CPU instrumentado** (`usec_max_stage`):
+  - normal: 1,7 ms na etapa "parâmetros" (`set_instance_shader_parameter`, sem troca no quadro);
+  - reduzido: 0,7 ms na etapa "troca" (3 trocas, criação dos `MeshInstance3D`);
+  - na suíte, o máximo chegou a 3,8–4,1 ms. A média fica em 45–62 µs.
+- **G3:** o teste agora exige também mais de 30 passos de braço encurtado pela **estrutura**, e passa.
+- **Capturas** (`captures/g24a2v2/{m4_stall,m5_street}-v3/f00000039.png`, abertas):
+  - M4: a barraca do limão inteira (toldo listrado, armação e frutas) e uma copa aparecem como um fantasma pontilhado uniforme, e o trio aparece inteiro. Ficou **bem transparente**; o `art3d` pode querer menos de 75%.
+  - M5: o caixote ao lado do herói aparece inteiro e uniformemente pontilhado; o caixote vizinho segue sólido.
+- **Testes:**
+  - `camera,movement,touch_controls,ep01_v3_late,cutscene`: o primeiro lote acusou só a troca de herói no teste novo (posição do caixote). Depois da correção, `camera_occlusion_life` passou com 10 PASS.
+  - Suíte completa: `OK (5432 PASS, 0 FALHA(S))` em 535 s.

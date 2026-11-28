@@ -122,8 +122,8 @@ func run(runner) -> void:
 		for u: int in us:
 			us_avg += u
 		us_avg /= maxf(us.size(), 1.0)
-		print("  medida oclusao custo (%s): %d trocas de material no percurso (max %d num quadro), max %d malhas pontilhadas ao mesmo tempo; CPU da atualizacao media %.0f us, p99 %d us, max %d us (GPU no celular nao medida)" % [
-			"reduzido" if reduced else "normal", _swaps, _swap_max, _swapped_max, us_avg, us[int(us.size() * 0.99)] if us.size() > 0 else 0, us[-1] if us.size() > 0 else 0])
+		print("  medida oclusao custo (%s): %d trocas de material no percurso (max %d num quadro), max %d malhas pontilhadas ao mesmo tempo; CPU da atualizacao media %.0f us, p99 %d us, max %d us, pior quadro na etapa %s (GPU no celular nao medida)" % [
+			"reduzido" if reduced else "normal", _swaps, _swap_max, _swapped_max, us_avg, us[int(us.size() * 0.99)] if us.size() > 0 else 0, us[-1] if us.size() > 0 else 0, main.camera_rig.occlusion.usec_max_stage if main.camera_rig.occlusion != null else "-"])
 		print("  medida oclusao (%s): %d paredes, %d passos; salto max %.2f m/quadro, p99 %.3f; camera dentro da estrutura %d, dentro de peca pontilhada %d; vista tapada %d passos (%d entrando no fade, %d sem pontilhado: %d por peca, %d pela estrutura %s); heroi no quadro min %.1f%% (%d < %.0f%%); pontilhado liga/desliga %.2f/s" % [
 			tag, walls, _ticks, top, p99, _inside, _piece_inside, _blocked, _fading, _uncovered.size(), _uncovered_piece, _uncovered_struct, _uncovered.slice(0, 3), _min_frac * 100.0, _low_frac, FRAC_MIN * 100.0, _toggles / secs])
 		r.check(walls >= 4 and _ticks > 800, "oclusao %s: %d paredes e %d passos" % [tag, walls, _ticks])
