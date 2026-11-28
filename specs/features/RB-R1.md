@@ -1277,3 +1277,16 @@ Thiago: "melhorou bastante as interações, a coesão, a explicação dos contex
 - **Exemplos concretos de Thiago para o G29 (M5, telhado do peixe):**
   1. **A Leme aparece no telhado.** O Pico escala, e de repente a Leme está lá em cima sem ter subido; quem escala é só o Pico. Critério: seguidores nunca vão para cima de telhado, toldo ou outro apoio que exija escalada. Eles esperam no chão, perto da base, e um teste cobre isso em todas as escaladas do Pico (M2, M3, M5, M7). Pode ser teletransporte de reagrupamento ou navegação; ache a causa.
   2. **Fala fora de hora.** "Daqui de cima eu vejo o barco do capitão" sai quando o Pico já desceu correndo. Critério: fala de história que se refere a um lugar ou momento toca ali, com trava e foco (G29). Nesse caso, no alto do telhado, antes da descida. Um teste verifica a posição do falante no início da fala.
+- **Pedido de Thiago (G29, gesto da fala):** quando der, o herói reage ao que fala. Por exemplo, em "tô vendo o barco do capitão" ele olha para o horizonte, na direção do barco, com um gesto de quem enxerga longe. Critérios:
+  - Cada fala de história pode ter no diálogo v3 os campos `look_at` (marcador ou nó) e `gesture` (clipe), ambos opcionais.
+  - Durante a fala travada, o falante vira o corpo e a cabeça para o alvo e toca o gesto. A câmera do foco enquadra o rosto e a direção do olhar.
+  - Com os clipes que já existem (`point`, `look_up`, `wave`, `celebrate`, `inspect`, `react_surprise`, `team_pose`), já entram as falas em que eles servem.
+  - Faltam clipes, que ficam no **G30** (`art3d`).
+- **G30 · gestos de fala (`art3d`), nos três heróis:**
+  - `look_far`: mão na testa, olhando longe;
+  - `think`: mão no queixo;
+  - `nod`: concordar;
+  - `shrug`: não sei;
+  - `explain`: mãos abertas ao explicar.
+
+  Seguem o padrão dos clipes do G19: mesmos ossos, sem mexer em malha nem nos clipes antigos, com captura e revisão. Depois o G29 usa esses clipes nas falas certas.
