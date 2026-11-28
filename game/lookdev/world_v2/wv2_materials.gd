@@ -168,7 +168,10 @@ static var _occl_meshes: Dictionary = {}
 
 static func occl_variant(m: Material, sync: bool = false) -> Material:
 	var sm := m as ShaderMaterial
-	if sm == null or sm.shader == null or not sm.shader.code.contains("void fragment() {"):
+	if sm == null or sm.shader == null:
+		return m  # StandardMaterial3D (wv2_lamp, wv2_glass*, pv3_*): sem variante, de proposito
+	if not sm.shader.code.begins_with("shader_type") or sm.shader.code.count("void fragment() {") != 1:
+		push_error("WV2Materials.occl_variant: injecao do pontilhado nao casa com %s (shader_type na 1a linha e um so 'void fragment() {')" % sm.shader.resource_path)
 		return m
 	if _occl_mats.has(sm):
 		var old: ShaderMaterial = _occl_mats[sm]

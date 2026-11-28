@@ -103,6 +103,12 @@ func _index(idx: int) -> void:
 			_grid[k] = cell
 
 
+## Zera o pior quadro no inicio do trecho medido (o rotulo conta so esses quadros).
+func reset_stats() -> void:
+	usec_max = 0
+	usec_max_stage = ""
+
+
 func piece_count() -> int:
 	return _pieces.size()
 
@@ -189,7 +195,8 @@ func update(cam: Vector3, hero_feet: Vector3, delta: float, instant: bool, on: b
 			continue
 		var proxy: Variant = a["proxy"]
 		if is_instance_valid(proxy):
-			(proxy as GeometryInstance3D).set_instance_shader_parameter(&"occl_cam", Vector4(cam.x, cam.y, cam.z, 0.0))
+			var inside := 1.0 if (_pieces[idx]["box"] as AABB).grow(NEAR_BOX).has_point(cam) else 0.0
+			(proxy as GeometryInstance3D).set_instance_shader_parameter(&"occl_cam", Vector4(cam.x, cam.y, cam.z, inside))
 			(proxy as GeometryInstance3D).set_instance_shader_parameter(&"occl_amount", amt)
 	var t4 := Time.get_ticks_usec()
 	stage_us["parametros"] = t4 - t3
@@ -376,10 +383,11 @@ func _update_dynamic(cam: Vector3, feet: Vector3, delta: float, instant: bool, o
 		if amt <= 0.0 and want <= 0.0:
 			_dyn_restore(key)
 			continue
+		var inside_d := 1.0 if box != null and (box as AABB).grow(NEAR_BOX).has_point(cam) else 0.0
 		for mk: Variant in (a["orig"] as Dictionary):
 			var pair: Array = (a["orig"] as Dictionary)[mk]
 			if is_instance_valid(pair[0]):
-				(pair[0] as GeometryInstance3D).set_instance_shader_parameter(&"occl_cam", Vector4(cam.x, cam.y, cam.z, 0.0))
+				(pair[0] as GeometryInstance3D).set_instance_shader_parameter(&"occl_cam", Vector4(cam.x, cam.y, cam.z, inside_d))
 				(pair[0] as GeometryInstance3D).set_instance_shader_parameter(&"occl_amount", amt)
 
 

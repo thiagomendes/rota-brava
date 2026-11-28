@@ -100,6 +100,8 @@ func run(runner) -> void:
 		_inside_at.clear()
 		_piece_inside = 0
 		var walls := 0
+		if main.camera_rig.occlusion != null and main.camera_rig.occlusion.has_method(&"reset_stats"):
+			main.camera_rig.occlusion.reset_stats()
 		for mk in MARKERS:
 			var m := main.world.marker(mk)
 			if m == null:

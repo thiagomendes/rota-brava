@@ -1076,3 +1076,13 @@ Critérios de aceite:
 - **Testes:**
   - `camera,movement,touch_controls,ep01_v3_late,cutscene`: o primeiro lote acusou só a troca de herói no teste novo (posição do caixote). Depois da correção, `camera_occlusion_life` passou com 10 PASS.
   - Suíte completa: `OK (5432 PASS, 0 FALHA(S))` em 535 s.
+
+#### G24a2 v2, rodada 5 (ajustes do `art3d` antes do merge)
+- **Teto do pontilhado:** 50% (xadrez do Bayer 4×4). Com a câmera dentro da peça, 62,5% (`occl_cam.w = 1`).
+- **Guarda da injeção:** `occl_variant` chama `push_error` quando o shader não começa com `shader_type` ou não tem exatamente um `void fragment() {`. StandardMaterial3D continua sem variante, de propósito.
+  - Novo `test_occlusion_shaders.gd` cobre os 6 shaders `wv2`. Confere essas duas condições, confere que a variante tem `occl_discard` e que compila: o servidor de render do modo headless devolve a lista de uniformes vazia quando a compilação falha, e a variante tem os mesmos uniformes da base.
+- **`usec_max_stage`:** zerado no início do percurso medido (`reset_stats`). Pico normal: 1,2 ms na etapa "troca", com 3 trocas. Pico reduzido: 1,5 ms na etapa "grade".
+- **Capturas** `captures/g24a2v2/{m4_stall,m5_street}-v4/f00000039.png` (abertas; 0 SHADER/SCRIPT ERROR no Vulkan):
+  - M4: a barraca do limão inteira aparece em xadrez meio transparente, com cores legíveis (frutas vermelhas, verdes e roxas, toldo amarelo), e o trio aparece inteiro.
+  - M5: o caixote ao lado do herói aparece em xadrez meio transparente, com as tábuas legíveis, e o herói inteiro.
+- **Teste:** `bash tools/test.sh camera,camera_occlusion,camera_occlusion_life,cutscene,occlusion_shaders`: `OK (409 PASS, 0 FALHA(S))`, com 0 SCRIPT ERROR nos logs.
