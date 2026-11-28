@@ -1245,3 +1245,13 @@ Critérios de aceite:
     - O peixe nas costas quase não aparece, e falta Thiago julgar se isso faz falta.
     - A câmera entra no telhado na descida do M5, pela parte de estrutura (G24a3).
     - Captura logo depois de um merge pede `--import`.
+
+### Vozes 4 (`audio`, branch `feature/rb-r1-vozes-4`, 2026-11-28; nada foi ouvido, aceite perceptual com Thiago)
+- Lote D19e: `gen_v3.py --max-calls 95` fez **78 pedidos** até o 429 de cota diária do Gemini 3.8 Flash TTS (o painel conta 100/dia; a diferença não foi investigada). 577 s.
+- **47 takes novos** entraram; 31 tentativas reprovadas pelo detector de leitura dupla/duração. 3 falas reprovaram nas 3 tentativas e voltaram para `pending.keys`: `ep01.call.c1.lumi_go`, `ep01.bay.pilot.see_buoys`, `ep01.lighthouse.pilot.aim`.
+- **Prioridade (32 do lote de 28/11):** 31 com take; falta só `ep01.call.c1.lumi_go` (reprovada 3 vezes). Os 5 do Lumi (G21i), as 2 da Vila Maré (G22c) e 24 de 25 do G25 saíram. Fora da prioridade, 16 antigas: `narrator.bridge.m2_m3`, `radio.v3_m4.deliver`, `bay.pilot.see_boat` (reprovadas no Vozes 3, agora passaram), mais 13 da baía e do farol (M6/M7).
+- Catálogo: **131 takes, 127 pendentes**. `detect_double --catalog`: 131 ok, 0 reprovados. Nenhum OGG, `.import` ou visemas sem entrada no catálogo. `register_v3.py`: 131 linhas no PROVENANCE, todas as novas com modelo, voz, data; o texto (`text_at_generation`) e os hashes ficam no catálogo.
+- Testes que fixavam o estado "pendente" das falas novas (`test_voice_v3` G22c, `test_cutscene_g21i`, `test_ep01_v3_g25`) passaram a aceitar take com o texto atual **ou** pendência, nunca os dois nem take antigo.
+- **Abertura (G17) com vozes reais:** `scene_length(game_intro)` = **48,65 s** (ficha 42,5 s; antes 47,06 s com tempo de leitura), sem fallback.
+- Suítes: `voice_v3,audio,cutscene,cutscene_sync,radio_level` `OK (456 PASS)`; completa `OK (5504 PASS, 0 FALHA(S))`, sem SCRIPT ERROR.
+- Pendente de Thiago: ouvir os 47 takes (sobretudo os 5 do Lumi e as 2 da Vila Maré). Próximo lote: 127 pendentes (~2 dias de cota).

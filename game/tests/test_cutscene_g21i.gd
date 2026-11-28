@@ -82,11 +82,12 @@ func _texts_and_voice() -> void:
 	var not_pending: Array[String] = []
 	for k: String in ["ep01.narrator.intro.base", "ep01.radio.intro.hello", "ep01.radio.intro.help",
 			"ep01.radio.help.invite_1", "ep01.radio.help.invite_4"]:
-		if v3.has(k) or not pending.has(k):
+		# Vozes 4: take novo com o texto atual, ou pendente; nunca os dois nem o take antigo
+		if v3.has(k) == pending.has(k) or (v3.has(k) and str(v3[k].get("text_at_generation", "")) != Loc.t(k)):
 			not_pending.append(k)
-	r.check(not_pending.is_empty(), "G21i: falas novas/trocadas sem take antigo e pendentes para o lote %s" % str(not_pending))
-	r.check(not FileAccess.file_exists("res://audio/voice/v3/ep01_radio_intro_hello.visemes.json"),
-		"G21i: visemas do take antigo da intro.hello removidos")
+	r.check(not_pending.is_empty(), "G21i: falas novas/trocadas com take do texto atual ou pendentes %s" % str(not_pending))
+	r.check(FileAccess.file_exists("res://audio/voice/v3/ep01_radio_intro_hello.visemes.json") == v3.has("ep01.radio.intro.hello"),
+		"G21i: visemas da intro.hello existem so se o take esta no catalogo")
 	# Decisao de Thiago: o jogo e multiplataforma, nenhuma fala do Ep01 cita tecla/botao por marcador ({...}); a
 	# legenda e igual ao que a voz diz (sem texto falado separado).
 	var d: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://episodes/ep01/v3/ep01_v3_dialogue.json"))
