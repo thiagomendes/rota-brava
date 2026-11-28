@@ -70,6 +70,28 @@ for t in "${tags[@]}"; do
 	[ "$c" = "124" ] && echo "TIMEOUT: processo $t passou de ${LIMIT}s (teste travado?)"
 	[ "$c" != "0" ] && code=$c
 done
+# G26: SCRIPT ERROR / Parse Error em qualquer log de processo reprova a rodada (um erro desses aborta a funcao no
+# meio sem nenhum FAIL). Excecoes so pela lista versionada tools/test_error_allow.txt (regex ERE | motivo).
+ALLOW="$ROOT/tools/test_error_allow.txt"
+allow_re="$ROOT/logs/test-error-allow.re"
+: > "$allow_re"
+[ -f "$ALLOW" ] && grep -vE '^[[:space:]]*(#|$)' "$ALLOW" | sed -E 's/[[:space:]]+\|[[:space:]].*$//' > "$allow_re"
+errs="$ROOT/logs/test-errors.txt"; : > "$errs"
+for t in "${tags[@]}"; do
+	grep -hE "SCRIPT ERROR|Parse Error" "$ROOT/logs/test-$t.log" >> "$errs"
+done
+allowed=0
+if [ -s "$allow_re" ]; then
+	allowed=$(grep -cEf "$allow_re" "$errs")
+	grep -vEf "$allow_re" "$errs" > "$errs.tmp"; mv "$errs.tmp" "$errs"
+fi
+nerr=$(wc -l < "$errs")
+[ "$allowed" -gt 0 ] && echo "== erros permitidos por tools/test_error_allow.txt: $allowed"
+if [ "$nerr" -gt 0 ]; then
+	echo "FAIL  $nerr erro(s) de script nos logs (contagem por mensagem):"
+	sed -E 's/^[[:space:]]+//' "$errs" | sort | uniq -c | sort -rn | head -40
+	fail=$((fail + 1)); [ "$code" = "0" ] && code=1
+fi
 git -C "$ROOT" checkout -- game/audio/default_bus_layout.tres 2>/dev/null || true   # a Godot reescreve; nunca commitar
 [ "$fail" -gt 0 ] && [ "$code" = "0" ] && code=1
 if [ $((pass + fail)) = 0 ]; then echo "FAIL  nenhum teste encontrado (filtro '$FILTER')"; fail=1; code=1; fi
