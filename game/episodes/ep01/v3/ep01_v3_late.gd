@@ -74,6 +74,10 @@ var _fish: Node3D
 ## G25: a Dona Amora espera o peixe na rua do M5; folga (m) do peixe contra o chao quando a corda o pousou na rua.
 var amora: Node3D
 var fish_street_gap: float = INF
+## G25b: chao do prumo da corda do telhado (a Amora espera ao lado; a corda para o peixe na mao dela).
+var fish_catch := Vector3.INF
+## Distancia (m) da mao da Amora ao peixe na ponta da corda no instante da pega (para os testes).
+var catch_gap: float = INF
 var captain: Node3D
 var pup: Node3D
 var _dinghy_home: Transform3D
@@ -226,6 +230,7 @@ func clear() -> void:
 	_fish = null
 	amora = null
 	fish_street_gap = INF
+	fish_catch = Vector3.INF
 	_hand_compass = null
 	super.clear()
 
@@ -250,9 +255,14 @@ func _build_m5() -> void:
 	_emblem(&"emb_m5_vane", _mk(&"M5_Weathervane") + Vector3(-1.2, 0, 0.9), &"pilot")
 	_emblem(&"emb_m5_roof", _mk(&"M5_ShedRoof") + Vector3(0.75, 0, 0.45), &"climber")
 	# G25: a Dona Amora espera o peixe na rua, alem do ponto onde a corda o pousa (longe dos caixotes).
+	# G25b: a corda do telhado so acha prumo livre no beco atras do galpao (fechado pelos caixotes da rua; ninguem chega
+	# la andando). A Amora espera ali, ao lado do prumo, e pega o peixe da ponta da corda.
+	fish_catch = catch_column(_mk(&"M5_ShedRoof") + ROOF_GRIP)
 	amora = StoryFigure.spawn(_root, "amora_model", "Amora")
-	amora.global_position = amora_point()
-	StoryFigure.face(amora, fish_down_point())
+	var place := amora_place()
+	amora.global_position = place["pos"]
+	amora.rotation.y = float(place["yaw"])
+	_figure_hand(amora)   # o ponto da mao ja segue o osso quando a corda descer
 
 
 func _build_m6() -> void:
@@ -570,19 +580,22 @@ func _recover_fish(a: MemberActor) -> void:
 			return
 	main.say("ep01.street.climber.fish_got")
 	# Baixa o peixe na corda ate a rua (lower_rope): a corda sai da mao e o peixe desce na ponta dela.
+	# G25b: com a Amora, a corda desce a prumo da mao direita dela e para na altura da mao
 	var down := fish_down_point()
-	if not await _lower_on_rope(a, _fish, down, s):
+	var stop_up := 0.0
+	if amora != null and is_instance_valid(amora):
+		down = fish_catch
+		stop_up = maxf(0.0, _figure_hand(amora).global_position.y - fish_catch.y - 0.05)
+	if not await _lower_on_rope(a, _fish, down, s, stop_up):
 		_act_end(a, s)
 		return
-	if is_instance_valid(_fish):
+	_catch_fish()
+	if is_instance_valid(_fish) and not _fish.has_meta(&"returned_to") and amora == null:
 		fish_street_gap = _fish.global_position.y + piece_low(_fish, _fish.global_basis) - _floor_y(_fish.global_position)
 	FeedbackFx.sparkle(world, _fish.global_position if is_instance_valid(_fish) else down)
 	main.say("ep01.street.climber.sees_boat")
 	# Desce escalando antes de concluir (a missao seguinte desmonta esta).
 	if not await _climb_chain(a, [_mk(&"M5_Awning"), _mk(&"M5_Crates"), points[&"CratesBase"]], s):
-		_act_end(a, s)
-		return
-	if not await _return_fish(a, s):
 		_act_end(a, s)
 		return
 	_act_end(a, s)
@@ -594,55 +607,75 @@ func fish_down_point() -> Vector3:
 	return _floor_at((points[&"CratesBase"] as Vector3) + Vector3(0.6, 0.1, 0.4))
 
 
-func amora_point() -> Vector3:
-	var down := fish_down_point()
-	var away := Vector3(down.x - (points[&"CratesBase"] as Vector3).x, 0.0, down.z - (points[&"CratesBase"] as Vector3).z)
-	return _floor_at(down + away.normalized() * 1.4 + Vector3(0, 0.3, 0))
+## G25b: prumo da corda para a Amora pegar o peixe: perto de onde a corda desce do telhado, com folga em volta (a corda
+## e o peixe longe das paredes e dos enfeites; a Amora cabe ao lado). Sem nenhum, o que a corda acharia sozinha.
+func catch_column(top: Vector3) -> Vector3:
+	var pred := drop_spot(top, fish_down_point(), 0.15)
+	var c0: Vector3 = pred.get("ground", fish_down_point())
+	for ring: float in [0.0, 0.2, 0.4, 0.6, 0.8]:
+		for k in (1 if ring == 0.0 else 12):
+			var c := _floor_at(c0 + Vector3(sin(TAU * k / 12.0), 0.3, cos(TAU * k / 12.0)) * ring)
+			if absf(c.y - c0.y) > 0.15 or not _body_clear(c, CATCH_CLEAR_R):
+				continue
+			var sp := drop_spot(top, c, 0.15)
+			if not sp.is_empty() and Vector2((sp["ground"] as Vector3).x - c.x, (sp["ground"] as Vector3).z - c.z).length() < 0.05:
+				return c
+	return c0
 
 
-## G25: o Pico pega o peixe na rua (pick_up), leva ate a Dona Amora e entrega (place_low): no alto do gesto o peixe passa
-## para a mao direita dela, que agradece (thanks). Sem a Amora (ou sem peixe) nao faz nada.
-func _return_fish(a: MemberActor, s: int) -> bool:
+## Mao do Pico no telhado, quando ele comeca a baixar o peixe, em relacao ao marcador M5_ShedRoof (medida no jogo).
+const ROOF_GRIP := Vector3(-0.17, 0.52, -0.13)
+## Folga (m) em volta do prumo da corda: o peixe e a corda passam longe das paredes e enfeites.
+const CATCH_CLEAR_R := 0.4
+
+
+## G25b: lugar e rumo da Amora para a mao direita dela ficar no prumo da corda: {pos, yaw}. Tenta 16 rumos e fica com o
+## primeiro em que o corpo cabe sem tocar a camada 1.
+func amora_place() -> Dictionary:
+	var c := fish_catch if fish_catch != Vector3.INF else fish_down_point()
+	for k in 16:
+		var yaw := TAU * k / 16.0
+		var off := Basis(Vector3.UP, yaw) * Vector3(AMORA_HAND.x, 0.0, AMORA_HAND.z)
+		var p := _floor_at(c - off + Vector3(0, 0.3, 0))
+		if absf(p.y - c.y) < 0.15 and _body_clear(p, AMORA_BODY_R):
+			return {"pos": p, "yaw": yaw}
+	return {"pos": _floor_at(c + Vector3(0.45, 0.3, 0)), "yaw": 0.0}
+
+
+## Mao direita da Amora no idle, no referencial dela (frente = -Z), medida no jogo: 0,26 m a direita, 0,78 m de altura,
+## 0,08 m a frente. Raio do corpo dela para achar lugar livre.
+const AMORA_HAND := Vector3(0.26, 0.78, -0.08)
+const AMORA_BODY_R := 0.28
+
+
+## Cabe um corpo de raio `r` de pe em `p` sem tocar a camada 1 (casas, kit, caixotes)?
+func _body_clear(p: Vector3, r: float) -> bool:
+	var cap := CapsuleShape3D.new()
+	cap.radius = r
+	cap.height = 1.5
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = cap
+	q.collision_mask = 1
+	q.transform = Transform3D(Basis(), p + Vector3(0, 0.1 + cap.height * 0.5, 0))
+	return get_world_3d().direct_space_state.intersect_shape(q, 1).is_empty()
+
+
+## G25b: a Amora pega o peixe da ponta da corda (que o parou na altura da mao dela) e agradece: o peixe passa para a
+## mao direita dela (hand.R). Sem a Amora o peixe fica no chao, onde a corda o pousou.
+func _catch_fish() -> void:
 	if not is_instance_valid(_fish) or amora == null or not is_instance_valid(amora):
-		return true
-	var to_fish := Vector3(_fish.global_position.x - a.global_position.x, 0.0, _fish.global_position.z - a.global_position.z)
-	if to_fish.length() > 0.55:
-		if not await _step_walk(a, a.global_position + to_fish.normalized() * (to_fish.length() - 0.4), s):
-			return false
-	a.face_now(_fish.global_position)
-	var L := _clip(a, &"pick_up", 1.0)
-	if not await _wait(L * 0.5, s):
-		return false
-	_take(a, _fish, true, Transform3D(Basis(Vector3.UP, PI / 2.0), Vector3.ZERO))
-	if not await _wait(L * 0.5, s):
-		return false
-	var front := -amora.global_basis.z
-	var meet := amora.global_position + Vector3(front.x, 0.0, front.z).normalized() * 0.6
-	meet.y = a.global_position.y
-	if not await _step_walk(a, meet, s):
-		return false
-	a.face_now(amora.global_position)
-	StoryFigure.face(amora, a.global_position)
-	var P := _clip(a, &"place_low", 1.3)
-	if not await _wait(P * 0.45, s):
-		return false
+		return
+	StoryFigure.once(amora, &"thanks")
 	var hand := _figure_hand(amora)
 	var piece := _fish
+	catch_gap = (hand as Node3D).global_position.distance_to(piece.global_position)
 	still(piece)
 	piece.reparent(hand, false)
 	piece.transform = Transform3D(Basis(Vector3.UP, PI / 2.0), Vector3.ZERO)
 	piece.set_meta(&"in_hand", &"vendor")
 	piece.set_meta(&"returned_to", &"vendor")
-	carried = null
-	carrier = null
-	a.hands = &""
 	hand_log.append({"piece": piece, "member": &"vendor", "two": false})
-	StoryFigure.once(amora, &"thanks")
 	FeedbackFx.sparkle(world, amora.global_position + Vector3(0, 1.2, 0))
-	if not await _wait(P * 0.55, s):
-		return false
-	_rest(a)
-	return true
 
 
 ## Ponto de pega na mao direita de um figurante (BoneAttachment3D no osso hand.R; sem esqueleto, o proprio figurante).
@@ -666,7 +699,8 @@ func _figure_hand(fig: Node3D) -> Node3D:
 ## G24b: nenhum trecho da corda nem o objeto atravessam a camada 1. O objeto sai da mao, vai ate a beira (`drop_spot`: um
 ## ponto no ar com o prumo livre ate o chao, o mais perto possivel de `down`) e desce a prumo; a corda apoia nessa beira
 ## (polilinha mao -> beira -> objeto). Sem ponto livre, desce como antes (e a auditoria G24d acusa).
-func _lower_on_rope(a: MemberActor, thing: Node3D, down: Vector3, serial: int) -> bool:
+## G25b: `stop_up` > 0 para a peca essa altura acima do chao (na mao de quem pega embaixo).
+func _lower_on_rope(a: MemberActor, thing: Node3D, down: Vector3, serial: int, stop_up: float = 0.0) -> bool:
 	if thing == null or not is_instance_valid(thing):
 		return true
 	var top := _grip(a, true).global_position
@@ -681,6 +715,7 @@ func _lower_on_rope(a: MemberActor, thing: Node3D, down: Vector3, serial: int) -
 	var spot := drop_spot(top, down, piece_radius(thing), [thing])
 	var land_at: Vector3 = spot.get("ground", down)
 	var end_xf := rest_xf(thing, land_at, rad_to_deg(thing.global_rotation.y))
+	end_xf.origin.y += stop_up
 	var hang := Vector3(0, 0.12, 0)
 	var way: PackedVector3Array = spot.get("way", PackedVector3Array([top, top]))
 	_clip(a, &"lower_rope", LOWER_SPEED)

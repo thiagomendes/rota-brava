@@ -237,14 +237,13 @@ func _m5_fish_to_amora() -> void:
 	for e: Dictionary in land.hand_log:
 		if e["piece"] == fish:
 			order.append(e["member"])
-	r.check(order == [&"climber", &"climber", &"vendor"],
-		"G25 M5: o peixe passa pela mao do Pico (telhado, rua) e termina na da Amora %s" % str(order))
+	r.check(order == [&"climber", &"vendor"],
+		"G25b M5: o peixe passa pela mao do Pico (telhado) e, pela corda, para a da Amora %s" % str(order))
 	var in_hand := fish != null and is_instance_valid(fish) and (fish as Node3D).get_parent() is BoneAttachment3D \
 		and ((fish as Node3D).get_parent() as BoneAttachment3D).bone_name == "hand.R" and amora.is_ancestor_of(fish)
 	r.check(in_hand and land.carried == null and pico.hands == &"", "G25 M5: o peixe fica na mao direita da Amora e o Pico de maos livres")
-	var near := pico.global_position.distance_to(amora.global_position) if amora != null else INF
-	r.check(near < 1.2, "G25 M5: o Pico entrega de perto (%.2f m da Amora)" % near)
-	r.check(absf(land.fish_street_gap) < 0.03, "G25 M5: antes, a corda pousa o peixe na rua (folga %.1f cm)" % (land.fish_street_gap * 100.0))
+	r.check(land.catch_gap < 0.1, "G25b M5: a corda para o peixe na mao da Amora (%.2f m da mao)" % land.catch_gap)
+	r.check(pico.global_position.y < 0.3, "G25b M5: o Pico desce dos caixotes sem ir ate a Amora (y %.2f)" % pico.global_position.y)
 	r.check(main.missions[5].is_completed(), "G25 M5: a entrega do peixe conclui a missao")
 	land.call("_set_busy", false)
 	await _free(main)
@@ -263,7 +262,8 @@ func _m5_without_amora() -> void:
 	land.amora = null
 	await r.frames(2)
 	await _m5_to_fish(main)
+	r.check(absf(land.fish_street_gap) < 0.03, "G25 M5 recuperacao: sem a Amora a corda pousa o peixe no chao (folga %.1f cm)" % (land.fish_street_gap * 100.0))
 	r.check(main.missions[5].is_completed() and land.carried == null,
-		"G25 M5 recuperacao: sem a Amora o peixe fica na rua e a missao conclui igual")
+		"G25 M5 recuperacao: sem a Amora o peixe fica no chao e a missao conclui igual")
 	land.call("_set_busy", false)
 	await _free(main)
