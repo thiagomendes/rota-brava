@@ -1,0 +1,3 @@
+# Excecoes do G26 (tools/test.sh reprova SCRIPT ERROR / Parse Error nos logs da suite).
+# Formato: <regex ERE> | <motivo>. Cada linha precisa de motivo; o ideal e esta lista ficar vazia.
+Parse Error: Failed\. \[Resource file res://actors/characters/rastro_model\.tscn:16\] | ja existia antes do G26 (log de 2026-11-28 no checkout principal); sai depois do RESULTADO, no encerramento do processo, sem abortar teste. Mesmo caso do village_world.tscn:7 citado no ticket, que nao apareceu nesta rodada
