@@ -50,6 +50,7 @@
   - Suíte: `OK (4542 PASS)` em 455 s.
   - O build 2 do iPhone rodou sem o travamento.
 - **Em andamento:**
+  - G28 (árvores: estudo de 3 opções para Thiago) com `art3d`; G29 (fala de herói com trava e câmera no rosto) com `gameplay`.
   - G18: varal do M2.
   - G19 e G19b: ações no jogo revisadas e integradas (pausa congela, sem mágica na troca de herói). Lente do M7 na parede da galeria (decisão de Thiago).
   - G21: Lumi aprovado por Thiago. G21i (plano na abertura) revisado e integrado; falas novas pendentes para o lote de 28/11; G23 (pés) revisado e integrado (dívida: build do cabelo do Lumi não determinístico).

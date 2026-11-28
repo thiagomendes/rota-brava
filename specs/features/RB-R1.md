@@ -1267,3 +1267,10 @@ Critérios de aceite:
     - encurtar as fichas de `narrator.intro.village` (+2,1 s de folga), `intro.call` e `intro.team`;
     - continuam pendentes `c1.lumi_go`, `bay.pilot.see_buoys` e `lighthouse.pilot.aim`.
   - Merge em `feature/rb-r1-reorientacao`.
+
+### Retorno de Thiago no iPhone, build com vozes 4 (2026-11-28): pacote G28/G29
+Thiago: "melhorou bastante as interações, a coesão, a explicação dos contextos". Dois pontos a melhorar.
+| Id | Relato | Critério de aceite | Dono |
+|---|---|---|---|
+| G28 | As árvores têm acabamento ruim: um tronco com uma bola em cima | **Decisão de Thiago: estudo com 3 opções antes de trocar.** Três estilos de copa originais feitos por script no Blender, todos no padrão do mundo v2: <br>• vários tufos; <br>• folhas em cachos; <br>• copa estilizada com recortes. <br>Cada opção sai em captura ao lado do trio, de dia e de noite, com a contagem de tris por árvore e o custo estimado no celular. Thiago escolhe; só depois a árvore é trocada no mundo. O pontilhado do G24a2 continua funcionando nas copas | `art3d` |
+| G29 | A fala dos heróis atrasa ou adianta. O herói já anda ou faz outra coisa enquanto a fala anterior ainda sai, e não dá para saber quem está falando | **Decisões de Thiago:** <br>(1) nas falas de **história** dos três heróis (início e fim de missão, descobertas, respostas aos chamados), o controle trava, o herói para e vira para a câmera, a câmera aproxima suave do rosto de quem fala, a fala sai inteira, e depois a câmera volta e o controle solta; <br>(2) comentários curtos e dicas **não** travam: saem com um indicador de quem fala, sem parar o jogo; <br>(3) apertar "agir" pula a fala travada e devolve o controle; <br>(4) rádio (Lumi) e narrador seguem em paralelo, sem travar. <br>Critérios: <br>• classificação de cada fala no diálogo v3 (história ou comentário), revisável; <br>• nenhuma fala de herói começa enquanto outra fala de herói ainda toca; <br>• nenhuma ação começa no meio de uma fala travada; <br>• a câmera aproxima e volta sem corte, também com movimento reduzido; <br>• o bot completa M0 a M8; <br>• testes medem sobreposição de falas e a trava | `gameplay` + `ux` |
