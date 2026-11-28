@@ -52,18 +52,7 @@ func _act_m5() -> void:
 	await _wait(0.3)
 	await _until_free(&"climber", &"crates_climb", "g25_m5_a_sobe", 6.0)
 	land.call("_set_busy", true)   # segura a montagem do M6 depois da entrega
-	# G25b: camera parada no beco, olhando a Amora e o prumo da corda; quadros enquanto o peixe desce e quando ela pega
-	var amora: Node3D = land.get("amora")
-	var c: Vector3 = land.get("fish_catch")
-	_subject = null
-	var fixed := Camera3D.new()
-	fixed.fov = 55.0
-	fixed.near = 0.03
-	add_child(fixed)
-	# o beco corre em z (atras do galpao): camera no fundo dele, alta, olhando para o prumo
-	fixed.global_position = c + Vector3(0.6, 2.2, -2.4)
-	fixed.look_at(c + Vector3(0, 1.0, 0), Vector3.UP)
-	fixed.current = true
+	# G25b: camera do jogo (sem --g19-cam), seguindo o Pico: quadros a cada 1 s e no instante da entrega
 	var pico := _hero(&"climber")
 	land.call("_on_spot", &"fish", pico)
 	var t := 0.0
@@ -74,7 +63,7 @@ func _act_m5() -> void:
 		var fish = land.get("_fish")
 		if not caught and fish != null and is_instance_valid(fish) and (fish as Node).has_meta(&"returned_to"):
 			caught = true
-			await _save("g25b_m5_amora_pega.png")
+			await _save("g25b_m5_entrega.png")
 		elif t >= next:
 			await _save("g25b_m5_%02d.png" % n)
 			n += 1

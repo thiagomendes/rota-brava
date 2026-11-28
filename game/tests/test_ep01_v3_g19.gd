@@ -558,10 +558,10 @@ func _m5_fish() -> void:
 	var ids := []
 	if fish != null and is_instance_valid(fish):
 		ids.append("mission:" + String((land.get("_root") as Node).get_path_to(fish)))
-	# G25b: a corda para o peixe na mao da Dona Amora, que espera embaixo (o caso sem a Amora, com o peixe pousado no chao,
-	# fica no test_ep01_v3_g25)
-	var gap := float(land.get("catch_gap"))
-	r.check(ids.size() == 1 and gap < 0.1, "G19 M5: o peixe baixado na corda termina na mao da Amora (%.2f m da mao)" % gap)
+	# G25b: com a Dona Amora na rua o Pico desce com o peixe no cinto e entrega a pe (a corda so desce no caso sem ela,
+	# medido no test_ep01_v3_g25)
+	var home: bool = fish != null and is_instance_valid(fish) and (fish as Node).get_meta(&"returned_to", &"") == &"vendor"
+	r.check(ids.size() == 1 and home, "G19 M5: o peixe termina na mao da Dona Amora")
 	po.free_probes()
 	land.call("_set_busy", false)
 	await _free(main)
