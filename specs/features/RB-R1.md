@@ -1255,3 +1255,15 @@ Critérios de aceite:
 - **Abertura (G17) com vozes reais:** `scene_length(game_intro)` = **48,65 s** (ficha 42,5 s; antes 47,06 s com tempo de leitura), sem fallback.
 - Suítes: `voice_v3,audio,cutscene,cutscene_sync,radio_level` `OK (456 PASS)`; completa `OK (5504 PASS, 0 FALHA(S))`, sem SCRIPT ERROR.
 - Pendente de Thiago: ouvir os 47 takes (sobretudo os 5 do Lumi e as 2 da Vila Maré). Próximo lote: 127 pendentes (~2 dias de cota).
+- **Revisão Vozes 4** (`reviewer`): **APROVADO**. Nada foi ouvido; a aceitação perceptual fica com Thiago.
+  - **Testes não frouxos:** as mutações (pendente e com take ao mesmo tempo; texto divergente) dão 3 e 4 falhas.
+  - **Catálogo:** 131 takes e 127 pendentes, sem órfãos. Detector: 0 reprovados.
+  - **Medidas objetivas:** Lumi de 2,3 a 3,5 palavras/s, pico entre −0,6 e −2,2 dB, sem silêncio anômalo.
+  - **Abertura:** 48,65 s, conferida plano a plano; nenhuma voz cortada.
+  - **Cota em 78:** 47 aprovados mais 31 tentativas reprovadas pelo detector, porque o modelo divagou com áudios de 39 a 45 s.
+  - **Suíte:** filtrada 478 PASS; completa 5504 PASS, 0 SCRIPT ERROR.
+  - **Dívidas:**
+    - limitar a duração ou ajustar o prompt do `gen_v3.py` para não queimar cerca de 40% da cota;
+    - encurtar as fichas de `narrator.intro.village` (+2,1 s de folga), `intro.call` e `intro.team`;
+    - continuam pendentes `c1.lumi_go`, `bay.pilot.see_buoys` e `lighthouse.pilot.aim`.
+  - Merge em `feature/rb-r1-reorientacao`.
