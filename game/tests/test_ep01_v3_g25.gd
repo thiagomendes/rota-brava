@@ -133,16 +133,20 @@ func _voice() -> void:
 	var stale: Array[String] = []
 	var missing: Array[String] = []
 	var voiced := NEW.keys() + REWRITTEN.keys()
+	var texts := {}
+	for e: Dictionary in cat["lines"]:
+		texts[str(e["id"])] = str(e.get("text_at_generation", ""))
+	# Vozes 4: fala nova/reescrita tem take gravado com o texto atual OU fica em pending.keys (nunca os dois, nunca take antigo)
 	for k: String in voiced:
-		if ids.has(k) or VoiceCatalog.has_v3(k):
+		if ids.has(k) and (pending.has(k) or texts[k] != Loc.t(k)):
 			stale.append(k)
-		if not pending.has(k):
+		if not ids.has(k) and not pending.has(k):
 			missing.append(k)
 	for k in GONE:
 		if ids.has(k) or pending.has(k) or FileAccess.file_exists("res://audio/voice/v3/%s.ogg" % k.replace(".", "_")):
 			stale.append(k)
 	r.check(stale.is_empty(), "G25: takes obsoletos fora do catalogo v3 (e sem OGG) %s" % str(stale))
-	r.check(missing.is_empty(), "G25: %d falas com voz nova em pending.keys %s" % [voiced.size(), str(missing)])
+	r.check(missing.is_empty(), "G25: %d falas com voz nova: take do texto atual ou pending.keys %s" % [voiced.size(), str(missing)])
 
 
 func _new_main(mission: StringName) -> Ep01V3Main:

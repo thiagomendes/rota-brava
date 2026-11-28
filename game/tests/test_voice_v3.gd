@@ -44,8 +44,14 @@ func run(r) -> void:
 		if str(v3[k].get("text_at_generation", "")) != Loc.t(k):
 			stale.append(k)
 	r.check(stale.is_empty(), "voz v3: todo take foi gravado com o texto atual da legenda (desatualizados: %s)" % ", ".join(stale))
-	r.check(pending.has("ep01.narrator.intro.village") and pending.has("ep01.narrator.opening.village") and not v3.has("ep01.narrator.intro.village") and not v3.has("ep01.narrator.opening.village"),
-		"voz v3: falas da Vila Mare sem take antigo, pendentes para o proximo lote (G22c)")
+	# Vozes 4: as falas da Vila Mare tem take novo (gravado com "Vila Mare") ou seguem pendentes; nunca o take antigo
+	var vila_ok := true
+	for k: String in ["ep01.narrator.intro.village", "ep01.narrator.opening.village"]:
+		if v3.has(k):
+			vila_ok = vila_ok and str(v3[k].get("text_at_generation", "")).contains("Maré") and not pending.has(k)
+		else:
+			vila_ok = vila_ok and pending.has(k)
+	r.check(vila_ok, "voz v3: falas da Vila Mare com take do texto novo ou pendentes (G22c)")
 	r.check(Loc.t("ep01.narrator.intro.village").contains("Vila Maré") and not Loc.t("ep01.narrator.opening.village").contains("Farol 7"), "voz v3: a vila se chama Vila Mare no texto do narrador (G22c)")
 	var bad_exc: Array[String] = []
 	for k: String in exc:
