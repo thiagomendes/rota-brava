@@ -300,18 +300,15 @@ func _canopy_entry(spheres: Array, a: Vector3, b: Vector3) -> Variant:
 	return best
 
 
-## Pancada numa peca: corpo `Props`/`CameraPieces`, forma de peca dentro de `Structures` (rig antigo) ou banco G19.
-const PIECE_SHAPES: Array[String] = ["NetShedAwning", "NetShedFishTable", "TreeBench", "FlowerBedN", "FlowerBedS"]
+## Pancada numa peca: corpo `Props` (kit) ou banco G19. Toldo/banca do galpao, banco da arvore e canteiros voltaram a
+## ser estrutura (revisao art3d; G24a3).
 
 
 func _is_piece_hit(hit: Dictionary) -> bool:
 	var body := hit["collider"] as CollisionObject3D
 	if body == null:
 		return false
-	if String(body.name) in ["Props", "CameraPieces"] or body.is_in_group(&"g19_bench"):
-		return true
-	var owner_node := body.shape_owner_get_owner(body.shape_find_owner(int(hit["shape"]))) as Node
-	return owner_node != null and String(owner_node.name) in PIECE_SHAPES
+	return String(body.name) == "Props" or body.is_in_group(&"g19_bench")
 
 
 ## Fracao (area) do retangulo projetado do AABB visual do heroi que cai dentro do quadro, no pior aspecto.

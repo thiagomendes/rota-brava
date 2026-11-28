@@ -1,23 +1,19 @@
 class_name CameraOcclusion
 extends RefCounted
 ## RB-R1 G24a2 v2: duas classes de obstaculo para a camera.
-##  - ESTRUTURA (predios, terreno, cais, muros): continua na mascara da camera (mola de braco do CameraRig, G6).
-##  - PECA (caixotes, carrinho, toldos, barracas, barris, vasos, bancos, arvores): sai da camera (`piece_bodies`) e,
-##    quando fica entre a camera e o heroi ou contem a camera, fica pontilhada (variante por malha, fade FADE_TIME s;
-##    com movimento reduzido so liga e desliga).
-## Separacao data-driven, sem tocar em .blend nem GLB: os tipos do `kit` do layout (PIECE_SKIP fora) sao pecas, o corpo
-## `Collision/Props` (colisao gerada do kit) sai da camera, e as formas de `Collision/Structures` em PIECE_SHAPES vao
-## para um corpo proprio (`Collision/CameraPieces`, mesma camada) que tambem sai da camera.
-## Troca: instancia do MultiMesh do kit some (escala ~0) e um MeshInstance3D com a malha pontilhada entra no lugar;
-## peca dentro de malha estatica (toldo do galpao) troca os materiais dessa malha. Parametros do pontilhado por
-## instancia. Mede: trocas no quadro, pecas trocadas agora e CPU da atualizacao (us).
+##  - ESTRUTURA (predios, terreno, cais, muros, e por ora toldo/banca do galpao, banco da arvore e canteiros, que estao
+##    dentro das malhas de quarteirao): continua na mascara da camera (mola de braco do CameraRig, G6).
+##  - PECA (instancias do kit: caixotes, carrinho, barracas, barris, vasos, bancos, arvores; e pecas de missao: carrinho
+##    do M4, banco do varal do G19): sai da camera e, quando fica entre a camera e o heroi ou contem a camera, a PECA
+##    INTEIRA fica pontilhada com um valor so de fade (FADE_TIME s; movimento reduzido so liga e desliga).
+## Regra (art3d): so troca malha que tem UMA peca (instancia do kit vira MeshInstance3D proprio; peca de missao e um no
+## proprio); nunca troca malha de quarteirao. Separacao data-driven, sem .blend nem GLB: tipos do `kit` do layout
+## (PIECE_SKIP fora); o corpo `Collision/Props` (colisao gerada do kit) sai da camera.
+## Mede: trocas no quadro, pecas trocadas, CPU da atualizacao (us) e a etapa do pior quadro.
 
 const PIECE_SKIP: Array[String] = ["grass_tall", "grass_tuft", "flowers_a", "flowers_b"]
-const PIECE_SHAPES: Array[String] = ["NetShedAwning", "NetShedFishTable", "TreeBench", "FlowerBedN", "FlowerBedS"]
 const FADE_TIME := 0.15
-const RADIUS := 0.7          ## raio do cone no heroi (metade na camera), como no shader
 const CENTER_Y := 0.6        ## centro do heroi acima dos pes
-const NEAR := 0.9            ## esfera em volta da camera: peca que contem a camera some em volta dela
 const RAYS: Array[float] = [0.2, 0.6, 1.0]   ## pe, centro e cabeca do heroi
 const GROW := 0.05           ## folga da caixa da peca no teste do segmento
 const NEAR_BOX := 0.2        ## camera a menos disto da caixa da peca conta como "dentro" (a lente nao corta a peca)
@@ -25,44 +21,33 @@ const KEEP := 0.25           ## histerese: peca ja trocada fica ate sair desta f
 const CELL := 4.0
 const HIDDEN_SCALE := 0.01   ## instancia do kit com escala menor que isto ja esta escondida (missao, grama)
 
-## peca: {box: AABB, mmi: MultiMeshInstance3D, i: int} (kit) ou {box: AABB, mesh: GeometryInstance3D} (estatica)
+## peca do kit: {box: AABB, mmi: MultiMeshInstance3D, i: int, xf: Transform3D}
 var _pieces: Array[Dictionary] = []
 var _grid: Dictionary = {}       ## Vector2i -> PackedInt32Array de indices de peca
 var _stamp: PackedInt32Array = []
 var _frame := 0
-## indice de peca -> {amount: float, want: float, proxy: MeshInstance3D, xf: Transform3D, orig: Array}
+## indice de peca -> {amount: float, proxy: MeshInstance3D, xf: Transform3D}
 var _active: Dictionary = {}
-## Pecas de missao (no inteiro; caixa recalculada a cada quadro porque o carrinho anda): no -> {amount, orig}
-var _dyn: Array[Node3D] = []
-var _dyn_active: Dictionary = {}
+## Pecas de missao (no inteiro; caixa recalculada a cada quadro porque o carrinho anda). Sem tipo nos lacos: o no
+## pode ter sido liberado pela missao (land.build) entre dois quadros.
+var _dyn: Array = []
+var _dyn_active: Dictionary = {}   ## instance_id -> {node, amount, orig: {mi_id: [mi, mats]}, box}
 var swaps_frame := 0
 var swapped_now := 0
 var usec_frame := 0
+var updates := 0                   ## atualizacoes completas (teste: o update nao aborta)
 var warm_count := 0
+## Pior quadro (us) e a etapa dele: grade, troca, dinamicas, parametros, devolucao.
+var usec_max := 0
+var usec_max_stage := ""
 
 
-## Corpos de peca que saem da mascara da camera (cria `Collision/CameraPieces` com as formas de PIECE_SHAPES).
+## Corpos de peca que saem da mascara da camera.
 static func piece_bodies(world: Node) -> Array[RID]:
 	var out: Array[RID] = []
 	var props := world.get_node_or_null("Collision/Props") as CollisionObject3D
 	if props != null:
 		out.append(props.get_rid())
-	var st := world.get_node_or_null("Collision/Structures") as StaticBody3D
-	if st == null:
-		return out
-	var body := world.get_node_or_null("Collision/CameraPieces") as StaticBody3D
-	if body == null:
-		body = StaticBody3D.new()
-		body.name = "CameraPieces"
-		body.collision_layer = st.collision_layer
-		body.collision_mask = st.collision_mask
-		st.get_parent().add_child(body)
-		body.global_transform = st.global_transform
-		for n: String in PIECE_SHAPES:
-			var cs := st.get_node_or_null(n) as CollisionShape3D
-			if cs != null:
-				cs.reparent(body, true)
-	out.append(body.get_rid())
 	return out
 
 
@@ -86,8 +71,7 @@ func _init(world: Node3D) -> void:
 				var xf := Transform3D(Basis(Vector3.UP, deg_to_rad(float(r[3]))).scaled(Vector3.ONE * float(r[4])),
 					Vector3(float(r[0]), float(r[1]), float(r[2])))
 				_pieces.append({box = mmi.global_transform * xf * local, mmi = mmi, i = i, xf = xf})
-	# A caixa da peca do kit cobre tambem a colisao gerada dela (`Collision/Props/<tipo>_<i>[_<j>]`): o que a vista
-	# bate na colisao fica dentro da caixa que pontilha.
+	# A caixa da peca do kit cobre tambem a colisao gerada dela (`Collision/Props/<tipo>_<i>[_<j>]`).
 	var by_name: Dictionary = {}
 	for i in _pieces.size():
 		by_name["%s_%d" % [(_pieces[i]["mmi"] as Node).name, int(_pieces[i]["i"])]] = i
@@ -104,32 +88,6 @@ func _init(world: Node3D) -> void:
 				continue
 			var idx: int = by_name[key]
 			_pieces[idx]["box"] = (_pieces[idx]["box"] as AABB).merge(cs.global_transform * cs.shape.get_debug_mesh().get_aabb())
-	var statics: Array[GeometryInstance3D] = []
-	var st_root := world.get_node_or_null("Static")
-	if st_root != null:
-		for g in st_root.find_children("*", "GeometryInstance3D", true, false):
-			statics.append(g as GeometryInstance3D)
-	var body := world.get_node_or_null("Collision/CameraPieces")
-	for n: String in PIECE_SHAPES:
-		var cs: CollisionShape3D = null
-		if body != null:
-			cs = body.get_node_or_null(n) as CollisionShape3D
-		if cs == null:
-			cs = world.get_node_or_null("Collision/Structures/" + n) as CollisionShape3D
-		if cs == null or cs.shape == null:
-			continue
-		var box := cs.global_transform * cs.shape.get_debug_mesh().get_aabb()
-		var best: GeometryInstance3D = null
-		var best_vol := INF
-		for g in statics:
-			var gb := g.global_transform * g.get_aabb()
-			if gb.has_point(box.get_center()) and gb.get_volume() < best_vol:
-				best = g
-				best_vol = gb.get_volume()
-		if best == null:
-			continue
-		_variants_of(best)
-		_pieces.append({box = box, mesh = best})
 	for i in _pieces.size():
 		_index(i)
 	_stamp.resize(_pieces.size())
@@ -145,23 +103,14 @@ func _index(idx: int) -> void:
 			_grid[k] = cell
 
 
-func _variants_of(g: GeometryInstance3D) -> void:
-	var mi := g as MeshInstance3D
-	if mi == null or mi.mesh == null:
-		return
-	for s in mi.mesh.get_surface_count():
-		var m := mi.get_surface_override_material(s)
-		WV2Materials.occl_variant(m if m != null else mi.mesh.surface_get_material(s))
-
-
 func piece_count() -> int:
 	return _pieces.size()
 
 
 ## Aquecimento na carga: um quadrado minusculo por variante pontilhada e uma copia minuscula de cada malha do kit
-## pontilhada, a `ahead` m na FRENTE da camera (dentro da vista: o desenho garante o pipeline montado, sem depender de
-## a Godot compilar o que esta fora da vista), por `seconds`. Devolve quantas instancias.
-## `warm_mode` (medida da captura G24a2): &"view" (padrao, na frente da camera), &"out" (longe da vista), &"none".
+## pontilhada, a `ahead` m na FRENTE da camera, por `seconds`. Medido na 4.7 (xvfb/llvmpipe): o pipeline base compila
+## tambem fora da vista; dentro dela compilam ainda as especializacoes. Devolve quantas instancias.
+## `warm_mode` (medida da captura G24a2): &"view" (padrao), &"out" (longe da vista), &"none".
 static var warm_mode: StringName = &"view"
 
 
@@ -177,8 +126,7 @@ func warm_up(cam: Camera3D, seconds: float = 0.5, ahead: float = 0.6) -> int:
 	var n := 0
 	var meshes: Dictionary = {}
 	for p: Dictionary in _pieces:
-		if p.has("mmi"):
-			meshes[(p["mmi"] as MultiMeshInstance3D).multimesh.mesh] = true
+		meshes[(p["mmi"] as MultiMeshInstance3D).multimesh.mesh] = true
 	for src: Mesh in meshes:
 		var mi := MeshInstance3D.new()
 		mi.mesh = WV2Materials.occl_mesh(src)
@@ -201,12 +149,13 @@ func warm_up(cam: Camera3D, seconds: float = 0.5, ahead: float = 0.6) -> int:
 ## Um quadro. `on` false (cena, enquadramento livre) devolve tudo. `instant` (movimento reduzido): sem fade.
 func update(cam: Vector3, hero_feet: Vector3, delta: float, instant: bool, on: bool = true) -> void:
 	var t0 := Time.get_ticks_usec()
+	var stage_us: Dictionary = {}
 	swaps_frame = 0
 	_frame += 1
 	var hits: Dictionary = {}
 	if on:
-		var lo := cam.min(hero_feet) - Vector3.ONE * (NEAR + 1.0)
-		var hi := cam.max(hero_feet) + Vector3.ONE * (NEAR + 1.0)
+		var lo := cam.min(hero_feet) - Vector3.ONE * 1.5
+		var hi := cam.max(hero_feet) + Vector3.ONE * 1.5
 		for x in range(floori(lo.x / CELL), floori(hi.x / CELL) + 1):
 			for z in range(floori(lo.z / CELL), floori(hi.z / CELL) + 1):
 				var cell: Variant = _grid.get(Vector2i(x, z))
@@ -219,11 +168,16 @@ func update(cam: Vector3, hero_feet: Vector3, delta: float, instant: bool, on: b
 					var g := KEEP if _active.has(idx) else GROW
 					if _blocks((_pieces[idx]["box"] as AABB).grow(g), cam, hero_feet):
 						hits[idx] = true
+	var t1 := Time.get_ticks_usec()
+	stage_us["grade"] = t1 - t0
 	for idx: int in hits:
 		if not _active.has(idx) and _swap(idx):
 			swaps_frame += 1
-	var center := hero_feet + Vector3(0, CENTER_Y, 0)
-	_update_dynamic(cam, hero_feet, center, delta, instant, on)
+	var t2 := Time.get_ticks_usec()
+	stage_us["troca"] = t2 - t1
+	_update_dynamic(cam, hero_feet, delta, instant, on)
+	var t3 := Time.get_ticks_usec()
+	stage_us["dinamicas"] = t3 - t2
 	var done: Array[int] = []
 	for idx: int in _active:
 		var a: Dictionary = _active[idx]
@@ -233,14 +187,27 @@ func update(cam: Vector3, hero_feet: Vector3, delta: float, instant: bool, on: b
 		if amt <= 0.0 and want <= 0.0:
 			done.append(idx)
 			continue
-		var gi := _target(idx, a)
-		gi.set_instance_shader_parameter(&"occl_cam", Vector4(cam.x, cam.y, cam.z, NEAR))
-		gi.set_instance_shader_parameter(&"occl_hero", Vector4(center.x, center.y, center.z, RADIUS))
-		gi.set_instance_shader_parameter(&"occl_amount", amt)
+		var proxy: Variant = a["proxy"]
+		if is_instance_valid(proxy):
+			(proxy as GeometryInstance3D).set_instance_shader_parameter(&"occl_cam", Vector4(cam.x, cam.y, cam.z, 0.0))
+			(proxy as GeometryInstance3D).set_instance_shader_parameter(&"occl_amount", amt)
+	var t4 := Time.get_ticks_usec()
+	stage_us["parametros"] = t4 - t3
 	for idx in done:
 		_restore(idx)
+	stage_us["devolucao"] = Time.get_ticks_usec() - t4
 	swapped_now = _active.size() + _dyn_active.size()
 	usec_frame = Time.get_ticks_usec() - t0
+	if usec_frame > usec_max:
+		usec_max = usec_frame
+		var worst := ""
+		var wu := -1
+		for k: String in stage_us:
+			if int(stage_us[k]) > wu:
+				wu = int(stage_us[k])
+				worst = k
+		usec_max_stage = "%s %d us (trocas %d)" % [worst, wu, swaps_frame]
+	updates += 1
 
 
 ## Caixa tapa algum dos raios camera -> heroi (pe, centro, cabeca) ou contem a camera.
@@ -253,54 +220,33 @@ func _blocks(box: AABB, cam: Vector3, feet: Vector3) -> bool:
 	return false
 
 
-func _target(idx: int, a: Dictionary) -> GeometryInstance3D:
-	if a.has("proxy"):
-		return a["proxy"] as GeometryInstance3D
-	return _pieces[idx]["mesh"] as GeometryInstance3D
-
-
 func _swap(idx: int) -> bool:
 	var p := _pieces[idx]
-	var a := {amount = 0.0}
-	if p.has("mmi"):
-		var mmi := p["mmi"] as MultiMeshInstance3D
-		if not is_instance_valid(mmi) or not mmi.is_visible_in_tree():
-			return false
-		var i: int = p["i"]
-		var xf: Transform3D = p["xf"]
-		# Instancia escondida pela missao (carrinho dirigivel: escala ~0 no mesmo lugar) nao pontilha. Sem servidor de
-		# render (headless) a leitura volta zerada: conta como visivel.
-		if _hidden(mmi.multimesh.get_instance_transform(i), xf):
-			return false
-		var proxy := MeshInstance3D.new()
-		proxy.name = "Occl_%s_%d" % [mmi.name, i]
-		proxy.mesh = WV2Materials.occl_mesh(mmi.multimesh.mesh)
-		proxy.cast_shadow = mmi.cast_shadow
-		proxy.visibility_range_end = mmi.visibility_range_end
-		proxy.visibility_range_end_margin = mmi.visibility_range_end_margin
-		proxy.visibility_range_fade_mode = mmi.visibility_range_fade_mode
-		mmi.add_child(proxy)
-		proxy.transform = xf
-		mmi.multimesh.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * 0.0001), xf.origin))
-		a["proxy"] = proxy
-		a["xf"] = xf
-	else:
-		var mi := p["mesh"] as MeshInstance3D
-		if mi == null or not is_instance_valid(mi) or not mi.is_visible_in_tree():
-			return false
-		var orig: Array = []
-		for s in mi.mesh.get_surface_count():
-			var m := mi.get_surface_override_material(s)
-			orig.append(m)
-			var base := m if m != null else mi.mesh.surface_get_material(s)
-			if base != null:
-				mi.set_surface_override_material(s, WV2Materials.occl_variant(base))
-		a["orig"] = orig
-	_active[idx] = a
+	var mmi := p["mmi"] as MultiMeshInstance3D
+	if not is_instance_valid(mmi) or not mmi.is_visible_in_tree():
+		return false
+	var i: int = p["i"]
+	var xf: Transform3D = p["xf"]
+	# Instancia escondida pela missao (carrinho dirigivel: escala ~0) nao pontilha. Sem servidor de render (headless)
+	# a leitura volta zerada: conta como visivel.
+	if _hidden(mmi.multimesh.get_instance_transform(i)):
+		return false
+	var proxy := MeshInstance3D.new()
+	proxy.name = "Occl_%s_%d" % [mmi.name, i]
+	# Variantes com os parametros atuais das bases (noite, festa).
+	proxy.mesh = WV2Materials.occl_mesh(mmi.multimesh.mesh, true)
+	proxy.cast_shadow = mmi.cast_shadow
+	proxy.visibility_range_end = mmi.visibility_range_end
+	proxy.visibility_range_end_margin = mmi.visibility_range_end_margin
+	proxy.visibility_range_fade_mode = mmi.visibility_range_fade_mode
+	mmi.add_child(proxy)
+	proxy.transform = xf
+	mmi.multimesh.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * 0.0001), xf.origin))
+	_active[idx] = {amount = 0.0, proxy = proxy, xf = xf}
 	return true
 
 
-func _hidden(live: Transform3D, xf: Transform3D) -> bool:
+func _hidden(live: Transform3D) -> bool:
 	if live.origin == Vector3.ZERO and live.basis.x == Vector3.ZERO:
 		return false
 	return live.basis.get_scale().x < HIDDEN_SCALE
@@ -308,21 +254,12 @@ func _hidden(live: Transform3D, xf: Transform3D) -> bool:
 
 func _restore(idx: int) -> void:
 	var a: Dictionary = _active[idx]
-	var p := _pieces[idx]
-	if a.has("proxy"):
-		var mmi := p["mmi"] as MultiMeshInstance3D
-		if is_instance_valid(mmi):
-			var i: int = p["i"]
-			mmi.multimesh.set_instance_transform(i, a["xf"] as Transform3D)
-		var proxy := a["proxy"] as Node
-		if is_instance_valid(proxy):
-			proxy.queue_free()
-	else:
-		var mi := p["mesh"] as MeshInstance3D
-		if is_instance_valid(mi):
-			var orig: Array = a["orig"]
-			for s in orig.size():
-				mi.set_surface_override_material(s, orig[s] as Material)
+	var mmi: Variant = _pieces[idx]["mmi"]
+	if is_instance_valid(mmi):
+		(mmi as MultiMeshInstance3D).multimesh.set_instance_transform(int(_pieces[idx]["i"]), a["xf"] as Transform3D)
+	var proxy: Variant = a["proxy"]
+	if is_instance_valid(proxy):
+		(proxy as Node).queue_free()
 	_active.erase(idx)
 
 
@@ -333,46 +270,50 @@ func mid_fade() -> int:
 		var amt := float((_active[idx] as Dictionary)["amount"])
 		if amt > 0.0 and amt < 1.0:
 			n += 1
+	for k: Variant in _dyn_active:
+		var amt2 := float((_dyn_active[k] as Dictionary)["amount"])
+		if amt2 > 0.0 and amt2 < 1.0:
+			n += 1
 	return n
 
 
+## Tudo volta ao normal na hora (cena, troca de heroi, antes de `land.build`).
 func restore_all() -> void:
 	for idx: int in _active.keys():
 		_restore(idx)
-	for n: Node3D in _dyn_active.keys():
-		_dyn_restore(n)
+	for k: Variant in _dyn_active.keys():
+		_dyn_restore(k)
 	swapped_now = 0
 
 
-## `point` esta numa peca pontilhada agora (fade >= 0,5) e dentro da area que o shader faz sumir? (testes)
-func covers_point(point: Vector3, cam: Vector3, hero_feet: Vector3) -> bool:
-	var center := hero_feet + Vector3(0, CENTER_Y, 0)
-	var seg := center - cam
-	var t := (point - cam).dot(seg) / maxf(seg.length_squared(), 1e-4)
-	var in_cone := t > 0.0 and t < 1.0 and (cam + seg * t).distance_to(point) < RADIUS * lerpf(0.5, 1.0, t)
-	if not in_cone and point.distance_to(cam) >= NEAR * 0.6:
-		return false
-	if _dyn_covers(point, GROW):
-		return true
-	for idx: int in _active:
-		if float((_active[idx] as Dictionary)["amount"]) >= 0.5 and (_pieces[idx]["box"] as AABB).grow(GROW).has_point(point):
-			return true
-	return false
+## `point` esta numa peca pontilhada agora (fade >= 0,5)? A peca inteira pontilha. (testes)
+func covers_point(point: Vector3, _cam: Vector3 = Vector3.ZERO, _hero_feet: Vector3 = Vector3.ZERO) -> bool:
+	return piece_contains(point, GROW)
 
 
-## Pecas de missao (nos com malhas); as que sairam da lista voltam ao normal. Variantes criadas aqui (carga da missao).
-func set_dynamic(nodes: Array[Node3D]) -> void:
-	for n: Node3D in _dyn_active.keys():
-		if not nodes.has(n):
-			_dyn_restore(n)
-	_dyn = nodes
-	for n in _dyn:
-		for mi in _meshes_of(n):
+## Pecas de missao (nos com malhas); as que sairam da lista ou foram liberadas voltam ao normal.
+func set_dynamic(nodes: Array) -> void:
+	var keep: Array = []
+	for n: Variant in nodes:
+		if is_instance_valid(n) and (n as Node).is_inside_tree():
+			keep.append(n)
+	for k: Variant in _dyn_active.keys():
+		var node: Variant = (_dyn_active[k] as Dictionary)["node"]
+		if not is_instance_valid(node) or not keep.has(node):
+			_dyn_restore(k)
+	_dyn = keep
+	for n: Variant in _dyn:
+		for mi in _meshes_of(n as Node3D):
 			for s in mi.mesh.get_surface_count():
 				var m := mi.get_surface_override_material(s)
 				var base := m if m != null else mi.mesh.surface_get_material(s)
 				if base != null:
 					WV2Materials.occl_variant(base)
+
+
+## Pecas de missao validas agora (teste: nenhuma liberada fica na lista).
+func dynamic_nodes() -> Array:
+	return _dyn
 
 
 func _meshes_of(n: Node3D) -> Array[MeshInstance3D]:
@@ -395,80 +336,84 @@ func _dyn_box(n: Node3D) -> Variant:
 	return box
 
 
-func _update_dynamic(cam: Vector3, feet: Vector3, center: Vector3, delta: float, instant: bool, on: bool) -> void:
-	for n: Node3D in _dyn_active.keys():
-		if not is_instance_valid(n):
-			_dyn_active.erase(n)
-	for n in _dyn:
-		if not is_instance_valid(n):
-			continue
-		var box: Variant = _dyn_box(n)
-		var g := KEEP if _dyn_active.has(n) else GROW
+func _update_dynamic(cam: Vector3, feet: Vector3, delta: float, instant: bool, on: bool) -> void:
+	# No liberado sai da lista e das trocas antes de qualquer uso.
+	var alive: Array = []
+	for n: Variant in _dyn:
+		if is_instance_valid(n) and (n as Node).is_inside_tree():
+			alive.append(n)
+	_dyn = alive
+	for k: Variant in _dyn_active.keys():
+		if not is_instance_valid((_dyn_active[k] as Dictionary)["node"]):
+			_dyn_restore(k)
+	for n: Variant in _dyn:
+		var node := n as Node3D
+		var key := node.get_instance_id()
+		var box: Variant = _dyn_box(node)
+		var g := KEEP if _dyn_active.has(key) else GROW
 		var hit: bool = on and box != null and _blocks((box as AABB).grow(g), cam, feet)
-		if hit and not _dyn_active.has(n):
+		if hit and not _dyn_active.has(key):
 			var orig: Dictionary = {}
-			for mi in _meshes_of(n):
+			for mi in _meshes_of(node):
 				var arr: Array = []
 				for s in mi.mesh.get_surface_count():
 					var m := mi.get_surface_override_material(s)
 					arr.append(m)
 					var base := m if m != null else mi.mesh.surface_get_material(s)
 					if base != null:
-						mi.set_surface_override_material(s, WV2Materials.occl_variant(base))
-				orig[mi] = arr
-			_dyn_active[n] = {amount = 0.0, orig = orig, box = box}
+						mi.set_surface_override_material(s, WV2Materials.occl_variant(base, true))
+				orig[mi.get_instance_id()] = [mi, arr]
+			_dyn_active[key] = {node = node, amount = 0.0, orig = orig, box = box}
 			swaps_frame += 1
-		if not _dyn_active.has(n):
+		if not _dyn_active.has(key):
 			continue
-		var a: Dictionary = _dyn_active[n]
+		var a: Dictionary = _dyn_active[key]
 		if box != null:
 			a["box"] = box
 		var want := 1.0 if hit else 0.0
 		var amt: float = want if instant or delta <= 0.0 else move_toward(float(a["amount"]), want, delta / FADE_TIME)
 		a["amount"] = amt
 		if amt <= 0.0 and want <= 0.0:
-			_dyn_restore(n)
+			_dyn_restore(key)
 			continue
-		for mi: MeshInstance3D in (a["orig"] as Dictionary):
-			mi.set_instance_shader_parameter(&"occl_cam", Vector4(cam.x, cam.y, cam.z, NEAR))
-			mi.set_instance_shader_parameter(&"occl_hero", Vector4(center.x, center.y, center.z, RADIUS))
-			mi.set_instance_shader_parameter(&"occl_amount", amt)
+		for mk: Variant in (a["orig"] as Dictionary):
+			var pair: Array = (a["orig"] as Dictionary)[mk]
+			if is_instance_valid(pair[0]):
+				(pair[0] as GeometryInstance3D).set_instance_shader_parameter(&"occl_cam", Vector4(cam.x, cam.y, cam.z, 0.0))
+				(pair[0] as GeometryInstance3D).set_instance_shader_parameter(&"occl_amount", amt)
 
 
-func _dyn_restore(n: Node3D) -> void:
-	var a: Dictionary = _dyn_active.get(n, {})
+func _dyn_restore(key: Variant) -> void:
+	var a: Dictionary = _dyn_active.get(key, {})
 	var orig: Dictionary = a.get("orig", {})
-	for mi: MeshInstance3D in orig:
-		if is_instance_valid(mi):
-			var arr: Array = orig[mi]
+	for mk: Variant in orig:
+		var pair: Array = orig[mk]
+		if is_instance_valid(pair[0]):
+			var arr: Array = pair[1]
 			for s in arr.size():
-				mi.set_surface_override_material(s, arr[s] as Material)
-	_dyn_active.erase(n)
+				(pair[0] as MeshInstance3D).set_surface_override_material(s, arr[s] as Material)
+	_dyn_active.erase(key)
 
 
-func _dyn_covers(point: Vector3, grow: float) -> bool:
-	for n: Node3D in _dyn_active:
-		var a: Dictionary = _dyn_active[n]
-		if float(a["amount"]) >= 0.5 and (a["box"] as AABB).grow(grow).has_point(point):
+## Alguma peca pontilhada (fade >= 0,5) contem `point` (com a folga `grow`)? (testes)
+func piece_contains(point: Vector3, grow: float = NEAR_BOX) -> bool:
+	for k: Variant in _dyn_active:
+		var a: Dictionary = _dyn_active[k]
+		if float(a["amount"]) >= 0.5 and a["box"] != null and (a["box"] as AABB).grow(grow).has_point(point):
 			return true
-	return false
-
-
-## Alguma peca pontilhada (fade >= 0,5) contem `point` (com a folga NEAR_BOX)? (testes: camera dentro de peca)
-func piece_contains(point: Vector3) -> bool:
-	if _dyn_covers(point, NEAR_BOX):
-		return true
 	for idx: int in _active:
-		if float((_active[idx] as Dictionary)["amount"]) >= 0.5 and (_pieces[idx]["box"] as AABB).grow(NEAR_BOX).has_point(point):
+		if float((_active[idx] as Dictionary)["amount"]) >= 0.5 and (_pieces[idx]["box"] as AABB).grow(grow).has_point(point):
 			return true
 	return false
 
 
-## Alguma peca (trocada ou nao) contem `point`? (testes: separar estrutura de peca)
+## Alguma peca (trocada ou nao) contem `point`? (testes)
 func is_piece_point(point: Vector3) -> bool:
-	for n in _dyn:
-		if is_instance_valid(n) and _dyn_box(n) != null and (_dyn_box(n) as AABB).grow(GROW).has_point(point):
-			return true
+	for n: Variant in _dyn:
+		if is_instance_valid(n):
+			var b: Variant = _dyn_box(n as Node3D)
+			if b != null and (b as AABB).grow(GROW).has_point(point):
+				return true
 	var cell: Variant = _grid.get(Vector2i(floori(point.x / CELL), floori(point.z / CELL)))
 	if cell == null:
 		return false

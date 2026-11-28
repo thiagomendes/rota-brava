@@ -202,6 +202,13 @@ func _setup_camera_avoidance() -> void:
 	camera_rig.occlusion.warm_up(camera_rig.camera)
 
 
+## G24a2 v2: tudo volta ao normal antes de `land.build` (a instancia CART_KIT_INDEX do kit nao pode reaparecer ao lado
+## do carrinho dirigivel), ao entrar em cena e ao trocar de heroi.
+func _occlusion_reset() -> void:
+	if camera_rig != null and camera_rig.occlusion != null:
+		camera_rig.occlusion.restore_all()
+
+
 ## G24a2 v2: pecas de missao (carrinho do M4, banco do varal do G19) pontilham como as do kit e saem do desvio
 ## da camera. Refeito a cada `land.build` (as pecas sao recriadas por missao).
 func _link_mission_pieces() -> void:
@@ -210,8 +217,9 @@ func _link_mission_pieces() -> void:
 	for rid in _mission_rids:
 		camera_rig.exclude.erase(rid)
 	_mission_rids.clear()
-	var nodes: Array[Node3D] = []
-	if land.cart != null and is_instance_valid(land.cart):
+	var nodes: Array = []
+	# Carrinho so enquanto a missao dele esta montada (land.build libera o velho; is_inside_tree descarta o liberado).
+	if is_instance_valid(land.cart) and land.cart.is_inside_tree():
 		nodes.append(land.cart)
 	for b in get_tree().get_nodes_in_group(&"g19_bench"):
 		var body := b as CollisionObject3D
@@ -397,6 +405,7 @@ func _start_mission(index: int) -> void:
 		_finish_episode()
 		return
 	current = missions[index]
+	_occlusion_reset()
 	land.build(current.id)
 	_link_mission_pieces()
 	var data: Dictionary = mission_data.get(current.id, {})
@@ -474,6 +483,7 @@ func _start_after_hops(index: int) -> void:
 
 
 func _finish_episode() -> void:
+	_occlusion_reset()
 	land.build(&"")
 	_link_mission_pieces()
 	current = null
@@ -905,6 +915,8 @@ func _setup_speech() -> void:
 # ---------- controle ----------
 
 func set_controlled(node: Node3D) -> void:
+	if node != controlled_node:
+		_occlusion_reset()  # G24a2: troca de heroi nao herda pecas pontilhadas do outro
 	controlled_node = node
 	for m: StringName in actors:
 		(actors[m] as MemberActor).controlled = (actors[m] == node)
@@ -1039,9 +1051,12 @@ func play_cutscene(sid: StringName, restore_members: bool = true) -> void:
 	set_followers_enabled(false)
 	camera_rig.orbit_enabled = false
 	MouseLock.block(&"cutscene")
+	camera_rig.occlusion_paused = true
+	_occlusion_reset()
 	if cutscene.play(sid):
 		_cutscene_hold_input()
 		await cutscene.finished
+	camera_rig.occlusion_paused = false
 	MouseLock.unblock(&"cutscene")
 	if not is_inside_tree():
 		return

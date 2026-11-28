@@ -158,27 +158,29 @@ static func set_festival(on: bool) -> void:
 
 ## RB-R1 G24a2: variante pontilhada de um material da biblioteca (mesmos parametros, shader com
 ## wv2_occlusion.gdshaderinc). So a peca que tapa o heroi usa a variante, e so enquanto o fade dura (CameraOcclusion).
-## Material que nao e ShaderMaterial com `void fragment() {` volta sem variante (a peca nao pontilha).
+## Material que nao e ShaderMaterial com `void fragment() {` (os StandardMaterial3D `wv2_lamp`, `wv2_glass*`, `pv3_*`)
+## volta sem variante: essa superficie nao pontilha. `sync`: copia os parametros atuais da base (noite, festa) na troca.
 const OCCL_INC := "res://lookdev/world_v2/wv2_occlusion.gdshaderinc"
 static var _occl_shaders: Dictionary = {}
 static var _occl_mats: Dictionary = {}
 static var _occl_meshes: Dictionary = {}
 
 
-static func occl_variant(m: Material) -> Material:
-	if m is BaseMaterial3D:
-		return _occl_base(m as BaseMaterial3D)
+static func occl_variant(m: Material, sync: bool = false) -> Material:
 	var sm := m as ShaderMaterial
 	if sm == null or sm.shader == null or not sm.shader.code.contains("void fragment() {"):
 		return m
 	if _occl_mats.has(sm):
-		return _occl_mats[sm]
+		var old: ShaderMaterial = _occl_mats[sm]
+		if sync:
+			_occl_sync(sm, old)
+		return old
 	var sh: Shader = _occl_shaders.get(sm.shader)
 	if sh == null:
 		var code := sm.shader.code
 		var nl := code.find("\n")
 		code = code.substr(0, nl + 1) + "#include \"%s\"\n" % OCCL_INC + code.substr(nl + 1)
-		code = code.replace("void fragment() {", "void fragment() {\n\tocc" + "l_discard((INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz, FRAGCOORD.xy, PROJECTION_MATRIX);")
+		code = code.replace("void fragment() {", "void fragment() {\n\tocc" + "l_discard(CAMERA_POSITION_WORLD, FRAGCOORD.xy, PROJECTION_MATRIX);")
 		sh = Shader.new()
 		sh.code = code
 		_occl_shaders[sm.shader] = sh
@@ -188,21 +190,11 @@ static func occl_variant(m: Material) -> Material:
 	return v
 
 
-## Peca de missao com StandardMaterial3D (a 4.7 nao expoe o codigo gerado ao GDScript): copia com o pontilhado de
-## distancia da propria Godot (PIXEL_DITHER), some perto da camera e fica inteira a OCCL_BASE_FAR m. Nao segue o cone
-## nem o fade de 0,15 s: liga e desliga com a troca. PROVISORIO, revisar com `art3d`.
-const OCCL_BASE_FAR := 8.0
-
-
-static func _occl_base(m: BaseMaterial3D) -> Material:
-	if _occl_mats.has(m):
-		return _occl_mats[m]
-	var v := m.duplicate() as BaseMaterial3D
-	v.distance_fade_mode = BaseMaterial3D.DISTANCE_FADE_PIXEL_DITHER
-	v.distance_fade_min_distance = 0.0
-	v.distance_fade_max_distance = OCCL_BASE_FAR
-	_occl_mats[m] = v
-	return v
+## Parametros da base na variante (set_night/set_festival mudam a base depois que a variante nasceu).
+static func _occl_sync(base: ShaderMaterial, v: ShaderMaterial) -> void:
+	for u: Dictionary in base.shader.get_shader_uniform_list():
+		var n := StringName(u["name"])
+		v.set_shader_parameter(n, base.get_shader_parameter(n))
 
 
 ## Variantes ja criadas (aquecimento na carga).
@@ -211,8 +203,13 @@ static func occl_variants() -> Array:
 
 
 ## Malha com cada material trocado pela variante pontilhada (cache por malha; a peca do kit vira um MeshInstance3D).
-static func occl_mesh(src: Mesh) -> Mesh:
+static func occl_mesh(src: Mesh, sync: bool = false) -> Mesh:
 	if _occl_meshes.has(src):
+		if sync:
+			for i in src.get_surface_count():
+				var b := src.surface_get_material(i)
+				if b != null:
+					occl_variant(b, true)
 		return _occl_meshes[src]
 	var mesh := src.duplicate() as Mesh
 	for i in mesh.get_surface_count():

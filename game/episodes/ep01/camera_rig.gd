@@ -41,6 +41,8 @@ var avoid_canopies: bool = true
 var occlusion: CameraOcclusion
 ## Alguma peca pontilhada no ultimo quadro (testes/depuracao).
 var occluded: bool = false
+## Cena (cutscene) em curso: nada pontilha (o rig continua andando por baixo do plano da cena).
+var occlusion_paused: bool = false
 const PROBE_RADIUS := 0.2
 const MIN_ARM := 0.9
 const ARM_MARGIN := 0.08
@@ -194,7 +196,10 @@ func _update(weight: float, delta: float) -> void:
 		camera.look_at(look, Vector3.UP)
 	_apply_fov()
 	if occlusion != null:
-		occlusion.update(pos, focus, delta, reduced_motion, not framing_world)
+		if occlusion_paused:
+			occlusion.restore_all()
+		else:
+			occlusion.update(pos, focus, delta, reduced_motion, not framing_world)
 		occluded = occlusion.swapped_now > 0
 
 
