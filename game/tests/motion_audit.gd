@@ -112,6 +112,10 @@ func _sample_all() -> void:
 	if land != null:
 		if is_instance_valid(land.carried) and land.carried.is_visible_in_tree():
 			_sample_hull(mission, "piece:" + String(land.carried.name), land.carried, "piece")
+		# G25b: peca presa no cinto do heroi (Ep01V3Late.belt) conta como a da mao
+		var belt = land.get("belt")
+		if belt != null and is_instance_valid(belt) and (belt as Node3D).is_visible_in_tree():
+			_sample_hull(mission, "piece:" + String((belt as Node3D).name), belt as Node3D, "piece")
 		if is_instance_valid(land.cart) and land.cart.is_inside_tree() and land.cart.is_visible_in_tree():
 			_sample_hull(mission, "piece:cart", land.cart, "piece")
 		var d := main.world.props.get("wv3_dinghy") as Node3D
