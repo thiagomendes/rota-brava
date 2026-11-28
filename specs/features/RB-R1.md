@@ -1231,3 +1231,17 @@ Critérios de aceite:
     - G24a3: estrutura, toldo e banca do galpão, banco da árvore, canteiros e a câmera dentro de paredes;
     - GPU no celular e grade com escala de render reduzida;
     - troca de herói sem fade.
+- **Revisão G25b** (`reviewer`, 3 rodadas). Merge em `feature/rb-r1-reorientacao`.
+  - **R1 (`865d7e3`), reprovado:** a Amora ficava num beco sem acesso e a entrega não aparecia pela câmera do jogo.
+  - **R2 (`bed0030`), reprovado:** o peixe pulava da mão para o cinto sem gesto.
+  - **R3 (`09bc78f`), APROVADO.**
+    - A Amora fica na rua, num lugar alcançável a pé.
+    - O Pico guarda o peixe nas costas (`chest`, com a troca a 45% do `place_low`), desce para um ponto livre (`free_near`), anda por A* até a Amora e entrega com `place_low` na mão dela.
+    - A `motion_audit` também amostra o peixe nas costas (`belt`). A `KNOWN` ficou intacta.
+    - Testes: `motion_audit,ep01_v3_g25,ep01_v3_g19,ep01_v3_late` com 189 PASS. Suíte completa do autor com 5504 PASS.
+  - **Dívidas:**
+    - **G27 (`art3d`):** clipe de pôr e tirar das costas, tipo mochila. Hoje as mãos vão à frente enquanto o peixe vai para as costas. Para a criança isso lê como "guardou", mas a pose não combina.
+    - Os comentários ainda dizem "cinto/quadril".
+    - O peixe nas costas quase não aparece, e falta Thiago julgar se isso faz falta.
+    - A câmera entra no telhado na descida do M5, pela parte de estrutura (G24a3).
+    - Captura logo depois de um merge pede `--import`.
